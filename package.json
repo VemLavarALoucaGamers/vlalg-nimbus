@@ -1,0 +1,33 @@
+{
+  "name": "vlalg-nimbus",
+  "description": "VLALG Nimbus",
+  "version": "1.0.0-alpha",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "modules/*",
+      "packages/*",
+      "vue-components/*"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
+  },
+  "homepage": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus",
+  "keywords": [
+    "vuejs",
+    "vue js",
+    "vue plugin",
+    "components",
+    "component",
+    "vue components",
+    "vuejs components",
+    "vue js components",
+    "modules",
+    "js lib",
+    "javascript lib"
+  ],
+  "author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)"
+}
