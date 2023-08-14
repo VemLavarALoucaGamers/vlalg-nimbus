@@ -1,0 +1,71 @@
+// File: main.scss
+// This file contains all imports
+@charset 'UTF-8';
+
+@import './abstracts/glob';
+
+:root {
+  --vp-c-bg: #1e1e20;
+  --vp-c-text-1: rgba(255, 255, 245, .86);
+}
+
+html {
+  &[data-theme="dark"] {
+    nav {
+      &.dialog {
+        & > div {
+          background-color: #1e1e20 !important; 
+        }   
+      }
+    }
+
+    #__nuxt {
+      background: var(--vp-c-bg);
+
+      header {
+        &.has-dialog {
+          border-bottom-color: #000000;
+          background-color: #1e1e20;    
+        }
+      }
+
+      .card-grid {
+        .card {
+          color: var(--vp-c-text-1);
+          background-color: #252529;
+          border: 1px solid #252529;
+        }
+      }
+    }
+  }
+}
+
+
+.block-hero {
+  .layout {
+    gap: var(--space-0) !important;
+
+    .content {
+      order: 2;
+    }
+    .support {
+      order: 1;
+      margin-bottom: 20px;
+    }
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .block-hero {
+    .layout {
+      gap: var(--space-16) !important;
+
+      .content {
+        order: 1;
+      }
+      .support {
+        order: 2;
+      }
+    }
+  }
+}
