@@ -6,9 +6,8 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "modules/*",
-      "packages/*",
-      "vue-components/*"
+      "apps/*",
+      "packages/*"
     ]
   },
   "repository": {
