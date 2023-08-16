@@ -2,7 +2,7 @@ export default defineAppConfig({
   docus: {
     title: 'Nimbus',
     description: 'An Open Source project by VLALG that aims to share JavaScript libs, VS Code extensions, Browser extensions and Vue.js 3 components',
-    image: 'https://user-images.githubusercontent.com/904724/185365452-87b7ca7b-6030-4813-a2db-5e65c785bf88.png',
+    image: 'https://github.com/VemLavarALoucaGamers/vlalg-nimbus/blob/main/apps/nimbus-docs/public/cover.png',
     socials: {
       twitter: 'SantosTonhao',
       github: 'VemLavarALoucaGamers/vlalg-nimbus',
@@ -15,11 +15,11 @@ export default defineAppConfig({
       }
     },
     github: {
-      dir: '.starters/default/content',
+      dir: 'apps/nimbus-docs',
       branch: 'main',
-      repo: 'docus',
-      owner: 'nuxt-themes',
-      edit: true
+      repo: 'vlalg-nimbus',
+      owner: 'VemLavarALoucaGamers',
+      edit: false
     },
     aside: {
       level: 0,
