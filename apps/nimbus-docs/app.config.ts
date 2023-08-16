@@ -2,7 +2,7 @@ export default defineAppConfig({
   docus: {
     title: 'Nimbus',
     description: 'An Open Source project by VLALG that aims to share JavaScript libs, VS Code extensions, Browser extensions and Vue.js 3 components',
-    image: 'https://github.com/VemLavarALoucaGamers/vlalg-nimbus/blob/main/apps/nimbus-docs/public/cover.png',
+    image: 'https://nimbus-vlalg.vercel.app/cover.png',
     socials: {
       twitter: 'SantosTonhao',
       github: 'VemLavarALoucaGamers/vlalg-nimbus',
