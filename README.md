@@ -10,7 +10,10 @@
   <img alt="Static Badge" src="https://img.shields.io/badge/maintained%20with-yarn%20workspaces-cc00ff">
 </a>
 <a href="https://discord.com/channels/730480649139388469/1141561204251295775">
-  <img alt="Discord" src="https://img.shields.io/discord/730480649139388469.svg?logo=discord" alt="Chat on Discord">
+  <img src="https://img.shields.io/discord/730480649139388469.svg?logo=discord" alt="Chat on Discord">
+</a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2FVemLavarALoucaGamers%2Fvlalg-nimbus?ref=badge_shield">
+  <img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FVemLavarALoucaGamers%2Fvlalg-nimbus.svg?type=shield" alt="FOSSA Status">
 </a>
 </div>
 
