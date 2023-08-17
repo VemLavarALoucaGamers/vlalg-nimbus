@@ -1,4 +1,18 @@
-# NIMBUS
+<div align="center" markdown="1" style="text-align:center; margin-bottom: 40px">
+    <img src="https://raw.githubusercontent.com/VemLavarALoucaGamers/vlalg-nimbus/main/editable/nimbus_logo_name.png" alt="Vue Styleguidist" width="300">
+
+**Open source project of Vue.js 3 Components, Web Components, JS Libraries, CSS Library and Helper's/Util's JS**
+
+<a href="LICENSE">
+	<img alt="GitHub" src="https://img.shields.io/github/license/VemLavarALoucaGamers/vlalg-nimbus">
+</a>
+<a href="https://classic.yarnpkg.com/lang/en/docs/workspaces/">
+  <img alt="Static Badge" src="https://img.shields.io/badge/maintained%20with-yarn%20workspaces-cc00ff">
+</a>
+<a href="https://discord.com/channels/730480649139388469/1141561204251295775">
+  <img alt="Discord" src="https://img.shields.io/discord/730480649139388469.svg?logo=discord" alt="Chat on Discord">
+</a>
+</div>
 
 > This project is in constant development, so if you find any problems let us know.
 
@@ -68,4 +82,4 @@ Thank you very much, the VLALG team greatly appreciates your support.
 - EmanuelGraff
 
 ## License
-The Nimbus is open-sourced software licensed under the MIT license.
+The Nimbus is open-sourced software licensed under the [MIT License](https://github.com/VemLavarALoucaGamers/vlalg-nimbus/blob/v0.0.1-alpha/LICENSE).
