@@ -1,4 +1,6 @@
 # NIMBUS
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FVemLavarALoucaGamers%2Fvlalg-nimbus.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FVemLavarALoucaGamers%2Fvlalg-nimbus?ref=badge_shield)
+
 
 > This project is in constant development, so if you find any problems let us know.
 
@@ -69,3 +71,6 @@ Thank you very much, the VLALG team greatly appreciates your support.
 
 ## License
 The Nimbus is open-sourced software licensed under the MIT license.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FVemLavarALoucaGamers%2Fvlalg-nimbus.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FVemLavarALoucaGamers%2Fvlalg-nimbus?ref=badge_large)
