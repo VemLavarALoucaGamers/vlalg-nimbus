@@ -66,3 +66,6 @@ Thank you very much, the VLALG team greatly appreciates your support.
 
 - RodrigoSantosDev
 - EmanuelGraff
+
+## License
+The Nimbus is open-sourced software licensed under the MIT license.
