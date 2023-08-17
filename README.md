@@ -48,7 +48,7 @@ In order not to keep these projects just for us (of course, only what we think i
 
 We will be opening the project for contributions soon, we are establishing some configurations and standards.
 
-## Support
+## Sponsorship
 
 For now the financial support for the project is closed, just until the release of version **v1.0.0**, not much time is left for this to happen.
 
