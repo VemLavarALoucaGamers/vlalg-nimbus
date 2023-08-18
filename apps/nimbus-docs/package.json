@@ -9,6 +9,7 @@
     "generate": "nuxi generate",
     "preview": "nuxi preview",
     "lint": "eslint .",
+    "commit": "git-cz",
     "nuxt:upgrade": "npx nuxi upgrade --force"
   },
   "devDependencies": {
@@ -22,5 +23,10 @@
   },
   "dependencies": {
     "sass": "^1.65.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }

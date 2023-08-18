@@ -36,6 +36,72 @@ html {
           border: 1px solid #252529;
         }
       }
+
+      .announcements-details {
+        border-radius: 10px;
+        background: #ECEBE8;
+        margin-bottom: 15px;
+        &:hover {
+          cursor: pointer;
+        }
+
+        summary {
+          font-size: 1.1em;
+          padding: 10px 10px;
+          color: black;
+          border-radius: 0;
+          border-bottom: 1px solid #000;
+
+          &:hover {
+            border-radius: 10px;
+            background-color: #1AD6FF !important;
+          }
+        }
+
+        .announcements-details-content {          
+          padding: 10px 20px;
+          color: black;
+          
+          &:hover {
+            cursor:default;
+          }
+
+          img {
+            width: 100%;
+          }
+
+          ul {
+            line-height: .7em;
+            list-style: none;
+            margin-top: 0;
+            margin-bottom: 10px;
+
+            li {
+              line-height: .7em;
+              &::before {
+                content: "\2022";
+                color: #1AD6FF;
+                font-weight: bold;
+                display: inline-block;
+                width: 1em;
+                margin-left: -1em;
+              }
+            }
+          }
+
+          @media screen and (min-width: 1024px) {
+            width: 60%;
+          }
+        }
+      }
+
+      .issues-report {
+        .issues-report__obs {
+          font-size: 0.8em;
+          margin: 0;
+          font-style: italic;
+        }
+      }
     }
   }
 }
