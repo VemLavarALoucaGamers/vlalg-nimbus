@@ -1,5 +1,5 @@
 # Nimbus Docs
-
+test commit
 This project uses Nuxt 3 with [Docus](https://docus.dev).
 
 ## Setup
