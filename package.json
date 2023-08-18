@@ -4,6 +4,9 @@
   "version": "1.0.0-alpha",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "prepare": "husky install"
+  },
   "workspaces": {
     "packages": [
       "apps/*",
@@ -28,5 +31,8 @@
     "js lib",
     "javascript lib"
   ],
-  "author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)"
+  "author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
+  "devDependencies": {
+    "husky": "^8.0.3"
+  }
 }
