@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discord Chat
+    url: https://discord.com/channels/730480649139388469/1141943762386428015
+    about: Ask questions and discuss with other Nimbus users in real time.
+  - name: Questions & Discussions
+    url: https://github.com/VemLavarALoucaGamers/vlalg-nimbus/discussions
+    about: Use GitHub discussions for message-board style questions and discussions.
+  - name: Patreon
+    url: https://www.patreon.com/nimbus-vlalg
+    about: Love Nimbus? Please consider supporting us via Patreon.
