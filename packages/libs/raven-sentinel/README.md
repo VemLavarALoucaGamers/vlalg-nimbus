@@ -1,4 +1,6 @@
-# Raven Sentinel
+<p align="center">
+<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/libs/raven-sentinel/images/Raven_Logo_White_Name.png" width="100">
+</p>
 
 <div align="center">
 
