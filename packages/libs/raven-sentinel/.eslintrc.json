@@ -1,97 +1,17 @@
 {
-  "root": true,
   "env": {
-    "node": true,
     "browser": true,
-    "es6": true
+    "es2021": true,
+    "node": true
   },
-    "extends": "eslint:recommended",
-    "globals": {
-      "ENV": true
-    },
-    "parserOptions": {
-      "parser": "@babel/eslint-parser",
-      "sourceType": "module"
-    },
-    "rules": {
-      "no-console": "off",
-      "no-debugger": "off",
-      "array-element-newline": ["error", "consistent"],
-      "array-bracket-newline": ["error", "consistent"],
-      "object-curly-newline": "off",
-      "quotes": [
-        2,
-        "single",
-        {
-          "avoidEscape": true
-        }
-      ],
-      "no-unused-vars": [
-        "error",
-        {
-          "vars": "all",
-          "varsIgnorePattern": "css",
-          "args": "all"
-        }
-      ],
-      "no-use-before-define": [
-        "error",
-        {
-          "functions": false,
-          "classes": true,
-          "variables": false
-        }
-      ],
-      "no-var": "error",
-      "prefer-const": 2,
-      "eqeqeq": [
-        "error",
-        "always",
-        {
-          "null": "ignore"
-        }
-      ],
-      "no-array-constructor": "error",
-      "no-new-object": "error",
-      "no-bitwise": "error",
-      "no-redeclare": 2,
-      "no-proto": 2,
-      "no-invalid-regexp": 2,
-      "no-warning-comments": [
-        "off",
-        {
-          "terms": [
-            "todo",
-            "fixme"
-          ],
-          "location": "anywhere"
-        }
-      ],
-      "space-before-function-paren": [
-        "error",
-        {
-          "anonymous": "always",
-          "named": "always",
-          "asyncArrow": "always"
-        }
-      ],
-      "no-new": 0,
-      "no-implied-eval": 0,
-      "handle-callback-err": 0,
-      "no-extend-native": 0,
-      "semi": 0,
-      "indent": ["error", 2, { "SwitchCase": 2 }],
-      "no-tabs": 0
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
   },
-  "overrides": [
-    {
-      "files": ["**/__tests__/*.{j,t}s?(x)", "**/tests/unit/**/*.spec.{j,t}s?(x)", "*.vue"],
-      "env": {
-        "jest": true
-      },
-      "rules": {
-        "indent": "off"
-      }
-    }
-  ]
+  "ignorePatterns": ["dist"],
+  "rules": {
+		"space-before-function-paren": "off",
+		"comma-dangle": "off"
+  }
 }

@@ -80,7 +80,7 @@ export class LoggerFactory {
   }
 
   // logEnum é do tipo LogName
-  // retorn string[]
+  // return string[]
   getLogMessage (logEnum) {
     switch (logEnum) {
       case LogName.Trace:

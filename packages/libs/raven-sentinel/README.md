@@ -162,8 +162,6 @@ const logOptions = {
   showLogs: isDev ? 'Trace' : 'Warn'
 }
 
-let app = createApp(App)
-
 const $log = new LoggerFactory(logOptions).create()
 
 $log.logDebug('Hello world')

@@ -9,7 +9,20 @@
 <body>
     <h3>Modules Log Manager</h3>
     <script type="module">
-        // import logManager from './modules/index.js'
+      import LoggerFactory from './modules/index.js'
+
+      const nodeEnv = 'development'
+      const isDev = !!(nodeEnv === 'development')
+
+      const logOptions = {
+        className: 'App Name',
+        nodeEnv: nodeEnv,
+        showLogs: isDev ? 'Trace' : 'Warn'
+      }
+
+      const $log = new LoggerFactory(logOptions).create()
+
+      $log.logDebug('Hello world')
     </script>
 </body>
 </html>

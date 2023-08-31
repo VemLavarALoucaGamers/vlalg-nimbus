@@ -3,7 +3,7 @@
 	"description": "Raven Sentinel - Log Manager",
 	"license": "MIT",
 	"private": false,
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"type": "module",
 	"main": "./dist/bundle.umd.js",
 	"module": "./dist/bundle.es.js",
@@ -23,7 +23,8 @@
 		"js": "cross-env NODE_ENV=development && rollup --config",
 		"js:minify": "cross-env NODE_ENV=production rollup --config",
 		"js:watch": "rollup --config --watch",
-		"npm:publish": "yarn js && npm login && npm publish --access=public"
+    "lint": "eslint ./modules --ext .js --fix",
+		"npm:publish": "yarn lint && yarn js && npm login && npm publish --access=public"
 	},
 	"dependencies": {},
 	"devDependencies": {
@@ -37,6 +38,7 @@
 		"@rollup/plugin-node-resolve": "^15.2.1",
 		"@rollup/plugin-replace": "^5.0.2",
 		"cross-env": "^7.0.3",
+		"eslint": "^8.48.0",
 		"rollup": "^3.28.1",
 		"rollup-plugin-uglify": "^6.0.4"
 	},
