@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modules Magic Consolelog</title>
+</head>
+<body>
+    <h3>Modules Magic Consolelog</h3>
+    <script type="module">
+      import MagicConsole from './modules/index.js'
+
+      const rainbowConfig = {
+        title: 'Rainbow Type',
+        titleConfig: {
+          color: '#ffffff',
+          size: '50px',
+          background: 'transparent',
+          shadow: [
+            'rgb(217,31,38)',
+            'rgb(226,91,14)',
+            'rgb(245,221,8)',
+            'rgb(5,148,68)',
+            'rgb(2,135,206)',
+            'rgb(4,77,145)',
+            'rgb(42,21,113)',
+          ],
+        },
+        text: 'Rainbow Text',
+        hasLink: true,
+        link: {
+          text: 'Link description',
+          url: 'https://github.com/VemLavarALoucaGamers/vlalg-nimbus',
+        },
+      };
+
+      new MagicConsole('rainbow', rainbowConfig);
+    </script>
+</body>
+</html>
