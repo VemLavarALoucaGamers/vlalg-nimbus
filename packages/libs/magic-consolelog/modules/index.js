@@ -1,4 +1,9 @@
-function objectHasProp(requiredProps, obj, errorMsg) {
+/**
+ * Magic ConsoleLog v2.0.3 by Nimbus.
+ * Nimbus Copyright (c) 2023 VLALG and contributors.
+ */
+
+function objectHasProp (requiredProps, obj, errorMsg) {
   for (const prop of requiredProps) {
     if (!(prop in obj)) {
       throw new Error(errorMsg);

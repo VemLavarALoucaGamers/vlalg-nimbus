@@ -10,42 +10,49 @@ import { uglify } from "rollup-plugin-uglify";
     - https://dev.to/iggredible/what-the-heck-are-cjs-amd-umd-and-esm-ikm
     - https://betterprogramming.pub/what-are-cjs-amd-umd-esm-system-and-iife-3633a112db62
 */
+const globalLibName = 'RavenSentinel'
+const isProd = !!(process.env.NODE_ENV === 'production')
+const defaultFileName = 'bundle'
+const newFileName = isProd ? `bundle.min` : defaultFileName
+
+const outputs = [
+  {
+    file: `dist/${newFileName}.amd.js`,
+    format: 'amd',
+    sourcemap: false,
+  },
+  {
+    file: `dist/${newFileName}.cjs.js`,
+    format: 'cjs',
+    sourcemap: false,
+  },
+  {
+    file: `dist/${newFileName}.umd.js`,
+    format: 'umd',
+    name: globalLibName,
+    sourcemap: false,
+  },
+  {
+    file: `dist/${newFileName}.es.js`,
+    format: 'es',
+    sourcemap: false,
+  },
+  {
+    file: `dist/${newFileName}.iife.js`,
+    format: 'iife',
+    name: globalLibName,
+    sourcemap: false,
+  },
+  {
+    file: `dist/${newFileName}.system.js`,
+    format: 'system',
+    sourcemap: false,
+  }
+]
+
 export default {
 	input: './modules/index.js',
-	output: [
-    {
-      file: 'dist/bundle.amd.js',
-      format: 'amd',
-      sourcemap: false,
-    },
-    {
-      file: 'dist/bundle.cjs.js',
-      format: 'cjs',
-      sourcemap: false,
-    },
-    {
-      file: 'dist/bundle.umd.js',
-      format: 'umd',
-      name: 'example',
-      sourcemap: false,
-    },
-    {
-      file: 'dist/bundle.es.js',
-      format: 'es',
-      sourcemap: false,
-    },
-    {
-      file: 'dist/bundle.iife.js',
-      format: 'iife',
-      name: 'example',
-      sourcemap: false,
-    },
-    {
-      file: 'dist/bundle.system.js',
-      format: 'system',
-      sourcemap: false,
-    },
-  ],
+	output: [...outputs],
   plugins: [
     resolve({
       jsnext: true,
@@ -64,7 +71,7 @@ export default {
       preventAssignment: true,
       exclude: 'node_modules/**',
       ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
-    }),,
-    process.env.NODE_ENV === 'production' && uglify(),
+    }),
+    isProd && uglify(),
   ],
 };

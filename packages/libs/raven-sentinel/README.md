@@ -167,6 +167,14 @@ const $log = new LoggerFactory(logOptions).create()
 $log.logDebug('Hello world')
 ```
 
+##### CDN
+
+[Unpkg](https://unpkg.com/@vlalg-nimbus/raven-sentinel/dist/bundle.min.umd.js)
+
+```js
+https://unpkg.com/@vlalg-nimbus/raven-sentinel/dist/bundle.min.umd.js
+```
+
 <img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/libs/raven-sentinel/images/example2.png" width="300">
 
 ### Options

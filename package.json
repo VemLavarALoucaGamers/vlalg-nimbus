@@ -1,7 +1,7 @@
 {
   "name": "vlalg-nimbus",
   "description": "VLALG Nimbus",
-  "version": "2.0.1-alpha",
+  "version": "2.0.2-alpha",
   "license": "MIT",
   "private": true,
   "type": "module",

@@ -1,3 +1,8 @@
+/**
+ * Raven Sentinel v2.0.1 by Nimbus.
+ * Nimbus Copyright (c) 2023 VLALG and contributors.
+ */
+
 import {
   LogColors,
   LogLevelStyle,

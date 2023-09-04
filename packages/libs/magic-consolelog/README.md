@@ -102,6 +102,14 @@ or
 yarn add @vlalg-nimbus/magic-consolelog
 ```
 
+##### CDN
+
+[Unpkg](https://unpkg.com/@vlalg-nimbus/magic-consolelog/dist/bundle.min.umd.js)
+
+```js
+https://unpkg.com/@vlalg-nimbus/magic-consolelog/dist/bundle.min.umd.js
+```
+
 ##### To use
 
 ```js
