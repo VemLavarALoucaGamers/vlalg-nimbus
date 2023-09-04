@@ -26,6 +26,20 @@ To view the documentation and learn more about this project:
 
 - [Documentation](https://nimbus-vlalg.vercel.app/)
 - [Playground](https://nimbus-vlalg.vercel.app/playground)
+- [NPM](https://www.npmjs.com/org/vlalg-nimbus)
+
+## Do you use this lib?
+We believe that using Nimbus in projects is also a contributor of Nimbus, which is telling people that Nimbus is a trustworthy open source project.🥳🥳🥳
+
+If your project uses Nimbus, please tell us in this [issues](), your project will have the opportunity to be showcased on Nimbus's official website.
+
+Post your project in the following format:
+
+```
+[your project name]
+[your project logo]
+[your project online link]
+```
 
 ## VLALG
 <a href="https://vemlavaralouca.com.br/" target="_blank">VLALG</a> is a Youtube channel that is under development, created by <a href="https://github.com/TonhaoSantos" target="_blank">Tonhão Santos</a> and <a href="https://github.com/lipecss" target="_blank">FelipeCss</a>, two gamer and developer brothers.
