@@ -24,8 +24,8 @@ This is an Open Source project by <a href="https://vemlavaralouca.com.br/" targe
 ## Documentation
 To view the documentation and learn more about this project:
 
-- [Documentation](https://nimbus-vlalg.vercel.app/)
-- [Playground](https://nimbus-vlalg.vercel.app/playground)
+- [Documentation](https://nimbus.tec.br/)
+- [Playground](https://nimbus.tec.br/playground)
 - [NPM](https://www.npmjs.com/org/vlalg-nimbus)
 
 ## Do you use this lib?

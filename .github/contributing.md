@@ -2,7 +2,7 @@
 
 Hi! I'm really excited that you are interested in contributing to Nimbus. Before submitting your contribution, please make sure to take a moment and read through the following guidelines:
 
-- [Code of Conduct](https://nimbus-vlalg.vercel.app/code-of-conduct)
+- [Code of Conduct](https://nimbus.tec.br/code-of-conduct)
 - [Issue Reporting Guidelines](#issue-reporting-guidelines)
 - [Pull Request Guidelines](#pull-request-guidelines)
 - [Development Setup](#development-setup)
