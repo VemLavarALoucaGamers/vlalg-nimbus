@@ -102,6 +102,15 @@ html {
           font-style: italic;
         }
       }
+
+      .npm-badge {
+        display: inline-block;
+        margin-left: 10px;
+
+        img {
+          margin: 0px;
+        }
+      }
     }
   }
 }
