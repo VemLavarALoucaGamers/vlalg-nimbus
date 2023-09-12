@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/libs/bee-css-reset/images/Bee_Logo_White_Name.png" width="100">
+<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/scss/bee-css-reset/images/Bee_Logo_White_Name.png" width="100">
 </p>
 
 <div align="center">
@@ -10,7 +10,7 @@
 <br />
 
 <p align="center">
-<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/libs/bee-css-reset/images/example.png" width="300">
+<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/scss/bee-css-reset/images/example.png" width="300">
 </p>
 
 A CSS library that resets the browser's default style settings, providing a clean, consistent foundation for web development.
@@ -23,7 +23,7 @@ This lib auto-imports Reset CSS through an IIFE function, if used, of course.
 
 To use the CSS file via CDN, or if you prefer, you can use the auto-import file (JS) via CDN, it can be done this way:
 
-[Unpkg CSS](https://unpkg.com/@vlalg-nimbus/bee-css-reset/dist/bee-css-reset.min.css) / [Unpkg JS](https://unpkg.com/@vlalg-nimbus/bee-css-reset/dist/bee-css-reset.min.css)
+[Unpkg CSS](https://unpkg.com/@vlalg-nimbus/bee-css-reset/dist/bee-css-reset.min.css) / [Unpkg JS](https://unpkg.com/@vlalg-nimbus/bee-css-reset/dist/bee-css-reset.min.js)
 
 Links:
 
