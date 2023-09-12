@@ -1,0 +1,61 @@
+{
+	"name": "@vlalg-nimbus/bee-css-reset",
+	"description": "BEE - CSS Reset",
+	"license": "MIT",
+	"private": false,
+	"version": "1.0.0",
+	"type": "module",
+	"main": "./dist/bee-css-reset.min.js",
+	"style": "dist/style.min.css",
+	"files": [
+		"LICENSE.md",
+		"dist/bee-css-reset.min.css",
+		"dist/bee-css-reset.min.js"
+	],
+	"browser": {
+		"./style.css": ""
+	},
+	"scripts": {
+		"dev": "yarn scss:dev",
+		"scss:dev": "sass -w modules/index.scss dist/bee-css-reset.css --style=expanded --no-source-map",
+		"postcss": "postcss --use autoprefixer -o dist/bee-css-reset.css dist/bee-css-reset.css --no-map",
+		"build:scss": "sass modules/index.scss dist/bee-css-reset.min.css --style=compressed --no-source-map",
+		"build:postcss": "postcss --use autoprefixer -o dist/bee-css-reset.min.css dist/bee-css-reset.min.css --no-map",
+		"js:dev": "cross-env NODE_ENV=development && rollup --config",
+		"js:minify": "cross-env NODE_ENV=production rollup --config",
+		"js:watch": "rollup --config --watch",
+		"lint": "eslint ./modules --ext .js --fix",
+    "build:js": "yarn lint && yarn js:minify",
+		"npm:publish": "yarn build:scss && yarn build:postcss && yarn build:js && npm login && npm publish --access=public"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@babel/core": "^7.22.11",
+		"@babel/eslint-parser": "^7.22.11",
+		"@babel/plugin-external-helpers": "^7.22.5",
+		"@babel/preset-env": "^7.22.14",
+		"@rollup/plugin-babel": "^6.0.3",
+		"@rollup/plugin-eslint": "^9.0.4",
+		"@rollup/plugin-replace": "^5.0.2",
+		"autoprefixer": "^10.4.15",
+		"cross-env": "^7.0.3",
+		"eslint": "^8.48.0",
+		"postcss": "^8.4.29",
+		"postcss-cli": "^10.1.0",
+		"rollup": "^3.28.1",
+		"rollup-plugin-uglify": "^6.0.4",
+		"sass": "^1.66.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
+	},
+	"homepage": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/tree/main/packages/libs/bee-css-reset",
+	"keywords": [
+		"module",
+		"lib",
+		"css",
+		"library"
+	],
+	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)"
+}
