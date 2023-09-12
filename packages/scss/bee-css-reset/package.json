@@ -20,12 +20,13 @@
 		"scss:dev": "sass -w modules/index.scss dist/bee-css-reset.css --style=expanded --no-source-map",
 		"postcss": "postcss --use autoprefixer -o dist/bee-css-reset.css dist/bee-css-reset.css --no-map",
 		"build:scss": "sass modules/index.scss dist/bee-css-reset.min.css --style=compressed --no-source-map",
+		"build:postcss": "postcss --use autoprefixer -o dist/bee-css-reset.min.css dist/bee-css-reset.min.css --no-map",
 		"js:dev": "cross-env NODE_ENV=development && rollup --config",
 		"js:minify": "cross-env NODE_ENV=production rollup --config",
 		"js:watch": "rollup --config --watch",
 		"lint": "eslint ./modules --ext .js --fix",
     "build:js": "yarn lint && yarn js:minify",
-		"npm:publish": "yarn build:scss && yarn postcss && yarn build:js && npm login && npm publish --access=public"
+		"npm:publish": "yarn build:scss && yarn build:postcss && yarn build:js && npm login && npm publish --access=public"
 	},
 	"dependencies": {},
 	"devDependencies": {
