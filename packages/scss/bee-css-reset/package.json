@@ -3,7 +3,7 @@
 	"description": "BEE - CSS Reset",
 	"license": "MIT",
 	"private": false,
-	"version": "1.0.3",
+	"version": "1.0.5",
 	"type": "module",
 	"main": "./dist/bee-css-reset.min.js",
 	"style": "dist/style.min.css",
@@ -50,12 +50,19 @@
 		"type": "git",
 		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
 	},
-	"homepage": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/tree/main/packages/libs/bee-css-reset",
+	"homepage": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/tree/main/packages/scss/bee-css-reset",
 	"keywords": [
 		"module",
 		"lib",
 		"css",
-		"library"
+		"library",
+    "css",
+    "sass",
+    "mobile-first",
+    "responsive",
+    "front-end",
+    "framework",
+    "web"
 	],
 	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)"
 }
