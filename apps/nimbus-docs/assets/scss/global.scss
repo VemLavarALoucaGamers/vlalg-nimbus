@@ -29,6 +29,48 @@ html {
         }
       }
 
+      .aside-nav {
+        margin-left: 25px;
+
+        .docs-aside-tree {
+          li {
+            &.active {
+              .title-collapsible-button {
+                color: $color-theme;
+              }
+            }
+            .link {
+              &:hover {
+                color: $color-theme;
+              }
+            }
+            .title-collapsible-button {
+              color: #ADA9A4;
+
+              &:hover {
+                color: $color-theme;
+              }
+
+              &:has(+ .docs-aside-tree .bordered.active) {
+                svg {
+                  color: $color-theme;
+                }
+              }
+            }
+
+            &:has(> .title-collapsible-button + .docs-aside-tree .bordered.active) {
+              .title-collapsible-button {
+                color: $color-theme;
+              }
+            }
+          }
+
+          .bordered {
+            border-left-color: $color-theme;
+          }
+        }
+      }
+
       .card-grid {
         .card {
           color: var(--vp-c-text-1);
@@ -54,7 +96,7 @@ html {
 
           &:hover {
             border-radius: 10px;
-            background-color: #1AD6FF !important;
+            background-color: $color-theme !important;
           }
         }
 
@@ -80,7 +122,7 @@ html {
               line-height: .7em;
               &::before {
                 content: "\2022";
-                color: #1AD6FF;
+                color: $color-theme;
                 font-weight: bold;
                 display: inline-block;
                 width: 1em;
@@ -137,7 +179,7 @@ html {
       }
       
       code {
-        color: #1AD6FF !important;
+        color: $color-theme !important;
       }
 
       .table-wrapper {

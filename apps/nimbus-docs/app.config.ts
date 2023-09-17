@@ -34,7 +34,7 @@ export default defineAppConfig({
       logo: true,
       showLinkIcon: true,
       exclude: [],
-      fluid: false,
+      fluid: true,
     },
     footer: {
       fluid: false,
