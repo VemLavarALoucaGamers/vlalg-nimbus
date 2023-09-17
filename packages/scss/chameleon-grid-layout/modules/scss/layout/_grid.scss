@@ -1,0 +1,707 @@
+// File: _reset.scss
+// This file contains reset config.
+
+@use "sass:math";
+
+$allgeneral: "*";
+$total-columns: 12;
+$column-xs: ".col-xs-";
+$column-sm: ".col-sm-";
+$column-md: ".col-md-";
+$column-lg: ".col-lg-";
+$column-xl: ".col-xl-";
+$mobileGap: 15px;
+$othersGap: 15px;
+$containerGap: 0px;
+
+#{$allgeneral} {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+
+  &:before#{", "}&:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+}
+
+$container-types: (
+  "container": "container",
+  "container-fluid": "container-fluid",
+);
+
+%container {
+  padding-right: $containerGap;
+  padding-left: $containerGap;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.clearfix:before,
+.clearfix:after,
+.container:before,
+.container:after,
+.container-fluid:before,
+.container-fluid:after,
+.row:before,
+.row:after {
+  display: table;
+  content: " ";
+}
+
+.clearfix:after,
+.container:after,
+.container-fluid:after,
+.row:after {
+  clear: both;
+}
+
+@each $key, $value in $container-types {
+  .#{$value} {
+    @extend %container;
+  }
+}
+
+.row {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.visible-xs-block,
+.visible-xs-inline,
+.visible-xs-inline-block,
+.visible-sm-block,
+.visible-sm-inline,
+.visible-sm-inline-block,
+.visible-md-block,
+.visible-md-inline,
+.visible-md-inline-block,
+.visible-lg-block,
+.visible-lg-inline,
+.visible-lg-inline-block,
+.visible-print-block,
+.visible-print-inline,
+.visible-print-inline-block {
+  display: none !important;
+}
+
+.no-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media print {
+  #{$allgeneral},
+  #{$allgeneral}:before,
+  #{$allgeneral}:after {
+    color: #000 !important;
+    text-shadow: none !important;
+    background: transparent !important;
+    -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+  }
+  .visible-print-block {
+    display: block !important;
+  }
+  .visible-print-inline {
+    display: inline !important;
+  }
+  .visible-print-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-print {
+    display: none !important;
+  }
+}
+
+@for $a from 1 through 1 {
+	@for $b from 2 through 2 {
+		@for $c from 3 through 3 {
+			@for $d from 4 through 4 {
+				@for $e from 5 through 5 {
+					@for $f from 6 through 6 {
+						@for $g from 7 through 7 {
+							@for $h from 8 through 8 {
+								@for $i from 9 through 9 {
+									@for $j from 10 through 10 {
+										@for $k from 11 through 11 {
+											@for $l from 12 through 12 {
+												#{$column-sm}#{$a + ", "}
+                        #{$column-md}#{$a + ", "}
+                        #{$column-lg}#{$a + ", "}
+                        #{$column-xl}#{$a + ", "}
+                        #{$column-sm}#{$b + ", "}
+                        #{$column-md}#{$b + ", "}
+                        #{$column-lg}#{$b + ", "}
+                        #{$column-xl}#{$b + ", "}
+                        #{$column-sm}#{$c + ", "}
+                        #{$column-md}#{$c + ", "}
+                        #{$column-lg}#{$c + ", "}
+                        #{$column-xl}#{$c + ", "}
+                        #{$column-sm}#{$d + ", "}
+                        #{$column-md}#{$d + ", "}
+                        #{$column-lg}#{$d + ", "}
+                        #{$column-xl}#{$d + ", "}
+                        #{$column-sm}#{$e + ", "}
+                        #{$column-md}#{$e + ", "}
+                        #{$column-lg}#{$e + ", "}
+                        #{$column-xl}#{$e + ", "}
+                        #{$column-sm}#{$f + ", "}
+                        #{$column-md}#{$f + ", "}
+                        #{$column-lg}#{$f + ", "}
+                        #{$column-xl}#{$f + ", "}
+                        #{$column-sm}#{$g + ", "}
+                        #{$column-md}#{$g + ", "}
+                        #{$column-lg}#{$g + ", "}
+                        #{$column-xl}#{$g + ", "}
+                        #{$column-sm}#{$h + ", "}
+                        #{$column-md}#{$h + ", "}
+                        #{$column-lg}#{$h + ", "}
+                        #{$column-xl}#{$h + ", "}
+                        #{$column-sm}#{$i + ", "}
+                        #{$column-md}#{$i + ", "}
+                        #{$column-lg}#{$i + ", "}
+                        #{$column-xl}#{$i + ", "}
+                        #{$column-sm}#{$j + ", "}
+                        #{$column-md}#{$j + ", "}
+                        #{$column-lg}#{$j + ", "}
+                        #{$column-xl}#{$j + ", "}
+                        #{$column-sm}#{$k + ", "}
+                        #{$column-md}#{$k + ", "}
+                        #{$column-lg}#{$k + ", "}
+                        #{$column-xl}#{$k + ", "}
+                        #{$column-sm}#{$l + ", "}
+                        #{$column-md}#{$l + ", "}
+                        #{$column-lg}#{$l + ", "}
+                        #{$column-xl}#{$l + ", "} {
+													position: relative;
+													min-height: 1px;
+													padding-right: $othersGap;
+													padding-left: $othersGap;
+												}	
+											}	
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@for $a from 1 through 1 {
+	@for $b from 2 through 2 {
+		@for $c from 3 through 3 {
+			@for $d from 4 through 4 {
+				@for $e from 5 through 5{
+					@for $f from 6 through 6 {
+						@for $g from 7 through 7 {
+							@for $h from 8 through 8 {
+								@for $i from 9 through 9 {
+									@for $j from 10 through 10 {
+										@for $k from 11 through 11 {
+											@for $l from 12 through 12 {
+												#{$column-xs}#{$a + ", "}
+                        #{$column-xs}#{$b + ", "}
+                        #{$column-xs}#{$c + ", "}
+                        #{$column-xs}#{$d + ", "}
+                        #{$column-xs}#{$e + ", "}
+                        #{$column-xs}#{$f + ", "}
+                        #{$column-xs}#{$g + ", "}
+                        #{$column-xs}#{$h + ", "}
+                        #{$column-xs}#{$i + ", "}
+                        #{$column-xs}#{$j + ", "}
+                        #{$column-xs}#{$k + ", "}
+                        #{$column-xs}#{$l + ", "} {
+													position: relative;
+													min-height: 1px;
+													padding-right: $mobileGap;
+													padding-left: $mobileGap;
+												}	
+											}	
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@for $a from 1 through 1 {
+  @for $b from 2 through 2 {
+		@for $c from 3 through 3 {
+			@for $d from 4 through 4 {
+				@for $e from 5 through 5 {
+					@for $f from 6 through 6 {
+						@for $g from 7 through 7 {
+							@for $h from 8 through 8 {
+								@for $i from 9 through 9 {
+									@for $j from 10 through 10 {
+										@for $k from 11 through 11 {
+											@for $l from 12 through 12 {
+												#{$column-xs}#{$a + ", "}
+                        #{$column-xs}#{$b + ", "}
+                        #{$column-xs}#{$c + ", "}
+                        #{$column-xs}#{$d + ", "}
+                        #{$column-xs}#{$e + ", "}
+                        #{$column-xs}#{$f + ", "}
+                        #{$column-xs}#{$g + ", "}
+                        #{$column-xs}#{$h + ", "}
+                        #{$column-xs}#{$i + ", "}
+                        #{$column-xs}#{$j + ", "}
+                        #{$column-xs}#{$k + ", "}
+                        #{$column-xs}#{$l + ", "} {
+                          float: left;
+												}	
+											}	
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@for $i from 1 through $total-columns { 
+  #{$column-xs}#{$i} {
+	  width: math.div($i * 100%, $total-columns);
+  }
+}
+@for $i from 0 through $total-columns {
+	@if $i == 0 {
+		#{$column-xs + "pull-"}#{$i} {
+      right: auto;
+    }
+	} @else {
+		#{$column-xs + "pull-"}#{$i} {
+		  right: math.div($i * 100%, $total-columns);
+    }
+  }
+}
+@for $i from 0 through $total-columns {
+  @if $i == 0 {
+		#{$column-xs + "push-"}#{$i} {
+      left: auto;
+    }
+	} @else {
+    #{$column-xs + "push-"}#{$i} {
+		  left: math.div($i * 100%, $total-columns);
+    }
+	}
+}
+@for $i from 0 through $total-columns {
+	@if $i == 0 {
+		#{$column-xs + "offset-"}#{$i} {
+      margin-left: 0;
+    }
+  } @else {
+		#{$column-xs + "offset-"}#{$i} {
+	    margin-left: math.div($i * 100%, $total-columns);
+    }
+  }
+}
+.visible-xs-block {
+  display: block !important;
+}
+.visible-xs-inline {
+  display: inline !important;
+}
+.visible-xs-inline-block {
+  display: inline-block !important;
+}
+.hidden-xs {
+  display: none !important;
+}
+
+@media screen and (min-width: 768px) {
+  .container {
+    width: 736px;
+  }
+	@for $a from 1 through 1{
+		@for $b from 2 through 2{
+			@for $c from 3 through 3{
+				@for $d from 4 through 4{
+					@for $e from 5 through 5{
+						@for $f from 6 through 6{
+							@for $g from 7 through 7{
+								@for $h from 8 through 8{
+									@for $i from 9 through 9{
+										@for $j from 10 through 10{
+											@for $k from 11 through 11{
+												@for $l from 12 through 12{
+													#{$column-sm}#{$a + ", "}
+                          #{$column-sm}#{$b + ", "}
+                          #{$column-sm}#{$c + ", "}
+                          #{$column-sm}#{$d + ", "}
+                          #{$column-sm}#{$e + ", "}
+                          #{$column-sm}#{$f + ", "}
+                          #{$column-sm}#{$g + ", "}
+                          #{$column-sm}#{$h + ", "}
+                          #{$column-sm}#{$i + ", "}
+                          #{$column-sm}#{$j + ", "}
+                          #{$column-sm}#{$k + ", "}
+                          #{$column-sm}#{$l + ", "} {
+                            float: left;
+                          }	
+												}	
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	@for $i from 1 through $total-columns { 
+    #{$column-sm}#{$i} {
+	    width: math.div($i * 100%, $total-columns);
+    }
+	}
+	@for $i from 0 through $total-columns {
+		@if $i == 0 {
+			#{$column-sm + "pull-"}#{$i} {
+        right: auto;
+      }
+    } @else {
+			#{$column-sm + "pull-"}#{$i} {
+	    	right: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+	@for $i from 0 through $total-columns {
+		@if $i == 0 {
+			#{$column-sm + "push-"}#{$i} {
+        left: auto;
+      }
+    } @else {
+			#{$column-sm + "push-"}#{$i} {
+	    	left: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+	@for $i from 0 through $total-columns {
+		@if $i == 0 {
+			#{$column-sm + "offset-"}#{$i} {
+        margin-left: 0;
+      }
+    } @else {
+			#{$column-sm + "offset-"}#{$i} {
+	    	margin-left: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+  .visible-sm-block {
+    display: block !important;
+  }
+  .visible-sm-inline {
+    display: inline !important;
+  }
+  .visible-sm-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-sm {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .container {
+    width: 992px;
+  }
+
+	@for $a from 1 through 1 {
+		@for $b from 2 through 2 {
+			@for $c from 3 through 3 {
+				@for $d from 4 through 4 {
+					@for $e from 5 through 5 {
+						@for $f from 6 through 6 {
+							@for $g from 7 through 7 {
+								@for $h from 8 through 8 {
+									@for $i from 9 through 9 {
+										@for $j from 10 through 10 {
+											@for $k from 11 through 11 {
+												@for $l from 12 through 12 {
+													#{$column-md}#{$a + ", "}
+                          #{$column-md}#{$b + ", "}
+                          #{$column-md}#{$c + ", "}
+                          #{$column-md}#{$d + ", "}
+                          #{$column-md}#{$e + ", "}
+                          #{$column-md}#{$f + ", "}
+                          #{$column-md}#{$g + ", "}
+                          #{$column-md}#{$h + ", "}
+                          #{$column-md}#{$i + ", "}
+                          #{$column-md}#{$j + ", "}
+                          #{$column-md}#{$k + ", "}
+                          #{$column-md}#{$l + ", "} {
+                            float: left;
+													}	
+												}	
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	@for $i from 1 through $total-columns { 
+    #{$column-md}#{$i} {
+	    width: math.div($i * 100%, $total-columns);
+    }
+	}
+	@for $i from 0 through $total-columns {
+		@if $i == 0 {
+			#{$column-md + "pull-"}#{$i} {
+        right: auto;
+      }
+    } @else {
+			#{$column-md + "pull-"}#{$i} {
+		    right: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+	@for $i from 0 through $total-columns {  
+		@if $i == 0 {
+			#{$column-md + "push-"}#{$i} {
+        left: auto;
+      }
+    } @else {
+			#{$column-md + "push-"}#{$i} {
+	    	left: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+	@for $i from 0 through $total-columns { 
+		@if $i == 0 {
+			#{$column-md + "offset-"}#{$i} {
+        margin-left: 0;
+      }
+    } @else {
+			#{$column-md + "offset-"}#{$i} {
+	    	margin-left: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+  .visible-md-block {
+    display: block !important;
+  }
+  .visible-md-inline {
+    display: inline !important;
+  }
+  .visible-md-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-md {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: 1440px){
+  .container {
+    width: 1408px;
+  }
+
+	@for $a from 1 through 1 {
+    @for $b from 2 through 2 {
+			@for $c from 3 through 3 {
+				@for $d from 4 through 4 {
+					@for $e from 5 through 5 {
+						@for $f from 6 through 6 {
+							@for $g from 7 through 7 {
+								@for $h from 8 through 8 {
+									@for $i from 9 through 9 {
+										@for $j from 10 through 10 {
+											@for $k from 11 through 11 {
+												@for $l from 12 through 12 {
+													#{$column-lg}#{$a + ", "}
+                          #{$column-lg}#{$b + ", "}
+                          #{$column-lg}#{$c + ", "}
+                          #{$column-lg}#{$d + ", "}
+                          #{$column-lg}#{$e + ", "}
+                          #{$column-lg}#{$f + ", "}
+                          #{$column-lg}#{$g + ", "}
+                          #{$column-lg}#{$h + ", "}
+                          #{$column-lg}#{$i + ", "}
+                          #{$column-lg}#{$j + ", "}
+                          #{$column-lg}#{$k + ", "}
+                          #{$column-lg}#{$l + ", "} {
+                            float: left;
+													}	
+												}	
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	@for $i from 1 through $total-columns { 
+    #{$column-lg}#{$i} {
+	    width: math.div($i * 100%, $total-columns);
+    }
+	}
+	@for $i from 0 through $total-columns { 
+		@if $i == 0 {
+			#{$column-lg + "pull-"}#{$i} {
+        right: auto;
+      }
+    } @else {
+			#{$column-lg + "pull-"}#{$i} {
+		    right: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+	@for $i from 0 through $total-columns { 
+		@if $i == 0 {
+			#{$column-lg + "push-"}#{$i} {
+        left: auto;
+      }
+    } @else {
+			#{$column-lg + "push-"}#{$i} {
+		    left: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+	@for $i from 0 through $total-columns {  
+		@if $i == 0 {
+			#{$column-lg + "offset-"}#{$i} {
+        margin-left: 0;
+      }
+    } @else {
+			#{$column-lg + "offset-"}#{$i} {
+		    margin-left: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+  .visible-lg-block {
+    display: block !important;
+  }
+  .visible-lg-inline {
+    display: inline !important;
+  }
+  .visible-lg-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-lg {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: 1600px){
+  .container {
+    width: 1568px;
+  }
+
+	@for $a from 1 through 1 {
+    @for $b from 2 through 2 {
+			@for $c from 3 through 3 {
+				@for $d from 4 through 4 {
+					@for $e from 5 through 5 {
+						@for $f from 6 through 6 {
+							@for $g from 7 through 7 {
+								@for $h from 8 through 8 {
+									@for $i from 9 through 9 {
+										@for $j from 10 through 10 {
+											@for $k from 11 through 11 {
+												@for $l from 12 through 12 {
+													#{$column-xl}#{$a + ", "}
+                          #{$column-xl}#{$b + ", "}
+                          #{$column-xl}#{$c + ", "}
+                          #{$column-xl}#{$d + ", "}
+                          #{$column-xl}#{$e + ", "}
+                          #{$column-xl}#{$f + ", "}
+                          #{$column-xl}#{$g + ", "}
+                          #{$column-xl}#{$h + ", "}
+                          #{$column-xl}#{$i + ", "}
+                          #{$column-xl}#{$j + ", "}
+                          #{$column-xl}#{$k + ", "}
+                          #{$column-xl}#{$l + ", "} {
+                            float: left;
+													}	
+												}	
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	@for $i from 1 through $total-columns { 
+    #{$column-xl}#{$i} {
+	    width: math.div($i * 100%, $total-columns);
+    }
+	}
+	@for $i from 0 through $total-columns { 
+		@if $i == 0 {
+			#{$column-xl + "pull-"}#{$i} {
+        right: auto;
+      }
+    } @else {
+			#{$column-xl + "pull-"}#{$i} {
+		    right: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+	@for $i from 0 through $total-columns { 
+		@if $i == 0 {
+			#{$column-xl + "push-"}#{$i} {
+        left: auto;
+      }
+    } @else {
+			#{$column-xl + "push-"}#{$i} {
+		    left: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+	@for $i from 0 through $total-columns {  
+		@if $i == 0 {
+			#{$column-xl + "offset-"}#{$i} {
+        margin-left: 0;
+      }
+    } @else {
+			#{$column-xl + "offset-"}#{$i} {
+		    margin-left: math.div($i * 100%, $total-columns);
+      }
+    }
+	}
+  .visible-lg-block {
+    display: block !important;
+  }
+  .visible-lg-inline {
+    display: inline !important;
+  }
+  .visible-lg-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-lg {
+    display: none !important;
+  }
+}

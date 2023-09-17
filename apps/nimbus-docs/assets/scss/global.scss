@@ -111,6 +111,65 @@ html {
           margin: 0px;
         }
       }
+
+      li {
+        &:has(> .icon-lib-status) {
+          margin: 0px 0 !important;
+        }
+
+        .icon-lib-status {
+          font-size: 1.4em;
+        }
+      }
+
+      .icon-lib-status {
+        font-size: 2em;
+      
+        &.icon-coming {
+          color: rgb(255,0,0);
+        }
+        &.icon-construction {
+          color: rgb(255,255,0);
+        }
+        &.icon-check {
+          color: rgb(17,255,0);
+        }
+      }
+      
+      code {
+        color: #1AD6FF !important;
+      }
+
+      .table-wrapper {
+        thead {
+          border-bottom-width: 1px;
+          border-bottom-style: solid;
+          border-bottom-color: #fff;
+
+          th {
+            padding-bottom: 8px;
+            font-size: 1rem;
+            color: #fff;
+          }
+        }
+        tbody {
+          tr {
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: #495057;
+
+            td {
+              padding: 10px 0;
+            }
+          }
+        }
+      }
+
+      button {
+        &[aria-label="Color Mode"] {
+          display: none;
+        }
+      }
     }
   }
 }
@@ -143,4 +202,14 @@ html {
       }
     }
   }
+}
+
+.test-container {
+  height: 100px;
+  background-color: blueviolet;
+}
+
+.test-container {
+  height: 100px;
+  background-color: goldenrod;
 }

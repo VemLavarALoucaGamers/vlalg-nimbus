@@ -1,0 +1,32 @@
+.color1 {
+  background-color: tomato;
+}
+.color2 {
+  background-color: green;
+}
+.color3 {
+  background-color: orange;
+}
+.color4 {
+  background-color: blueviolet;
+}
+.color5 {
+  background-color: blue;
+}
+.color6 {
+  background-color: yellow;
+}
+.color7 {
+  background-color: red;
+}
+.color8 {
+  background-color: cyan;
+}
+
+.text-center {
+  text-align: center;
+}
+.test-grid {
+  height: 50px;
+  font-weight: bold;
+}
