@@ -3,7 +3,7 @@
 	"description": "MysteryBox - CSS Framework",
 	"license": "MIT",
 	"private": false,
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"type": "module",
 	"main": "./dist/mystery-box-css-framework.min.js",
 	"style": "dist/style.min.css",

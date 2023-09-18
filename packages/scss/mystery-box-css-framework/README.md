@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/scss/mystery-box-css-framework/images/Bee_Logo_White_Name.png" width="100">
+<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/scss/mystery-box-css-framework/images/Mystery_Box_Logo_White_Name.png" width="100">
 </p>
 
 <div align="center">
