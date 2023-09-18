@@ -1,0 +1,430 @@
+// File: _utilities.scss
+// This file contains utilities config.
+
+@use 'sass:math';
+
+$utilities: (
+  "padding": (
+    "prefix": "p",
+    "values": (
+      "0": 0,
+      "1": $base-padding,
+      "2": $base-padding * 2,
+      "3": $base-padding * 4,
+      "4": $base-padding * 6,
+      "5": $base-padding * 8
+    ),
+  ),
+  "padding-left": (
+    "prefix": "pl",
+    "values": (
+      "0": 0,
+      "1": $base-padding,
+      "2": $base-padding * 2,
+      "3": $base-padding * 4,
+      "4": $base-padding * 6,
+      "5": $base-padding * 8
+    ),
+  ),
+  "padding-right": (
+    "prefix": "pr",
+    "values": (
+      "0": 0,
+      "1": $base-padding,
+      "2": $base-padding * 2,
+      "3": $base-padding * 4,
+      "4": $base-padding * 6,
+      "5": $base-padding * 8
+    ),
+  ),
+  "padding-top": (
+    "prefix": "pt",
+    "values": (
+      "0": 0,
+      "1": $base-padding,
+      "2": $base-padding * 2,
+      "3": $base-padding * 4,
+      "4": $base-padding * 6,
+      "5": $base-padding * 8
+    ),
+  ),
+  "padding-bottom": (
+    "prefix": "pb",
+    "values": (
+      "0": 0,
+      "1": $base-padding,
+      "2": $base-padding * 2,
+      "3": $base-padding * 4,
+      "4": $base-padding * 6,
+      "5": $base-padding * 8
+    ),
+  ),
+  "margin": (
+    "prefix": "m",
+    "values": (
+      "0": 0,
+      "1": $base-margin,
+      "2": $base-margin * 2,
+      "3": $base-margin * 4,
+      "4": $base-margin * 6,
+      "5": $base-margin * 8
+    ),
+  ),
+  "margin-left": (
+    "prefix": "ml",
+    "values": (
+      "0": 0,
+      "1": $base-margin,
+      "2": $base-margin * 2,
+      "3": $base-margin * 4,
+      "4": $base-margin * 6,
+      "5": $base-margin * 8
+    ),
+  ),
+  "margin-right": (
+    "prefix": "mr",
+    "values": (
+      "0": 0,
+      "1": $base-margin,
+      "2": $base-margin * 2,
+      "3": $base-margin * 4,
+      "4": $base-margin * 6,
+      "5": $base-margin * 8
+    ),
+  ),
+  "margin-top": (
+    "prefix": "mt",
+    "values": (
+      "0": 0,
+      "1": $base-margin,
+      "2": $base-margin * 2,
+      "3": $base-margin * 4,
+      "4": $base-margin * 6,
+      "5": $base-margin * 8
+    ),
+  ),
+  "margin-bottom": (
+    "prefix": "mb",
+    "values": (
+      "0": 0,
+      "1": $base-margin,
+      "2": $base-margin * 2,
+      "3": $base-margin * 4,
+      "4": $base-margin * 6,
+      "5": $base-margin * 8
+    ),
+  ),
+
+  "opacity": (
+    "prefix": "o",
+    "values": (
+      "10": 0.1,
+      "20": 0.2,
+      "30": 0.3,
+      "40": 0.4,
+      "50": 0.5,
+      "60": 0.6,
+      "70": 0.7,
+      "80": 0.8,
+      "90": 0.9,
+      "100": 1,
+    ),
+  ),
+  "border-radius": (
+    "prefix": "br",
+    "values": (
+      "default": $base-border-radius,
+      "none": 0,
+      "xs": math.div($base-border-radius, 4),
+      "sm": math.div($base-border-radius, 2),
+      "lg": $base-border-radius * 2,
+      "full": 50%,
+    )
+  ),
+  "display": (
+    "prefix": "display",
+    "values": (
+      "n": none,
+      "b": block,
+      "f": flex,
+      "i": inline,
+      "i-b": inline-block
+    )
+  ),
+  "font-size": (
+    "prefix": "font",
+    "values": (
+      "sm": $font-size-sm,
+      "md": $base-font-size,
+      "lg": $font-size-lg,
+      "xl": $font-size-xl,
+      "xxl": $font-size-xxl
+    )
+  )
+);
+
+// generate utility classes
+@each $property, $map in $utilities {
+  $prefix: map-get($map, "prefix");
+  $values: map-get($map, "values");
+
+  @each $k, $v in $values {
+    @if($k == "default") {
+      .#{$prefix} {
+        #{$property}: $v;
+      }
+    } @else {
+      .#{$prefix}-#{$k}{
+        #{$property}: $v;
+      }
+    }
+  }
+}
+
+.spotlight {
+  margin-bottom: 20px;
+  font-size: 1.6em;
+  font-weight: bold;
+  line-height: 1.4;
+}
+.page-header {
+  padding-bottom: 9px;
+  margin: 25px 0 10px;
+  border-bottom: 1px solid #eee;
+}
+.credit,
+.author {
+  font-size: 80%;
+  color: #777;
+}
+.txt-italic {
+  font-style: italic;
+}
+.txt-bold {
+  font-weight: bold;
+}
+.txt-left {
+  text-align: left;
+}
+.txt-right {
+  text-align: right;
+}
+.txt-center {
+  text-align: center;
+}
+.txt-justify {
+  text-align: justify;
+}
+.txt-overflow-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.txt-overflow-clip {
+  text-overflow: clip;
+}
+.txt-overflow-clip,
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-scroll {
+  overflow: scroll;
+}
+.txt-nowrap {
+  white-space: nowrap;
+}
+.txt-direction {
+  direction: ltr;
+  direction: rtl;
+}
+.txt-indent1x {
+  text-indent: 10px;
+}
+.txt-indent2x {
+  text-indent: 20px;
+}
+.txt-indent3x {
+  text-indent: 30px;
+}
+.txt-indent4x {
+  text-indent: 40px;
+}
+.txt-indent5x {
+  text-indent: 50px;
+}
+.txt-decoration_ol {
+  text-decoration: overline;
+}
+.txt-decoration_lt {
+  text-decoration: line-through;
+}
+.txt-decoration_ul {
+  text-decoration: underline;
+}
+.txt-uppercase {
+  text-transform: uppercase;
+}
+.txt-lowercase {
+  text-transform: lowercase;
+}
+.txt-capitalize {
+  text-transform: capitalize;
+}
+.txt-vertical-top {
+  vertical-align: text-top;
+}
+.txt-vertical-middle {
+  vertical-align: middle;
+}
+.txt-vertical-bottom {
+  vertical-align: text-bottom;
+}
+.txt-muted {
+  color: #95a5a6;
+}
+.none-margin {
+  margin: 0;
+}
+.none-margin-top {
+  margin-top: 0;
+}
+.none-margin-right {
+  margin-right: 0;
+}
+.none-margin-bottom {
+  margin-bottom: 0;
+}
+.none-margin-left {
+  margin-left: 0;
+}
+.no-padding {
+	padding: 0;
+}
+.fixed {
+  position: fixed;
+}
+.pull-left {
+  float: left !important;
+}
+.pull-right {
+  float: right !important;
+}
+.hidden {
+  display: none !important;
+}
+.txt-hidden {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  border: 0;
+  background-color: transparent;
+}
+.unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.clear-left,
+.clear-right {
+  clear: left;
+}
+.clear-both {
+  clear: both;
+}
+.clear-none {
+  clear: none;
+}
+.sronly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+.sronly-focus:active,
+.sronly-focus:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  background-clip: auto;
+}
+.ico-1x {
+  font-size: 1em;
+}
+.ico-2x {
+  font-size: 2em;
+}
+.ico-3x {
+  font-size: 3em;
+}
+.ico-4x {
+  font-size: 4em;
+}
+.ico-5x {
+  font-size: 5em;
+}
+.ico-6x {
+  font-size: 6em;
+}
+.ico-7x {
+  font-size: 7em;
+}
+.ico-8x {
+  font-size: 8em;
+}
+.ico-9x {
+  font-size: 9em;
+}
+.ico-10x {
+  font-size: 10em;
+}
+
+// IMG
+.rounded {
+  border-radius: 6px;
+}
+.circle {
+  border-radius: 50%;
+}
+.circle-border {
+  padding: 7px;
+  background-color: #f5f5f5;
+  border: 0;
+  border-radius: 50%;
+}
+.thumbnail {
+  max-width: 100%;
+  height: auto;
+  line-height: inherit;
+  border: 0;
+  border-radius: 0;
+  padding: 7px;
+  background-color: #f5f5f5;
+}
+.img-responsive-width {
+  width: 100%;
+  height: auto;
+}
+.img-responsive-height {
+  width: auto;
+  height: 100%;
+}
+
+.highlight-box-text {
+  font-family: 'Lato Black';
+  background-color: $primary;
+  color: #fff;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+.highlight-line-text {
+  font-family: 'Lato Black';
+  -webkit-text-decoration-line: underline; /* Safari */
+  text-decoration-line: underline;
+  text-decoration-color: $primary;
+}

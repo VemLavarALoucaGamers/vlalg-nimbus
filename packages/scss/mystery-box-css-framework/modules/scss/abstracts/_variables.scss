@@ -1,0 +1,75 @@
+// File: _variables.scss
+// This file contains variables config.
+
+// theme colors
+$primary: #326dee !default;
+$secondary: #1ac886 !default;
+$error: #d32752 !default;
+$info: #f6c31c !default;
+
+// color palette
+$colors: (
+  "primary": $primary,
+  "secondary": $secondary,
+  "error": $error,
+  "info": $info,
+  "blue": #1919e6,
+  "red": #e61919,
+  "yellow": #e6e619,
+  "green": #19e635,
+  "orange": #ffa600,
+  "purple": #9900ff,
+  "gray": #808080,
+  "black": rgb(33, 33, 33),
+  "black-75": rgba(33, 33, 33, 0.75),
+  "black-50": rgba(33, 33, 33, 0.5),
+  "black-25": rgba(33, 33, 33, 0.25),
+  "white": rgb(247, 247, 247),
+  "white-75": rgba(247, 247, 247, 0.75),
+  "white-50": rgba(247, 247, 247, 0.5),
+  "white-25": rgba(247, 247, 247, 0.25),
+);
+
+$theme-colors: (
+	"primary" : #626ED4,
+	"secondary" : #343549,
+	"success": #2AA39A,
+	"danger": #EC4561,
+	"warning": #F8B425,
+	"info": #38A5F8,
+	"light": #f8f8fa,
+	"dark": #575c62,
+	"muted": #EDECF1
+);
+
+// @debug map-get($colors, "purple");
+// @debug map-has-key($colors, "secondary");
+// @debug map-has-key($colors, "tertiary");
+// @debug map-remove($colors, "primary");
+// @debug map-merge($colors, ("pink": #ffc0cb));
+
+// spacing
+$base-padding: 0.75rem !default;
+$base-margin: 0.75rem !default;
+
+// borders
+$base-border-thickness: 1px !default;
+$base-border-radius: 20px !default;
+
+// box-shadow
+$base-box-shadow: 1px 3px 5px rgba(0,0,0,0.1) !default;
+
+// font sizes
+$base-font-size: 1rem;
+$font-size-sm: $base-font-size * 0.75 !default;
+$font-size-lg: $base-font-size * 1.5 !default;
+$font-size-xl: $base-font-size * 2 !default;
+$font-size-xxl: $base-font-size * 3 !default;
+
+$breakpoints: (
+  "xs": 0,
+  "sm": 768px,
+  "md": 1024px,
+  "lg": 1440px,
+  "xl": 1600px,
+);

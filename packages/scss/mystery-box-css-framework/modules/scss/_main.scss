@@ -1,0 +1,36 @@
+// File: main.scss
+// This file contains all imports
+@charset "UTF-8";
+
+/*
+* MysteryBox - CSS Framework v1.0.0 (https://nimbus.tec.br/)
+* Copyright 2023 Vem Lavar a Louça Gamers
+* Licensed under MIT (https://github.com/VemLavarALoucaGamers/vlalg-nimbus/blob/main/LICENSE)
+*/
+
+// Variables, Mixins, Functions & Breakpoints
+@import 'abstracts/glob';
+
+// Base, Reset, Typography
+@import 'base/glob';
+
+// Colors
+@import "colors/glob";
+
+// Components (button, card, navbar, ...)
+@import 'components/glob';
+
+// Grid
+@import "layout/glob";
+
+// Pages
+@import 'pages/glob';
+
+// Themes
+@import 'themes/glob';
+
+// Utilities (margin, padding, opacity, ...)
+@import 'others/glob';
+
+// Vendors (Bootstrap, Bulma, ...)
+@import 'vendors/glob';

@@ -1,0 +1,8 @@
+// File: _functions.scss
+// This file contains functions config.
+
+@function light-comp($color) {
+  $complement: complement($color);
+  $light-complement: lighten($complement, 30%);
+  @return $light-complement;
+}

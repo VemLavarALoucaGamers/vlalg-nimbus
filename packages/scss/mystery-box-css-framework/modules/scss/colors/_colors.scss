@@ -1,0 +1,36 @@
+// File: _colors.scss
+// This file contains color config, colors for test.
+
+.color1 {
+  background-color: tomato;
+}
+.color2 {
+  background-color: green;
+}
+.color3 {
+  background-color: orange;
+}
+.color4 {
+  background-color: blueviolet;
+}
+.color5 {
+  background-color: blue;
+}
+.color6 {
+  background-color: yellow;
+}
+.color7 {
+  background-color: red;
+}
+.color8 {
+  background-color: cyan;
+}
+
+@each $key, $value in $colors {
+  .color-#{$key} {
+    color: $value;
+  }
+  .background-#{$key} {
+    background-color: $value;
+  }
+}

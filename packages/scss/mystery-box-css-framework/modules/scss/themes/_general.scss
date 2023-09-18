@@ -1,0 +1,10 @@
+// File: _general.scss
+// This file contains general config.
+
+@each $name,$color in $theme-colors {
+  .theme-#{$name}{
+      background-color: $color;
+      color: white;
+  }
+}
+
