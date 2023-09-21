@@ -7,6 +7,8 @@
 	"type": "module",
 	"main": "./dist/bundle.min.umd.js",
 	"module": "./dist/bundle.min.es.js",
+  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
 	"files": [
 		"dist"
 	],
@@ -22,9 +24,11 @@
 	"scripts": {
 		"js": "cross-env NODE_ENV=development && rollup --config",
 		"js:minify": "cross-env NODE_ENV=production rollup --config",
+		"js:watch-prod": "cross-env NODE_ENV=production rollup --config --watch",
 		"js:watch": "rollup --config --watch",
-    "lint": "eslint ./modules --ext .js --fix",
-		"npm:publish": "yarn lint && yarn js:minify && npm login && npm publish --access=public"
+		"lint": "eslint ./modules --ext .js --fix",
+    "generate-typing": "npx tsc",
+		"npm:publish": "yarn lint && yarn js:minify && yarn generate-typing && npm login && npm publish --access=public"
 	},
 	"dependencies": {},
 	"devDependencies": {
@@ -40,7 +44,8 @@
 		"cross-env": "^7.0.3",
 		"eslint": "^8.48.0",
 		"rollup": "^3.28.1",
-		"rollup-plugin-uglify": "^6.0.4"
+		"rollup-plugin-uglify": "^6.0.4",
+		"typescript": "^5.2.2"
 	},
 	"repository": {
 		"type": "git",
@@ -53,12 +58,12 @@
 		"master",
 		"tool",
 		"master tool",
-    "helpers",
-    "helper functions",
-    "helper",
-    "functions",
-    "utils",
-    "utils functions"
+		"helpers",
+		"helper functions",
+		"helper",
+		"functions",
+		"utils",
+		"utils functions"
 	],
 	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)"
 }

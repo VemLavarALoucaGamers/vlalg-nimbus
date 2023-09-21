@@ -1,4 +1,4 @@
-# test-libs
+# test-libs-vue3-js
 
 This project is for testing the components simulating a real project.
 
