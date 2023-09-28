@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "CommonJS",
+    "outDir": "dist",
+    "rootDir": "src",
+    "allowJs": true,
+    "checkJs": true
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.js",
+    "./src/**/*.vue",
+    "./src/**/*.ext"
+  ],
+  "exclude": ["node_modules"]
+}

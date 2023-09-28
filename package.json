@@ -1,7 +1,7 @@
 {
   "name": "vlalg-nimbus",
   "description": "VLALG Nimbus",
-  "version": "6.0.3-alpha",
+  "version": "7.0.0-alpha",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -11,8 +11,8 @@
   },
   "workspaces": {
     "packages": [
-      "apps/*",
-      "packages/*"
+      "apps/**/*",
+      "packages/**/*"
     ]
   },
   "repository": {

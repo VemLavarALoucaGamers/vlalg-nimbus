@@ -1,0 +1,75 @@
+{
+	"name": "@vlalg-nimbus/master-tool",
+	"description": "Master Tool - Helpers and Utils functions",
+	"license": "MIT",
+	"private": false,
+	"version": "1.0.0",
+	"type": "module",
+  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
+	"main": "./dist/bundle.min.umd.js",
+	"module": "./dist/bundle.min.es.js",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/bundle.min.es.js",
+			"require": "./dist/bundle.min.umd.js"
+		}
+	},
+	"browser": {
+		"./style.css": ""
+	},
+	"scripts": {
+    "dev:only": "cross-env NODE_ENV=development yarn rollup",
+    "dev:watch-prod": "cross-env NODE_ENV=production yarn rollup:watch",
+    "dev": "concurrently \"yarn clean\" \"yarn dev:watch-prod\" \"yarn generate-typing:watch\"",
+    "prod:minify": "cross-env NODE_ENV=production yarn rollup",
+    "rollup": "rollup --config",
+    "rollup:watch": "rollup --config --watch",
+    "generate-typing": "npx tsc",
+    "generate-typing:watch": "npx tsc -w",
+    "clean": "rimraf dist",
+    "lint": "eslint ./modules --ext .js --fix",
+    "npm:publish": "yarn clean && yarn lint && yarn prod:minify && yarn generate-typing && npm login && npm publish --access=public"
+  },
+	"dependencies": {},
+	"devDependencies": {
+		"@babel/core": "^7.22.11",
+		"@babel/eslint-parser": "^7.22.11",
+		"@babel/plugin-external-helpers": "^7.22.5",
+		"@babel/preset-env": "^7.22.14",
+		"@rollup/plugin-babel": "^6.0.3",
+		"@rollup/plugin-commonjs": "^25.0.4",
+		"@rollup/plugin-eslint": "^9.0.4",
+		"@rollup/plugin-node-resolve": "^15.2.1",
+		"@rollup/plugin-replace": "^5.0.2",
+		"concurrently": "^8.2.1",
+		"cross-env": "^7.0.3",
+		"eslint": "^8.48.0",
+		"rimraf": "^5.0.5",
+		"rollup": "^3.28.1",
+		"rollup-plugin-uglify": "^6.0.4",
+		"typescript": "^5.2.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
+	},
+	"homepage": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/tree/main/packages/libs/master-tool",
+	"keywords": [
+		"module",
+		"lib",
+		"master",
+		"tool",
+		"master tool",
+		"helpers",
+		"helper functions",
+		"helper",
+		"functions",
+		"utils",
+		"utils functions"
+	],
+	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)"
+}
