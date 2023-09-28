@@ -231,6 +231,12 @@ html {
   }
 }
 
+@media screen and (max-width: 1023px) {
+  .docs-page-content {
+    padding: 0 12px;
+  }
+}
+
 @media screen and (min-width: 1024px) {
   .block-hero {
     .layout {
