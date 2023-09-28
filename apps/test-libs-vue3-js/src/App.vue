@@ -1,5 +1,13 @@
 <script setup>
+import { inject, onMounted } from 'vue';
 import HelloWorld from './components/HelloWorld.vue'
+
+const $masterTool = inject('$masterTool')
+
+console.log($masterTool.fixNullToNumber()) // 0
+console.log($masterTool.fixNullToNumber(null)) // 0
+console.log($masterTool.fixNullToNumber(undefined)) // 0
+console.log($masterTool.fixNullToNumber(1)) // 1
 </script>
 
 <template>

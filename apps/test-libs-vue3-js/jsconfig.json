@@ -14,6 +14,10 @@
       "dom",
       "dom.iterable",
       "scripthost"
-    ]
-  }
+    ],
+    "allowJs": true,
+    "checkJs": true,
+    "typeRoots": ["./node_modules/@vlalg-nimbus/**/*.ts"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.js", "src/**/*.vue"]
 }

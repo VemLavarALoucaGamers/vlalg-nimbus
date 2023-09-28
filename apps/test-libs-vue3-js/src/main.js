@@ -2,10 +2,13 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import App from './App.vue'
 
-// import LibName from '@vlalg-nimbus/lib-name'
+import MasterTool from '@vlalg-nimbus/master-tool'
+const $masterTool = MasterTool()
 
-let app = createApp(App)
+const app = createApp(App)
 
-// app.config.globalProperties.$log = new LibName()
+// console.log($masterTool.asyncMapPromise([1], () => {}))
+
+app.provide('$masterTool', $masterTool)
 
 app.mount('#app')

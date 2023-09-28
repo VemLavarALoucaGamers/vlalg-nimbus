@@ -10,10 +10,12 @@ import { uglify } from "rollup-plugin-uglify";
     - https://dev.to/iggredible/what-the-heck-are-cjs-amd-umd-and-esm-ikm
     - https://betterprogramming.pub/what-are-cjs-amd-umd-esm-system-and-iife-3633a112db62
 */
-const globalLibName = 'RavenSentinel'
+const globalLibName = 'MasterTool'
 const isProd = !!(process.env.NODE_ENV === 'production')
 const defaultFileName = 'bundle'
 const newFileName = isProd ? `bundle.min` : defaultFileName
+
+console.log(process.env.NODE_ENV)
 
 const outputs = [
   {
