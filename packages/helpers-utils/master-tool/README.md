@@ -1,17 +1,11 @@
 <p align="center">
-<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/helpers-utils/master-tool/images/Master_tool_Logo_White_Name.png" width="100">
+<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/helpers-utils/master-tool/images/Master_Tool_Logo_White_Name.png" width="100">
 </p>
 
 <div align="center">
 
 ![npm](https://img.shields.io/npm/v/@vlalg-nimbus/master-tool?style=for-the-badge) ![npm](https://img.shields.io/npm/dm/@vlalg-nimbus/master-tool?style=for-the-badge) ![Snyk Vulnerabilities for npm package](https://img.shields.io/snyk/vulnerabilities/npm/@vlalg-nimbus/master-tool?label=npm%20vulnerabilities&style=for-the-badge) ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/VemLavarALoucaGamers/vlalg-nimbus?label=Repo%20Vulnerabilities&style=for-the-badge)
 </div>
-
-<br />
-
-<p align="center">
-<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/helpers-utils/master-tool/images/example.png" width="300">
-</p>
 
 This LIB has several Helpers/Users already created to avoid breaking the head making the same logic.
 
