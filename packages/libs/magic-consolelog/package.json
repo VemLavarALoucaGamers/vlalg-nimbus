@@ -24,7 +24,8 @@
 		"js:minify": "cross-env NODE_ENV=production rollup --config",
 		"js:watch": "rollup --config --watch",
 		"lint": "eslint ./modules --ext .js --fix",
-		"npm:publish": "yarn lint && yarn js:minify && npm login && npm publish --access=public"
+    "clean": "rimraf dist",
+		"npm:publish": "yarn clean && yarn lint && yarn js:minify && npm login && npm publish --access=public"
 	},
 	"dependencies": {},
 	"devDependencies": {
@@ -39,6 +40,7 @@
 		"@rollup/plugin-replace": "^5.0.2",
 		"cross-env": "^7.0.3",
 		"eslint": "^8.48.0",
+		"rimraf": "^5.0.5",
 		"rollup": "^3.28.1",
 		"rollup-plugin-uglify": "^6.0.4"
 	},
