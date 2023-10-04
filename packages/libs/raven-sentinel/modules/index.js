@@ -20,7 +20,7 @@ function printObject (obj) {
     : JSON.parse(JSON.stringify(String(obj)))
 }
 
-export class LoggerFactory {
+export default class LoggerFactory {
   // parameters recebe
   /*
     className: string
@@ -285,5 +285,3 @@ export class LoggerFactory {
     }
   }
 }
-
-export default LoggerFactory
