@@ -38,7 +38,7 @@ function consoleMount (type, title, titleConfig, text, hasLink, link) {
   }
 }
 
-class MagicConsole {
+export default class MagicConsole {
   constructor (type = 'normal', config = null) {
     this.type = type
     this.config = config
@@ -103,5 +103,3 @@ class MagicConsole {
     )
   }
 }
-
-export default MagicConsole
