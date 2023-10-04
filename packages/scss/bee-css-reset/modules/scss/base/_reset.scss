@@ -6,6 +6,8 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   background-repeat: no-repeat; /* Backgrounds do not repeat by default (opinionated). */
+  border-width: 0;
+  border-style: solid;
 }
 
 * {
@@ -58,6 +60,32 @@ body {
   font-size: 1.6em;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+  margin: 0;
+}
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -90,7 +118,8 @@ main {
 ol, ul,
 ol[role='list'], ul[role='list']{
   list-style: none;
-  padding-left: 0;
+  margin: 0;
+  padding: 0
 }
 
 blockquote, q {
@@ -202,10 +231,12 @@ textarea {
 }
 
 /* Imagens responsivas por padrao */
-img, picture, video, canvas, svg {
+img, picture, video, canvas, svg,
+audio, iframe, embed, object {
   max-width: 100%;
   height: auto;
   display: block;
+  vertical-align: middle;
 }
 
 details {
