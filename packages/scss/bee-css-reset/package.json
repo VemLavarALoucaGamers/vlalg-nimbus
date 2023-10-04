@@ -3,7 +3,7 @@
 	"description": "BEE - CSS Reset",
 	"license": "MIT",
 	"private": false,
-	"version": "1.0.5",
+	"version": "2.0.0",
 	"type": "module",
 	"main": "./dist/bee-css-reset.min.js",
 	"style": "dist/style.min.css",
