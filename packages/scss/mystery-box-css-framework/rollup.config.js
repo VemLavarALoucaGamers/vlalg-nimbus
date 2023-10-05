@@ -2,16 +2,23 @@ import { babel } from '@rollup/plugin-babel';
 import eslint from '@rollup/plugin-eslint';
 import replace from '@rollup/plugin-replace';
 import { uglify } from "rollup-plugin-uglify";
+import license from 'rollup-plugin-license';
 
 /*
     Formats tips
     - https://dev.to/iggredible/what-the-heck-are-cjs-amd-umd-and-esm-ikm
     - https://betterprogramming.pub/what-are-cjs-amd-umd-esm-system-and-iife-3633a112db62
 */
+
+const year = new Date().getFullYear()
 const globalLibName = 'MysteryBoxCssFramework'
 const isProd = !!(process.env.NODE_ENV === 'production')
 const defaultFileName = 'mystery-box-css-framework'
 const newFileName = isProd ? `mystery-box-css-framework.min` : defaultFileName
+const bannerText = `
+  ${globalLibName} v<%= pkg.version %> by Nimbus
+	Nimbus Copyright (c) ${year} VLALG and contributors.
+`;
 
 const outputs = [
   {
@@ -39,5 +46,8 @@ export default {
       ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
     }),
     isProd && uglify(),
+    license({
+      banner: bannerText,
+    }),
   ],
 };

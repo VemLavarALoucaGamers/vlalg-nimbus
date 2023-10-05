@@ -4,18 +4,23 @@ import eslint from '@rollup/plugin-eslint';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
 import { uglify } from "rollup-plugin-uglify";
+import license from 'rollup-plugin-license';
 
 /*
     Formats tips
     - https://dev.to/iggredible/what-the-heck-are-cjs-amd-umd-and-esm-ikm
     - https://betterprogramming.pub/what-are-cjs-amd-umd-esm-system-and-iife-3633a112db62
 */
+
+const year = new Date().getFullYear()
 const globalLibName = 'MasterTool'
 const isProd = !!(process.env.NODE_ENV === 'production')
 const defaultFileName = 'bundle'
 const newFileName = isProd ? `bundle.min` : defaultFileName
-
-console.log(process.env.NODE_ENV)
+const bannerText = `
+  ${globalLibName} v<%= pkg.version %> by Nimbus
+	Nimbus Copyright (c) ${year} VLALG and contributors.
+`;
 
 const outputs = [
   {
@@ -75,5 +80,8 @@ export default {
       ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
     }),
     isProd && uglify(),
+    license({
+      banner: bannerText,
+    }),
   ],
 };

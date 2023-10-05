@@ -1,8 +1,7 @@
 {
   "name": "vlalg-nimbus",
   "description": "VLALG Nimbus",
-  "version": "8.0.1-alpha",
-  "license": "MIT",
+  "version": "8.0.2-alpha",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,11 +14,22 @@
       "packages/**/*"
     ]
   },
+  "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
+    "chalk": "^5.3.0",
+    "commitizen": "^4.3.0",
+    "husky": "^8.0.3"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
   },
-  "homepage": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus",
+  "bugs": {
+    "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
+  },
+	"homepage": "https://nimbus.tec.br",
+	"license": "MIT",
   "keywords": [
     "vuejs",
     "vue js",
@@ -33,13 +43,15 @@
     "js lib",
     "javascript lib"
   ],
-  "author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
-  "devDependencies": {
-    "@commitlint/cli": "^17.7.1",
-    "@commitlint/config-conventional": "^17.7.0",
-    "chalk": "^5.3.0",
-    "commitizen": "^4.3.0",
-    "husky": "^8.0.3"
+	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
+  "contributors": [
+    "TonhaoSantos (https://github.com/TonhaoSantos)",
+    "Felipecss (https://github.com/lipecss)"
+  ],
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": "please-use-yarn",
+    "yarn": ">=1.20.19"
   },
   "config": {
     "commitizen": {

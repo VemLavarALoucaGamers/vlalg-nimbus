@@ -1,26 +1,28 @@
 {
 	"name": "@vlalg-nimbus/raven-sentinel",
 	"description": "Raven Sentinel - Log Manager",
-	"license": "MIT",
 	"private": false,
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"type": "module",
-  "types": "./dist/index.d.ts",
-  "typings": "./dist/index.d.ts",
 	"main": "./dist/bundle.min.umd.js",
 	"module": "./dist/bundle.min.es.js",
-	"files": [
-		"dist"
-	],
 	"exports": {
 		".": {
 			"import": "./dist/bundle.min.es.js",
 			"require": "./dist/bundle.min.umd.js"
-		}
+		},
+    "./package.json": "./package.json"
 	},
 	"browser": {
 		"./style.css": ""
 	},
+  "typeScriptVersion": "^5.2.2",
+  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
+  "sideEffects": false,
+	"files": [
+		"dist"
+	],
 	"scripts": {
     "dev:only": "cross-env NODE_ENV=development yarn rollup",
     "dev:watch-prod": "cross-env NODE_ENV=production yarn rollup:watch",
@@ -50,6 +52,7 @@
 		"eslint": "^8.48.0",
 		"rimraf": "^5.0.5",
 		"rollup": "^3.28.1",
+		"rollup-plugin-license": "^3.1.0",
 		"rollup-plugin-uglify": "^6.0.4",
 		"typescript": "^5.2.2"
 	},
@@ -57,7 +60,11 @@
 		"type": "git",
 		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
 	},
-	"homepage": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/tree/main/packages/libs/raven-sentinel",
+  "bugs": {
+    "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
+  },
+	"homepage": "https://nimbus.tec.br",
+	"license": "MIT",
 	"keywords": [
 		"module",
 		"lib",
@@ -68,5 +75,15 @@
 		"sentinel",
 		"raven sentinel"
 	],
-	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)"
+	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
+  "contributors": [
+    "TonhaoSantos (https://github.com/TonhaoSantos)",
+    "Felipecss (https://github.com/lipecss)"
+  ],
+  "engineStrict": true,
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": "please-use-yarn",
+    "yarn": ">=1.20.19"
+  }
 }
