@@ -1,6 +1,6 @@
 {
   "name": "@vlalg-nimbus/nb-payments",
-	"description": "Payments components for Vuejs 3",
+  "description": "Payments components for Vuejs 3",
   "private": false,
   "version": "1.0.0",
   "type": "module",
@@ -18,7 +18,7 @@
     "./style.css": "./dist/style.css",
     "./dist/images": "./dist/images"
   },
-	"sideEffects": false,
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -32,6 +32,7 @@
     "npm:publish": "vite build && npm login && npm publish --access=public"
   },
   "dependencies": {
+    "@vlalg-nimbus/master-tool": "^1.0.3",
     "vue": "^3.3.4"
   },
   "devDependencies": {
@@ -51,13 +52,13 @@
     "vitest": "^0.34.4",
     "vue-the-mask": "^0.11.1"
   },
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
-	},
-	"bugs": {
-		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
-	},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
+  },
+  "bugs": {
+    "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
+  },
   "homepage": "https://nimbus.tec.br",
   "keywords": [
     "vuejs",
@@ -71,14 +72,8 @@
     "vue js components"
   ],
   "author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
-	"contributors": [
-		"TonhaoSantos (https://github.com/TonhaoSantos)",
-		"Felipecss (https://github.com/lipecss)"
-	],
-	"engineStrict": true,
-	"engines": {
-		"node": ">=10.0.0",
-		"npm": "please-use-yarn",
-		"yarn": ">=1.20.19"
-	}
+  "contributors": [
+    "TonhaoSantos (https://github.com/TonhaoSantos)",
+    "Felipecss (https://github.com/lipecss)"
+  ]
 }

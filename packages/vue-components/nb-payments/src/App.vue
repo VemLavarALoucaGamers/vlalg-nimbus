@@ -17,7 +17,7 @@
         class="col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;"
       >
-        <VgCreditCard
+        <NbCreditCard
           vg-id="asdas"
           :show-form="true"
           chip-model="two"
@@ -39,7 +39,7 @@ import { defineComponent, defineAsyncComponent, ref } from 'vue';
 export default defineComponent({
   name: 'App',
   components: {
-    VgCreditCard: defineAsyncComponent(() => import('@components/VgCreditCard.vue'))
+    NbCreditCard: defineAsyncComponent(() => import('@components/NbCreditCard.vue'))
   },
   emits: [],
   props: {},

@@ -3,4 +3,6 @@ import App from './App.vue';
 
 // import '../../../scss/main.scss';
 
-createApp(App).mount('#app');
+import MasterTool from './plugin/masterTool'
+
+createApp(App).use(MasterTool).mount('#app');

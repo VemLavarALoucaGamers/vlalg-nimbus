@@ -1,3 +1,3 @@
-import VgCreditCard from '@components/VgCreditCard.vue';
+import NbCreditCard from '@components/NbCreditCard.vue';
 
-export default { VgCreditCard };
+export default { NbCreditCard };

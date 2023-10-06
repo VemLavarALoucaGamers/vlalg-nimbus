@@ -27,7 +27,7 @@ export default defineConfig({
     },
   },
   external: [
-    // '@vemlavaraloucagamers/helpers',
+    '@vlalg-nimbus/master-tool',
     'vue-the-mask',
     /node_modules/
   ],
