@@ -2,7 +2,7 @@
 	"name": "@vlalg-nimbus/bee-css-reset",
 	"description": "BEE - CSS Reset",
 	"private": false,
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"type": "module",
 	"main": "./dist/bee-css-reset.min.js",
 	"browser": {
@@ -73,11 +73,5 @@
 	"contributors": [
 		"TonhaoSantos (https://github.com/TonhaoSantos)",
 		"Felipecss (https://github.com/lipecss)"
-	],
-	"engineStrict": true,
-	"engines": {
-		"node": ">=10.0.0",
-		"npm": "please-use-yarn",
-		"yarn": ">=1.20.19"
-	}
+	]
 }

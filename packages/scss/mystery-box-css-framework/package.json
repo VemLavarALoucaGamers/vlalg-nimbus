@@ -2,7 +2,7 @@
 	"name": "@vlalg-nimbus/mystery-box-css-framework",
 	"description": "MysteryBox - CSS Framework",
 	"private": false,
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"type": "module",
 	"main": "./dist/mystery-box-css-framework.min.js",
 	"browser": {
@@ -73,11 +73,5 @@
 	"contributors": [
 		"TonhaoSantos (https://github.com/TonhaoSantos)",
 		"Felipecss (https://github.com/lipecss)"
-	],
-	"engineStrict": true,
-	"engines": {
-		"node": ">=10.0.0",
-		"npm": "please-use-yarn",
-		"yarn": ">=1.20.19"
-	}
+	]
 }
