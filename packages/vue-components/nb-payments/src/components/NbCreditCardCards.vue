@@ -2,48 +2,48 @@
   <div class="vg-wrapper">
     <div
       :id="vgId"
-      class="vg-credit-card__card vg-reset"
+      class="nb-credit-card__card vg-reset"
     >
       <div
-        class="vg-credit-card__card-faces"
+        class="nb-credit-card__card-faces"
         @mouseover="flipCardOnHover('over')"
         @mouseleave="flipCardOnHover('leave')"
       >
         <div
           ref="front"
           :style="[cardStyleBg, cardStyleColor, cardStyleBorderRadius, cardStyleShadow]"
-          class="vg-credit-card__card-faces--front"
+          class="nb-credit-card__card-faces--front"
         >
-          <div class="vg-credit-card__front-images">
+          <div class="nb-credit-card__front-images">
             <img
               :src="getCardChipImage"
               alt=""
-              class="vg-credit-card__front-images--chip"
+              class="nb-credit-card__front-images--chip"
             />
             <img
               :src="getCardTypeImage"
               alt=""
-              class="vg-credit-card__front-images--brand"
+              class="nb-credit-card__front-images--brand"
             />
           </div>
 
           <div
-            :class="['vg-credit-card__front-number', hasNumber ? 'has-number' : 'without-number' , hasAllNumbers ? 'has-all-numbers' : '']"
+            :class="['nb-credit-card__front-number', hasNumber ? 'has-number' : 'without-number' , hasAllNumbers ? 'has-all-numbers' : '']"
           >
             {{ getMaskedCardNumber }}
           </div>
 
-          <div class="vg-credit-card__front-infos">
-            <div class="vg-credit-card__front-column vg-credit-card__front-column--name">
-              <span class="vg-credit-card__front-column-title">{{ textCardHolder }}</span>
-              <div class="vg-credit-card__front-column-value--name">
+          <div class="nb-credit-card__front-infos">
+            <div class="nb-credit-card__front-column nb-credit-card__front-column--name">
+              <span class="nb-credit-card__front-column-title">{{ textCardHolder }}</span>
+              <div class="nb-credit-card__front-column-value--name">
                 {{ getHolderName }}
               </div>
             </div>
 
-            <div class="vg-credit-card__front-column vg-credit-card__front-column--expiration">
-              <span class="vg-credit-card__front-column-title">{{ textCardExpiration }}</span>
-              <div class="vg-credit-card__front-column-value">
+            <div class="nb-credit-card__front-column nb-credit-card__front-column--expiration">
+              <span class="nb-credit-card__front-column-title">{{ textCardExpiration }}</span>
+              <div class="nb-credit-card__front-column-value">
                 {{ formatedExpiration }}
               </div>
             </div>
@@ -53,16 +53,16 @@
         <div 
           ref="back"
           :style="[cardStyleBg, cardStyleColor, cardStyleBorderRadius, cardStyleShadow]"
-          class="vg-credit-card__card-faces--back"
+          class="nb-credit-card__card-faces--back"
         >
-          <div class="vg-credit-card__back-stripe">
+          <div class="nb-credit-card__back-stripe">
           </div>
-          <div class="vg-credit-card__back-column">
-            <span class="vg-credit-card__back-column-title">{{ textCardCcv }}</span>
-            <div class="vg-credit-card__back-column-info">
+          <div class="nb-credit-card__back-column">
+            <span class="nb-credit-card__back-column-title">{{ textCardCcv }}</span>
+            <div class="nb-credit-card__back-column-info">
               <span
                 :style="[cardCcvStyleColor]"
-                class="vg-credit-card__back-column-info--value"
+                class="nb-credit-card__back-column-info--value"
               >
                 {{ cardCcv }}
               </span>
@@ -70,7 +70,7 @@
               <img
                 src="@images/pattern.png"
                 alt=""
-                class="vg-credit-card__back-column-info--image"
+                class="nb-credit-card__back-column-info--image"
                 style="position: absolute; z-index: 0; left: 0; top: 0; right: 0;"
               />
             </div>
@@ -495,7 +495,7 @@ export default defineComponent ({
     box-sizing: border-box;
   }
 }
-.vg-credit-card__card {
+.nb-credit-card__card {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -507,14 +507,14 @@ export default defineComponent ({
   display: inline-block;
   padding-top: 13px;
 }
-.vg-credit-card__card-faces {
+.nb-credit-card__card-faces {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-.vg-credit-card__card-faces--front,
-.vg-credit-card__card-faces--back {
+.nb-credit-card__card-faces--front,
+.nb-credit-card__card-faces--back {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -522,33 +522,33 @@ export default defineComponent ({
   transition:transform .4s ease-out;
 }
 
-.vg-credit-card__card-faces .vg-credit-card__card-faces--front {
+.nb-credit-card__card-faces .nb-credit-card__card-faces--front {
   padding: 15px;
   transform:perspective(1000px) rotateY(0deg);
 }
 
 
-.vg-credit-card__card-faces .vg-credit-card__card-faces--back {
+.nb-credit-card__card-faces .nb-credit-card__card-faces--back {
   text-align: right;
   transform:perspective(1000px) rotateY(180deg);
 }
 
-.vg-credit-card__card-faces--front .vg-credit-card__front-images {
+.nb-credit-card__card-faces--front .nb-credit-card__front-images {
   display: flex;
   align-items:center;
   justify-content: space-between;
   height: 45px;
 }
 
-.vg-credit-card__card-faces--front .vg-credit-card__front-images img {
+.nb-credit-card__card-faces--front .nb-credit-card__front-images img {
   height: 100%;
   display: block;
 }
 
-.vg-credit-card__front-images .vg-credit-card__front-images--brand {
+.nb-credit-card__front-images .nb-credit-card__front-images--brand {
     height: 80%;
 }
-.vg-credit-card__card-faces--front .vg-credit-card__front-number {
+.nb-credit-card__card-faces--front .nb-credit-card__front-number {
   width: 100%;
   word-spacing: 15px;
   height: 54px;
@@ -559,48 +559,48 @@ export default defineComponent ({
   font-weight: 900;
   font-size: 14px;
 }
-.vg-credit-card__front-number.without-number {
+.nb-credit-card__front-number.without-number {
   letter-spacing: -1px;
 }
-.vg-credit-card__front-number.has-number {
+.nb-credit-card__front-number.has-number {
   padding: 20px 0;
 }
-.vg-credit-card__front-number.has-all-numbers {
+.nb-credit-card__front-number.has-all-numbers {
   font-size: 20px !important;
 }
-.vg-credit-card__card-faces--front .vg-credit-card__front-infos {
+.nb-credit-card__card-faces--front .nb-credit-card__front-infos {
   display: flex;
   text-align: left;
 }
-.vg-credit-card__front-infos .vg-credit-card__front-column {
+.nb-credit-card__front-infos .nb-credit-card__front-column {
   font-size: 15px;
 }
-.vg-credit-card__front-column.vg-credit-card__front-column--name {
+.nb-credit-card__front-column.nb-credit-card__front-column--name {
     margin-right: auto;
 }
-.vg-credit-card__front-column.vg-credit-card__front-column--expiration {
+.nb-credit-card__front-column.nb-credit-card__front-column--expiration {
   width: 62px;
 }
-.vg-credit-card__card-faces--front .vg-credit-card__front-column .vg-credit-card__front-column-title, 
-.vg-credit-card__card-faces--back .vg-credit-card__back-column .vg-credit-card__back-column-title {
+.nb-credit-card__card-faces--front .nb-credit-card__front-column .nb-credit-card__front-column-title, 
+.nb-credit-card__card-faces--back .nb-credit-card__back-column .nb-credit-card__back-column-title {
   font-size: 9px;
   font-style: italic;
   letter-spacing: 1px;
 }
-.vg-credit-card__front-column-value--name {
+.nb-credit-card__front-column-value--name {
   width: 180px;
   overflow: hidden;
 }
-.vg-credit-card__card-faces--back .vg-credit-card__back-stripe {
+.nb-credit-card__card-faces--back .nb-credit-card__back-stripe {
   background: #000;
   width: 100%;
   margin: 10px 0;
   height: 40px;
 }
-.vg-credit-card__card-faces--back .vg-credit-card__back-column {
+.nb-credit-card__card-faces--back .nb-credit-card__back-column {
   padding: 0 20px;
 }
-.vg-credit-card__back-column .vg-credit-card__back-column-info {
+.nb-credit-card__back-column .nb-credit-card__back-column-info {
   height: 40px;
   width: 67px;
   padding: 10px;
@@ -608,7 +608,7 @@ export default defineComponent ({
   position: relative;
   overflow: hidden;
 }
-.vg-credit-card__back-column-info .vg-credit-card__back-column-info--value {
+.nb-credit-card__back-column-info .nb-credit-card__back-column-info--value {
   position: absolute;
   z-index: 1;
   right: 0px;
@@ -619,7 +619,7 @@ export default defineComponent ({
   background: #fff;
 }
 
-.vg-credit-card__back-column-info .vg-credit-card__back-column-info--image {
+.nb-credit-card__back-column-info .nb-credit-card__back-column-info--image {
   height: 40px;
 }
 </style>

@@ -3,7 +3,7 @@
     <div
       v-if="vgId"
       :id="vgId"
-      class="vg-credit-card vg-reset"
+      class="nb-credit-card vg-reset"
       :style="[ verticalAlign ]"
     >
       <NbCreditCardCards
@@ -32,17 +32,17 @@
         v-if="showForm"
         :vg-id="`${vgId}-form`"
         :style="[formStyleBg, formStyleColor, formStyleBorderRadius, formStyleShadow]"
-        class="vg-credit-card__form vg-reset"
+        class="nb-credit-card__form vg-reset"
       >
-        <div class="vg-credit-card__form-items">
-          <span class="vg-credit-card__form-items--text">{{ formNumberText }}</span>
+        <div class="nb-credit-card__form-items">
+          <span class="nb-credit-card__form-items--text">{{ formNumberText }}</span>
           <input
             v-model="cdNumber"
             v-mask="getCardMask"
             type="text"
             :maxlength="getMaxCardNumber"
             :style="[inputStyle, isActiveInputNumber]"
-            class="vg-credit-card__form-items--input"
+            class="nb-credit-card__form-items--input"
             autocomplete="off"
             @active="activeNumber = true"
             @focus="activeNumber = true"
@@ -50,27 +50,27 @@
           />
         </div>
 
-        <div class="vg-credit-card__form-items">
-          <span class="vg-credit-card__form-items--text">{{ formHolderText }}</span>
+        <div class="nb-credit-card__form-items">
+          <span class="nb-credit-card__form-items--text">{{ formHolderText }}</span>
           <input
             v-model="cdName"
             type="text"
             :style="[inputStyle, isActiveInputName]"
-            class="vg-credit-card__form-items--input"
+            class="nb-credit-card__form-items--input"
             @focus="activeName = true"
             @blur="activeName = false"
           />
         </div>
 
-        <div class="vg-credit-card__form-flexbox">
-          <div class="vg-credit-card__form-items">
-            <span class="vg-credit-card__form-items--text">{{ formExpMonthText }}</span>
+        <div class="nb-credit-card__form-flexbox">
+          <div class="nb-credit-card__form-items">
+            <span class="nb-credit-card__form-items--text">{{ formExpMonthText }}</span>
             <select
               id=""
               v-model="cdExpMonth"
               name=""
               :style="[inputStyle, isActiveInputMonth]"
-              class="vg-credit-card__form-items--select"
+              class="nb-credit-card__form-items--select"
               @focus="activeMonth = true"
               @blur="activeMonth = false"
             >
@@ -91,14 +91,14 @@
             </select>
           </div>
 
-          <div class="vg-credit-card__form-items">
-            <span class="vg-credit-card__form-items--text">{{ formExpYearText }}</span>
+          <div class="nb-credit-card__form-items">
+            <span class="nb-credit-card__form-items--text">{{ formExpYearText }}</span>
             <select
               id=""
               v-model="cdExpYear"
               name=""
               :style="[inputStyle, isActiveInputYear]"
-              class="vg-credit-card__form-items--select"
+              class="nb-credit-card__form-items--select"
               @focus="activeYear = true"
               @blur="activeYear = false"
             >
@@ -119,14 +119,14 @@
             </select>
           </div>
 
-          <div class="vg-credit-card__form-items">
-            <span class="vg-credit-card__form-items--text">{{ formCcvText }}</span>
+          <div class="nb-credit-card__form-items">
+            <span class="nb-credit-card__form-items--text">{{ formCcvText }}</span>
             <input
               v-model="cdCcv"
               type="text"
               maxlength="4"
               :style="[inputStyle, isActiveInputCcv]"
-              class="vg-credit-card__form-items--input"
+              class="nb-credit-card__form-items--input"
               @click="updateCcv(true)"
               @blur="updateCcv(false)"
             />
@@ -638,7 +638,7 @@ export default defineComponent ({
   }
 }
 
-.vg-credit-card {
+.nb-credit-card {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -647,7 +647,7 @@ export default defineComponent ({
   display: inline-block;
     text-align: center;
 }
-.vg-credit-card .vg-credit-card__form {
+.nb-credit-card .nb-credit-card__form {
   padding: 20px;
   width: 600px;
   margin: 0 auto;
@@ -658,11 +658,11 @@ export default defineComponent ({
   overflow: hidden;
 }
 
-.vg-credit-card__form .vg-credit-card__form-items {
+.nb-credit-card__form .nb-credit-card__form-items {
   margin-top: 20px;
 }
 
-.vg-credit-card__form-items .vg-credit-card__form-items--text {
+.nb-credit-card__form-items .nb-credit-card__form-items--text {
   display: block;
   padding-bottom: 5px;
   height: 30px;
@@ -670,8 +670,8 @@ export default defineComponent ({
   text-align: left;
 }
 
-.vg-credit-card__form-items .vg-credit-card__form-items--input,
-.vg-credit-card__form-items .vg-credit-card__form-items--select {
+.nb-credit-card__form-items .nb-credit-card__form-items--input,
+.nb-credit-card__form-items .nb-credit-card__form-items--select {
   width: 100%;
   padding: 10px;
   border-width: 1px;
@@ -680,12 +680,12 @@ export default defineComponent ({
 }
 
 
-.vg-credit-card__form .vg-credit-card__form-flexbox {
+.nb-credit-card__form .nb-credit-card__form-flexbox {
   display: flex;
   gap:15px;
 }
 
-.vg-credit-card__form .vg-credit-card__form-flexbox .vg-credit-card__form-items {
+.nb-credit-card__form .nb-credit-card__form-flexbox .nb-credit-card__form-items {
   flex:1 1 150px;
 }
 </style>
