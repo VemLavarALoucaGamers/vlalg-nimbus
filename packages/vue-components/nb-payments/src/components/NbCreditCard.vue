@@ -145,10 +145,10 @@ import {
   defineAsyncComponent,
   toRefs,
   watch,
-  onMounted,
-  inject
+  onMounted
 } from 'vue';
 import { mask } from 'vue-the-mask'
+import MasterTool from '@vlalg-nimbus/master-tool';
 
 const generateYearList = () => {
   const currentYear = new Date().getFullYear()
@@ -180,7 +180,7 @@ const defaultFormStyle = {
 export default defineComponent ({
   name: 'NbCreditCard',
   components: {
-    NbCreditCardCards: defineAsyncComponent(() => import('@components/NbCreditCardCards.vue'))
+    NbCreditCardCards: defineAsyncComponent(() => import('./NbCreditCardCards.vue'))
   },
   directives: { mask },
   inheritAttrs: false,
@@ -393,7 +393,7 @@ export default defineComponent ({
       '12',
     ])
 
-    const $masterTool = inject('$masterTool')
+    const $masterTool = MasterTool()
 
     const yearsList = computed(() => {
       return (!years.value.length) ? generateYearList() : years.value

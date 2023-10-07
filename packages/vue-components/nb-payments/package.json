@@ -48,6 +48,7 @@
     "jsdom": "^22.1.0",
     "prettier": "^3.0.3",
     "sass": "^1.69.0",
+    "unplugin-vue-components": "^0.25.2",
     "vite": "^4.4.9",
     "vitest": "^0.34.4",
     "vue-the-mask": "^0.11.1"

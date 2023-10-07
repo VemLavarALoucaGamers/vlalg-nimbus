@@ -68,7 +68,7 @@
               </span>
               
               <img
-                src="@images/pattern.png"
+                src="../images/pattern.png"
                 alt=""
                 class="nb-credit-card__back-column-info--image"
                 style="position: absolute; z-index: 0; left: 0; top: 0; right: 0;"
@@ -81,7 +81,8 @@
   </div>
 </template>
 <script>
-import { computed, defineComponent, reactive, ref, watch, toRefs, onMounted, inject } from 'vue';
+import { computed, defineComponent, reactive, ref, watch, toRefs, onMounted } from 'vue';
+import MasterTool from '@vlalg-nimbus/master-tool';
 
 import imagesChipOne from '../images/chip_one.png'
 import imagesChipTwo from '../images/chip_two.png'
@@ -256,7 +257,7 @@ export default defineComponent ({
       maxNumber: 19
     })
 
-    const $masterTool = inject('$masterTool')
+    const $masterTool = MasterTool()
 
     const getConfig = computed(() => {
       return getCardType.value === 'amex' ? amexConfig : otherConfig
