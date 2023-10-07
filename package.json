@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "prepare": "husky install",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "install:all": "yarn install --workspace '*'"
   },
   "workspaces": {
     "packages": [
