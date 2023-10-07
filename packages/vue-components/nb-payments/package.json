@@ -43,7 +43,7 @@
     "@vitejs/plugin-vue": "^4.3.4",
     "@vue/eslint-config-prettier": "^8.0.0",
     "@vue/test-utils": "^2.4.1",
-    "eslint": "^8.49.0",
+    "eslint": "^8.51.0",
     "eslint-plugin-vue": "^9.17.0",
     "jsdom": "^22.1.0",
     "prettier": "^3.0.3",
