@@ -1,0 +1,66 @@
+// File: _histoire.scss
+// This file contains "histoire.dev" config.
+
+.controls {
+  text-align: left;
+
+  .controls-title {
+    padding: 15px 10px 20px;
+    margin: 0;
+    color: #1AD6FF;
+    display: none;
+  }
+
+  .controls-list {
+    .controls-list__item {
+      color: #fff;
+      font-size: 1em;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      display: flex;
+      height: 35px;
+      padding: 0 10px;
+      margin: 5px;
+
+      &:hover {
+        background-color: #1AD6FF;
+      }
+
+      .controls-list__item-name {
+        // margin-right: 10px;
+        // font-weight: bold;
+        // text-transform: uppercase;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 9rem;
+        flex-shrink: 0;
+      }
+      .controls-list__item-input {
+        color: black;
+        flex-grow: 1;
+        
+        input, select {
+          background-color: rgb(63, 63, 70, 1);
+          padding: 0.25rem 0.3rem;
+          outline: 2px solid transparent;
+          outline-offset: 2px;
+          border-style: solid;
+          border-width: 1px;
+          border-color: rgb(255 255 255 / 0.25);
+          border-radius: 0.25rem;
+          margin-top: -0.25rem;
+          margin-bottom: -0.25rem;
+          color: #fff;
+          font-size: 1.1em;
+          width: 100%;
+
+          &:focus {
+            border-color: #1AD6FF;
+          }
+        }
+      }
+    }
+  }
+}

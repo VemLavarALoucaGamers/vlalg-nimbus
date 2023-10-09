@@ -1,12 +1,13 @@
 {
   "name": "vlalg-nimbus",
   "description": "VLALG Nimbus",
-  "version": "8.0.3-alpha",
+  "version": "9.0.0-alpha",
   "private": true,
   "type": "module",
   "scripts": {
     "prepare": "husky install",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "install:all": "yarn install --workspace '*'"
   },
   "workspaces": {
     "packages": [
