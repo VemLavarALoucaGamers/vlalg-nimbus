@@ -678,13 +678,24 @@ export default defineComponent({
 }
 .nb-credit-card .nb-credit-card__form {
 	padding: 20px;
-	width: 600px;
+	width: 100%;
+	max-width: 600px;
 	margin: 0 auto;
 	margin-top: -25px;
 	margin-bottom: 10px;
 	display: block;
-	width: 100%;
 	overflow: hidden;
+}
+
+@media screen and (min-width: 768px) {
+	.nb-credit-card .nb-credit-card__form {
+	}
+}
+@media screen and (min-width: 1024px) {
+}
+@media screen and (min-width: 1440px) {
+}
+@media screen and (min-width: 1600px) {
 }
 
 .nb-credit-card__form .nb-credit-card__form-items {

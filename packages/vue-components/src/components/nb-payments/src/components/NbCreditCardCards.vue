@@ -514,10 +514,13 @@ export default defineComponent({
 	font-family: 'Lato', sans-serif;
 	background-color: transparent;
 	height: 200px;
-	width: 295px;
+	width: 95%;
+	max-width: 295px;
 	display: inline-block;
 	padding-top: 13px;
+	overflow: hidden;
 }
+
 .nb-credit-card__card-faces {
 	position: relative;
 	width: 100%;

@@ -57,7 +57,7 @@ const setCardValues = $event => {
 <template>
 	<Story
 		title="Nb Payments/nb-credit-card"
-		:layout="{ type: 'grid', width: 500 }"
+		:layout="{ type: 'grid', width: '100%' }"
 		icon="ic:round-payment"
 		icon-color="#8B5CF6"
 		autoPropsDisabled
@@ -66,6 +66,7 @@ const setCardValues = $event => {
 			title="Default Values"
 			icon="gis:flag-start"
 			icon-color="#fca673"
+			responsive-disabled
 			:init-state="initState"
 		>
 			<template #default="{ state }">
