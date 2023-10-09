@@ -14,6 +14,11 @@ export default defineConfig({
       ]
     })
   ],
+  external: [
+    '@vlalg-nimbus/master-tool',
+    'vue-the-mask',
+    /node_modules/
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
