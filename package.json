@@ -7,7 +7,8 @@
   "scripts": {
     "prepare": "husky install",
     "commit": "git-cz",
-    "install:all": "yarn install --workspace '*'"
+    "install:all": "yarn install --workspace '*'",
+    "playground": "yarn workspace @vlalg-nimbus/master-tool build && yarn workspace vue-components install && yarn workspace vue-components build"
   },
   "workspaces": {
     "packages": [

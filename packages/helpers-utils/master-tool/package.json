@@ -34,6 +34,7 @@
 		"generate-typing:watch": "npx tsc -w",
 		"clean": "rimraf dist",
 		"lint": "eslint ./modules --ext .js --fix",
+		"build": "yarn clean && yarn lint && yarn prod:minify && yarn generate-typing",
 		"npm:publish": "yarn clean && yarn lint && yarn prod:minify && yarn generate-typing && npm login && npm publish --access=public"
 	},
 	"dependencies": {},
