@@ -1,5 +1,5 @@
 {
-  "name": "@vlalg-nimbus/nimbus-playground",
+  "name": "nimbus-playground",
   "version": "1.0.0",
   "private": true,
   "scripts": {
