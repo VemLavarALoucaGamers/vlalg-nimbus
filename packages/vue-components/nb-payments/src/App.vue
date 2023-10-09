@@ -3,22 +3,18 @@
     <div class="row">
       <div class="col-md-10 col-md-offset-1 test-page__title">
         <h2>Test page</h2>
-        <p class="test-page__component-name">
-          <strong>Component:</strong> VgCreditCard
-        </p>
-        <p class="test-page__warning">
-          Warning: Look at the console to see the click event
-        </p>
+        <p class="test-page__component-name"><strong>Component:</strong> VgCreditCard</p>
+        <p class="test-page__warning">Warning: Look at the console to see the click event</p>
       </div>
     </div>
 
     <div class="row">
       <div
         class="col-md-10 col-md-offset-1 test-page__content"
-        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;"
+        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
       >
         <NbCreditCard
-          vg-id="asdas"
+          nb-id="asdas"
           :show-form="true"
           chip-model="two"
           format-mode="two"
@@ -34,7 +30,7 @@
   </div>
 </template>
 <script>
-import { defineComponent, defineAsyncComponent, ref } from 'vue';
+import { defineComponent, defineAsyncComponent, ref } from 'vue'
 
 export default defineComponent({
   name: 'App',
@@ -43,7 +39,7 @@ export default defineComponent({
   },
   emits: [],
   props: {},
-  setup () {
+  setup() {
     const day = ref(14)
     const month = ref('01')
     const year = ref(2024)
@@ -69,8 +65,8 @@ export default defineComponent({
       cardValues,
       setCardValues
     }
-  },
-});
+  }
+})
 </script>
 
 <style lang="scss" scoped>

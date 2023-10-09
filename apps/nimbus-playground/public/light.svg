@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="svg5" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 2311.8 512"
+	 style="enable-background:new 0 0 2311.8 512;" xml:space="preserve">
+<style type="text/css">
+	.st0{font-family:'Lato-Black';}
+	.st1{font-size:405.5022px;}
+	.st2{fill:url(#SVGID_1_);}
+	.st3{fill:url(#SVGID_2_);}
+</style>
+<text id="Name" transform="matrix(1 0 0 1 688.4069 397.4607)" class="st0 st1">NIMBUS</text>
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="292.9125" y1="29.6219" x2="326.0797" y2="393.3336">
+	<stop  offset="0" style="stop-color:#41D1FF"/>
+	<stop  offset="0.1369" style="stop-color:#41CBFF"/>
+	<stop  offset="0.3171" style="stop-color:#3FBBFF"/>
+	<stop  offset="0.5215" style="stop-color:#3D9FFE"/>
+	<stop  offset="0.7438" style="stop-color:#3A79FD"/>
+	<stop  offset="0.9781" style="stop-color:#3549FC"/>
+	<stop  offset="1" style="stop-color:#3544FC"/>
+</linearGradient>
+<path class="st2" d="M548.2,244.7c12-8.1,22.7-22.5,23-47c0,0-1.7-95.7-97.5-80.1l-25-32.2c0,0-49.8-61.3-79.4,16.7
+	c0,0,12.7-70.7-82.8-85.1c0,0-103.9-18.8-112.7,66.1c0,0-3.6,20.1,5.6,41.6l3.1,4.7c-24.5,0-28.7,24.6-28.7,24.6l-1.3,4.9
+	c-11.1-3.6-20.6-2.7-37.3,4.7c0,0-45.4,19.6-41.5,71.8l-8.5,1.9c-18.6,6.9-25.9,30.5-25.9,30.5c-17.8,67.3,43.1,66.1,43.1,66.1
+	l450.9-2.9c0,0,72.5,3.7,63.8-45.6C597.1,285.3,595.4,255.6,548.2,244.7z"/>
+<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="387.428" y1="127.8313" x2="260.1231" y2="491.9753">
+	<stop  offset="0" style="stop-color:#FFEA83"/>
+	<stop  offset="8.333299e-02" style="stop-color:#FFDD35"/>
+	<stop  offset="1" style="stop-color:#FFA800"/>
+</linearGradient>
+<path class="st3" d="M361.3,140.7l-157,203.9c0,0-17.7,16.5,84.9,7.5c0,0,5.8-1.2-10.2,25.1L215.2,496c0,0,0.7,12.9,20.4-6.1
+	l208.6-218.1c0,0,10.9-12.2-14.9-10.9h-87.7c0,0-10.9,1.4-4.8-12.9C336.8,248,372.2,126.4,361.3,140.7z"/>
+</svg>

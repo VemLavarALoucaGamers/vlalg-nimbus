@@ -1,0 +1,10 @@
+// File: main.scss
+// This file contains all imports
+@charset 'UTF-8';
+
+@import './abstracts/glob';
+@import './base/glob';
+@import './components/glob';
+@import './pages/glob';
+@import './themes/glob';
+@import './vendors/glob';

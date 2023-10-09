@@ -5,4 +5,6 @@ import App from './App.vue';
 
 // import MasterTool from './plugin/masterTool'
 
-createApp(App).use(MasterTool).mount('#app');
+const app = createApp(App)
+//app.use(MasterTool)
+app.mount('#app');

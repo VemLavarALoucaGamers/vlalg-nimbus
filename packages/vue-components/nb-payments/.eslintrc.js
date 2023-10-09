@@ -1,7 +1,7 @@
 /* eslint-env node */
 require('@rushstack/eslint-patch/modern-module-resolution')
 
-module.exports = {
+export default {
   root: true,
   env: {
     node: true,
@@ -165,7 +165,7 @@ module.exports = {
     indent: ['error', 2, { SwitchCase: 2 }],
     'vue/script-indent': [
       'error',
-      2,
+      'tab',
       {
         baseIndent: 0,
         switchCase: 1,
@@ -173,7 +173,7 @@ module.exports = {
     ],
     'vue/html-indent': [
       'error',
-      2,
+      'tab',
       {
         attribute: 1,
         baseIndent: 1,
