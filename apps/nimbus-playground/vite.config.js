@@ -10,14 +10,10 @@ export default defineConfig({
     vue(),
     Components({
       dirs: [
+        'components',
         ...localComponents
       ]
     })
-  ],
-  external: [
-    '@vlalg-nimbus/master-tool',
-    'vue-the-mask',
-    /node_modules/
   ],
   resolve: {
     alias: {
