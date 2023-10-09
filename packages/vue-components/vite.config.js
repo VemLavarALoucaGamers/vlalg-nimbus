@@ -10,7 +10,7 @@ export default defineConfig({
     vue(),
     Components({
       dirs: [
-        'components',
+        'src/components',
         ...localComponents
       ]
     })
