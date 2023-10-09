@@ -7,6 +7,10 @@ const libColor = {
 }
 
 export default defineConfig({
+  routerMode: 'hash',
+  vite: {
+    base: process.env.HISTOIRE_BASE || "/",
+  },
 	theme: {
 		title: 'Nimbus',
     logo: {

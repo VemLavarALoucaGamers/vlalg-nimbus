@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "histoire dev",
     "build": "histoire build",
-    "preview": "histoire preview"
+    "preview": "histoire preview",
+    "pre-build:master-tool": "yarn workspace @vlalg-nimbus/master-tool build",
+    "deploy": "pre:master-tool && yarn workspace vue-components install && yarn workspace vue-components build"
   },
   "dependencies": {
     "@vlalg-nimbus/master-tool": "^1.0.3",
