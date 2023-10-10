@@ -2,7 +2,7 @@
 	"name": "@vlalg-nimbus/master-tool",
 	"description": "Master Tool - Helpers and Utils functions",
 	"private": false,
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"type": "module",
 	"main": "./dist/bundle.min.umd.js",
 	"module": "./dist/bundle.min.es.js",
