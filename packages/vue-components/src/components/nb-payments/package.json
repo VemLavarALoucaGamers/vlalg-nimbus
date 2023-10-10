@@ -2,7 +2,7 @@
   "name": "@vlalg-nimbus/nb-payments",
   "description": "Payments components for Vuejs 3",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "main": "./dist/nb-payments.umd.js",
   "module": "./dist/nb-payments.js",

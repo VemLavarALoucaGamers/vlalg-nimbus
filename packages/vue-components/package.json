@@ -1,7 +1,6 @@
 {
   "name": "vue-components",
   "description": "Nimbus Vue Components Playground",
-  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "histoire dev",
