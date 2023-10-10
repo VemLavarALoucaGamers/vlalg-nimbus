@@ -1,13 +1,14 @@
 {
   "name": "vlalg-nimbus",
   "description": "VLALG Nimbus",
-  "version": "9.0.2-alpha",
+  "version": "9.1.0-alpha",
   "private": true,
   "type": "module",
   "scripts": {
     "prepare": "husky install",
     "commit": "git-cz",
-    "install:all": "yarn install --workspace '*'"
+    "install:all": "yarn install --workspace '*'",
+    "deploy:playground": "yarn workspace vue-components deploy:vercel"
   },
   "workspaces": {
     "packages": [
