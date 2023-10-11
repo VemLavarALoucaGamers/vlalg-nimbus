@@ -9,11 +9,11 @@ declare module 'vue' {
   export interface GlobalComponents {
     AboutView: typeof import('./src/views/AboutView.vue')['default']
     App: typeof import('./src/components/nb-payments/src/App.vue')['default']
-    ControlNbCreditCardText: typeof import('./src/components/nb-payments/src/components/histoire/ControlNbCreditCardText.vue')['default']
+    ControlNbCreditCardText: typeof import('./src/components/nb-payments/ControlNbCreditCardText.vue')['default']
     HomeView: typeof import('./src/views/HomeView.vue')['default']
-    NbCreditCard: typeof import('./src/components/nb-payments/src/components/NbCreditCard.vue')['default']
-    'NbCreditCard.story': typeof import('./src/components/nb-payments/src/components/histoire/NbCreditCard.story.vue')['default']
-    NbCreditCardCards: typeof import('./src/components/nb-payments/src/components/NbCreditCardCards.vue')['default']
+    NbCreditCard: typeof import('./../../packages/vue-components/nb-payments/src/components/NbCreditCard.vue')['default']
+    'NbCreditCard.story': typeof import('./src/components/nb-payments/NbCreditCard.story.vue')['default']
+    NbCreditCardCards: typeof import('./../../packages/vue-components/nb-payments/src/components/NbCreditCardCards.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

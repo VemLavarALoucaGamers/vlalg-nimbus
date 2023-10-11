@@ -1,7 +1,7 @@
 {
   "name": "vlalg-nimbus",
   "description": "VLALG Nimbus",
-  "version": "9.1.1-alpha",
+  "version": "9.2.0-alpha",
   "private": true,
   "type": "module",
   "scripts": {

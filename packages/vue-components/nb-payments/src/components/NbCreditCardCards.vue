@@ -188,6 +188,10 @@ export default defineComponent({
 		cardCcvColor: {
 			type: String,
 			default: defaultCardStyle.ccvColor
+		},
+		showForm: {
+			type: Boolean,
+			default: false
 		}
 	},
 	setup(props, { emit }) {
@@ -210,7 +214,8 @@ export default defineComponent({
 			cardCcvColor,
 			cardHolderText,
 			cardExpirationText,
-			cardCcvText
+			cardCcvText,
+			showForm
 		} = toRefs(props)
 
 		const front = ref('')
@@ -515,10 +520,16 @@ export default defineComponent({
 	background-color: transparent;
 	height: 200px;
 	width: 95%;
+	min-width: 260px;
 	max-width: 295px;
-	display: inline-block;
 	padding-top: 13px;
-	overflow: hidden;
+	display: inline-block;
+}
+
+@media screen and (min-width: 768px) {
+	.nb-credit-card__card {
+		width: 95%;
+	}
 }
 
 .nb-credit-card__card-faces {

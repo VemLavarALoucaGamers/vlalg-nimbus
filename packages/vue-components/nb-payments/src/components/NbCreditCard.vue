@@ -25,6 +25,7 @@
 				:card-holder-text="cardHolderText"
 				:card-expiration-text="cardExpirationText"
 				:card-ccv-text="cardCcvText"
+				:show-form="showForm"
 				@updated-card-config="changeCardConfig"
 			/>
 
@@ -690,12 +691,6 @@ export default defineComponent({
 @media screen and (min-width: 768px) {
 	.nb-credit-card .nb-credit-card__form {
 	}
-}
-@media screen and (min-width: 1024px) {
-}
-@media screen and (min-width: 1440px) {
-}
-@media screen and (min-width: 1600px) {
 }
 
 .nb-credit-card__form .nb-credit-card__form-items {
