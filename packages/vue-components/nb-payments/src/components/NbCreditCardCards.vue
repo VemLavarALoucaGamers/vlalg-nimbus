@@ -1,8 +1,8 @@
 <template>
-	<div class="vg-wrapper">
+	<div class="nb-wrapper">
 		<div
-			:id="vgId"
-			class="nb-credit-card__card vg-reset"
+			:id="nbId"
+			class="nb-credit-card__card nb-reset"
 		>
 			<div
 				class="nb-credit-card__card-faces"
@@ -109,7 +109,7 @@ export default defineComponent({
 	inheritAttrs: false,
 	emits: ['updated-card-config'],
 	props: {
-		vgId: {
+		nbId: {
 			type: String,
 			required: true
 		},
@@ -482,7 +482,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
-.vg-wrapper {
+.nb-wrapper {
 	margin: 0;
 	padding: 0;
 	font-size: 62.5%;
@@ -491,7 +491,7 @@ export default defineComponent({
 	box-sizing: border-box;
 }
 
-.vg-reset {
+.nb-reset {
 	font-size: 16px;
 	font-family: 'Lato', sans-serif;
 	font-style: normal;

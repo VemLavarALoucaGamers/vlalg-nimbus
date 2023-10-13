@@ -1,15 +1,15 @@
 {
-  "name": "@vlalg-nimbus/nb-payments",
-  "description": "Payments components for Vuejs 3",
+  "name": "@vlalg-nimbus/nb-text",
+  "description": "Text components for Vuejs 3",
   "private": false,
-  "version": "3.0.1",
+  "version": "1.0.0",
   "type": "module",
-  "main": "./dist/nb-payments.umd.js",
-  "module": "./dist/nb-payments.js",
+  "main": "./dist/nb-text.umd.js",
+  "module": "./dist/nb-text.js",
   "exports": {
     ".": {
-      "import": "./dist/nb-payments.js",
-      "require": "./dist/nb-payments.umd.js"
+      "import": "./dist/nb-text.js",
+      "require": "./dist/nb-text.umd.js"
     },
     "./dist/style.css": "./dist/style.css",
     "./dist/images": "./dist/images"
@@ -52,8 +52,7 @@
     "sass": "^1.69.0",
     "unplugin-vue-components": "^0.25.2",
     "vite": "^4.4.9",
-    "vitest": "^0.34.4",
-    "vue-the-mask": "^0.11.1"
+    "vitest": "^0.34.4"
   },
   "repository": {
     "type": "git",

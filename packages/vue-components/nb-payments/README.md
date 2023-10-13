@@ -4,7 +4,7 @@
 <br />
 
 <p align="center">
-  <img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/vue-components/src/components/nb-payments/src/images/nb-credit-card_example.gif" width="400">
+  <img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/raw/main/packages/vue-components/nb-payments/src/images/nb-credit-card_example.gif" width="400">
 </p>
 
 This is a component credit card.

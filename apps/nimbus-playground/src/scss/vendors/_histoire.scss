@@ -28,9 +28,6 @@
       }
 
       .controls-list__item-name {
-        // margin-right: 10px;
-        // font-weight: bold;
-        // text-transform: uppercase;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -40,6 +37,14 @@
       .controls-list__item-input {
         color: black;
         flex-grow: 1;
+
+        &.controls-list__item-input--group {
+          display: flex;
+
+          input, select {
+            flex-direction: row;
+          }
+        }
         
         input, select {
           background-color: rgb(63, 63, 70, 1);

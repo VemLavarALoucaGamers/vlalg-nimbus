@@ -7,7 +7,7 @@
 			:style="[verticalAlign]"
 		>
 			<NbCreditCardCards
-				:vg-id="`${nbId}-card`"
+				:nb-id="`${nbId}-card`"
 				:chip-model="chipModel"
 				:card-number="cdNumber"
 				:card-name="cdName"
