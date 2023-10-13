@@ -92,7 +92,7 @@ const initState = () => {
 </style>
 
 <docs lang="md">
-# Nb Gradient Text
+# Nb Highlight Selected Text
 
 > This component is only for [Vue.js 3+](https://vuejs.org/)
 
