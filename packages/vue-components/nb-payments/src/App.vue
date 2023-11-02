@@ -3,7 +3,7 @@
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1 test-page__title">
 				<h2>Test page</h2>
-				<p class="test-page__component-name"><strong>Component:</strong> NbCreditCard</p>
+				<p class="test-page__component-name"><strong>Component:</strong> NbPayments</p>
 				<p class="test-page__warning">Warning: Look at the console to see the click event</p>
 			</div>
 		</div>
@@ -13,6 +13,7 @@
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
+				<h4 class="test-page__content-tile">NbCreditCard</h4>
 				<NbCreditCard
 					nb-id="asdas"
 					:show-form="true"
@@ -109,5 +110,5 @@ export default defineComponent({
 		text-align: left;
 		overflow: hidden;
 	}
-} /**/
+}
 </style>

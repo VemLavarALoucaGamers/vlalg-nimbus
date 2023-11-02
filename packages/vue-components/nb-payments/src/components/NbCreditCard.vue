@@ -1,7 +1,9 @@
 <template>
-	<div class="nb-wrapper">
+	<div
+		v-if="nbId"
+		class="nb-wrapper"
+	>
 		<div
-			v-if="nbId"
 			:id="nbId"
 			class="nb-credit-card nb-reset"
 			:style="[verticalAlign]"

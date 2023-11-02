@@ -3,55 +3,27 @@
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1 test-page__title">
 				<h2>Test page</h2>
-				<p class="test-page__component-name"><strong>Component:</strong> NbText</p>
+				<p class="test-page__component-name"><strong>Component:</strong> NbButtonX</p>
 				<p class="test-page__warning">Warning: Look at the console to see the click event</p>
 			</div>
 		</div>
-
 		<div class="row">
 			<div
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
-				<h4 class="test-page__content-tile">NbGradientText</h4>
-				bbbb<NbGradientText
-					nb-id="asdas"
-					alignment="center"
-					line-height="1"
-					size="3.5rem"
-					padding-bottom="10"
-					bg-first="magenta"
-					bg-second="cyan"
-				>
-					<template #text> i love to<br />drink coffee<br />very much </template> </NbGradientText
-				>aaaaaa
-
-				<h4 class="test-page__content-tile">NbHighlightSelectedText</h4>
-				<p style="font-size: 26px !important">
-					Select
-					<NbHighlightSelectedText
-						nb-id="asdas"
-						background-color="tomato"
-						text-color="blue"
-					>
-						this part of the text
-					</NbHighlightSelectedText>
-					to see it in another color
-				</p>
+				<NbButtonX />
 			</div>
 		</div>
 	</div>
 </template>
 <script>
-import { defineComponent, defineAsyncComponent } from 'vue'
+import { defineComponent, defineAsyncComponent, ref } from 'vue'
 
 export default defineComponent({
 	name: 'App',
 	components: {
-		NbGradientText: defineAsyncComponent(() => import('@components/NbGradientText.vue')),
-		NbHighlightSelectedText: defineAsyncComponent(() =>
-			import('@components/NbHighlightSelectedText.vue')
-		)
+		NbButtonX: defineAsyncComponent(() => import('@components/NbButtonX.vue'))
 	},
 	emits: [],
 	props: {},
@@ -100,16 +72,6 @@ export default defineComponent({
 	.test-page__content {
 		text-align: left;
 		overflow: hidden;
-
-		.test-page__content-tile {
-			font-family: 'Lato', sans-serif;
-			text-align: left;
-			font-weight: 800;
-
-			&:not(:first-child) {
-				margin-top: 150px;
-			}
-		}
 	}
 }
 </style>

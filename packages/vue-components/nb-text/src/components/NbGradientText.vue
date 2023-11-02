@@ -6,7 +6,7 @@
 		:style="[textAlign]"
 	>
 		<div
-			class="nb-gradient-text"
+			class="nb-gradient-text nb-reset"
 			:style="[newLineHeight, gradient, fontSize, pBottom, family]"
 		>
 			<slot name="text"></slot>
@@ -157,7 +157,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
 .nb-wrapper {
 	margin: 0;
@@ -167,8 +167,6 @@ export default defineComponent({
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	display: inline-block;
-	width: auto;
-	overflow: hidden;
 }
 
 .nb-reset {
