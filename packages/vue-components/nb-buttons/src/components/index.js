@@ -1,3 +1,3 @@
-import NbButtonX from '@components/NbButtonX.vue';
+import NbButtonMechanical from '@components/NbButtonMechanical.vue';
 
-export default { NbButtonX };
+export default { NbButtonMechanical };

@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 
 import { mount } from '@vue/test-utils';
-import NbButtonX from '../NbButtonX.vue';
+import NbButtonMechanical from '../NbButtonMechanical.vue';
 
-describe('NbButtonX', () => {
+describe('NbButtonMechanical', () => {
   it('renders properly', () => {
-    const wrapper = mount(NbButtonX, { props: { txt: 'Hello Vitest' } });
+    const wrapper = mount(NbButtonMechanical, { props: { txt: 'Hello Vitest' } });
     expect(wrapper.text()).toContain('Hello Vitest');
   });
 });

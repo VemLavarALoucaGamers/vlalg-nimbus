@@ -34,7 +34,7 @@ app.mount('#app')
 
 The components that are part of this lib are:
 
-- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-delete-button" target="_blank">nb-delete-button</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-mechanical" target="_blank">nb-button-mechanical</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

@@ -3,7 +3,7 @@
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1 test-page__title">
 				<h2>Test page</h2>
-				<p class="test-page__component-name"><strong>Component:</strong> NbButtonX</p>
+				<p class="test-page__component-name"><strong>Component:</strong> NbButtons</p>
 				<p class="test-page__warning">Warning: Look at the console to see the click event</p>
 			</div>
 		</div>
@@ -12,25 +12,39 @@
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
-				<NbButtonX />
+				<h4 class="test-page__content-tile">NbButtonMechanical</h4>
+				<NbButtonMechanical
+					container-color="#181818"
+					button-color="tomato"
+					font-size="1.6em"
+					text="button with block display"
+					@clicked="buttonAction"
+				/>
+
+				<p>
+					Text before
+					<NbButtonMechanical
+						text="button with inline-block display"
+						display="ib"
+						container-color="#181818"
+						button-color="tomato"
+						@clicked="buttonAction"
+					/>
+					text after
+				</p>
 			</div>
 		</div>
 	</div>
 </template>
-<script>
-import { defineComponent, defineAsyncComponent, ref } from 'vue'
 
-export default defineComponent({
-	name: 'App',
-	components: {
-		NbButtonX: defineAsyncComponent(() => import('@components/NbButtonX.vue'))
-	},
-	emits: [],
-	props: {},
-	setup() {
-		return {}
-	}
-})
+<script setup>
+import { defineAsyncComponent } from 'vue'
+
+const NbButtonMechanical = defineAsyncComponent(() => import('@components/NbButtonMechanical.vue'))
+
+const buttonAction = () => {
+	console.log('aqui')
+}
 </script>
 
 <style lang="scss" scoped>
