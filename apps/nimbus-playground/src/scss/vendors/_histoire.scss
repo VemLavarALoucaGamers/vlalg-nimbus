@@ -3,6 +3,9 @@
 
 .controls {
   text-align: left;
+  margin-left: 10px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 
   .controls-title {
     padding: 15px 10px 20px;
@@ -68,4 +71,81 @@
       }
     }
   }
+}
+
+.simulator {
+  text-align: left;
+  margin-left: 10px;
+  margin-bottom: 30px;
+
+    .simulator__item {
+      color: #fff;
+      font-size: 1em;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      display: flex;
+      height: 35px;
+      padding: 0 10px;
+      margin: 5px;
+
+      &:hover {
+        background-color: #1AD6FF;
+      }
+
+      .simulator__item-name {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 9rem;
+        flex-shrink: 0;
+      }
+      .simulator__item-input {
+        color: black;
+        flex-grow: 1;
+
+        &.simulator__item-input--group {
+          display: flex;
+
+          input, select {
+            flex-direction: row;
+          }
+        }
+        
+        input, select {
+          background-color: rgb(63, 63, 70, 1);
+          padding: 0.25rem 0.3rem;
+          outline: 2px solid transparent;
+          outline-offset: 2px;
+          border-style: solid;
+          border-width: 1px;
+          border-color: rgb(255 255 255 / 0.25);
+          border-radius: 0.25rem;
+          margin-top: -0.25rem;
+          margin-bottom: -0.25rem;
+          color: #fff;
+          font-size: 1.1em;
+          width: 100%;
+
+          &:focus {
+            border-color: #1AD6FF;
+          }
+        }
+      }
+    }
+
+    .simulator__item-tip {
+      display: block;
+      padding: 0 10px;
+      margin: 5px;
+      font-size: .775rem;
+    }
+}
+
+code {
+  background-color: black;
+  padding: 5px 7px;
+  margin: 0 2px;
+  border-radius: 5px;
+  font-style: italic;
 }

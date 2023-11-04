@@ -47,7 +47,7 @@ export default defineConfig({
         900: libColor.hover,
       }
     },
-    logoHref: 'https://nimbus.tec.br/playground',
+    logoHref: '#',
     defaultColorScheme: 'dark',
     hideColorSchemeSwitch: true,
 	},

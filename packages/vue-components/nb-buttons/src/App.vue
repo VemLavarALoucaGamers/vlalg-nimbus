@@ -14,22 +14,26 @@
 			>
 				<h4 class="test-page__content-tile">NbButtonMechanical</h4>
 				<NbButtonMechanical
+					nb-id="NbButtonMechanical1"
 					container-color="#181818"
 					button-color="tomato"
 					font-size="1.6em"
-					text="button with block display"
 					@clicked="buttonAction"
-				/>
+				>
+					<template #content> button with block display </template>
+				</NbButtonMechanical>
 
 				<p>
 					Text before
 					<NbButtonMechanical
-						text="button with inline-block display"
+						nb-id="NbButtonMechanical2"
 						display="ib"
 						container-color="#181818"
 						button-color="tomato"
 						@clicked="buttonAction"
-					/>
+					>
+						<template #content> button with inline-block display </template>
+					</NbButtonMechanical>
 					text after
 				</p>
 			</div>

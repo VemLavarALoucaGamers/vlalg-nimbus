@@ -1,14 +1,16 @@
 <template>
 	<div
+		v-if="nbId"
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
 		@click="interacted"
 	>
 		<div
+			:id="nbId"
 			:class="['nb-reset', 'component', 'component-transition', transitionSlow]"
 			:style="[componentStyle]"
 		>
-			{{ props.text }}
+			<slot name="content">Default Text</slot>
 		</div>
 	</div>
 </template>
@@ -24,9 +26,9 @@ defineOptions({
 const emit = defineEmits(['clicked'])
 
 const props = defineProps({
-	text: {
+	nbId: {
 		type: String,
-		default: 'Default Text'
+		required: true
 	},
 	display: {
 		type: String,
@@ -98,7 +100,6 @@ const props = defineProps({
 })
 
 const {
-	text,
 	display,
 	buttonColor,
 	textColor,
@@ -190,7 +191,6 @@ const styleButtonColor = computed(() => {
 })
 
 const interacted = () => {
-	console.log('oi')
 	emit('clicked')
 }
 </script>
