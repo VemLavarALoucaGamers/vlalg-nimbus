@@ -7,14 +7,12 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    AboutView: typeof import('./src/views/AboutView.vue')['default']
-    App: typeof import('./src/components/nb-payments/src/App.vue')['default']
-    ControlNbCreditCardText: typeof import('./src/components/nb-payments/ControlNbCreditCardText.vue')['default']
+    ControlNbButtonMechanical: typeof import('./src/components/nb-buttons/ControlNbButtonMechanical.vue')['default']
+    ControlNbCreditCard: typeof import('./src/components/nb-payments/ControlNbCreditCard.vue')['default']
     ControlNbGradientText: typeof import('./src/components/nb-gradient-text/ControlNbGradientText.vue')['default']
     ControlNbHighlightSelectedText: typeof import('./src/components/nb-gradient-text/ControlNbHighlightSelectedText.vue')['default']
-    ControlVgGradientText: typeof import('./src/components/nb-gradient-text/ControlVgGradientText.vue')['default']
-    copy: typeof import('./src/components/nb-gradient-text/NbGradientText.story copy.vue')['default']
-    HomeView: typeof import('./src/views/HomeView.vue')['default']
+    NbButtonMechanical: typeof import('./../../packages/vue-components/nb-buttons/src/components/NbButtonMechanical.vue')['default']
+    'NbButtonMechanical.story': typeof import('./src/components/nb-buttons/NbButtonMechanical.story.vue')['default']
     NbCreditCard: typeof import('./../../packages/vue-components/nb-payments/src/components/NbCreditCard.vue')['default']
     'NbCreditCard.story': typeof import('./src/components/nb-payments/NbCreditCard.story.vue')['default']
     NbCreditCardCards: typeof import('./../../packages/vue-components/nb-payments/src/components/NbCreditCardCards.vue')['default']
@@ -24,6 +22,5 @@ declare module 'vue' {
     'NbHighlightSelectedText.story': typeof import('./src/components/nb-gradient-text/NbHighlightSelectedText.story.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    'VgGradientText.story': typeof import('./src/components/VgGradientText/VgGradientText.story.vue')['default']
   }
 }

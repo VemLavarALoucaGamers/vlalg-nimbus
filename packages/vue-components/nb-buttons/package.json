@@ -1,15 +1,15 @@
 {
-  "name": "@vlalg-nimbus/nb-payments",
-  "description": "Payments components for Vuejs 3",
+  "name": "@vlalg-nimbus/nb-buttons",
+  "description": "Button components for Vuejs 3",
   "private": false,
-  "version": "4.0.0",
+  "version": "1.0.0",
   "type": "module",
-  "main": "./dist/nb-payments.umd.js",
-  "module": "./dist/nb-payments.js",
+  "main": "./dist/nb-buttons.umd.js",
+  "module": "./dist/nb-buttons.js",
   "exports": {
     ".": {
-      "import": "./dist/nb-payments.js",
-      "require": "./dist/nb-payments.umd.js"
+      "import": "./dist/nb-buttons.js",
+      "require": "./dist/nb-buttons.umd.js"
     },
     "./dist/style.css": "./dist/style.css",
     "./dist/images": "./dist/images"
@@ -34,7 +34,6 @@
   "dependencies": {
     "@vlalg-nimbus/bee-css-reset": "^2.0.2",
     "@vlalg-nimbus/chameleon-grid-layout": "^1.0.2",
-    "@vlalg-nimbus/master-tool": "^1.0.3",
     "vue": "^3.3.4"
   },
   "devDependencies": {
@@ -52,8 +51,7 @@
     "sass": "^1.69.0",
     "unplugin-vue-components": "^0.25.2",
     "vite": "^4.4.9",
-    "vitest": "^0.34.4",
-    "vue-the-mask": "^0.11.1"
+    "vitest": "^0.34.4"
   },
   "repository": {
     "type": "git",
@@ -67,7 +65,10 @@
     "vuejs",
     "vue js",
     "vue plugin",
-    "credit card",
+    "delete button",
+    "delete",
+    "buttons",
+    "button",
     "components",
     "component",
     "vue components",

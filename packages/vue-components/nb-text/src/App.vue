@@ -4,7 +4,7 @@
 			<div class="col-md-10 col-md-offset-1 test-page__title">
 				<h2>Test page</h2>
 				<p class="test-page__component-name"><strong>Component:</strong> NbText</p>
-				<p class="test-page__warning">Warning:</p>
+				<p class="test-page__warning">Warning: Look at the console to see the click event</p>
 			</div>
 		</div>
 
@@ -111,5 +111,5 @@ export default defineComponent({
 			}
 		}
 	}
-} /**/
+}
 </style>

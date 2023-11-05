@@ -302,50 +302,6 @@ const filterNumber = (fieldName, maxCharacters) => {
       </p>
     </div>
   </div>
-
-  <div v-if="false">
-    text:
-    <textarea style="color: black; white-space: pre-line" v-model="state.text" /><br />
-
-    nb-id:
-    <input type="text" style="color: black" v-model="state.nbId" /><br />
-
-    lineHeight:
-    <input
-      type="number"
-      step="0.00000001"
-      min="0"
-      style="color: black"
-      v-model="state.lineHeight"
-    /><br />
-
-    size:
-    <input type="number" style="color: black" v-model="state.size" />
-    <select v-model="state.sizeType">
-      <option v-for="(op, index) in fontSizeOptionsList" :key="index" :value="op.type">
-        {{ op.title }}
-      </option></select
-    ><br />
-
-    bg-first:
-    <input type="color" style="color: black" v-model="state.bgFirst" /><br />
-
-    bg-second:
-    <input type="color" style="color: black" v-model="state.bgSecond" /><br />
-
-    alignment:
-    <select v-model="state.alignment">
-      <option value="left">left</option>
-      <option value="center">center</option>
-      <option value="right">right</option></select
-    ><br />
-
-    padding-Bottom:
-    <input type="number" min="5" style="color: black" v-model="state.paddingBottom" /><br />
-
-    font:
-    <input type="text" style="color: black" v-model="state.font" /><br />
-  </div>
 </template>
 
 <style lang="scss" scoped>

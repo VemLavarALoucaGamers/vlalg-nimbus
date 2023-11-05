@@ -21,6 +21,12 @@
 
 This is an Open Source project by <a href="https://vemlavaralouca.com.br/" target="_blank">VLALG</a> (**Vem Lavar a Louça Gamers**) that aims to share JavaScript libs, VS Code extensions, Browser extensions and Vue.js 3 components, with the focus of putting Brazil <img src="./brazil-icon.png" alt="Brazil flag" style="width:20px;"/> in the field of vision of world developers with a 100% Brazilian project.
 
+<div align="center">
+  <a href="[https://app.fossa.com/projects/git%2Bgithub.com%2FVemLavarALoucaGamers%2Fvlalg-nimbus?ref=badge_shield](https://nimbus.tec.br/)">
+    <img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/blob/main/editable/repository-open-graph-template.png" alt="Nimbus Printscreen" width="80%">
+  </a>
+</div>
+
 ## Documentation
 To view the documentation and learn more about this project:
 

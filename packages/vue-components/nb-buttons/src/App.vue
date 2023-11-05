@@ -3,71 +3,52 @@
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1 test-page__title">
 				<h2>Test page</h2>
-				<p class="test-page__component-name"><strong>Component:</strong> NbPayments</p>
+				<p class="test-page__component-name"><strong>Component:</strong> NbButtons</p>
 				<p class="test-page__warning">Warning: Look at the console to see the click event</p>
 			</div>
 		</div>
-
 		<div class="row">
 			<div
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
-				<h4 class="test-page__content-tile">NbCreditCard</h4>
-				<NbCreditCard
-					nb-id="asdas"
-					:show-form="true"
-					chip-model="two"
-					format-mode="two"
-					:flip-on-hover="true"
-					:form-shadow="true"
-					form-input-background="white"
-					form-input-border="magenta"
-					form-input-active-color="yellow"
-					@card-values="setCardValues"
-				/>
+				<h4 class="test-page__content-tile">NbButtonMechanical</h4>
+				<NbButtonMechanical
+					nb-id="NbButtonMechanical1"
+					container-color="#181818"
+					button-color="tomato"
+					font-size="1.6em"
+					@clicked="buttonAction"
+				>
+					<template #content> button with block display </template>
+				</NbButtonMechanical>
+
+				<p>
+					Text before
+					<NbButtonMechanical
+						nb-id="NbButtonMechanical2"
+						display="ib"
+						container-color="#181818"
+						button-color="tomato"
+						@clicked="buttonAction"
+					>
+						<template #content> button with inline-block display </template>
+					</NbButtonMechanical>
+					text after
+				</p>
 			</div>
 		</div>
 	</div>
 </template>
-<script>
-import { defineComponent, defineAsyncComponent, ref } from 'vue'
 
-export default defineComponent({
-	name: 'App',
-	components: {
-		NbCreditCard: defineAsyncComponent(() => import('@components/NbCreditCard.vue'))
-	},
-	emits: [],
-	props: {},
-	setup() {
-		const day = ref(14)
-		const month = ref('01')
-		const year = ref(2024)
-		const hour = ref(19)
-		const minute = ref(44)
-		const second = ref(10)
-		const cardValues = ref({})
+<script setup>
+import { defineAsyncComponent } from 'vue'
 
-		const toDate = ref('oct 11, 2022 16:05:00')
+const NbButtonMechanical = defineAsyncComponent(() => import('@components/NbButtonMechanical.vue'))
 
-		const setCardValues = $event => {
-			cardValues.value = $event
-		}
-
-		return {
-			day,
-			month,
-			year,
-			hour,
-			minute,
-			second,
-			toDate,
-			cardValues,
-			setCardValues
-		}
-	}
-})
+const buttonAction = () => {
+	console.log('aqui')
+}
 </script>
 
 <style lang="scss" scoped>
