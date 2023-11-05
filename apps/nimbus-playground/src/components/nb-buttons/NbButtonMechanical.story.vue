@@ -26,7 +26,7 @@ const clicked = () => {
   <Story
     title="Nb Buttons/nb-button-mechanical"
     :layout="{ type: 'grid', width: '100%' }"
-    icon="ic:round-payment"
+    icon="material-symbols:buttons-alt-rounded"
     icon-color="#8B5CF6"
     autoPropsDisabled
   >

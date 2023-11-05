@@ -19,7 +19,7 @@
 import { defineProps, toRefs, computed } from 'vue'
 
 defineOptions({
-	name: 'ComponentName',
+	name: 'NbButtonMechanical',
 	inheritAttrs: false
 })
 
