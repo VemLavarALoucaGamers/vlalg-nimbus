@@ -1,35 +1,46 @@
 <template>
 	<div
-		v-if="nbId && quantidadeItens && quantidadeItens > 0"
-		:class="['nb-wrapper', componentDisabled]"
+		v-if="nbId && quantityOfItems && quantityOfItems > 0"
+		:class="['nb-wrapper', wrapperComponentDisabled]"
 		:style="[wrapperStyle]"
 	>
 		<div
 			:id="nbId"
-			:class="['nb-reset', 'component', 'component-transition']"
-			:style="[componentStyle]"
+			:class="['nb-reset', 'component']"
+			:style="[componentStyle, componentDisabled]"
+			style="text-align: center"
 		>
 			<div
-				class="container"
+				class="slide-container"
 				ref="container"
 				:style="[containerStyle]"
 			>
+				<div class="slide-container__border"></div>
+
+				<!--<progress
+					v-if="showProgressBar"
+					class="slide-container__progress"
+					:value="progress"
+					max="100"
+				/>-->
+
 				<div
-					class="div-border"
-					@mouseenter="pauseButton"
-					@mouseleave="playButton"
-				></div>
+					v-if="showProgressBar"
+					class="slide-container__progress"
+					:style="[progressStyle]"
+				/>
+
 				<div
-					id="linha"
-					ref="linha"
-					:style="[linhaStyle]"
-					class=""
+					id="row"
+					ref="row"
+					:style="[rowStyle]"
+					class="slide-container__row"
 				>
 					<div
 						class="slide"
 						ref="slides"
 						:style="[slidesStyle]"
-						v-for="(item, index) in quantidadeItens"
+						v-for="(item, index) in quantityOfItems"
 						:key="index"
 						:id="`${nbId}-slot${index}`"
 					>
@@ -38,9 +49,34 @@
 				</div>
 			</div>
 
-			<br /><br />
+			<ul
+				style="list-style-type: none"
+				class="slide-buttons"
+			>
+				<li
+					v-for="(item, index) in quantityOfItems"
+					:key="index"
+					:class="[
+						'slide-buttons__button',
+						currentIndex === index ? 'slide-buttons__button--active' : ''
+					]"
+					:style="[
+						slideButtonsStyle,
+						slideButtonsStyleColor,
+						currentIndex === index || index === hoverSlideButton ? slideButtonsActiveStyleColor : ''
+					]"
+					data-index="index"
+					:disabled="currentIndex === index"
+					@mouseenter="changeSlideButtonHover(index)"
+					@mouseleave="changeSlideButtonHover(null)"
+					@click="slideButtons(index)"
+				></li>
+			</ul>
 
-			<div class="controls">
+			<div
+				v-if="isDevelopment"
+				class="controls"
+			>
 				<progress
 					id="progress"
 					:value="progress"
@@ -50,11 +86,11 @@
 				<br />
 
 				<button
-					v-for="(item, index) in quantidadeItens"
+					v-for="(item, index) in quantityOfItems"
 					:key="index"
 					class="slide-button"
 					data-index="index"
-					:disabled="currentIndex === index"
+					:disabled="disabled || currentIndex === index"
 					@click="slideButtons(index)"
 				>
 					Slide {{ index + 1 }}
@@ -62,7 +98,7 @@
 
 				<br /><br />
 
-				<p id="timer-info">{{ timerInfo }}</p>
+				<p class="timer-info">{{ timerInfo }}</p>
 
 				<button
 					id="pause"
@@ -70,18 +106,21 @@
 				>
 					Pause
 				</button>
+
 				<button
 					id="play"
 					@click="playButton"
 				>
 					Play
 				</button>
+
 				<button
 					id="restart"
 					@click="restartButton"
 				>
 					Restart
 				</button>
+
 				<button
 					id="replay"
 					@click="replayButton"
@@ -94,7 +133,17 @@
 </template>
 
 <script setup>
-import { defineProps, toRefs, computed, ref, onMounted, watch, useSlots } from 'vue'
+import {
+	defineProps,
+	defineOptions,
+	toRefs,
+	computed,
+	ref,
+	onMounted,
+	onBeforeUnmount,
+	watch,
+	useSlots
+} from 'vue'
 
 defineOptions({
 	name: 'NbSlideDivFixedSize',
@@ -118,7 +167,7 @@ const props = defineProps({
 		type: Boolean,
 		default: false,
 		validator: value => {
-			return typeof value === 'boolean' && [true, false].includes(value)
+			return !!(typeof value === 'boolean' && [true, false].includes(value))
 		}
 	},
 	borderRadius: {
@@ -140,9 +189,40 @@ const props = defineProps({
 		type: Number,
 		default: 200
 	},
-	quantidadeItens: {
+	quantityOfItems: {
 		type: Number,
 		default: 0
+	},
+	slideInterval: {
+		type: Number,
+		default: 5000
+	},
+	buttonsSize: {
+		type: Number,
+		default: 10
+	},
+	buttonMarginTop: {
+		type: Number,
+		default: 10
+	},
+	buttonMarginBottom: {
+		type: Number,
+		default: 10
+	},
+	buttonsColor: {
+		type: String,
+		default: 'tomato'
+	},
+	buttonsColorHover: {
+		type: String,
+		default: 'blue'
+	},
+	showProgressBar: {
+		type: Boolean,
+		default: false,
+		validator: value => {
+			return !!(typeof value === 'boolean' && [true, false].includes(value))
+		}
 	}
 })
 
@@ -154,7 +234,13 @@ const {
 	slideType,
 	slideWidth,
 	slideHeight,
-	quantidadeItens
+	quantityOfItems,
+	slideInterval,
+	buttonsSize,
+	buttonMarginTop,
+	buttonMarginBottom,
+	buttonsColor,
+	buttonsColorHover
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
@@ -165,7 +251,13 @@ const formatDefaultValues = computed(() => {
 	const slideTypeValue = !slideType.value ? 'transform' : slideType.value
 	const slideWidthValue = !slideWidth.value ? 200 : slideWidth.value
 	const slideHeightValue = !slideHeight.value ? 200 : slideHeight.value
-	const quantidadeItensValue = !quantidadeItens.value ? 0 : quantidadeItens.value
+	const quantityOfItemsValue = !quantityOfItems.value ? 0 : quantityOfItems.value
+	const slideIntervalValue = !slideInterval.value ? 5000 : slideInterval.value
+	const buttonsSizeValue = !buttonsSize.value ? 10 : buttonsSize.value
+	const buttonMarginTopValue = !buttonMarginTop.value ? 10 : buttonMarginTop.value
+	const buttonMarginBottomValue = !buttonMarginBottom.value ? 10 : buttonMarginBottom.value
+	const buttonsColorValue = !buttonsColor ? 'tomato' : buttonsColor.value
+	const buttonsColorHoverValue = !buttonsColorHover ? 'blue' : buttonsColorHover.value
 
 	return {
 		nbId: nbIdValue,
@@ -175,13 +267,29 @@ const formatDefaultValues = computed(() => {
 		slideType: slideTypeValue,
 		slideWidth: slideWidthValue,
 		slideHeight: slideHeightValue,
-		quantidadeItens: quantidadeItensValue
+		quantityOfItems: quantityOfItemsValue,
+		slideInterval: slideIntervalValue,
+		buttonsSize: buttonsSizeValue,
+		buttonMarginTop: buttonMarginTopValue,
+		buttonMarginBottom: buttonMarginBottomValue,
+		buttonsColor: buttonsColorValue,
+		buttonsColorHover: buttonsColorHoverValue
 	}
+})
+const wrapperComponentDisabled = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.disabled
 })
 const componentDisabled = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.disabled
+	if (defaultValues.disabled) return {}
+
+	return {
+		backgroundColor: `${defaultValues.buttonColor} !important`,
+		color: `${defaultValues.textColor} !important`
+	}
 })
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
@@ -204,11 +312,10 @@ const containerStyle = computed(() => {
 	return {
 		width: `${defaultValues.slideWidth}px`,
 		height: `${defaultValues.slideHeight}px`,
-		overflow: currentSlideType === 'transform' ? 'visible' : 'visible'
-		// overflow: currentSlideType === 'transform' ? 'hidden' : 'visible' // Voltar
+		overflow: currentSlideType === 'transform' ? 'hidden' : 'visible'
 	}
 })
-const linhaStyle = computed(() => {
+const rowStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	const currentSlideType = defaultValues.slideType
 
@@ -217,7 +324,7 @@ const linhaStyle = computed(() => {
 		currentSlideType === 'transform' ? { transition: 'transform 500ms ease-in-out' } : {}
 
 	return {
-		width: `${defaultValues.slideWidth * defaultValues.quantidadeItens}px`,
+		width: `${defaultValues.slideWidth * defaultValues.quantityOfItems}px`,
 		height: `${defaultValues.slideHeight}px`,
 		...transition,
 		transform:
@@ -235,44 +342,60 @@ const slidesStyle = computed(() => {
 		currentSlideType === 'transform'
 			? { position: 'relative' }
 			: {
-					zIndex: 0,
 					position: 'absolute'
 			  }
-	console.log({
-		width: `${defaultValues.slideWidth}px`,
-		height: `${defaultValues.slideHeight}px`,
-		...otherConfigs
-	})
+
 	return {
+		overflow: 'hidden',
 		width: `${defaultValues.slideWidth}px`,
 		height: `${defaultValues.slideHeight}px`,
 		...otherConfigs
 	}
 })
-
-const styleTextColor = computed(() => {
+const slideButtonsStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.textColor
+	return {
+		width: `${defaultValues.buttonsSize}px`,
+		height: `${defaultValues.buttonsSize}px`,
+		margin: `${defaultValues.buttonMarginTop}px 5px ${defaultValues.buttonMarginBottom}px 5px`
+	}
 })
-const styleButtonColor = computed(() => {
+const slideButtonsStyleColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.buttonColor
+	return {
+		background: defaultValues.buttonsColor
+	}
+})
+const slideButtonsActiveStyleColor = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return {
+		background: defaultValues.buttonsColorHover
+	}
+})
+const progressStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return {
+		width: `${progress}%`,
+		background: defaultValues.progressColor
+	}
 })
 
+const isDevelopment = ref(true)
 const container = ref(null)
 const slides = ref(null)
-const linha = ref(null)
+const row = ref(null)
+const hoverSlideButton = ref(null)
 
 const slideLength = ref(0)
 const hasSlots = ref(false)
 
-const slideInterval = ref(2000) // 5000
-
 const currentIndex = ref(0)
 const timeElapsed = ref(0)
-const timer = ref(null)
+const setIntervalInstance = ref(null)
 const progress = ref(0)
 const percentage = ref(0)
 const isPaused = ref(false)
@@ -280,10 +403,11 @@ const hasReplay = ref(true)
 
 const timerInfo = ref('')
 
-const lastIndex = formatDefaultValues.value.quantidadeItens - 1
-
 function updateProgress() {
-	percentage.value = (timeElapsed.value / slideInterval.value) * 100
+	const defaultValues = formatDefaultValues.value
+	const currentSlideInterval = defaultValues.slideInterval
+
+	percentage.value = (timeElapsed.value / currentSlideInterval) * 100
 	progress.value = percentage.value
 
 	changeInfo()
@@ -292,21 +416,20 @@ function updateProgress() {
 function changeInfo() {
 	const defaultValues = formatDefaultValues.value
 
-	// console.log(currentIndex.value, currentIndex.value + 1, defaultValues.quantidadeItens)
+	const infoTimer = `Timer: ${currentIndex.value + 1} / ${defaultValues.quantityOfItems}`
+	const infoProgress = `Progress: ${percentage.value.toFixed(3)}%`
+	const infoTime = `Time: ${timeElapsed.value / 1000} seconds`
+	const infoPause = `Pause: ${isPaused.value}`
 
-	timerInfo.value = `
-  Timer: ${currentIndex.value + 1} / ${defaultValues.quantidadeItens} |
-  Progress: ${percentage.value.toFixed(3)}% |
-  Time: ${timeElapsed.value / 1000} seconds |
-  Pause: ${isPaused.value}`
+	timerInfo.value = `${infoTimer} | ${infoProgress} | ${infoTime} | ${infoPause}`
 }
 
-function scrollToSlide(slideIndex) {
+function scrollToSlide(slideIndex = 0) {
 	const defaultValues = formatDefaultValues.value
 
 	const distanceToScroll = defaultValues.slideWidth * slideIndex
-	console.log('a -> ', currentIndex.value, slideIndex)
-	linha.value.style.transform = `translateX(-${distanceToScroll}px)`
+
+	if (row.value) row.value.style.transform = `translateX(-${distanceToScroll}px)`
 
 	currentIndex.value = slideIndex
 	timeElapsed.value = 0
@@ -314,7 +437,7 @@ function scrollToSlide(slideIndex) {
 	startSlideShow(slideIndex)
 }
 
-function changeZIndex(index) {
+function changeZIndex(index = 0) {
 	formatSlots(index)
 
 	currentIndex.value = index
@@ -323,36 +446,34 @@ function changeZIndex(index) {
 	startSlideShow(index)
 }
 
-function changeSlide(index) {
-	if (timer.value) {
-		clearInterval(timer.value)
-		timer.value = null
+function changeSlide(index = 0) {
+	if (setIntervalInstance.value) {
+		removeSetIntervalInstance()
 	}
 
-	// const slideToEnd = (currentIndex === lastIndex) ? lastIndex : currentIndex
-	// console.log(currentIndex, index, lastIndex, slideToEnd)
-	// linha.appendChild(slides[slideToEnd])
-
-	// console.log('1 -> ', index)
-
 	if (!isPaused.value) updateDiv(index)
-	// console.log('changeSlide', currentIndex.value, index)
 }
 
-function startSlideShow(newIndex) {
+function startSlideShow(newIndex = 0) {
 	const defaultValues = formatDefaultValues.value
+	const currentSlideType = defaultValues.slideType
+	const currentSlideInterval = defaultValues.slideInterval
 
-	timer.value = setInterval(function () {
+	if (currentSlideType === 'z-index') formatSlots(newIndex)
+
+	setIntervalInstance.value = setInterval(function () {
 		timeElapsed.value += 100
-		const isFinalTime = !!(timeElapsed.value > slideInterval.value)
-		const isLastSlide = !!(currentIndex.value === defaultValues.quantidadeItens - 1)
+
+		const isFinalTime = !!(timeElapsed.value > currentSlideInterval)
+		const isLastSlide = !!(currentIndex.value === defaultValues.quantityOfItems - 1)
+
+		if (!setIntervalInstance.value) removeSetIntervalInstance()
 
 		if (isFinalTime) {
-			clearInterval(timer.value)
-			timer.value = null
+			removeSetIntervalInstance()
 
 			if (!isLastSlide || (isLastSlide && hasReplay.value)) {
-				const newNextIndex = (newIndex + 1) % defaultValues.quantidadeItens
+				const newNextIndex = (newIndex + 1) % defaultValues.quantityOfItems
 				changeSlide(newNextIndex)
 			}
 		} else {
@@ -361,20 +482,23 @@ function startSlideShow(newIndex) {
 	}, 100)
 }
 
-function slideButtons(index) {
-	console.log(currentIndex.value !== index)
+function slideButtons(index = 0) {
 	if (currentIndex.value !== index) {
 		isPaused.value = false
-		clearInterval(timer.value)
-		timer.value = null
+
+		removeSetIntervalInstance()
+
 		updateDiv(index)
 	}
 }
 
+function changeSlideButtonHover(index) {
+	hoverSlideButton.value = index
+}
+
 function pauseButton() {
 	isPaused.value = true
-	clearInterval(timer.value)
-	timer.value = null
+	removeSetIntervalInstance()
 }
 
 function playButton() {
@@ -389,8 +513,8 @@ function playButton() {
 
 function restartButton() {
 	isPaused.value = false
-	clearInterval(timer.value)
-	timer.value = null
+
+	removeSetIntervalInstance()
 
 	updateDiv(0)
 }
@@ -400,7 +524,7 @@ function replayButton() {
 	restartButton()
 }
 
-function updateDiv(index) {
+function updateDiv(index = 0) {
 	const defaultValues = formatDefaultValues.value
 	const currentSlideType = defaultValues.slideType
 
@@ -413,47 +537,76 @@ function updateDiv(index) {
 	}
 }
 
-function formatSlots(index) {
-	console.log(index)
+function formatSlots(index = 0) {
 	const defaultValues = formatDefaultValues.value
 
 	let slotsList = Object.keys(slots)
 
-	slotsList = slotsList.slice(0, formatDefaultValues.value.quantidadeItens)
+	if (slotsList.length) {
+		slotsList = slotsList.slice(0, formatDefaultValues.value.quantityOfItems)
+	}
 
 	if (!slotsList.length) {
 		hasSlots.value = false
 	} else {
 		hasSlots.value = true
 
-		slotsList.forEach((item, slotsListIndex) => {
-			const element = document.getElementById(`${defaultValues.nbId}-slot${slotsListIndex}`)
-			let defaultZIndex = 0
+		slotsList.forEach((item, itemIndex) => {
+			const elementItem = document.getElementById(`${defaultValues.nbId}-slot${itemIndex}`)
 
-			if (index === slotsListIndex) defaultZIndex = 1
-
-			element.style.zIndex = defaultZIndex
+			if (elementItem) {
+				if (index === itemIndex) {
+					elementItem.classList.add('slide-z-index-1')
+					elementItem.classList.remove('slide-z-index-0')
+				} else {
+					elementItem.classList.remove('slide-z-index-1')
+					elementItem.classList.add('slide-z-index-0')
+				}
+			}
 		})
 	}
 }
 
-function startSlide() {
-	// updateDiv(0)
-	// formatSlots(0)
-	startSlideShow(0)
+function removeSetIntervalInstance() {
+	clearInterval(setIntervalInstance.value)
+	setIntervalInstance.value = null
+}
+
+function changeDisabled() {
+	if (disabled.value) {
+		pauseButton()
+	} else {
+		restartButton()
+	}
 }
 
 const slots = useSlots()
 onMounted(() => {
-	// console.log(container.value, slides.value, linha.value)
+	if (disabled.value) {
+		changeDisabled()
+	} else {
+		if (container.value && slides.value && row.value) {
+			startSlideShow(0)
+		}
+	}
+})
 
-	// Start
-	startSlide()
+onBeforeUnmount(() => {
+	removeSetIntervalInstance()
+})
+
+window.removeEventListener('beforeunload', function (event) {
+	event.preventDefault()
+	event.returnValue = ''
+	removeSetIntervalInstance()
 })
 
 watch(slideType, () => {
-	setSlideType(0)
 	restartButton()
+})
+
+watch(disabled, value => {
+	changeDisabled()
 })
 </script>
 
@@ -499,7 +652,76 @@ watch(slideType, () => {
 
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	cursor: pointer;
+	vertical-align: bottom;
+
+	.slide-container {
+		margin: 0;
+		padding: 0;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		white-space: nowrap;
+		position: relative;
+		display: inline-block;
+		color: white;
+		cursor: pointer;
+
+		.slide-container__border {
+			position: absolute;
+			z-index: 17;
+			// border: 1px solid black;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		}
+
+		.slide-container__progress {
+			position: absolute;
+			z-index: 1;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			height: 5px;
+			border: 0;
+		}
+
+		.slide-container__row {
+			background: tomato;
+			position: relative;
+
+			.slide {
+				vertical-align: top;
+
+				&.slide-transform {
+					position: relative;
+					/*display: block;*/
+				}
+
+				&.slide-z-index-1 {
+					z-index: 1;
+				}
+				&.slide-z-index-0 {
+					z-index: 0;
+				}
+			}
+		}
+	}
+
+	.slide-buttons {
+		.slide-buttons__button {
+			border-radius: 50%;
+			display: inline-block;
+
+			&:hover {
+				cursor: pointer;
+			}
+
+			&.slide-buttons__button--active {
+				cursor: inherit;
+			}
+		}
+	}
 }
 
 .component-disabled {
@@ -508,56 +730,15 @@ watch(slideType, () => {
 	user-select: none;
 
 	.component {
-		--disabled-button-color: v-bind('styleButtonColor');
-		--disabled-color: v-bind('styleTextColor');
-		background-color: var(--disabled-button-color) !important;
-		color: var(--disabled-color) !important;
 		opacity: 0.7;
 		border-radius: inherit;
 	}
 }
 
-.container {
-	margin: 0;
-	padding: 0;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	white-space: nowrap;
-	position: relative;
-	display: inline-block;
-	color: white;
-}
-
-#linha {
-	background: tomato;
-	position: relative;
-}
-
-.div-border {
-	position: absolute;
-	z-index: 17;
-	border: 1px solid black;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-}
-
-.slide {
-	vertical-align: top;
-}
-.slide.slide-transform {
-	position: relative;
-	/*display: block;*/
-}
-.slide.slide-z-index {
-	z-index: 0;
-	position: absolute;
-}
-
 .controls {
 	text-align: center;
-	margin-top: 10px;
+	padding-top: 30px;
+	font-size: 1.6em;
+	font-weight: 800;
 }
 </style>

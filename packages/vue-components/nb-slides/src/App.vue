@@ -8,69 +8,50 @@
 			</div>
 		</div>
 		<div class="row">
+			<button @click="changeVisibilidade">mostra</button>
 			<div
+				v-if="mostra"
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
 				<h4 class="test-page__content-tile">NbSlideDivFixedSize</h4>
-				<!----><NbSlideDivFixedSize
-					nb-id="NbSlideDivFixedSize1"
-					slideType="z-index"
-					:quantidadeItens="4"
-				>
-					<template #slides1>
-						<div style="background: gray; height: 100%">aqui (1)</div>
-					</template>
-					<template #slides2>
-						<div style="background: green; height: 100%">aqui (2)</div>
-					</template>
-					<template #slides3>
-						<div style="background: blue; height: 100%">aqui (3)</div>
-					</template>
-					<template #slides4>
-						<div style="background: cyan; height: 100%">aqui (4)</div>
-					</template>
-					<template #slides5>
-						<div style="background: yellow; height: 100%">aqui (5)</div>
-					</template>
-				</NbSlideDivFixedSize>
 
-				<p>
-					Text before
-					<NbSlideDivFixedSize
-						nb-id="NbSlideDivFixedSize2"
-						slideType="transform"
-						:quantidadeItens="4"
-					>
-						<template #slides1>
-							<div style="background: gray; height: 100%">aqui (1)</div>
-						</template>
-						<template #slides2>
-							<div style="background: green; height: 100%">aqui (2)</div>
-						</template>
-						<template #slides3>
-							<div style="background: blue; height: 100%">aqui (3)</div>
-						</template>
-						<template #slides4>
-							<div style="background: cyan; height: 100%">aqui (4)</div>
-						</template>
-						<template #slides5>
-							<div style="background: yellow; height: 100%">aqui (5)</div>
-						</template>
-					</NbSlideDivFixedSize>
-					text after
-				</p>
+				<div style="width: 100%; background: cyan; color: white">
+					<p>
+						Text before
+						<NbSlideDivFixedSize
+							nb-id="NbSlideDivFixedSize2"
+							slideType="z-index"
+							:slideInterval="10000"
+							:quantityOfItems="2"
+							showProgressBar
+						>
+							<template #slides1>
+								<div style="background: gray; height: 100%; font-size: 20px">aqui (1)</div>
+							</template>
+							<template #slides2>
+								<div style="background: green; height: 100%; font-size: 20px">aqui (2)</div>
+							</template>
+						</NbSlideDivFixedSize>
+						text after
+					</p>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 
 const NbSlideDivFixedSize = defineAsyncComponent(() =>
 	import('@components/NbSlideDivFixedSize.vue')
 )
+
+const mostra = ref(true)
+const changeVisibilidade = () => {
+	mostra.value = !mostra.value
+}
 
 const buttonAction = () => {
 	console.log('aqui')
