@@ -1,6 +1,6 @@
 <template>
 	<div
-		v-if="nbId && quantityOfItems && quantityOfItems > 0"
+		v-if="nbId"
 		:class="['nb-wrapper', wrapperComponentDisabled]"
 		:style="[wrapperStyle]"
 	>
@@ -17,13 +17,6 @@
 			>
 				<div class="slide-container__border"></div>
 
-				<!--<progress
-					v-if="showProgressBar"
-					class="slide-container__progress"
-					:value="progress"
-					max="100"
-				/>-->
-
 				<div
 					v-if="showProgressBar"
 					class="slide-container__progress"
@@ -37,12 +30,12 @@
 					class="slide-container__row"
 				>
 					<div
+						:id="`${nbId}-slot${index}`"
+						v-for="(item, index) in slotsLength"
+						:key="index"
 						class="slide"
 						ref="slides"
 						:style="[slidesStyle]"
-						v-for="(item, index) in quantityOfItems"
-						:key="index"
-						:id="`${nbId}-slot${index}`"
 					>
 						<slot :name="`slides${item}`" />
 					</div>
@@ -50,11 +43,12 @@
 			</div>
 
 			<ul
+				v-if="showButtons"
 				style="list-style-type: none"
 				class="slide-buttons"
 			>
 				<li
-					v-for="(item, index) in quantityOfItems"
+					v-for="(item, index) in slotsLength"
 					:key="index"
 					:class="[
 						'slide-buttons__button',
@@ -86,7 +80,7 @@
 				<br />
 
 				<button
-					v-for="(item, index) in quantityOfItems"
+					v-for="(item, index) in slotsLength"
 					:key="index"
 					class="slide-button"
 					data-index="index"
@@ -189,13 +183,13 @@ const props = defineProps({
 		type: Number,
 		default: 200
 	},
-	quantityOfItems: {
-		type: Number,
-		default: 0
-	},
 	slideInterval: {
 		type: Number,
 		default: 5000
+	},
+	showButtons: {
+		type: Boolean,
+		default: true
 	},
 	buttonsSize: {
 		type: Number,
@@ -223,6 +217,10 @@ const props = defineProps({
 		validator: value => {
 			return !!(typeof value === 'boolean' && [true, false].includes(value))
 		}
+	},
+	progressColor: {
+		type: String,
+		default: 'blue'
 	}
 })
 
@@ -234,13 +232,13 @@ const {
 	slideType,
 	slideWidth,
 	slideHeight,
-	quantityOfItems,
 	slideInterval,
 	buttonsSize,
 	buttonMarginTop,
 	buttonMarginBottom,
 	buttonsColor,
-	buttonsColorHover
+	buttonsColorHover,
+	progressColor
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
@@ -251,13 +249,13 @@ const formatDefaultValues = computed(() => {
 	const slideTypeValue = !slideType.value ? 'transform' : slideType.value
 	const slideWidthValue = !slideWidth.value ? 200 : slideWidth.value
 	const slideHeightValue = !slideHeight.value ? 200 : slideHeight.value
-	const quantityOfItemsValue = !quantityOfItems.value ? 0 : quantityOfItems.value
 	const slideIntervalValue = !slideInterval.value ? 5000 : slideInterval.value
 	const buttonsSizeValue = !buttonsSize.value ? 10 : buttonsSize.value
 	const buttonMarginTopValue = !buttonMarginTop.value ? 10 : buttonMarginTop.value
 	const buttonMarginBottomValue = !buttonMarginBottom.value ? 10 : buttonMarginBottom.value
 	const buttonsColorValue = !buttonsColor ? 'tomato' : buttonsColor.value
 	const buttonsColorHoverValue = !buttonsColorHover ? 'blue' : buttonsColorHover.value
+	const progressColorValue = !progressColor.value ? 'blue' : progressColor.value
 
 	return {
 		nbId: nbIdValue,
@@ -267,13 +265,13 @@ const formatDefaultValues = computed(() => {
 		slideType: slideTypeValue,
 		slideWidth: slideWidthValue,
 		slideHeight: slideHeightValue,
-		quantityOfItems: quantityOfItemsValue,
 		slideInterval: slideIntervalValue,
 		buttonsSize: buttonsSizeValue,
 		buttonMarginTop: buttonMarginTopValue,
 		buttonMarginBottom: buttonMarginBottomValue,
 		buttonsColor: buttonsColorValue,
-		buttonsColorHover: buttonsColorHoverValue
+		buttonsColorHover: buttonsColorHoverValue,
+		progressColor: progressColorValue
 	}
 })
 const wrapperComponentDisabled = computed(() => {
@@ -324,7 +322,7 @@ const rowStyle = computed(() => {
 		currentSlideType === 'transform' ? { transition: 'transform 500ms ease-in-out' } : {}
 
 	return {
-		width: `${defaultValues.slideWidth * defaultValues.quantityOfItems}px`,
+		width: `${defaultValues.slideWidth * slotsLength.value}px`,
 		height: `${defaultValues.slideHeight}px`,
 		...transition,
 		transform:
@@ -379,18 +377,20 @@ const progressStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		width: `${progress}%`,
+		width: `${progress.value}%`,
 		background: defaultValues.progressColor
 	}
 })
 
-const isDevelopment = ref(true)
+const isDevelopment = ref(false)
 const container = ref(null)
 const slides = ref(null)
 const row = ref(null)
 const hoverSlideButton = ref(null)
 
-const slideLength = ref(0)
+const slots = useSlots()
+const slotsLength = ref(0)
+const slotsList = ref([])
 const hasSlots = ref(false)
 
 const currentIndex = ref(0)
@@ -402,6 +402,20 @@ const isPaused = ref(false)
 const hasReplay = ref(true)
 
 const timerInfo = ref('')
+
+function getSlotList() {
+	const list = Object.keys(slots).filter(key => key.includes('slides'))
+
+	if (list.length) {
+		slotsLength.value = list.length
+		slotsList.value = list
+		hasSlots.value = true
+	} else {
+		slotsLength.value = 0
+		slotsList.value = []
+		hasSlots.value = false
+	}
+}
 
 function updateProgress() {
 	const defaultValues = formatDefaultValues.value
@@ -416,7 +430,7 @@ function updateProgress() {
 function changeInfo() {
 	const defaultValues = formatDefaultValues.value
 
-	const infoTimer = `Timer: ${currentIndex.value + 1} / ${defaultValues.quantityOfItems}`
+	const infoTimer = `Timer: ${currentIndex.value + 1} / ${slotsLength.value}`
 	const infoProgress = `Progress: ${percentage.value.toFixed(3)}%`
 	const infoTime = `Time: ${timeElapsed.value / 1000} seconds`
 	const infoPause = `Pause: ${isPaused.value}`
@@ -454,10 +468,12 @@ function changeSlide(index = 0) {
 	if (!isPaused.value) updateDiv(index)
 }
 
-function startSlideShow(newIndex = 0) {
+async function startSlideShow(newIndex = 0) {
 	const defaultValues = formatDefaultValues.value
 	const currentSlideType = defaultValues.slideType
 	const currentSlideInterval = defaultValues.slideInterval
+
+	await getSlotList()
 
 	if (currentSlideType === 'z-index') formatSlots(newIndex)
 
@@ -465,7 +481,7 @@ function startSlideShow(newIndex = 0) {
 		timeElapsed.value += 100
 
 		const isFinalTime = !!(timeElapsed.value > currentSlideInterval)
-		const isLastSlide = !!(currentIndex.value === defaultValues.quantityOfItems - 1)
+		const isLastSlide = !!(currentIndex.value === slotsLength.value - 1)
 
 		if (!setIntervalInstance.value) removeSetIntervalInstance()
 
@@ -473,7 +489,7 @@ function startSlideShow(newIndex = 0) {
 			removeSetIntervalInstance()
 
 			if (!isLastSlide || (isLastSlide && hasReplay.value)) {
-				const newNextIndex = (newIndex + 1) % defaultValues.quantityOfItems
+				const newNextIndex = (newIndex + 1) % slotsLength.value
 				changeSlide(newNextIndex)
 			}
 		} else {
@@ -537,34 +553,24 @@ function updateDiv(index = 0) {
 	}
 }
 
-function formatSlots(index = 0) {
+async function formatSlots(index = 0) {
 	const defaultValues = formatDefaultValues.value
 
-	let slotsList = Object.keys(slots)
+	await getSlotList()
 
-	if (slotsList.length) {
-		slotsList = slotsList.slice(0, formatDefaultValues.value.quantityOfItems)
-	}
+	slotsList.value.forEach((item, itemIndex) => {
+		const elementItem = document.getElementById(`${defaultValues.nbId}-slot${itemIndex}`)
 
-	if (!slotsList.length) {
-		hasSlots.value = false
-	} else {
-		hasSlots.value = true
-
-		slotsList.forEach((item, itemIndex) => {
-			const elementItem = document.getElementById(`${defaultValues.nbId}-slot${itemIndex}`)
-
-			if (elementItem) {
-				if (index === itemIndex) {
-					elementItem.classList.add('slide-z-index-1')
-					elementItem.classList.remove('slide-z-index-0')
-				} else {
-					elementItem.classList.remove('slide-z-index-1')
-					elementItem.classList.add('slide-z-index-0')
-				}
+		if (elementItem) {
+			if (index === itemIndex) {
+				elementItem.classList.add('slide-z-index-1')
+				elementItem.classList.remove('slide-z-index-0')
+			} else {
+				elementItem.classList.remove('slide-z-index-1')
+				elementItem.classList.add('slide-z-index-0')
 			}
-		})
-	}
+		}
+	})
 }
 
 function removeSetIntervalInstance() {
@@ -580,8 +586,9 @@ function changeDisabled() {
 	}
 }
 
-const slots = useSlots()
-onMounted(() => {
+onMounted(async () => {
+	await getSlotList()
+
 	if (disabled.value) {
 		changeDisabled()
 	} else {
@@ -608,6 +615,14 @@ watch(slideType, () => {
 watch(disabled, value => {
 	changeDisabled()
 })
+
+watch(
+	() => slots,
+	() => {
+		getSlotList()
+	},
+	{ deep: true }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -664,7 +679,6 @@ watch(disabled, value => {
 		position: relative;
 		display: inline-block;
 		color: white;
-		cursor: pointer;
 
 		.slide-container__border {
 			position: absolute;

@@ -8,29 +8,31 @@
 			</div>
 		</div>
 		<div class="row">
-			<button @click="changeVisibilidade">mostra</button>
 			<div
-				v-if="mostra"
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
 				<h4 class="test-page__content-tile">NbSlideDivFixedSize</h4>
 
-				<div style="width: 100%; background: cyan; color: white">
+				<div style="width: 100%; color: white">
+					<!---->
 					<p>
 						Text before
 						<NbSlideDivFixedSize
 							nb-id="NbSlideDivFixedSize2"
 							slideType="z-index"
 							:slideInterval="10000"
-							:quantityOfItems="2"
 							showProgressBar
+							showButtons
 						>
 							<template #slides1>
 								<div style="background: gray; height: 100%; font-size: 20px">aqui (1)</div>
 							</template>
 							<template #slides2>
 								<div style="background: green; height: 100%; font-size: 20px">aqui (2)</div>
+							</template>
+							<template #slides3>
+								<div style="background: green; height: 100%; font-size: 20px">aqui (3)</div>
 							</template>
 						</NbSlideDivFixedSize>
 						text after
@@ -47,11 +49,6 @@ import { defineAsyncComponent, ref } from 'vue'
 const NbSlideDivFixedSize = defineAsyncComponent(() =>
 	import('@components/NbSlideDivFixedSize.vue')
 )
-
-const mostra = ref(true)
-const changeVisibilidade = () => {
-	mostra.value = !mostra.value
-}
 
 const buttonAction = () => {
 	console.log('aqui')
