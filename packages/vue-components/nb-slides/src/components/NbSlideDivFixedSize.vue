@@ -7,13 +7,13 @@
 		<div
 			:id="nbId"
 			:class="['nb-reset', 'component']"
-			:style="[componentStyle, componentDisabled]"
+			:style="[componentDisabled]"
 			style="text-align: center"
 		>
 			<div
 				class="slide-container"
 				ref="container"
-				:style="[containerStyle]"
+				:style="[containerStyle, componentStyle]"
 			>
 				<div class="slide-container__border"></div>
 
@@ -128,13 +128,13 @@
 
 <script setup>
 import {
-	defineProps,
 	defineOptions,
 	toRefs,
 	computed,
 	ref,
 	onMounted,
 	onBeforeUnmount,
+	onBeforeUpdate,
 	watch,
 	useSlots
 } from 'vue'
@@ -151,7 +151,7 @@ const props = defineProps({
 	},
 	display: {
 		type: String,
-		default: 'ib',
+		default: 'b',
 		validator: (value = 'b') => {
 			const currentValue = value ? value.toLowerCase() : ''
 			return ['b', 'ib'].includes(currentValue)
@@ -602,6 +602,10 @@ onBeforeUnmount(() => {
 	removeSetIntervalInstance()
 })
 
+onBeforeUpdate(() => {
+	getSlotList()
+})
+
 window.removeEventListener('beforeunload', function (event) {
 	event.preventDefault()
 	event.returnValue = ''
@@ -615,14 +619,6 @@ watch(slideType, () => {
 watch(disabled, value => {
 	changeDisabled()
 })
-
-watch(
-	() => slots,
-	() => {
-		getSlotList()
-	},
-	{ deep: true }
-)
 </script>
 
 <style lang="scss" scoped>
@@ -706,6 +702,7 @@ watch(
 
 			.slide {
 				vertical-align: top;
+				text-align: left;
 
 				&.slide-transform {
 					position: relative;

@@ -11,6 +11,7 @@ declare module 'vue' {
     ControlNbCreditCard: typeof import('./src/components/nb-payments/ControlNbCreditCard.vue')['default']
     ControlNbGradientText: typeof import('./src/components/nb-gradient-text/ControlNbGradientText.vue')['default']
     ControlNbHighlightSelectedText: typeof import('./src/components/nb-gradient-text/ControlNbHighlightSelectedText.vue')['default']
+    ControlNbSlideDivFixedSize: typeof import('./src/components/nb-slides/ControlNbSlideDivFixedSize.vue')['default']
     NbButtonMechanical: typeof import('./../../packages/vue-components/nb-buttons/src/components/NbButtonMechanical.vue')['default']
     'NbButtonMechanical.story': typeof import('./src/components/nb-buttons/NbButtonMechanical.story.vue')['default']
     NbCreditCard: typeof import('./../../packages/vue-components/nb-payments/src/components/NbCreditCard.vue')['default']
@@ -20,6 +21,8 @@ declare module 'vue' {
     'NbGradientText.story': typeof import('./src/components/nb-gradient-text/NbGradientText.story.vue')['default']
     NbHighlightSelectedText: typeof import('./../../packages/vue-components/nb-text/src/components/NbHighlightSelectedText.vue')['default']
     'NbHighlightSelectedText.story': typeof import('./src/components/nb-gradient-text/NbHighlightSelectedText.story.vue')['default']
+    NbSlideDivFixedSize: typeof import('./../../packages/vue-components/nb-slides/src/components/NbSlideDivFixedSize.vue')['default']
+    'NbSlideDivFixedSize.story': typeof import('./src/components/nb-slides/NbSlideDivFixedSize.story.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

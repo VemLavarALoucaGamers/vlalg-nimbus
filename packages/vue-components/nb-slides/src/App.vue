@@ -20,6 +20,7 @@
 						Text before
 						<NbSlideDivFixedSize
 							nb-id="NbSlideDivFixedSize2"
+							display="b"
 							slideType="z-index"
 							:slideInterval="10000"
 							showProgressBar
