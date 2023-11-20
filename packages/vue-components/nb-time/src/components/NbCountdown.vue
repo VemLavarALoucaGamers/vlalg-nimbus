@@ -231,6 +231,10 @@ const props = defineProps({
 		type: String,
 		default: ':'
 	},
+	separatorColor: {
+		type: String,
+		default: '#000'
+	},
 	fontFamily: {
 		type: String,
 		default: `'Lato', sans-serif`
@@ -253,14 +257,28 @@ const props = defineProps({
 		type: Number,
 		default: 3,
 		validator: value => {
-			return !value ? 0.7 : value
+			return !value ? 3 : value
 		}
 	},
-	fontWeight: {
+	fontWeightNumber: {
 		type: Number,
-		default: 400,
+		default: 900,
 		validator: value => {
-			return !value ? 400 : value
+			return !value ? 900 : value
+		}
+	},
+	fontWeightText: {
+		type: Number,
+		default: 300,
+		validator: value => {
+			return !value ? 300 : value
+		}
+	},
+	fontWeightSeparator: {
+		type: Number,
+		default: 900,
+		validator: value => {
+			return !value ? 900 : value
 		}
 	},
 	containerWidth: {
@@ -294,7 +312,9 @@ const {
 	fontSizeNumber,
 	fontSizeText,
 	fontSizeSeparator,
-	fontWeight,
+	fontWeightNumber,
+	fontWeightText,
+	fontWeightSeparator,
 	containerWidth,
 	containerHeight
 } = toRefs(props)
@@ -315,8 +335,13 @@ const formatDefaultValues = computed(() => {
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeNumberValue = !fontSizeNumber.value ? 2.6 : fontSizeNumber.value
 	const fontSizeTextValue = !fontSizeText.value ? 1.3 : fontSizeText.value
-	const fontSizeSeparatorValue = !fontSizeSeparator.value ? 0.7 : fontSizeSeparator.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
+	const fontSizeSeparatorValue = !fontSizeSeparator.value ? 3 : fontSizeSeparator.value
+	const fontWeightNumberValue =
+		!fontWeightNumber.value || fontWeightNumber.value < 0 ? 900 : fontWeightNumber.value
+	const fontWeightTextValue =
+		!fontWeightText.value || fontWeightText.value < 0 ? 300 : fontWeightText.value
+	const fontWeightSeparatorValue =
+		!fontWeightSeparator.value || fontWeightSeparator.value < 0 ? 900 : fontWeightSeparator.value
 	const containerWidthValue = !containerWidth.value ? 256 : containerWidth.value
 	const containerHeightValue = !containerHeight.value ? 43 : containerHeight.value
 
@@ -328,7 +353,9 @@ const formatDefaultValues = computed(() => {
 		fontSizeNumber: fontSizeNumberValue,
 		fontSizeText: fontSizeTextValue,
 		fontSizeSeparator: fontSizeSeparatorValue,
-		fontWeight: fontWeightValue,
+		fontWeightNumber: fontWeightNumberValue,
+		fontWeightText: fontWeightTextValue,
+		fontWeightSeparator: fontWeightSeparatorValue,
 		containerWidth: containerWidthValue,
 		containerHeight: containerHeightValue
 	}
@@ -368,7 +395,6 @@ const componentStyle = computed(() => {
 		width: `${newWidth}px`,
 		height: `${newHeight}px`,
 		color: defaultValues.color,
-		fontWeight: defaultValues.fontWeight,
 		...borderConfig
 	}
 })
@@ -382,14 +408,16 @@ const styleNumber = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		fontSize: `${defaultValues.fontSizeNumber}em`
+		fontSize: `${defaultValues.fontSizeNumber}em`,
+		fontWeight: defaultValues.fontWeightNumber
 	}
 })
 const styleText = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		fontSize: `${defaultValues.fontSizeText}em`
+		fontSize: `${defaultValues.fontSizeText}em`,
+		fontWeight: defaultValues.fontWeightText
 	}
 })
 const styleSeparator = computed(() => {
@@ -397,7 +425,7 @@ const styleSeparator = computed(() => {
 
 	return {
 		fontSize: `${defaultValues.fontSizeSeparator}em !important`,
-		fontWeight: 900
+		fontWeight: defaultValues.fontWeightSeparator
 	}
 })
 
@@ -542,7 +570,6 @@ watch(oldDistance, () => {
 			position: relative;
 			display: block;
 			margin: 0;
-			font-weight: 900;
 			letter-spacing: 2px;
 			line-height: 1;
 			height: auto;
@@ -553,7 +580,6 @@ watch(oldDistance, () => {
 			position: relative;
 			display: block;
 			margin: 0;
-			font-weight: 300;
 			letter-spacing: 1px;
 			overflow: hidden;
 		}
@@ -563,7 +589,6 @@ watch(oldDistance, () => {
 		position: relative;
 		margin: 0 5px;
 		padding: 0;
-		font-weight: 900;
 		height: 100%;
 		display: flex;
 		justify-content: center;
