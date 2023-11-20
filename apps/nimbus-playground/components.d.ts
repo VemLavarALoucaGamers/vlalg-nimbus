@@ -8,12 +8,16 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ControlNbButtonMechanical: typeof import('./src/components/nb-buttons/ControlNbButtonMechanical.vue')['default']
+    ControlNbCountdown: typeof import('./src/components/nb-time/ControlNbCountdown.vue')['default']
     ControlNbCreditCard: typeof import('./src/components/nb-payments/ControlNbCreditCard.vue')['default']
     ControlNbGradientText: typeof import('./src/components/nb-gradient-text/ControlNbGradientText.vue')['default']
     ControlNbHighlightSelectedText: typeof import('./src/components/nb-gradient-text/ControlNbHighlightSelectedText.vue')['default']
     ControlNbSlideDivFixedSize: typeof import('./src/components/nb-slides/ControlNbSlideDivFixedSize.vue')['default']
+    copy: typeof import('./src/components/nb-slides/NbSlideDivFixedSize.story copy.vue')['default']
     NbButtonMechanical: typeof import('./../../packages/vue-components/nb-buttons/src/components/NbButtonMechanical.vue')['default']
     'NbButtonMechanical.story': typeof import('./src/components/nb-buttons/NbButtonMechanical.story.vue')['default']
+    NbCountdown: typeof import('./../../packages/vue-components/nb-time/src/components/NbCountdown.vue')['default']
+    'NbCountdown.story': typeof import('./src/components/nb-time/NbCountdown.story.vue')['default']
     NbCreditCard: typeof import('./../../packages/vue-components/nb-payments/src/components/NbCreditCard.vue')['default']
     'NbCreditCard.story': typeof import('./src/components/nb-payments/NbCreditCard.story.vue')['default']
     NbCreditCardCards: typeof import('./../../packages/vue-components/nb-payments/src/components/NbCreditCardCards.vue')['default']

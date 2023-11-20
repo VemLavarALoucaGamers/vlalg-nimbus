@@ -2,7 +2,7 @@
   "name": "@vlalg-nimbus/nb-time",
   "description": "Time components for Vuejs 3",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.3",
   "type": "module",
   "main": "./dist/nb-time.umd.js",
   "module": "./dist/nb-time.js",

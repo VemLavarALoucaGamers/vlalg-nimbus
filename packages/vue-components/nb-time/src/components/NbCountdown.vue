@@ -1,6 +1,6 @@
 <template>
 	<div
-		v-if="nbId && playCountdown"
+		v-if="nbId && playCountdown && (showDays || showHours || showMinutes || showSeconds)"
 		:class="['nb-wrapper']"
 		:style="[wrapperStyle]"
 	>
@@ -28,7 +28,7 @@
 			</div>
 
 			<div
-				v-if="separator"
+				v-if="separator && showHours && showDays"
 				class="component__separator"
 				:style="[styleSeparator]"
 			>
@@ -54,7 +54,7 @@
 			</div>
 
 			<div
-				v-if="separator"
+				v-if="separator && showMinutes && (showDays || showHours)"
 				class="component__separator"
 				:style="[styleSeparator]"
 			>
@@ -80,7 +80,7 @@
 			</div>
 
 			<div
-				v-if="separator"
+				v-if="separator && showSeconds && (showDays || showHours || showMinutes)"
 				class="component__separator"
 				:style="[styleSeparator]"
 			>
@@ -117,10 +117,10 @@ import {
 	validHour,
 	validMinute,
 	validSecond
-} from '@helpers/validation'
+} from '../helpers/validation'
 
 defineOptions({
-	name: 'VgCountdown',
+	name: 'NbCountdown',
 	inheritAttrs: false
 })
 
@@ -131,15 +131,15 @@ const props = defineProps({
 		type: String,
 		required: true
 	},
-	display: {
-		type: String,
-		default: 'b',
-		validator: (value = 'b') => {
-			const currentValue = value ? value.toLowerCase() : ''
-			return ['b', 'ib'].includes(currentValue)
-		}
-	},
 	textColor: {
+		type: String,
+		default: '#000'
+	},
+	numberColor: {
+		type: String,
+		default: '#000'
+	},
+	separatorColor: {
 		type: String,
 		default: '#000'
 	},
@@ -219,21 +219,13 @@ const props = defineProps({
 		type: Boolean,
 		default: true
 	},
-	numberColor: {
-		type: String,
-		default: '#000'
-	},
 	separator: {
 		type: Boolean,
-		default: false
+		default: true
 	},
 	separatorType: {
 		type: String,
-		default: ':'
-	},
-	separatorColor: {
-		type: String,
-		default: '#000'
+		default: '/'
 	},
 	fontFamily: {
 		type: String,
@@ -298,7 +290,6 @@ const props = defineProps({
 })
 
 const {
-	display,
 	day,
 	month,
 	year,
@@ -308,6 +299,8 @@ const {
 	border,
 	borderColor,
 	textColor,
+	numberColor,
+	separatorColor,
 	fontFamily,
 	fontSizeNumber,
 	fontSizeText,
@@ -329,8 +322,9 @@ const oldDistance = ref(0)
 const playCountdown = ref(false)
 
 const formatDefaultValues = computed(() => {
-	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const textColorValue = !textColor.value ? '#000' : textColor.value
+	const numberColorValue = !numberColor.value ? '#000' : numberColor.value
+	const separatorColorValue = !separatorColor.value ? '#000' : separatorColor.value
 	const borderColorValue = !borderColor.value ? '#000' : borderColor.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeNumberValue = !fontSizeNumber.value ? 2.6 : fontSizeNumber.value
@@ -346,8 +340,9 @@ const formatDefaultValues = computed(() => {
 	const containerHeightValue = !containerHeight.value ? 43 : containerHeight.value
 
 	return {
-		display: displayValue,
 		color: textColorValue,
+		numberColor: numberColorValue,
+		separatorColor: separatorColorValue,
 		borderColor: borderColorValue,
 		font: fontValue,
 		fontSizeNumber: fontSizeNumberValue,
@@ -366,7 +361,6 @@ const wrapperStyle = computed(() => {
 	const newWidth = border.value ? defaultValues.containerWidth + 12 : defaultValues.containerWidth
 
 	return {
-		display: defaultValues.display,
 		width: `${newWidth}px`
 	}
 })
@@ -394,7 +388,6 @@ const componentStyle = computed(() => {
 	return {
 		width: `${newWidth}px`,
 		height: `${newHeight}px`,
-		color: defaultValues.color,
 		...borderConfig
 	}
 })
@@ -408,6 +401,7 @@ const styleNumber = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
+		color: defaultValues.numberColor,
 		fontSize: `${defaultValues.fontSizeNumber}em`,
 		fontWeight: defaultValues.fontWeightNumber
 	}
@@ -416,6 +410,7 @@ const styleText = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
+		color: defaultValues.color,
 		fontSize: `${defaultValues.fontSizeText}em`,
 		fontWeight: defaultValues.fontWeightText
 	}
@@ -424,6 +419,7 @@ const styleSeparator = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
+		color: defaultValues.separatorColor,
 		fontSize: `${defaultValues.fontSizeSeparator}em !important`,
 		fontWeight: defaultValues.fontWeightSeparator
 	}
@@ -455,7 +451,6 @@ const negativeNumber = computed(() => {
 
 onMounted(() => {
 	if (isValidProps.value) {
-		playCountdown.value = true
 		runInterval()
 	} else {
 		playCountdown.value = false
@@ -484,6 +479,8 @@ const newYear = () => {
 const runInterval = () => {
 	emit('started')
 
+	playCountdown.value = true
+
 	intervalId.value = setInterval(() => {
 		newYear()
 	}, interval.value)
@@ -493,11 +490,37 @@ const formatNumber = value => {
 	return value >= 0 && value <= 9 ? `0${value}` : value
 }
 
+const reset = () => {
+	if (intervalId.value) clearInterval(intervalId.value)
+
+	playCountdown.value = false
+	runInterval()
+}
+
 watch(oldDistance, () => {
 	if (negativeNumber.value && intervalId.value) {
 		clearInterval(intervalId.value)
 		emit('finished')
 	}
+})
+
+watch(day, () => {
+	reset()
+})
+watch(month, () => {
+	reset()
+})
+watch(year, () => {
+	reset()
+})
+watch(hour, () => {
+	reset()
+})
+watch(minute, () => {
+	reset()
+})
+watch(second, () => {
+	reset()
 })
 </script>
 
@@ -511,6 +534,8 @@ watch(oldDistance, () => {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+
+	display: inline-block;
 
 	text-align: center;
 	vertical-align: bottom;
