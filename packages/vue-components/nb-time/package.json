@@ -1,15 +1,15 @@
 {
-  "name": "@vlalg-nimbus/nb-buttons",
-  "description": "Button components for Vuejs 3",
+  "name": "@vlalg-nimbus/nb-time",
+  "description": "Time components for Vuejs 3",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.3",
   "type": "module",
-  "main": "./dist/nb-buttons.umd.js",
-  "module": "./dist/nb-buttons.js",
+  "main": "./dist/nb-time.umd.js",
+  "module": "./dist/nb-time.js",
   "exports": {
     ".": {
-      "import": "./dist/nb-buttons.js",
-      "require": "./dist/nb-buttons.umd.js"
+      "import": "./dist/nb-time.js",
+      "require": "./dist/nb-time.umd.js"
     },
     "./dist/style.css": "./dist/style.css",
     "./dist/images": "./dist/images"
@@ -32,8 +32,6 @@
     "npm:publish": "vite build && npm login && npm publish --access=public"
   },
   "dependencies": {
-    "@vlalg-nimbus/bee-css-reset": "^2.0.2",
-    "@vlalg-nimbus/chameleon-grid-layout": "^1.0.2",
     "vue": "^3.3.4"
   },
   "devDependencies": {
@@ -44,6 +42,8 @@
     "@vitejs/plugin-vue": "^4.3.4",
     "@vue/eslint-config-prettier": "^8.0.0",
     "@vue/test-utils": "^2.4.1",
+    "@vlalg-nimbus/bee-css-reset": "^2.0.2",
+    "@vlalg-nimbus/chameleon-grid-layout": "^1.0.2",
     "eslint": "^8.51.0",
     "eslint-plugin-vue": "^9.17.0",
     "jsdom": "^22.1.0",
@@ -65,10 +65,8 @@
     "vuejs",
     "vue js",
     "vue plugin",
-    "delete button",
-    "delete",
-    "buttons",
-    "button",
+    "time",
+    "countdown",
     "components",
     "component",
     "vue components",

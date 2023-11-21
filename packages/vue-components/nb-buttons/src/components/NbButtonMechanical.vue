@@ -206,6 +206,7 @@ const interacted = () => {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	// display: inline-block;
+	vertical-align: bottom;
 }
 
 .nb-reset {
@@ -239,6 +240,7 @@ const interacted = () => {
 
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+
 	cursor: pointer;
 	text-align: center;
 	-webkit-text-decoration-line: none;
