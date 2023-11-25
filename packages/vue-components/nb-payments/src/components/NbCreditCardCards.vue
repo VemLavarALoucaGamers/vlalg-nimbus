@@ -95,6 +95,9 @@ import imagesBrandsAmex from '../images/amex.png'
 import imagesBrandsMastercard from '../images/mastercard.png'
 import imagesBrandsDiscover from '../images/discover.png'
 import imagesBrandsTroy from '../images/troy.png'
+import imagesBrandsDinersClub from '../images/diners-club.png'
+import imagesBrandsJcb from '../images/jcb.png'
+import imagesBrandsGeneric from '../images/generic.png'
 
 const defaultCardStyle = {
 	bg: 'linear-gradient(45deg, blueviolet, deeppink)',
@@ -247,7 +250,10 @@ export default defineComponent({
 			amex: imagesBrandsAmex,
 			mastercard: imagesBrandsMastercard,
 			discover: imagesBrandsDiscover,
-			troy: imagesBrandsTroy
+			troy: imagesBrandsTroy,
+			dinersClub: imagesBrandsDinersClub,
+			jcb: imagesBrandsJcb,
+			generic: imagesBrandsGeneric
 		})
 
 		const amexConfig = reactive({
@@ -271,22 +277,36 @@ export default defineComponent({
 
 		const getCardType = computed(() => {
 			const number = cardNumber.value
-			let typeName = 'visa'
+			let typeName = 'generic'
+
+			// Visa (4)
 			let reg = new RegExp('^4')
 
 			if (number.match(reg) != null) typeName = 'visa'
 
+			// American Express - Amex (34 or 37)
 			reg = new RegExp('^(34|37)')
 			if (number.match(reg) != null) typeName = 'amex'
 
-			reg = new RegExp('^5[1-5]')
+			// Mastercard (51-55 or 23-27)
+			reg = new RegExp('^(5[1-5]|2[3-7])')
 			if (number.match(reg) != null) typeName = 'mastercard'
 
-			reg = new RegExp('^6011')
+			// Discover (6011, 644-659 or 65)
+			reg = new RegExp('^(65|6011|64[4-9]|65[0-9])')
 			if (number.match(reg) != null) typeName = 'discover'
 
+			// Troy (9792)
 			reg = new RegExp('^9792')
 			if (number.match(reg) != null) typeName = 'troy'
+
+			// DinersClub (300-305, 36, 38 or 309)
+			reg = new RegExp('^(30[0-5]|36|38|309)')
+			if (number.match(reg) != null) typeName = 'dinersClub'
+
+			// JCB (35, 2131 or 1800)
+			reg = new RegExp('^(35|2131|1800)')
+			if (number.match(reg) != null) typeName = 'jcb'
 
 			return typeName
 		})
