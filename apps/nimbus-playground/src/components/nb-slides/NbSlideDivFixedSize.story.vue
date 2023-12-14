@@ -50,14 +50,14 @@ const initState = () => {
             <div style="background: gray; height: 100%; padding: 15px; text-wrap: wrap">
               <h1 style="margin-top: 0; text-align: center">Content 1</h1>
               <p>This is an example of content, look at the generated code to understand better.</p>
-              <img src="http://localhost:6006/square.png" style="width: auto; height: 58%" />
+              <img src="/square.png" style="width: auto; height: 58%" />
             </div>
           </template>
           <template #slides2>
             <div style="background: green; height: 100%; padding: 15px; text-wrap: wrap">
               <h1 style="margin-top: 0; text-align: center">Content 2</h1>
               <p>This is an example of content, look at the generated code to understand better.</p>
-              <img src="http://localhost:6006/square.png" style="width: auto; height: 58%" />
+              <img src="/square.png" style="width: auto; height: 58%" />
             </div>
           </template>
         </NbSlideDivFixedSize>
@@ -137,7 +137,7 @@ const initState = () => {
             <div style="background: gray; height: 100%; padding: 15px; text-wrap: wrap">
               <h1 style="margin-top: 0; text-align: center">Content 1</h1>
               <p>This is an example of content, look at the generated code to understand better.</p>
-              <img src="http://localhost:6006/square.png" style="width: auto; height: 58%" />
+              <img src="/square.png" style="width: auto; height: 58%" />
             </div>
           </template>
         </NbSlideDivFixedSize>
