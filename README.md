@@ -104,5 +104,15 @@ Thank you very much, the VLALG team greatly appreciates your support.
 - RodrigoSantosDev
 - EmanuelGraff
 
+## Supporting
+
+JetBrains are providing **"All Products Pack"** licenses free of charge for Nimbus developers as part of their [support of OSS](https://jb.gg/OpenSourceSupport).
+
+Special thanks to JetBrains for supporting open source projects.
+
+<a href="https://jb.gg/OpenSourceSupport" target="_blank">
+<img src="https://raw.githubusercontent.com/VemLavarALoucaGamers/vlalg-nimbus/main/images/jb_beam.png" alt="JetBrains" width="100">
+</a>
+
 ## License
 The Nimbus is open-sourced software licensed under the [MIT License](https://github.com/VemLavarALoucaGamers/vlalg-nimbus/blob/v0.0.1-alpha/LICENSE).
