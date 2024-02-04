@@ -14,7 +14,10 @@
 				style="margin-bottom: 50px; overflow: hidden"
 			>
 				<select v-model="btType">
-					<option value="teste">teste</option>
+					<option value="test">test</option>
+					<option value="prevNext">prevNext</option>
+					<option value="vavaGane">vavaGane</option>
+					<option value="hamburger">hamburger</option>
 					<option value="showHover">showHover</option>
 					<option value="colorHover">colorHover</option>
 					<option value="mechanical">mechanical</option>
@@ -23,7 +26,133 @@
 		</div>
 
 		<div
-			v-if="btType === 'showHover'"
+			v-if="btType === 'test'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonHamburger2</h4>
+				<NbButtonTest
+					nb-id="NbButtonMechanical1"
+					display="b"
+					text="button with block display"
+					@clicked="buttonAction"
+				/>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonTest
+						nb-id="NbButtonMechanical1"
+						display="ib"
+						text="button with inline-block display"
+						@clicked="buttonAction"
+					/>
+					text after
+				</p>
+			</div>
+		</div>
+
+		<div
+			v-else-if="btType === 'prevNext'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonPrevNext</h4>
+				<NbButtonPrevNext
+					nb-id="NbButtonPrevNext1"
+					:disabledPreview="false"
+					:disabledNext="false"
+					:disabled="false"
+					@clicked="buttonAction"
+				>
+					<template #prev>Prev Text</template>
+					<template #next>Next Text</template>
+				</NbButtonPrevNext>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonPrevNext
+						nb-id="NbButtonPrevNext2"
+						:disabledPreview="false"
+						:disabledNext="false"
+						:disabled="false"
+						@clicked="buttonAction"
+					>
+						<template #prev>Prev Text</template>
+						<template #next>Next Text</template>
+					</NbButtonPrevNext>
+					text after
+				</p>
+			</div>
+		</div>
+
+		<div
+			v-else-if="btType === 'vavaGane'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonVavaGame</h4>
+				<NbButtonVavaGame
+					nb-id="NbButtonVavaGame1"
+					@clicked="buttonAction"
+				>
+					<template #text>
+						Slot with<br />
+						name 'test'
+					</template>
+				</NbButtonVavaGame>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonVavaGame
+						nb-id="NbButtonVavaGame2"
+						@clicked="buttonAction"
+					>
+						<template #text>
+							Slot with<br />
+							name 'test'
+						</template>
+					</NbButtonVavaGame>
+					text after
+				</p>
+			</div>
+		</div>
+
+		<div
+			v-else-if="btType === 'hamburger'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonHamburger</h4>
+				<NbButtonTest
+					nb-id="NbButtonHamburger1"
+					@clicked="buttonAction"
+				/>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonTest
+						nb-id="NbButtonHamburger2"
+						@clicked="buttonAction"
+					/>
+					text after
+				</p>
+			</div>
+		</div>
+
+		<div
+			v-else-if="btType === 'showHover'"
 			class="row"
 		>
 			<div
@@ -135,6 +264,10 @@ import { defineAsyncComponent, ref } from 'vue'
 const NbButtonMechanical = defineAsyncComponent(() => import('@components/NbButtonMechanical.vue'))
 const NbButtonColorHover = defineAsyncComponent(() => import('@components/NbButtonColorHover.vue'))
 const NbButtonShowHover = defineAsyncComponent(() => import('@components/NbButtonShowHover.vue'))
+const NbButtonHamburger = defineAsyncComponent(() => import('@components/NbButtonHamburger.vue'))
+const NbButtonVavaGame = defineAsyncComponent(() => import('@components/NbButtonVavaGame.vue'))
+const NbButtonPrevNext = defineAsyncComponent(() => import('@components/NbButtonPrevNext.vue'))
+const NbButtonTest = defineAsyncComponent(() => import('@components/NbButtonTest.vue'))
 
 const btType = ref('colorHover')
 
