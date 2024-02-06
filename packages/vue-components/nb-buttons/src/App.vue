@@ -21,6 +21,7 @@
 					<option value="showHover">showHover</option>
 					<option value="colorHover">colorHover</option>
 					<option value="mechanical">mechanical</option>
+					<option value="mechanical2">mechanical 2</option>
 				</select>
 			</div>
 		</div>
@@ -33,20 +34,57 @@
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
-				<h4 class="test-page__content-tile">NbButtonHamburger2</h4>
+				<h4 class="test-page__content-tile">NbButtonTest</h4>
 				<NbButtonTest
-					nb-id="NbButtonMechanical1"
+					nb-id="NbButtonTest"
 					display="b"
 					text="button with block display"
+					buttonColor="blueviolet"
+					shadowColor="green"
 					@clicked="buttonAction"
 				/>
 
 				<p style="margin-top: 4px">
 					Text before
 					<NbButtonTest
-						nb-id="NbButtonMechanical1"
+						nb-id="NbButtonTest"
 						display="ib"
 						text="button with inline-block display"
+						buttonColor="blueviolet"
+						shadowColor="green"
+						@clicked="buttonAction"
+					/>
+					text after
+				</p>
+			</div>
+		</div>
+
+		<div
+			v-if="btType === 'mechanical2'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonMechanica2</h4>
+				<NbButtonMechanical2
+					nb-id="NbButtonMechanical2"
+					display="b"
+					text="button with block display"
+					buttonColor="blueviolet"
+					shadowColor="green"
+					@clicked="buttonAction"
+				/>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonMechanical2
+						nb-id="NbButtonMechanical2"
+						display="ib"
+						text="button with inline-block display"
+						buttonColor="blueviolet"
+						shadowColor="green"
 						@clicked="buttonAction"
 					/>
 					text after
@@ -135,14 +173,14 @@
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
 				<h4 class="test-page__content-tile">NbButtonHamburger</h4>
-				<NbButtonTest
+				<NbButtonHamburger
 					nb-id="NbButtonHamburger1"
 					@clicked="buttonAction"
 				/>
 
 				<p style="margin-top: 4px">
 					Text before
-					<NbButtonTest
+					<NbButtonHamburger
 						nb-id="NbButtonHamburger2"
 						@clicked="buttonAction"
 					/>
@@ -262,6 +300,9 @@
 import { defineAsyncComponent, ref } from 'vue'
 
 const NbButtonMechanical = defineAsyncComponent(() => import('@components/NbButtonMechanical.vue'))
+const NbButtonMechanical2 = defineAsyncComponent(() =>
+	import('@components/NbButtonMechanical2.vue')
+)
 const NbButtonColorHover = defineAsyncComponent(() => import('@components/NbButtonColorHover.vue'))
 const NbButtonShowHover = defineAsyncComponent(() => import('@components/NbButtonShowHover.vue'))
 const NbButtonHamburger = defineAsyncComponent(() => import('@components/NbButtonHamburger.vue'))
