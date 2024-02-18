@@ -22,6 +22,7 @@
 					<option value="colorHover">colorHover</option>
 					<option value="mechanical">mechanical</option>
 					<option value="mechanical2">mechanical 2</option>
+					<option value="colorOutside">colorOutside</option>
 				</select>
 			</div>
 		</div>
@@ -48,6 +49,39 @@
 					Text before
 					<NbButtonTest
 						nb-id="NbButtonTest"
+						display="ib"
+						text="button with inline-block display"
+						buttonColor="blueviolet"
+						shadowColor="green"
+						@clicked="buttonAction"
+					/>
+					text after
+				</p>
+			</div>
+		</div>
+
+		<div
+			v-if="btType === 'colorOutside'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonColorOutside</h4>
+				<NbButtonColorOutside
+					nb-id="NbButtonColorOutside"
+					display="b"
+					text="button with block display"
+					buttonColor="blueviolet"
+					shadowColor="green"
+					@clicked="buttonAction"
+				/>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonColorOutside
+						nb-id="NbButtonColorOutside"
 						display="ib"
 						text="button with inline-block display"
 						buttonColor="blueviolet"
@@ -308,9 +342,12 @@ const NbButtonShowHover = defineAsyncComponent(() => import('@components/NbButto
 const NbButtonHamburger = defineAsyncComponent(() => import('@components/NbButtonHamburger.vue'))
 const NbButtonVavaGame = defineAsyncComponent(() => import('@components/NbButtonVavaGame.vue'))
 const NbButtonPrevNext = defineAsyncComponent(() => import('@components/NbButtonPrevNext.vue'))
+const NbButtonColorOutside = defineAsyncComponent(() =>
+	import('@components/NbButtonColorOutside.vue')
+)
 const NbButtonTest = defineAsyncComponent(() => import('@components/NbButtonTest.vue'))
 
-const btType = ref('colorHover')
+const btType = ref('test')
 
 // btType
 const buttonAction = () => {
