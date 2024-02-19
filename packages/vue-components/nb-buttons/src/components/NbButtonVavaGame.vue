@@ -310,13 +310,16 @@ const interacted = () => {
 
 	user-select: none;
 
+	touch-action: manipulation;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
 	opacity: 1;
 	transition: opacity 0.7s ease-out 0.2s;
 	text-align: center;
 	position: relative;
 	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
 	z-index: 1;
 
 	color: v-bind('styleTextColor');

@@ -10,16 +10,22 @@
 			:class="['nb-reset', 'component']"
 			:style="[componentStyle]"
 		>
-			{{ formatDefaultValues.text }}
+			<div class="first-child">
+				<slot name="content">Default Text</slot>
+			</div>
+
+			<div class="last-child">
+				<slot name="content-alternate">Default Alternate Text</slot>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { defineProps, toRefs, computed } from 'vue'
+import { defineProps, ref, toRefs, computed } from 'vue'
 
 defineOptions({
-	name: 'NbButtonColorOutside',
+	name: 'NbButtonAlternateText',
 	inheritAttrs: false
 })
 
@@ -38,21 +44,43 @@ const props = defineProps({
 			return ['b', 'ib'].includes(currentValue)
 		}
 	},
-	text: {
-		type: String,
-		default: 'Default Text'
-	},
 	textColor: {
 		type: String,
 		default: '#ffffff'
 	},
+	textHoverColor: {
+		type: String,
+		default: '#000000'
+	},
 	buttonColor: {
 		type: String,
-		default: '#bbbbbb'
+		default: '#ffffff'
+	},
+	buttonHoverColor: {
+		type: String,
+		default: 'red'
 	},
 	borderColor: {
 		type: String,
 		default: '#ffe54c'
+	},
+	showBorder: {
+		type: Boolean,
+		default: true,
+		validator: value => {
+			return typeof value === 'boolean' && [true, false].includes(value)
+		}
+	},
+	borderRadius: {
+		type: Number,
+		default: 0.375
+	},
+	width: {
+		type: Number,
+		default: 86,
+		validator: value => {
+			return !value ? 86 : value
+		}
 	},
 	paddingX: {
 		type: Number,
@@ -63,9 +91,9 @@ const props = defineProps({
 	},
 	paddingY: {
 		type: Number,
-		default: 0.2,
+		default: 0.4,
 		validator: value => {
-			return !value ? 0.2 : value
+			return !value ? 0.4 : value
 		}
 	},
 	disabled: {
@@ -96,11 +124,15 @@ const props = defineProps({
 })
 
 const {
-	text,
 	display,
 	buttonColor,
 	borderColor,
+	buttonHoverColor,
+	showBorder,
+	borderRadius,
 	textColor,
+	textHoverColor,
+	width,
 	paddingX,
 	paddingY,
 	disabled,
@@ -110,14 +142,18 @@ const {
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
-	const textValue = !text.value ? 'Default Text' : text.value
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const buttonColorValue = !buttonColor.value ? '#bbbbbb' : buttonColor.value
+	const buttonColorValue = !buttonColor.value ? '#ffffff' : buttonColor.value
+	const buttonHoverColorValue = !buttonHoverColor.value ? '#000000' : buttonHoverColor.value
 	const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
+	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const showBorderValue = !showBorder.value ? true : showBorder.value
 	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
+	const textHoverColorValue = !textHoverColor.value ? '#000000' : textHoverColor.value
+	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
+	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.4 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
@@ -126,11 +162,15 @@ const formatDefaultValues = computed(() => {
 		disabled: disabledValue,
 		display: displayValue,
 		buttonColor: buttonColorValue,
+		buttonHoverColor: buttonHoverColorValue,
 		borderColor: borderColorValue,
+		showBorder: showBorderValue,
+		borderRadius: borderRadiusValue,
 		textColor: textColorValue,
+		textHoverColor: textHoverColorValue,
+		width: widthValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
-		text: textValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue
@@ -151,10 +191,20 @@ const wrapperStyle = computed(() => {
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
+	const newWidth = defaultValues.display === 'block' ? 'auto' : `${defaultValues.width}px`
+
+	const border = defaultValues.showBorder
+		? { border: `1px solid ${defaultValues.borderColor}` }
+		: {}
+
 	return {
-		border: `1px solid ${defaultValues.borderColor}`,
-		color: defaultValues.textColor,
+		...border,
+		borderRadius: `${defaultValues.borderRadius}rem`,
+		background: defaultValues.buttonColor,
+		minWidth: '33px',
+		width: newWidth,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
+		lineHeight: '1.42857143',
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight
 	}
@@ -170,10 +220,15 @@ const styleTextColor = computed(() => {
 
 	return defaultValues.textColor
 })
+const styleTextHoverColor = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.textHoverColor
+})
 const styleButtonColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.buttonColor
+	return defaultValues.buttonHoverColor
 })
 
 const interacted = () => {
@@ -216,9 +271,8 @@ const interacted = () => {
 
 .component {
 	margin: 0;
-	padding: 0;
 	box-sizing: border-box;
-	line-height: 1.42857143;
+	line-height: 16px;
 	font-family: 'Lato', sans-serif;
 	font-family: v-bind('font');
 
@@ -240,26 +294,56 @@ const interacted = () => {
 	position: relative;
 
 	margin-top: 4px;
-	margin-bottom: 10px;
-	margin-right: 6px;
+	margin-bottom: 4px;
+
+	overflow: hidden;
+
+	.first-child {
+		--disabled-color: v-bind('styleTextColor');
+		color: var(--disabled-color) !important;
+		position: relative;
+		transition: color 600ms cubic-bezier(0.48, 0, 0.12, 1);
+		z-index: 10;
+	}
+	.last-child {
+		color: var(--text-color) !important;
+		--text-color: v-bind('styleTextHoverColor');
+		display: block;
+		position: absolute;
+		bottom: 0;
+		transition: all 500ms cubic-bezier(0.48, 0, 0.12, 1);
+		z-index: 100;
+		opacity: 1;
+		bottom: 0;
+		left: 50%;
+		transform: translateY(225%) translateX(-50%);
+	}
 
 	&:after {
+		--button-color: v-bind('styleButtonColor');
 		content: '';
-		--disabled-button-color: v-bind('styleButtonColor');
-		background-color: var(--disabled-button-color) !important;
-		width: 100%;
-		z-index: -1;
 		position: absolute;
+		bottom: -50%;
+		left: 0;
+		width: 100%;
 		height: 100%;
-		top: 7px;
-		left: 7px;
-		transition: 0.2s;
+		background-color: var(--button-color) !important;
+		transform-origin: bottom center;
+		transition: transform 600ms cubic-bezier(0.48, 0, 0.12, 1);
+		transform: skewY(7.2deg) scaleY(0);
+		z-index: 10;
 	}
 
 	&:hover {
 		&:after {
-			top: 0px;
-			left: 0px;
+			transform-origin: bottom center;
+			transform: skewY(0deg) scaleY(2);
+		}
+		.last-child {
+			bottom: 50%;
+			transform: translateY(50%) translateX(-50%);
+			opacity: 1;
+			transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
 		}
 	}
 }
@@ -274,11 +358,6 @@ const interacted = () => {
 		color: var(--disabled-color) !important;
 		opacity: 0.7;
 		border-radius: inherit;
-
-		&:after {
-			top: 0px;
-			left: 0px;
-		}
 	}
 }
 </style>

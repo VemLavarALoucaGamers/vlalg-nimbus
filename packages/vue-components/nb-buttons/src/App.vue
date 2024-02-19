@@ -23,6 +23,7 @@
 					<option value="mechanical">mechanical</option>
 					<option value="mechanical2">mechanical 2</option>
 					<option value="colorOutside">colorOutside</option>
+					<option value="alternateText">alternateText</option>
 				</select>
 			</div>
 		</div>
@@ -40,21 +41,76 @@
 					nb-id="NbButtonTest"
 					display="b"
 					text="button with block display"
+					text-color="white"
 					buttonColor="blueviolet"
 					shadowColor="green"
 					@clicked="buttonAction"
-				/>
+				>
+					<template #content> texto 1 </template>
+					<template #content-alternate> alternativo </template>
+				</NbButtonTest>
 
 				<p style="margin-top: 4px">
 					Text before
 					<NbButtonTest
 						nb-id="NbButtonTest"
 						display="ib"
+						text-color="white"
 						text="button with inline-block display"
 						buttonColor="blueviolet"
+						:width="160"
 						shadowColor="green"
+						:show-border="true"
+						:border-radius="0"
 						@clicked="buttonAction"
-					/>
+					>
+						<template #content> texto 1</template>
+						<template #content-alternate> texto 2</template>
+					</NbButtonTest>
+					text after
+				</p>
+			</div>
+		</div>
+
+		<div
+			v-else-if="btType === 'alternateText'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonAlternateText</h4>
+				<NbButtonAlternateText
+					nb-id="NbButtonAlternateText1"
+					display="b"
+					text="button with block display"
+					text-color="white"
+					buttonColor="blueviolet"
+					shadowColor="green"
+					@clicked="buttonAction"
+				>
+					<template #content> text 1 </template>
+					<template #content-alternate> text 2 </template>
+				</NbButtonAlternateText>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonAlternateText
+						nb-id="NbButtonAlternateText2"
+						display="ib"
+						text-color="white"
+						text="button with inline-block display"
+						buttonColor="blueviolet"
+						:width="160"
+						shadowColor="green"
+						:show-border="true"
+						:border-radius="0"
+						@clicked="buttonAction"
+					>
+						<template #content> text 1 </template>
+						<template #content-alternate> text 2 </template>
+					</NbButtonAlternateText>
 					text after
 				</p>
 			</div>
@@ -344,6 +400,9 @@ const NbButtonVavaGame = defineAsyncComponent(() => import('@components/NbButton
 const NbButtonPrevNext = defineAsyncComponent(() => import('@components/NbButtonPrevNext.vue'))
 const NbButtonColorOutside = defineAsyncComponent(() =>
 	import('@components/NbButtonColorOutside.vue')
+)
+const NbButtonAlternateText = defineAsyncComponent(() =>
+	import('@components/NbButtonAlternateText.vue')
 )
 const NbButtonTest = defineAsyncComponent(() => import('@components/NbButtonTest.vue'))
 

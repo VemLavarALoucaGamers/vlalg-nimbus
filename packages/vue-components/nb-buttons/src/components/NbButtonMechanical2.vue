@@ -219,6 +219,8 @@ const interacted = () => {
 
 	user-select: none;
 
+	touch-action: manipulation;
+
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 

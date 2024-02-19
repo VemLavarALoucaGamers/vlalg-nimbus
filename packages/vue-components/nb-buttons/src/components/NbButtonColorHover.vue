@@ -1,10 +1,3 @@
-<!--
-  Como usar
-  
-  import Button from '../components/buttons/Componente.vue';
-
-  <p>texto antes <Button display="b" @clicked="console.log('oi')" :disabled="false" /> texto depois</p>
--->
 <template>
 	<div
 		:class="['nb-wrapper', componentDisabled]"
@@ -252,6 +245,8 @@ const interacted = () => {
 	font-family: v-bind('font');
 
 	user-select: none;
+
+	touch-action: manipulation;
 
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

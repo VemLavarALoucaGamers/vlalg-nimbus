@@ -279,6 +279,11 @@ const interacted = clickType => {
 
 	user-select: none;
 
+	touch-action: manipulation;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
 	.buttonNextPreview {
 		display: inline-block;
 		text-align: center;

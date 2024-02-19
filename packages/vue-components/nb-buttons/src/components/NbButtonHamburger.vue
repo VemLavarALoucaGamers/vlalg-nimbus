@@ -221,6 +221,13 @@ watch(status, () => {
 	line-height: 1.42857143;
 	cursor: pointer;
 
+	user-select: none;
+
+	touch-action: manipulation;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
 	.component__line-one,
 	.component__line-two,
 	.component__line-three {
