@@ -148,7 +148,7 @@ const formatDefaultValues = computed(() => {
 	const buttonHoverColorValue = !buttonHoverColor.value ? '#000000' : buttonHoverColor.value
 	const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
 	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
-	const showBorderValue = !showBorder.value ? true : showBorder.value
+	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
 	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
 	const textHoverColorValue = !textHoverColor.value ? '#000000' : textHoverColor.value
 	const widthValue = !width.value || width.value < 86 ? 86 : width.value
