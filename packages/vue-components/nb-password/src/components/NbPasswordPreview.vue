@@ -42,6 +42,18 @@ const props = defineProps({
 			return ['b', 'ib'].includes(currentValue)
 		}
 	},
+	type: {
+		type: String,
+		default: 'generate',
+		validator: (value = 'generate') => {
+			const currentValue = value ? value.toLowerCase() : ''
+			return ['generate', 'insert'].includes(currentValue)
+		}
+	},
+	password: {
+		type: String,
+		default: ''
+	},
 	background: {
 		type: String,
 		default: '#ffffff'
@@ -60,6 +72,13 @@ const props = defineProps({
 	borderRadius: {
 		type: Number,
 		default: 0.375
+	},
+	width: {
+		type: Number,
+		default: 140,
+		validator: value => {
+			return !value ? 140 : value
+		}
 	},
 	paddingX: {
 		type: Number,
@@ -125,7 +144,7 @@ const colorGreen = ref('#18C954')
 const colorBlue = ref('#39ABEB')
 const colorRed = ref('#F87676')
 
-const { length, hasNumbers, hasSpecial, hasUppercaseLowercase } = toRefs(props)
+const { type, password, length, hasNumbers, hasSpecial, hasUppercaseLowercase } = toRefs(props)
 
 const patternLetter = /[a-zA-Z]/
 const patternNumber = /[0-9]/
@@ -137,6 +156,7 @@ const {
 	borderColor,
 	showBorder,
 	borderRadius,
+	width,
 	paddingX,
 	paddingY,
 	fontFamily,
@@ -150,6 +170,7 @@ const formatDefaultValues = computed(() => {
 	const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
 	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
 	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
 	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.4 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
@@ -162,6 +183,7 @@ const formatDefaultValues = computed(() => {
 		borderColor: borderColorValue,
 		showBorder: showBorderValue,
 		borderRadius: borderRadiusValue,
+		width: widthValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
 		font: fontValue,
@@ -180,6 +202,8 @@ const wrapperStyle = computed(() => {
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
+	const newWidth = defaultValues.display === 'block' ? '100%' : `${defaultValues.width}px`
+
 	const border = defaultValues.showBorder
 		? { border: `1px solid ${defaultValues.borderColor}` }
 		: {}
@@ -187,6 +211,8 @@ const componentStyle = computed(() => {
 	return {
 		...border,
 		borderRadius: `${defaultValues.borderRadius}rem`,
+		minWidth: '33px',
+		width: newWidth,
 		background: defaultValues.background,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		fontSize: defaultValues.fontSize,
@@ -260,21 +286,27 @@ const generatePassword = (
 		.join('')
 }
 
-const updateValue = () => {
-	generated.value = generatePassword(
-		length.value,
-		hasNumbers.value,
-		hasSpecial.value,
-		hasUppercaseLowercase.value
-	)
+const updateValue = () => {}
+
+const checkComponentType = () => {
+	if (type.value === 'generate') {
+		generated.value = generatePassword(
+			length.value,
+			hasNumbers.value,
+			hasSpecial.value,
+			hasUppercaseLowercase.value
+		)
+	} else {
+		generated.value = password.value
+	}
 }
 
 onMounted(() => {
-	updateValue()
+	checkComponentType()
 })
 
 watch(props, () => {
-	updateValue()
+	checkComponentType()
 })
 </script>
 
@@ -327,5 +359,8 @@ watch(props, () => {
 	position: relative;
 
 	letter-spacing: 1px;
+
+	height: 32px;
+	background: tomato;
 }
 </style>
