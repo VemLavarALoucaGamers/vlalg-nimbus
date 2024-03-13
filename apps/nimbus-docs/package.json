@@ -23,6 +23,7 @@
     "nuxt": "^3.6.2"
   },
   "dependencies": {
+    "@vlalg-nimbus/nb-buttons": "^1.0.1",
     "sass": "^1.65.1"
   },
   "config": {
