@@ -16,7 +16,6 @@
         :font-weight="400"
         @clicked="logEvent()"
       />
-
       <p class="legend">Look at the console to see the triggered event</p>
     </div>
   </div>
