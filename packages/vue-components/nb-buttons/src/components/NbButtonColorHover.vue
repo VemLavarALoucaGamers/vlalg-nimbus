@@ -9,7 +9,7 @@
 			class="nb-reset component component-transition"
 			:style="[componentStyle]"
 		>
-			{{ formatDefaultValues.text }}
+			<slot name="content">Default Text</slot>
 		</div>
 	</div>
 </template>
@@ -28,10 +28,6 @@ const props = defineProps({
 	nbId: {
 		type: String,
 		required: true
-	},
-	text: {
-		type: String,
-		default: 'Default Text'
 	},
 	display: {
 		type: String,
@@ -103,7 +99,6 @@ const props = defineProps({
 })
 
 const {
-	text,
 	display,
 	textColor,
 	paddingX,
@@ -119,7 +114,6 @@ const {
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
-	const textValue = !text.value ? 'Default Text' : text.value
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const textColorValue = !textColor ? 'ffffff' : textColor.value
@@ -139,7 +133,6 @@ const formatDefaultValues = computed(() => {
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
-		text: textValue,
 		textColor: textColorValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,

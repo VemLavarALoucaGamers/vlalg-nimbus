@@ -10,7 +10,7 @@
 			:class="['nb-reset', 'component', 'component-transition']"
 			:style="[componentStyle]"
 		>
-			{{ props.text }}
+			<slot name="content">Default Text</slot>
 		</div>
 	</div>
 </template>
@@ -19,7 +19,7 @@
 import { defineProps, toRefs, computed } from 'vue'
 
 defineOptions({
-	name: 'NbButtonMechanica2',
+	name: 'NbButtonMechanical2',
 	inheritAttrs: false
 })
 
@@ -29,10 +29,6 @@ const props = defineProps({
 	nbId: {
 		type: String,
 		required: true
-	},
-	text: {
-		type: String,
-		default: 'Default Text'
 	},
 	display: {
 		type: String,
@@ -100,7 +96,6 @@ const props = defineProps({
 })
 
 const {
-	text,
 	display,
 	buttonColor,
 	textColor,

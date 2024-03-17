@@ -10,7 +10,14 @@
 			:class="['nb-reset', 'component']"
 			:style="[componentStyle]"
 		>
-			{{ formatDefaultValues.text }}
+			<div
+				class="component-content"
+				:style="[borderStyle]"
+			>
+				<slot name="content">Default Text</slot>
+			</div>
+
+			<div class="component-shadow" />
 		</div>
 	</div>
 </template>
@@ -37,10 +44,6 @@ const props = defineProps({
 			const currentValue = value ? value.toLowerCase() : ''
 			return ['b', 'ib'].includes(currentValue)
 		}
-	},
-	text: {
-		type: String,
-		default: 'Default Text'
 	},
 	textColor: {
 		type: String,
@@ -75,6 +78,10 @@ const props = defineProps({
 			return typeof value === 'boolean' && [true, false].includes(value)
 		}
 	},
+	borderRadius: {
+		type: Number,
+		default: 0.25
+	},
 	fontFamily: {
 		type: String,
 		default: `'Lato', sans-serif`
@@ -96,13 +103,13 @@ const props = defineProps({
 })
 
 const {
-	text,
 	display,
 	buttonColor,
 	borderColor,
 	textColor,
 	paddingX,
 	paddingY,
+	borderRadius,
 	disabled,
 	fontFamily,
 	fontSize,
@@ -110,7 +117,6 @@ const {
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
-	const textValue = !text.value ? 'Default Text' : text.value
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const buttonColorValue = !buttonColor.value ? '#bbbbbb' : buttonColor.value
@@ -118,6 +124,7 @@ const formatDefaultValues = computed(() => {
 	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
 	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
 	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
+	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
@@ -130,7 +137,7 @@ const formatDefaultValues = computed(() => {
 		textColor: textColorValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
-		text: textValue,
+		borderRadius: borderRadiusValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue
@@ -152,12 +159,24 @@ const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		border: `1px solid ${defaultValues.borderColor}`,
 		color: defaultValues.textColor,
-		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight
 	}
+})
+const borderStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return {
+		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
+		border: `1px solid ${defaultValues.borderColor}`,
+		borderRadius: componentBorderRadius.value
+	}
+})
+const componentBorderRadius = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return `${defaultValues.borderRadius}rem`
 })
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
@@ -243,21 +262,28 @@ const interacted = () => {
 	margin-bottom: 10px;
 	margin-right: 6px;
 
-	&:after {
-		content: '';
+	.component-content {
+		position: relative;
+		z-index: 4;
+
+		overflow: hidden;
+	}
+
+	.component-shadow {
 		--disabled-button-color: v-bind('styleButtonColor');
 		background-color: var(--disabled-button-color) !important;
 		width: 100%;
-		z-index: -1;
-		position: absolute;
 		height: 100%;
+		position: absolute;
 		top: 7px;
 		left: 7px;
 		transition: 0.2s;
+		border-radius: v-bind('componentBorderRadius');
+		z-index: 3;
 	}
 
 	&:hover {
-		&:after {
+		.component-shadow {
 			top: 0px;
 			left: 0px;
 		}
@@ -275,7 +301,7 @@ const interacted = () => {
 		opacity: 0.7;
 		border-radius: inherit;
 
-		&:after {
+		.component-shadow {
 			top: 0px;
 			left: 0px;
 		}

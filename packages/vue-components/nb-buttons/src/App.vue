@@ -40,7 +40,6 @@
 				<NbButtonTest
 					nb-id="NbButtonTest"
 					display="b"
-					text="button with block display"
 					text-color="white"
 					buttonColor="blueviolet"
 					shadowColor="green"
@@ -56,7 +55,6 @@
 						nb-id="NbButtonTest"
 						display="ib"
 						text-color="white"
-						text="button with inline-block display"
 						buttonColor="blueviolet"
 						:width="160"
 						shadowColor="green"
@@ -64,8 +62,8 @@
 						:border-radius="0"
 						@clicked="buttonAction"
 					>
-						<template #content> texto 1</template>
-						<template #content-alternate> texto 2</template>
+						<template #content> text 1</template>
+						<template #content-alternate> text 2</template>
 					</NbButtonTest>
 					text after
 				</p>
@@ -84,10 +82,8 @@
 				<NbButtonAlternateText
 					nb-id="NbButtonAlternateText1"
 					display="b"
-					text="button with block display"
 					text-color="white"
 					buttonColor="blueviolet"
-					shadowColor="green"
 					@clicked="buttonAction"
 				>
 					<template #content> text 1 </template>
@@ -100,10 +96,8 @@
 						nb-id="NbButtonAlternateText2"
 						display="ib"
 						text-color="white"
-						text="button with inline-block display"
 						buttonColor="blueviolet"
 						:width="160"
-						shadowColor="green"
 						:show-border="true"
 						:border-radius="0"
 						@clicked="buttonAction"
@@ -128,9 +122,8 @@
 				<NbButtonColorOutside
 					nb-id="NbButtonColorOutside"
 					display="b"
-					text="button with block display"
 					buttonColor="blueviolet"
-					shadowColor="green"
+					:disabled="false"
 					@clicked="buttonAction"
 				/>
 
@@ -139,9 +132,8 @@
 					<NbButtonColorOutside
 						nb-id="NbButtonColorOutside"
 						display="ib"
-						text="button with inline-block display"
 						buttonColor="blueviolet"
-						shadowColor="green"
+						:disabled="false"
 						@clicked="buttonAction"
 					/>
 					text after
@@ -161,7 +153,6 @@
 				<NbButtonMechanical2
 					nb-id="NbButtonMechanical2"
 					display="b"
-					text="button with block display"
 					buttonColor="blueviolet"
 					shadowColor="green"
 					@clicked="buttonAction"
@@ -172,7 +163,6 @@
 					<NbButtonMechanical2
 						nb-id="NbButtonMechanical2"
 						display="ib"
-						text="button with inline-block display"
 						buttonColor="blueviolet"
 						shadowColor="green"
 						@clicked="buttonAction"
@@ -290,7 +280,6 @@
 				<h4 class="test-page__content-tile">NbButtonShowHover</h4>
 				<NbButtonShowHover
 					nb-id="NbButtonShowHover1"
-					text="button with block display"
 					container-color="#181818"
 					button-color="tomato"
 					text-color-hover="red"
@@ -303,7 +292,6 @@
 					Text before
 					<NbButtonShowHover
 						nb-id="NbButtonShowHover2"
-						text="button with inline-block display"
 						container-color="#181818"
 						button-color="tomato"
 						text-color-hover="red"
@@ -328,7 +316,6 @@
 				<NbButtonColorHover
 					nb-id="NbButtonColorHover1"
 					display="b"
-					text="button with block display"
 					container-color="#181818"
 					button-color="tomato"
 					@clicked="buttonAction"
@@ -339,7 +326,6 @@
 					<NbButtonColorHover
 						nb-id="NbButtonColorHover2"
 						display="ib"
-						text="button with inline-block display"
 						container-color="#181818"
 						button-color="tomato"
 						@clicked="buttonAction"

@@ -11,7 +11,7 @@
 			:style="[componentStyle]"
 			@click.prevent
 		>
-			{{ formatDefaultValues.text }}
+			<slot name="content">Default Text</slot>
 		</a>
 	</div>
 </template>
@@ -30,10 +30,6 @@ const props = defineProps({
 	nbId: {
 		type: String,
 		required: true
-	},
-	text: {
-		type: String,
-		default: 'Default Text'
 	},
 	textColor: {
 		type: String,
@@ -104,7 +100,6 @@ const props = defineProps({
 })
 
 const {
-	text,
 	textColor,
 	buttonColorHover,
 	buttonColorOpacityHover,
@@ -119,7 +114,6 @@ const {
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
-	const textValue = !text.value ? 'Default Text' : text.value
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const verticalAlignValue = !verticalAlign.value ? 'middle' : verticalAlign.value
 	const textColorValue = !textColor ? 'ffffff' : textColor.value
@@ -146,7 +140,6 @@ const formatDefaultValues = computed(() => {
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
-		text: textValue,
 		verticalAlign: verticalAlignValue
 	}
 })

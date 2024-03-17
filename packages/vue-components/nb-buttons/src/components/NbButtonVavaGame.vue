@@ -15,7 +15,7 @@
 				:style="[componentContentStyle]"
 			>
 				<span class="component-content__text">
-					<slot name="text">Default Text</slot>
+					<slot name="content">Default Text</slot>
 				</span>
 				<span
 					class="component-content__mask"

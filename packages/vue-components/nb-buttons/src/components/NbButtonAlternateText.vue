@@ -15,7 +15,7 @@
 			</div>
 
 			<div class="last-child">
-				<slot name="content-alternate">Default Alternate Text</slot>
+				<slot name="content">Default Text</slot>
 			</div>
 		</div>
 	</div>
