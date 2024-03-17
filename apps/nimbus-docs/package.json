@@ -24,7 +24,10 @@
   },
   "dependencies": {
     "@vlalg-nimbus/nb-buttons": "^2.0.7",
-    "sass": "^1.65.1"
+    "@vlalg-nimbus/nb-time": "^1.0.3",
+    "add": "^2.0.6",
+    "sass": "^1.65.1",
+    "yarn": "^1.22.22"
   },
   "config": {
     "commitizen": {
