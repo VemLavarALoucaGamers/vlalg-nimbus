@@ -3,7 +3,11 @@ import { resolve } from 'path'
 export default defineNuxtConfig({
   // https://github.com/nuxt-themes/docus
   extends: '@nuxt-themes/docus',
-
+  build: {
+    extends: (config, ctx) => {
+      config.resolve.symlinks = false
+    }
+  },
   modules: [
     // https://github.com/nuxt-modules/plausible
     '@nuxtjs/plausible',
