@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   // https://github.com/nuxt-themes/docus
   extends: '@nuxt-themes/docus',
   build: {
-    extends: (config, ctx) => {
+    extends: (config) => {
       config.resolve.symlinks = false
     }
   },

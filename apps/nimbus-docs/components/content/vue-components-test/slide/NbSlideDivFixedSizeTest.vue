@@ -8,7 +8,7 @@
           slide-type="z-index"
           :slide-interval="10000"
           show-progress-bar
-          showButtons
+          show-buttons
         >
           <template #slides1>
             <div style="background: gray; height: 100%; font-size: 20px">
