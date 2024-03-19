@@ -1,3 +1,4 @@
+// @ts-nocheck
 import NbTimeComponents from '@vlalg-nimbus/nb-time'
 import "@vlalg-nimbus/nb-time/dist/style.css";
 

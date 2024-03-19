@@ -1,4 +1,5 @@
-import NbButtonsComponents from '@vlalg-nimbus/nb-buttons'
+// @ts-nocheck
+import NbButtonsComponents from "@vlalg-nimbus/nb-buttons";
 import "@vlalg-nimbus/nb-buttons/dist/style.css";
 
 export default defineNuxtPlugin(context => {
