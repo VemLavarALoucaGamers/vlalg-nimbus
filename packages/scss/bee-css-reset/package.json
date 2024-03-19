@@ -1,8 +1,8 @@
 {
 	"name": "@vlalg-nimbus/bee-css-reset",
 	"description": "BEE - CSS Reset",
-	"private": false,
-	"version": "2.0.2",
+	"private": true,
+	"version": "2.0.3",
 	"type": "module",
 	"main": "./dist/bee-css-reset.min.js",
 	"browser": {

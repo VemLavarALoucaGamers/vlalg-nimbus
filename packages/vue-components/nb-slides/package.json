@@ -1,8 +1,8 @@
 {
   "name": "@vlalg-nimbus/nb-slides",
   "description": "Slide components for Vuejs 3",
-  "private": false,
-  "version": "4.0.1",
+  "private": true,
+  "version": "4.0.2",
   "type": "module",
   "main": "./dist/nb-slides.umd.js",
   "module": "./dist/nb-slides.js",

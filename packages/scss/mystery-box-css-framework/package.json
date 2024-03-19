@@ -1,8 +1,8 @@
 {
 	"name": "@vlalg-nimbus/mystery-box-css-framework",
 	"description": "MysteryBox - CSS Framework",
-	"private": false,
-	"version": "1.0.3",
+	"private": true,
+	"version": "1.0.4",
 	"type": "module",
 	"main": "./dist/mystery-box-css-framework.min.js",
 	"browser": {

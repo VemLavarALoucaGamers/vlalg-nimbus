@@ -1,8 +1,8 @@
 {
   "name": "@vlalg-nimbus/nb-text",
   "description": "Text components for Vuejs 3",
-  "private": false,
-  "version": "4.0.0",
+  "private": true,
+  "version": "4.0.1",
   "type": "module",
   "main": "./dist/nb-text.umd.js",
   "module": "./dist/nb-text.js",

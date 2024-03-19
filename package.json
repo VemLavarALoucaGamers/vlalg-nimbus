@@ -8,11 +8,11 @@
     "prepare": "husky install",
     "commit": "git-cz",
     "install:all": "yarn install --workspace '*'",
-    "deploy:playground": "yarn workspace nimbus-playground deploy:vercel"
+    "deploy:playground": "yarn workspace nimbus-playground deploy:vercel",
+    "clean:node-modules": "rm -fR **/**/node_modules **/**/yarn.lock"
   },
   "workspaces": {
     "packages": [
-      "apps/**/*",
       "packages/**/*"
     ]
   },
