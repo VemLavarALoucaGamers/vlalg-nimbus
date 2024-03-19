@@ -8,7 +8,7 @@
     "prepare": "husky install",
     "commit": "git-cz",
     "install:all": "yarn install --workspace '*'",
-    "deploy:playground": "yarn workspace nimbus-docs build"
+    "deploy:playground": "yarn workspace nimbus-playground deploy:vercel"
   },
   "workspaces": {
     "packages": [
