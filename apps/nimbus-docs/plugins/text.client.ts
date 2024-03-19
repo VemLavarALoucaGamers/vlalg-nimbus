@@ -1,4 +1,3 @@
-// @ts-nocheck
 import NbTextComponents from '@vlalg-nimbus/nb-text'
 import "@vlalg-nimbus/nb-text/dist/style.css";
 
