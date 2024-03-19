@@ -1,0 +1,630 @@
+@charset "UTF-8";
+/*
+* BEE - CSS Reset v1.0.0 (https://nimbus.tec.br/)
+* Copyright 2023 Vem Lavar a Louça Gamers
+* Licensed under MIT (https://github.com/VemLavarALoucaGamers/vlalg-nimbus/blob/main/LICENSE)
+*/
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
+*, *::before, *::after {
+  box-sizing: border-box;
+  background-repeat: no-repeat; /* Backgrounds do not repeat by default (opinionated). */
+  border-width: 0;
+  border-style: solid;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+::before,
+::after {
+  text-decoration: inherit;
+  vertical-align: inherit;
+}
+
+:where(:root) {
+  /* Breaks words to prevent overflow in all browsers */
+  overflow-wrap: break-word;
+  /* Use a 4-space tab width in all browsers */
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+     tab-size: 4;
+  /* For IOS */
+  -webkit-tap-highlight-color: transparent; /* Remove the grey highlight on links */
+  -webkit-text-size-adjust: 100%; /* Prevent adjustments of font size after orientation changes */
+  -moz-text-size-adjust: 100%;
+       text-size-adjust: 100%; /* Prevent adjustments of font size after orientation changes */
+}
+
+[hidden] {
+  display: none;
+}
+
+html {
+  color-scheme: dark light;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Set core root defaults */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeSpeed;
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  font-size: 1.6em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+  margin: 0;
+}
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+main {
+  display: block;
+}
+
+ol, ul,
+ol[role=list], ul[role=list] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+a {
+  text-decoration: none;
+  color: #007bff;
+  background-color: transparent;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:not([class]) {
+  -webkit-text-decoration-skip: ink;
+          text-decoration-skip-ink: auto;
+}
+
+button,
+[type=button],
+[type=submit],
+[type=reset] {
+  cursor: pointer;
+  -webkit-appearance: button;
+}
+
+button::-moz-focus-inner,
+[type=button]::-moz-focus-inner,
+[type=reset]::-moz-focus-inner,
+[type=submit]::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+button:-moz-focusring,
+[type=button]:-moz-focusring,
+[type=reset]:-moz-focusring,
+[type=submit]:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+button, input {
+  overflow: visible;
+}
+
+button, select {
+  text-transform: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+input, textarea, select {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+}
+
+input, textarea, select, button, optgroup {
+  font: inherit;
+  line-height: 1.15;
+  margin: 0;
+}
+
+textarea {
+  overflow: auto;
+}
+
+[type=checkbox],
+[type=radio] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+[type=number]::-webkit-inner-spin-button,
+[type=number]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+[type=search] {
+  -webkit-appearance: textfield;
+  outline-offset: -2px;
+}
+
+[type=search]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  font: inherit;
+}
+
+/* Imagens responsivas por padrao */
+img, picture, video, canvas, svg,
+audio, iframe, embed, object {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: middle;
+}
+
+details {
+  display: block;
+}
+
+template {
+  display: none;
+}
+
+summary {
+  display: list-item;
+}
+
+img {
+  border-style: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+th, td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+fieldset {
+  border: 1px solid #a0a0a0;
+  padding: 0.35em 0.75em 0.625em;
+}
+
+legend {
+  box-sizing: border-box;
+  color: inherit;
+  display: table;
+  max-width: 100%;
+  padding: 0;
+  white-space: normal;
+}
+
+progress {
+  vertical-align: baseline;
+}
+
+hr {
+  height: 0;
+  overflow: visible;
+}
+
+abbr[title] {
+  border-bottom: none;
+  text-decoration: underline;
+  -webkit-text-decoration: underline dotted;
+          text-decoration: underline dotted;
+}
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+code,
+kbd,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+small {
+  font-size: 80%;
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* Create a root stacking context */
+#root, #__next {
+  isolation: isolate;
+}
+
+/* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+* {
+  color: inherit;
+  margin: 0;
+}
+
+body {
+  font-family: "Lato Regular", Helvetica, Arial, sans-serif;
+  font-style: normal;
+  font-weight: light;
+  line-height: 1.42857143;
+  color: #333;
+  background: #fff;
+  -webkit-user-select: none;
+}
+
+a {
+  color: #2980b9;
+  text-decoration: none;
+  background-color: transparent;
+}
+a:hover, a:focus {
+  color: #2c3e50;
+  text-decoration: underline;
+}
+a:focus {
+  outline: thin dotted;
+  outline: 1px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+label {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: default;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  padding: 0;
+  margin: 1px 0;
+  border: 0;
+  border-top: 1px solid #efefef;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  color: inherit;
+}
+
+h1 {
+  font-size: 3.6em;
+}
+
+h2 {
+  font-size: 3em;
+}
+
+h3 {
+  font-size: 2.4em;
+}
+
+h4 {
+  font-size: 1.8em;
+}
+
+h5 {
+  font-size: 1.4em;
+}
+
+h6 {
+  font-size: 1.2em;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+h4,
+h5,
+h6 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+p {
+  margin: 0 0 10px;
+}
+
+abbr[title],
+abbr[data-text-help] {
+  border-bottom: 1px dotted #777;
+}
+
+abbr[data-text-help] {
+  cursor: help;
+}
+
+dfn,
+dfn[title] {
+  font-style: italic;
+  border-bottom: 1px dotted #777;
+}
+
+dfn[data-text-help] {
+  display: none;
+}
+
+dfn abbr,
+dfn abbr[title],
+dfn[title] abbr,
+dfn[title] abbr[title] {
+  font-style: normal;
+  border-bottom: 1px dotted #777;
+}
+
+del,
+s {
+  text-decoration: line-through;
+}
+
+ins,
+u {
+  text-decoration: underline;
+}
+
+q {
+  display: inline;
+}
+
+q,
+cite,
+em {
+  font-size: inherit;
+  font-style: italic;
+}
+
+q::before,
+cite::before {
+  content: ' "';
+}
+
+q::after,
+cite::after {
+  content: '" ';
+}
+
+strong {
+  font-weight: bold;
+}
+
+sub {
+  vertical-align: sub;
+}
+
+sub,
+sup {
+  font-size: smaller;
+}
+
+sup {
+  vertical-align: super;
+}
+
+code,
+samp,
+kbd,
+var {
+  font-family: monospace;
+}
+
+var {
+  font-style: italic;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: Menlo, Consolas, "Bitstream Vera Sans Mono", "DejaVu Sans Mono", Monaco, monospace;
+}
+
+code {
+  color: #c7254e;
+  padding: 2px 4px;
+  background-color: #f9f2f4;
+}
+
+code,
+kbd {
+  font-size: 0.9em;
+}
+
+kbd {
+  color: #fff;
+  background-color: #333;
+}
+
+kbd,
+var {
+  padding: 2px 4px;
+  box-shadow: none;
+}
+
+var {
+  font-size: 1.2em;
+  color: #333;
+}
+
+kbd > kbd {
+  font-size: 1em;
+  font-weight: bold;
+  padding: 0;
+  box-shadow: none;
+}
+
+pre {
+  font-size: 0.9em;
+  line-height: 1.42857143;
+  color: #fff;
+  display: block;
+  padding: 10px;
+  margin: 0;
+  border: 0;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #000;
+}
+
+pre code {
+  font-size: inherit;
+}
+
+pre code,
+pre var {
+  color: inherit;
+  padding: 0;
+  white-space: pre-wrap;
+  background-color: transparent;
+}
+
+pre var {
+  font-size: 1.2em;
+}
+
+ul {
+  padding: 0;
+  list-style-type: none;
+}
+
+img {
+  max-width: 100%;
+}/*# sourceMappingURL=glob.css.map */
