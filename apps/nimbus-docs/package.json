@@ -10,6 +10,7 @@
     "preview": "nuxi preview",
     "lint": "eslint .",
     "commit": "git-cz",
+    "deploy:vercel": "yarn workspace '@vlalg-nimbus/master-tool' build && yarn workspace '@vlalg-nimbus/nb-time' build && yarn workspace '@vlalg-nimbus/nb-text' build && yarn workspace '@vlalg-nimbus/nb-slides' build && yarn workspace '@vlalg-nimbus/nb-payments' build && yarn workspace '@vlalg-nimbus/nb-password' build && yarn workspace '@vlalg-nimbus/nb-buttons' build && yarn workspace nimbus-docs install && yarn workspace nimbus-docs build",
     "nuxt:upgrade": "npx nuxi upgrade --force"
   },
   "devDependencies": {
