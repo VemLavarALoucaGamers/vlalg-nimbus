@@ -120,6 +120,10 @@ html {
 
             li {
               line-height: .7em;
+
+              code {
+                line-height: 25px;
+              }
               &::before {
                 content: "\2022";
                 color: $color-theme;

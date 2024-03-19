@@ -41,28 +41,13 @@ export default defineComponent({
 	emits: [],
 	props: {},
 	setup() {
-		const day = ref(14)
-		const month = ref('01')
-		const year = ref(2024)
-		const hour = ref(19)
-		const minute = ref(44)
-		const second = ref(10)
 		const cardValues = ref({})
-
-		const toDate = ref('oct 11, 2022 16:05:00')
 
 		const setCardValues = $event => {
 			cardValues.value = $event
 		}
 
 		return {
-			day,
-			month,
-			year,
-			hour,
-			minute,
-			second,
-			toDate,
 			cardValues,
 			setCardValues
 		}
