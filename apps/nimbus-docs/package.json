@@ -24,10 +24,10 @@
   },
   "dependencies": {
     "@vlalg-nimbus/nb-buttons": "^2.0.7",
-    "@vlalg-nimbus/nb-password": "1.0.0",
+    "@vlalg-nimbus/nb-password": "^1.0.0",
     "@vlalg-nimbus/nb-payments": "^5.0.0",
     "@vlalg-nimbus/nb-slides": "^4.0.0",
-    "@vlalg-nimbus/nb-text": "^3.0.0",
+    "@vlalg-nimbus/nb-text": "^4.0.0",
     "@vlalg-nimbus/nb-time": "^1.0.3",
     "add": "^2.0.6",
     "sass": "^1.65.1",
