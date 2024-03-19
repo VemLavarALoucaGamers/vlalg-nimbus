@@ -34,7 +34,7 @@ app.mount('#app')
 
 The components that are part of this lib are:
 
-- <a href="http://nimbus.tec.br/vue-components/nb-slides/nb-button-mechanical" target="_blank">nb-slide-div-fixed-size</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-slides/nb-slide-div-fixed-size" target="_blank">nb-slide-div-fixed-size</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

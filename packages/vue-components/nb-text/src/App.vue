@@ -4,28 +4,53 @@
 			<div class="col-md-10 col-md-offset-1 test-page__title">
 				<h2>Test page</h2>
 				<p class="test-page__component-name"><strong>Component:</strong> NbText</p>
-				<p class="test-page__warning">Warning: Look at the console to see the click event</p>
 			</div>
 		</div>
 
 		<div class="row">
 			<div
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-bottom: 50px; overflow: hidden"
+			>
+				<select v-model="textType">
+					<option value="gradientText">gradientText</option>
+					<option value="highlightSelectedText">highlightSelectedText</option>
+				</select>
+			</div>
+		</div>
+
+		<div
+			v-if="textType === 'gradientText'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
 			>
 				<h4 class="test-page__content-tile">NbGradientText</h4>
-				bbbb<NbGradientText
-					nb-id="asdas"
-					alignment="center"
+
+				<NbGradientText
+					nb-id="nb-gradient-text"
 					line-height="1"
 					size="3.5rem"
-					padding-bottom="10"
 					bg-first="magenta"
 					bg-second="cyan"
+					alignment="center"
+					padding-bottom="10"
 				>
-					<template #text> i love to<br />drink coffee<br />very much </template> </NbGradientText
-				>aaaaaa
+					<template #text> i love to<br />drink coffee<br />very much </template>
+				</NbGradientText>
+			</div>
+		</div>
 
+		<div
+			v-else
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
 				<h4 class="test-page__content-tile">NbHighlightSelectedText</h4>
 				<p style="font-size: 26px !important">
 					Select
@@ -34,7 +59,7 @@
 						background-color="tomato"
 						text-color="blue"
 					>
-						this part of the text
+						<template #text>this part of the text</template>
 					</NbHighlightSelectedText>
 					to see it in another color
 				</p>
@@ -43,7 +68,7 @@
 	</div>
 </template>
 <script>
-import { defineComponent, defineAsyncComponent } from 'vue'
+import { defineComponent, defineAsyncComponent, ref } from 'vue'
 
 export default defineComponent({
 	name: 'App',
@@ -56,7 +81,11 @@ export default defineComponent({
 	emits: [],
 	props: {},
 	setup() {
-		return {}
+		const textType = ref('gradientText')
+
+		return {
+			textType
+		}
 	}
 })
 </script>

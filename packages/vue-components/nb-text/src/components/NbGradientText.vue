@@ -7,7 +7,7 @@
 	>
 		<div
 			class="nb-gradient-text nb-reset"
-			:style="[newLineHeight, gradient, fontSize, pBottom, family]"
+			:style="[newLineHeight, gradient, fontStyle, pBottom]"
 		>
 			<slot name="text"></slot>
 			<p v-if="!$slots.text">Default Text</p>
@@ -23,10 +23,11 @@ const defaultValues = {
 	bgFirst: '#5639fc',
 	bgSecond: '#05f7ff',
 	lineHeight: '1.42857143',
-	size: '3rem',
 	align: 'left',
 	paddingBottom: '5',
-	font: 'Fugaz One, cursive'
+	fontFamily: `'Lato', sans-serif`,
+	fontSize: '3rem',
+	fontWeight: 800
 }
 
 const validsAlign = ['center', 'left', 'right']
@@ -43,10 +44,6 @@ export default defineComponent({
 		lineHeight: {
 			type: [String, Number],
 			default: defaultValues.lineHeight
-		},
-		size: {
-			type: String,
-			default: defaultValues.size
 		},
 		bgFirst: {
 			type: String,
@@ -67,13 +64,36 @@ export default defineComponent({
 			type: [String, Number],
 			default: defaultValues.paddingBottom
 		},
-		font: {
+		fontFamily: {
 			type: String,
-			default: defaultValues.font
+			default: defaultValues.fontFamily
+		},
+		fontSize: {
+			type: String,
+			default: defaultValues.fontSize,
+			validator: value => {
+				return !value ? '1.6em' : value
+			}
+		},
+		fontWeight: {
+			type: Number,
+			default: defaultValues.fontWeight,
+			validator: value => {
+				return !value ? 800 : value
+			}
 		}
 	},
 	setup(props) {
-		const { lineHeight, bgFirst, bgSecond, size, alignment, paddingBottom, font } = toRefs(props)
+		const {
+			lineHeight,
+			bgFirst,
+			bgSecond,
+			alignment,
+			paddingBottom,
+			fontFamily,
+			fontSize,
+			fontWeight
+		} = toRefs(props)
 
 		const $masterTool = MasterTool()
 
@@ -99,14 +119,6 @@ export default defineComponent({
 				'background-clip': 'text',
 				'-webkit-background-clip': 'text',
 				'-webkit-text-fill-color': 'transparent'
-			}
-		})
-
-		const fontSize = computed(() => {
-			const newSize = size.value ? size.value : defaultValues.size
-
-			return {
-				'font-size': newSize
 			}
 		})
 
@@ -137,21 +149,24 @@ export default defineComponent({
 			}
 		})
 
-		const family = computed(() => {
-			const newFont = font.value ? font.value : defaultValues.font
+		const fontStyle = computed(() => {
+			const newSize = fontSize.value ? fontSize.value : defaultValues.fontSize
+			const newFont = fontFamily.value ? fontFamily.value : defaultValues.fontFamily
+			const newWeight = fontWeight.value ? fontWeight.value : defaultValues.fontWeight
 
 			return {
-				'font-family': newFont
+				fontFamily: newFont,
+				fontSize: newSize,
+				fontWeight: newWeight
 			}
 		})
 
 		return {
 			newLineHeight,
 			gradient,
-			fontSize,
 			textAlign,
 			pBottom,
-			family
+			fontStyle
 		}
 	}
 })
@@ -159,6 +174,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+
 .nb-wrapper {
 	margin: 0;
 	padding: 0;

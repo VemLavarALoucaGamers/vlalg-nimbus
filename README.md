@@ -1,8 +1,14 @@
-<div align="center" markdown="1" style="text-align:center; margin-bottom: 40px">
-    <img src="https://raw.githubusercontent.com/VemLavarALoucaGamers/vlalg-nimbus/main/editable/nimbus_logo_name.png" alt="Vue Styleguidist" width="300">
+<p align="center">
+  <a href="https://nimbus.tec.br/">
+    <img width="40%" src="https://raw.githubusercontent.com/VemLavarALoucaGamers/vlalg-nimbus/main/editable/nimbus_logo_name.png" alt="Vue Styleguidist" />
+  </a>
+</p>
 
+<p align="center">
 **Open source project of Vue.js 3 Components, Web Components, JS Libraries, CSS Library and Helper's/Util's JS**
+</p>
 
+<div align="center" markdown="1" style="text-align:center; margin-bottom: 40px">
 <a href="LICENSE">
 	<img alt="GitHub" src="https://img.shields.io/github/license/VemLavarALoucaGamers/vlalg-nimbus">
 </a>
@@ -27,12 +33,30 @@ This is an Open Source project by <a href="https://vemlavaralouca.com.br/" targe
   </a>
 </div>
 
+## Introduction
+
+Nimbus is a free and open-source library collection that provides ready-to-use Vue.js components and other usable items that you can easily combine to build robust applications.
+
+The main objective of libraries is to speed up and simplify the application development process, improving their design without compromising essential functionalities. We aim for all components to be independent in terms of colors, shapes and design, while JavaScript libraries act as allies in the development cycle, contributing to the creation of robust, high-quality applications.
+
+## Support the project ⭐
+
+If you feel awesome and want to support us in a small way, please consider starring and sharing the repo! This helps us getting known and grow the community. 🙏
+
+<img src="https://github.com/VemLavarALoucaGamers/vlalg-nimbus/blob/main/editable/github-star.gif" alt="nimbus-star" />
+
 ## Documentation
 To view the documentation and learn more about this project:
 
 - [Documentation](https://nimbus.tec.br/)
 - [Playground](https://nimbus.tec.br/playground)
 - [NPM](https://www.npmjs.com/org/vlalg-nimbus)
+
+## Components
+All components can be seen [here](https://nimbus.tec.br/vue-components), it is impossible to list everything here because there are so many components
+
+## VLALG
+<a href="https://vemlavaralouca.com.br/" target="_blank">VLALG</a> is a Youtube channel that is under development, created by <a href="https://github.com/TonhaoSantos" target="_blank">Tonhão Santos</a> and <a href="https://github.com/lipecss" target="_blank">FelipeCss</a>, two gamer and developer brothers.
 
 ## Do you use this lib?
 We believe that using Nimbus in projects is also a contributor of Nimbus, which is telling people that Nimbus is a trustworthy open source project.🥳🥳🥳
@@ -46,9 +70,6 @@ Post your project in the following format:
 [your project logo]
 [your project online link]
 ```
-
-## VLALG
-<a href="https://vemlavaralouca.com.br/" target="_blank">VLALG</a> is a Youtube channel that is under development, created by <a href="https://github.com/TonhaoSantos" target="_blank">Tonhão Santos</a> and <a href="https://github.com/lipecss" target="_blank">FelipeCss</a>, two gamer and developer brothers.
 
 ## Name meaning
 

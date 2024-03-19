@@ -3283,6 +3283,16 @@
   resolved "https://registry.yarnpkg.com/@vlalg-nimbus/master-tool/-/master-tool-1.0.0.tgz#d6b8d2a6a248cb9c28304b2f6379f25c7d38ddb5"
   integrity sha512-cZoX2orJT5X2TXQavxBpfq0li9w2/lKCABNYE6HRt/31QW3OyLOuxO2mXYMaSQFuj0g20F9VhKeF/xgC49ZDDw==
 
+"@vlalg-nimbus/nb-text@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@vlalg-nimbus/nb-text/-/nb-text-3.0.0.tgz#88b5e1a7f74405a7e262158897935f482479b25b"
+  integrity sha512-EFudU2dA3tDpmiBvQVIxg7XGGd2qXNS08yv/sOgz0h08zBVYoEpQPKOMZ91juIK36YdIuUltQz8s8FC03I01tA==
+  dependencies:
+    "@vlalg-nimbus/bee-css-reset" "^2.0.2"
+    "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
+    "@vlalg-nimbus/master-tool" "^1.0.3"
+    vue "^3.3.4"
+
 "@volar/language-core@1.10.0", "@volar/language-core@~1.10.0":
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/@volar/language-core/-/language-core-1.10.0.tgz#fb6b3ad22e75c53a1ae4d644c4a788b47d411b9d"
@@ -3605,6 +3615,11 @@ acorn@^8.1.0, acorn@^8.8.1:
   version "8.11.2"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.11.2.tgz#ca0d78b51895be5390a5903c5b3bdcdaf78ae40b"
   integrity sha512-nc0Axzp/0FILLEVsm4fNwLCwMttvhEI263QtVPQcbpfZZ3ts0hLsZGOpE6czNlid7CJ9MlyH8reXkpsf3YUY4w==
+
+add@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/add/-/add-2.0.6.tgz#248f0a9f6e5a528ef2295dbeec30532130ae2235"
+  integrity sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==
 
 agent-base@6, agent-base@^6.0.2:
   version "6.0.2"
@@ -12971,6 +12986,11 @@ yargs@^17.0.0, yargs@^17.5.1, yargs@^17.7.2:
     string-width "^4.2.3"
     y18n "^5.0.5"
     yargs-parser "^21.1.1"
+
+yarn@^1.22.22:
+  version "1.22.22"
+  resolved "https://registry.yarnpkg.com/yarn/-/yarn-1.22.22.tgz#ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  integrity sha512-prL3kGtyG7o9Z9Sv8IPfBNrWTDmXB4Qbes8A9rEzt6wkJV8mUvoirjU0Mp3GGAU06Y0XQyA3/2/RQFVuK7MTfg==
 
 yauzl@^2.10.0, yauzl@^2.4.2:
   version "2.10.0"
