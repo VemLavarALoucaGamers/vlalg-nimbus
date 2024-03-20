@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-password",
   "description": "Password components for Vuejs 3",
-  "private": true,
+  "private": false,
   "version": "1.0.1",
   "type": "module",
   "main": "./dist/nb-password.umd.js",

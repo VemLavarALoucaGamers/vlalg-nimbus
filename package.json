@@ -1,15 +1,15 @@
 {
   "name": "vlalg-nimbus",
   "description": "VLALG Nimbus",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "type": "module",
   "scripts": {
     "prepare": "husky install",
     "commit": "git-cz",
-    "install:all": "yarn install --workspace '*'",
+    "install:all": "yarn cache clean && yarn install --workspace '*'",
     "deploy:playground": "yarn workspace nimbus-playground deploy:vercel",
-    "clean:node-modules": "rm -fR **/**/node_modules **/**/yarn.lock"
+    "clean:node-modules": "find . -type d -name 'node_modules' -exec rm -rf {} + && rm -f yarn.lock"
   },
   "workspaces": {
     "packages": [

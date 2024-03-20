@@ -1,7 +1,7 @@
 {
 	"name": "@vlalg-nimbus/magic-consolelog",
 	"description": "Printing the console.log in a magical way",
-	"private": true,
+	"private": false,
 	"version": "2.0.7",
 	"type": "module",
 	"main": "./dist/bundle.min.umd.js",
