@@ -221,7 +221,7 @@ const formatDefaultValues = computed(() => {
   const itemGapValue = (itemGap.value !== 0 && !itemGap.value) || itemGap.value < 0 ? 15 : itemGap.value
   const internalGapValue = (internalGap.value !== 0 && !internalGap.value) || internalGap.value < 0 ? 6 : internalGap.value
   const typeValue = !['box', 'circle'].includes(type.value) ? 'box' : type.value
-  console.log(typeValue)
+
 	return {
 		disabled: disabledValue,
     display: displayValue,
