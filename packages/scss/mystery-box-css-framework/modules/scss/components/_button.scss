@@ -1,3 +1,6 @@
+@use 'sass:color';
+@use '../abstracts/variables' as *;
+
 @mixin btn($bg-color: #e2e2e2) {
   text-decoration: none;
   cursor: pointer;
@@ -12,11 +15,13 @@
   @include btn;
 }
 
+$darken-percent: 30%;
+
 @each $key, $val in $colors {
   .btn-#{$key} {
     @include btn($val);
     &:hover {
-      background-color: lighten($val, 5);
+      background-color: color.scale($val, $lightness: $darken-percent);
     }
   }
   .btn-outlined-#{$key} {

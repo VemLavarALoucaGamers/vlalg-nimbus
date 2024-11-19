@@ -1,7 +1,7 @@
 {
 	"name": "@vlalg-nimbus/chameleon-grid-layout",
 	"description": "Chameleon Grid Layout",
-	"version": "1.0.3",
+	"version": "2.0.0",
 	"type": "module",
 	"main": "./dist/chameleon-grid-layout.min.js",
 	"browser": {

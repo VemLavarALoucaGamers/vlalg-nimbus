@@ -1,5 +1,6 @@
 // File: _general.scss
 // This file contains general config.
+@use '../abstracts/variables' as *;
 
 @each $name,$color in $theme-colors {
   .theme-#{$name}{

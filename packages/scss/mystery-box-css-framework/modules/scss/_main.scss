@@ -9,28 +9,28 @@
 */
 
 // Variables, Mixins, Functions & Breakpoints
-@import 'abstracts/glob';
+@use 'abstracts/glob' as *;
 
 // Base, Reset, Typography
-@import 'base/glob';
+@use 'base/glob' as *;
 
 // Colors
-@import "colors/glob";
+@use "colors/glob" as *;
 
 // Components (button, card, navbar, ...)
-@import 'components/glob';
+@use 'components/glob' as *;
 
 // Grid
-@import "layout/glob";
+@use "layout/glob" as *;
 
 // Pages
-@import 'pages/glob';
+@use 'pages/glob' as *;
 
 // Themes
-@import 'themes/glob';
+@use 'themes/glob' as *;
 
 // Utilities (margin, padding, opacity, ...)
-@import 'others/glob';
+@use 'others/glob' as *;
 
 // Vendors (Bootstrap, Bulma, ...)
-@import 'vendors/glob';
+@use 'vendors/glob' as *;

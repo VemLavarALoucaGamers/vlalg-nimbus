@@ -1,8 +1,12 @@
 // File: _functions.scss
 // This file contains functions config.
+@use 'sass:color';
+@use 'variables' as *;
+
+$darken-percent: 30%;
 
 @function light-comp($color) {
   $complement: complement($color);
-  $light-complement: lighten($complement, 30%);
+  $light-complement: color.scale($complement, $lightness: $darken-percent);
   @return $light-complement;
 }

@@ -1,5 +1,6 @@
 // File: _colors.scss
 // This file contains color config, colors for test.
+@use '../abstracts/variables' as *;
 
 .color1 {
   background-color: tomato;

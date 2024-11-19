@@ -1,4 +1,4 @@
 // File: _reset.scss
 // This file contains reset config.
 
-@import '../../../../chameleon-grid-layout/modules/index';
+@use '../../../../chameleon-grid-layout/modules/index' as *;

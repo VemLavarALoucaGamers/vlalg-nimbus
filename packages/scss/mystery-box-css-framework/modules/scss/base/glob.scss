@@ -1,6 +1,6 @@
 // File: glob.scss
 // This file contains all imports
 
-@import 'reset';
-@import 'general';
-@import 'typography';
+@use 'reset' as *;
+@use 'general' as *;
+@use 'typography' as *;
