@@ -177,7 +177,7 @@ const props = defineProps({
 	},
 	fontWeight: {
 		type: Number,
-		default: 200,
+		default: 400,
 		validator: value => {
 			return !value ? 200 : value
 		}
