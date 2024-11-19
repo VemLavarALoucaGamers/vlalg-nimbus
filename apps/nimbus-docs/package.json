@@ -1,7 +1,6 @@
 {
   "name": "nimbus-docs",
   "version": "1.19.0",
-  "private": false,
   "scripts": {
     "start": "yarn install && yarn dev",
     "dev": "nuxi dev",

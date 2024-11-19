@@ -1,13 +1,13 @@
 {
   "name": "vlalg-nimbus",
   "description": "VLALG Nimbus",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": true,
   "type": "module",
   "scripts": {
     "prepare": "husky install",
     "commit": "git-cz",
-    "install:all": "yarn cache clean && yarn install --workspace '*'",
+    "install-all": "yarn cache clean && yarn workspaces foreach --all run yarn install",
     "deploy:playground": "yarn workspace nimbus-playground deploy:vercel",
     "clean:node-modules": "find . -type d -name 'node_modules' -exec rm -rf {} + && rm -f yarn.lock"
   },
@@ -31,8 +31,8 @@
   "bugs": {
     "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
   },
-	"homepage": "https://nimbus.tec.br",
-	"license": "MIT",
+  "homepage": "https://nimbus.tec.br",
+  "license": "MIT",
   "keywords": [
     "vuejs",
     "vue js",
@@ -46,7 +46,7 @@
     "js lib",
     "javascript lib"
   ],
-	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
+  "author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
   "contributors": [
     "TonhaoSantos (https://github.com/TonhaoSantos)",
     "Felipecss (https://github.com/lipecss)"
@@ -55,5 +55,10 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "packageManager": "yarn@4.5.1",
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0"
   }
 }

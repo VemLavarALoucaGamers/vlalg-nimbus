@@ -1,7 +1,6 @@
 {
 	"name": "@vlalg-nimbus/github-stars-button",
 	"description": "A button that shows the number of stars of a Github repository",
-	"private": false,
 	"version": "1.0.0",
 	"type": "module",
 	"main": "./dist/github-stars-button.min.umd.js",
@@ -18,17 +17,16 @@
 		"dist"
 	],
 	"scripts": {
-    "dev:server": "live-server --entry-file=./modules/index.html --verbose",
+		"dev:server": "live-server --entry-file=./modules/index.html --verbose",
 		"prod:minify": "cross-env NODE_ENV=production yarn rollup",
-    "dev:watch-prod": "cross-env NODE_ENV=production yarn rollup:watch",
-    "dev": "concurrently \"yarn clean\" \"yarn dev:watch-prod\" \"yarn dev:server\"",
+		"dev:watch-prod": "cross-env NODE_ENV=production yarn rollup:watch",
+		"dev": "concurrently \"yarn clean\" \"yarn dev:watch-prod\" \"yarn dev:server\"",
 		"rollup": "rollup --config",
-    "rollup:watch": "rollup --config --watch",
+		"rollup:watch": "rollup --config --watch",
 		"clean": "rimraf dist",
 		"lint": "eslint ./modules --ext .js --fix",
 		"npm:publish": "yarn clean && yarn lint && yarn prod:minify && npm login && npm publish --access=public"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"@babel/core": "^7.22.11",
 		"@babel/eslint-parser": "^7.22.11",
