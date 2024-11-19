@@ -5,9 +5,7 @@ export default defineNuxtConfig({
  extends: '@nuxt-themes/docus',
 
   build: {
-    extends: (config) => {
-      config.resolve.symlinks = false
-    }
+    transpile: ['@vlalg-nimbus/github-stars-button']
   },
 
   modules: [
@@ -34,9 +32,18 @@ export default defineNuxtConfig({
   },
   
   vite: {
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './'),
+        '@assets': resolve(__dirname, './assets')
+      }
+    },
     build: {
       target: 'esnext', // Necessário para Web Components em navegadores modernos
     },
+    optimizeDeps: {
+      include: ['@vlalg-nimbus/github-stars-button']
+    }
   },
 
   vue: {

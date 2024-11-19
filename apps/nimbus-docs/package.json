@@ -32,7 +32,8 @@
     "@vlalg-nimbus/nb-text": "^4.0.0",
     "@vlalg-nimbus/nb-time": "^1.0.3",
     "add": "^2.0.6",
-    "sass": "^1.65.1",
+    "sass": "^1.81.0",
+    "vue-loader": "^17.4.2",
     "yarn": "^1.22.22"
   },
   "config": {

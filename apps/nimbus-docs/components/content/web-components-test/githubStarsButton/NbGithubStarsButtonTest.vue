@@ -20,8 +20,6 @@ const githubStarsButton = ref(null);
 
 onMounted(() => {
   if (import.meta.client) {
-    import('@vlalg-nimbus/github-stars-button');
-    
     githubStarsButton.value.addEventListener('webcomp-clicked', (event) => {
       const repoOwner = event.target.repoOwner;
       const repoName = event.target.repoName;
