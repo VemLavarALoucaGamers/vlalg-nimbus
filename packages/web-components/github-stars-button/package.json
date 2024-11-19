@@ -25,7 +25,8 @@
 		"rollup:watch": "rollup --config --watch",
 		"clean": "rimraf dist",
 		"lint": "eslint ./modules --ext .js --fix",
-		"npm:publish": "yarn clean && yarn lint && yarn prod:minify && npm login && npm publish --access=public"
+		"build": "yarn clean && yarn lint && yarn prod:minify",
+		"npm:publish": "yarn build && npm login && npm publish --access=public"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.22.11",
