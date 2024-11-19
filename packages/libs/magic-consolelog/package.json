@@ -1,25 +1,25 @@
 {
 	"name": "@vlalg-nimbus/magic-consolelog",
 	"description": "Printing the console.log in a magical way",
-	"private": false,
-	"version": "2.0.7",
+	"version": "3.0.0",
 	"type": "module",
 	"main": "./dist/bundle.min.umd.js",
 	"module": "./dist/bundle.min.es.js",
 	"exports": {
 		".": {
 			"import": "./dist/bundle.min.es.js",
-			"require": "./dist/bundle.min.umd.js"
+			"require": "./dist/bundle.min.umd.js",
+			"types": "./dist/index.d.ts"
 		},
-    "./package.json": "./package.json"
+		"./package.json": "./package.json"
 	},
 	"browser": {
 		"./style.css": ""
 	},
-  "typeScriptVersion": "^5.2.2",
+	"typeScriptVersion": "^5.2.2",
 	"types": "./dist/index.d.ts",
 	"typings": "./dist/index.d.ts",
-  "sideEffects": false,
+	"sideEffects": false,
 	"files": [
 		"dist"
 	],
@@ -36,7 +36,6 @@
 		"lint": "eslint ./modules --ext .js --fix",
 		"npm:publish": "yarn clean && yarn lint && yarn prod:minify && yarn generate-typing && npm login && npm publish --access=public"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"@babel/core": "^7.22.11",
 		"@babel/eslint-parser": "^7.22.11",
@@ -60,11 +59,11 @@
 		"type": "git",
 		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
 	},
-  "bugs": {
-    "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
-  },
+	"bugs": {
+		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
+	},
 	"homepage": "https://nimbus.tec.br",
-  "license": "MIT",
+	"license": "MIT",
 	"keywords": [
 		"module",
 		"lib",
@@ -76,8 +75,8 @@
 		"magic consolelog"
 	],
 	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
-  "contributors": [
-    "TonhaoSantos (https://github.com/TonhaoSantos)",
-    "Felipecss (https://github.com/lipecss)"
-  ]
+	"contributors": [
+		"TonhaoSantos (https://github.com/TonhaoSantos)",
+		"Felipecss (https://github.com/lipecss)"
+	]
 }

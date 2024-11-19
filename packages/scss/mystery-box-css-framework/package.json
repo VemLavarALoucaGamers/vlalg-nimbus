@@ -1,7 +1,6 @@
 {
 	"name": "@vlalg-nimbus/mystery-box-css-framework",
 	"description": "MysteryBox - CSS Framework",
-	"private": false,
 	"version": "1.0.4",
 	"type": "module",
 	"main": "./dist/mystery-box-css-framework.min.js",
@@ -28,7 +27,6 @@
 		"build:js": "yarn lint && yarn js:minify",
 		"npm:publish": "yarn build:scss && yarn build:postcss && yarn build:js && npm login && npm publish --access=public"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"@babel/core": "^7.22.11",
 		"@babel/eslint-parser": "^7.22.11",

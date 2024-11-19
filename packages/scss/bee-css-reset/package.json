@@ -1,8 +1,7 @@
 {
 	"name": "@vlalg-nimbus/bee-css-reset",
 	"description": "BEE - CSS Reset",
-	"private": false,
-	"version": "2.0.3",
+	"version": "3.0.0",
 	"type": "module",
 	"main": "./dist/bee-css-reset.min.js",
 	"browser": {
@@ -28,7 +27,6 @@
 		"build:js": "yarn lint && yarn js:minify",
 		"npm:publish": "yarn build:scss && yarn build:postcss && yarn build:js && npm login && npm publish --access=public"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"@babel/core": "^7.22.11",
 		"@babel/eslint-parser": "^7.22.11",

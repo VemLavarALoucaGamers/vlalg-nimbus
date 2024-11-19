@@ -141,7 +141,7 @@ export default () => {
     /**
      * Function that returns the initial letters of the string
      * @param {string} wordsToPickUp - Text that will be analyzed
-     * @returns {array} Returns all initial letters in uppercase
+     * @returns {string} Returns all initial letters in uppercase
     */
     initialLetter (wordsToPickUp = '') {
       if (withoutField(wordsToPickUp)) {
@@ -231,7 +231,6 @@ export default () => {
       if (typeof phone !== 'string' || typeof msg !== 'string' || typeof type !== 'string') {
         errorTypes('goWhatsapp')
       }*/
-      console.log(phone)
       const newText = msg
       const newPhone = phone
       let message = `https://wa.me/${newPhone}?text=${newText}`

@@ -1,42 +1,41 @@
 {
 	"name": "@vlalg-nimbus/raven-sentinel",
 	"description": "Raven Sentinel - Log Manager",
-	"private": false,
-	"version": "2.0.5",
+	"version": "3.0.0",
 	"type": "module",
 	"main": "./dist/bundle.min.umd.js",
 	"module": "./dist/bundle.min.es.js",
 	"exports": {
 		".": {
 			"import": "./dist/bundle.min.es.js",
-			"require": "./dist/bundle.min.umd.js"
+			"require": "./dist/bundle.min.umd.js",
+			"types": "./dist/index.d.ts"
 		},
-    "./package.json": "./package.json"
+		"./package.json": "./package.json"
 	},
 	"browser": {
 		"./style.css": ""
 	},
-  "typeScriptVersion": "^5.2.2",
-  "types": "./dist/index.d.ts",
-  "typings": "./dist/index.d.ts",
-  "sideEffects": false,
+	"typeScriptVersion": "^5.2.2",
+	"types": "./dist/index.d.ts",
+	"typings": "./dist/index.d.ts",
+	"sideEffects": false,
 	"files": [
 		"dist"
 	],
 	"scripts": {
-    "dev:only": "cross-env NODE_ENV=development yarn rollup",
-    "dev:watch-prod": "cross-env NODE_ENV=production yarn rollup:watch",
-    "dev": "concurrently \"yarn clean\" \"yarn dev:watch-prod\" \"yarn generate-typing:watch\"",
-    "prod:minify": "cross-env NODE_ENV=production yarn rollup",
-    "rollup": "rollup --config",
-    "rollup:watch": "rollup --config --watch",
-    "generate-typing": "npx tsc",
-    "generate-typing:watch": "npx tsc -w",
-    "clean": "rimraf dist",
-    "lint": "eslint ./modules --ext .js --fix",
-    "npm:publish": "yarn clean && yarn lint && yarn prod:minify && yarn generate-typing && npm login && npm publish --access=public"
+		"dev:only": "cross-env NODE_ENV=development yarn rollup",
+		"dev:watch-prod": "cross-env NODE_ENV=production yarn rollup:watch",
+		"dev": "concurrently \"yarn clean\" \"yarn dev:watch-prod\" \"yarn generate-typing:watch\"",
+		"prod:minify": "cross-env NODE_ENV=production yarn rollup",
+		"rollup": "rollup --config",
+		"rollup:watch": "rollup --config --watch",
+		"generate-typing": "npx tsc",
+		"generate-typing:watch": "npx tsc -w",
+		"clean": "rimraf dist",
+		"lint": "eslint ./modules --ext .js --fix",
+		"npm:publish": "yarn clean && yarn lint && yarn prod:minify && yarn generate-typing && npm login && npm publish --access=public"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"@babel/core": "^7.22.11",
 		"@babel/eslint-parser": "^7.22.11",
@@ -60,9 +59,9 @@
 		"type": "git",
 		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
 	},
-  "bugs": {
-    "url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
-  },
+	"bugs": {
+		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
+	},
 	"homepage": "https://nimbus.tec.br",
 	"license": "MIT",
 	"keywords": [
@@ -76,8 +75,8 @@
 		"raven sentinel"
 	],
 	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
-  "contributors": [
-    "TonhaoSantos (https://github.com/TonhaoSantos)",
-    "Felipecss (https://github.com/lipecss)"
-  ]
+	"contributors": [
+		"TonhaoSantos (https://github.com/TonhaoSantos)",
+		"Felipecss (https://github.com/lipecss)"
+	]
 }

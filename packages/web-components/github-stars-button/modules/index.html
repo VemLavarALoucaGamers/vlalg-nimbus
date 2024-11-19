@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Github Stars Button</title>
+  <script type="module" src="./dist/github-stars-button.min.es.js"></script>
+  <!--<script src="./modules/index.js"></script>-->
+</head>
+<body>
+  <github-stars-button
+    data-repo-owner="VemLavarALoucaGamers"
+    data-repo-name="vlalg-nimbus"
+    data-show-count="true"
+    data-go-repo="true"
+  >
+  </github-stars-button>
+
+    <script>
+    const githubStarsButton = document.querySelector('github-stars-button')
+
+    githubStarsButton.addEventListener('webcomp-clicked', function(event) {
+      const repoOwner = this.dataset.repoOwner
+      const repoName = this.dataset.repoName
+      const showCount = this.dataset.showCount
+
+			console.log('Here', repoOwner, repoName, showCount)
+      console.log('Custom event triggered:', event.detail.message)
+    })
+  </script>
+</body>
+</html>
