@@ -7,11 +7,11 @@ const objectIsEmpty = (obj) => {
   return Object.keys(obj).length === 0 && obj.constructor === Object
 }
 
-const validProps = ['repoOwner', 'repoName', 'showCount']
+const validProps = ['repoOwner', 'repoName', 'showCount', 'goRepo']
 
 class StarRate extends HTMLElement {
   constructor() {
-		super();
+		super()
 
 		this.start()
   }
@@ -34,18 +34,27 @@ class StarRate extends HTMLElement {
 
 	// Start creating the component
   build () {
+    // Check if a Shadow Root already exists
+    if (this.shadowRoot) {
+      console.warn("Shadow root já existente. Evitando recriação.")
+      return
+    }
+
     // Start values
-    this.repoOwner = ''
-    this.repoName = ''
-    this.showCount = ''
+    this.repoOwner = this.dataset.repoOwner || this.getAttribute('repoOwner') || ''
+    this.repoName = this.dataset.repoName || this.getAttribute('repoName') || ''
+    this.showCount = this.dataset.showCount || this.getAttribute('showCount') || ''
+    this.goRepo = this.dataset.goRepo || this.getAttribute('goRepo') || ''
 
 		// Shadow Mode: Can receive changes from outside later
 		const shadowMode = 'closed' // 'open' or 'closed'
 
 		// Creating a ShadownDOM
-		const shadow = this.attachShadow({
-			mode: shadowMode
-		})
+    let shadow = ''
+    
+    if (!this.shadowRoot) {
+      shadow = this.attachShadow({ mode: shadowMode }); // ou 'closed'
+    }
 
 		// Starting structure
 		const wrapper = this.createWrapper()
@@ -78,16 +87,19 @@ class StarRate extends HTMLElement {
 		webComponentContent.classList.add('web-component__wrapper-content-reset')
 
     const githubSvgIcon = `
-    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 50 50" fill="#00FF00" class="svg-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50" fill="#000000" class="svg-icon">
     <path d="M25,8c9.389,0,17,7.611,17,17c0,7.548-4.921,13.944-11.729,16.163c0.002-0.006,0.005-0.016,0.005-0.016	s-1.147-0.538-1.123-1.498c0.027-1.056,0-3.521,0-4.426c0-1.553-0.983-2.654-0.983-2.654s7.709,0.087,7.709-8.139	c0-3.174-1.659-4.825-1.659-4.825s0.871-3.388-0.302-4.825c-1.315-0.142-3.669,1.257-4.675,1.91c0,0-1.593-0.653-4.244-0.653	c-2.65,0-4.244,0.653-4.244,0.653c-1.005-0.653-3.36-2.052-4.675-1.91c-1.173,1.437-0.302,4.825-0.302,4.825	s-1.659,1.652-1.659,4.825c0,8.226,7.709,8.139,7.709,8.139s-0.777,0.878-0.946,2.168c-0.538,0.183-1.33,0.408-1.969,0.408	c-1.673,0-2.946-1.626-3.412-2.379c-0.46-0.742-1.403-1.365-2.281-1.365c-0.579,0-0.861,0.289-0.861,0.62	c0,0.331,0.811,0.562,1.347,1.175c1.129,1.294,1.109,4.202,5.132,4.202c0.437,0,1.329-0.107,2-0.198	c-0.004,0.916-0.005,1.882,0.009,2.447c0.024,0.96-1.123,1.498-1.123,1.498s0.003,0.01,0.005,0.016C12.921,38.944,8,32.548,8,25	C8,15.611,15.611,8,25,8z"></path>
     </svg>`
 
-    webComponentContent.innerHTML = `
+    let contentBody = `
     <div class="content-icon">
-      ${githubSvgIcon}
+      ${githubSvgIcon} STAR
     </div>
-    <div class="content-count">2000</div>
     `
+
+    if (this.showCount === 'true') contentBody = `${contentBody}<div class="content-count">2000</div>`
+
+    webComponentContent.innerHTML = contentBody
 
 		webComponentContent.addEventListener('click', event => this.eventContentClick(event))
 
@@ -106,7 +118,6 @@ class StarRate extends HTMLElement {
 				-moz-box-sizing: border-box;
 				box-sizing: border-box;
 
-        background: tomato;
         display: inline-block;
 			}
 			.web-component__wrapper-disabled {
@@ -148,16 +159,28 @@ class StarRate extends HTMLElement {
         max-height: 30px;
         width: auto;
         overflow: hidden;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center;
+        font-size: 1.4em;
+        font-weight: 900;
+        border-radius: 5px;
+        border: 1px solid #cdcdcd;
 			}
       .web-component__wrapper-content .content-icon {
-        background: blue;
+        background: #f8f8f8;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 10px;
+        border-right: 1px solid #cdcdcd;
       }
       .web-component__wrapper-content .content-count {
-        background: gray;
+        background: #ffffff;
+        padding: 0 10px;
       }
       .content-icon .svg-icon {
-        width: auto;
-        height: 100%;
+        height: 30px;
       }
 			.web-component__wrapper-content:hover {
 				cursor: pointer;
@@ -169,13 +192,21 @@ class StarRate extends HTMLElement {
 
 	// Adding custom event
 	eventContentClick () {
-		// console.log('Content clicked -> ', event)
-		this.customEvent('webcomp-click', 'Web Component clicked')
+    if (this.goRepo === 'true' && this.repoName && this.repoOwner) {
+      const owner = this.repoOwner ? this.repoOwner : 'VemLavarALoucaGamers'
+      const name = this.repoName ? this.repoName : 'vlalg-nimbus'
+
+      const repoUrl = `https://github.com/${owner}/${name}`
+
+      window.open(repoUrl, '_blank')
+    }
+    
+		this.customEvent('webcomp-clicked', { message: 'Web Component clicked' })
 	}
 
 	// Creating custom event
 	customEvent (eventName, returnValue) {
-		const validEventNames = ['webcomp-click']
+		const validEventNames = ['webcomp-clicked']
 		const hasValidEventName = validEventNames.includes(eventName)
 
 		if (eventName && returnValue && hasValidEventName) {
@@ -198,19 +229,17 @@ class StarRate extends HTMLElement {
     if (oldValue !== newValue) {
       this[name] = newValue
 
-      switch (name) {
-        case 'x':
-          this.querySelector('input').value = newValue
-          break
-        default:
-          this.build()
+      if (!this.shadowRoot) {
+        this.build()
       }
     }
   }
 
   // Triggers every time a custom element enters the DOM/page
   connectedCallback () {
-    this.start()
+    if (!this.shadowRoot) {
+      this.start();
+    }
   }
 
   // Triggers whenever a custom element leaves the DOM/page
