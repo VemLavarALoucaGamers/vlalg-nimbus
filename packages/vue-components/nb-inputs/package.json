@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-inputs",
   "description": "Input components for Vuejs 3",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "main": "./dist/nb-inputs.umd.js",
   "module": "./dist/nb-inputs.js",

@@ -40,7 +40,7 @@
 import { defineProps, ref, toRefs, computed, onMounted, watch, watchEffect } from 'vue'
 
 defineOptions({
-	name: 'NbInputRadio',
+	name: 'NbInputCheckbox',
 	inheritAttrs: false
 })
 
