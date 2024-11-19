@@ -2,7 +2,8 @@
 // This file contains all imports
 @charset 'UTF-8';
 
-@import './abstracts/glob';
+@use './abstracts/variables' as *;
+@use './abstracts/glob' as *;
 
 :root {
   --vp-c-bg: #1e1e20;

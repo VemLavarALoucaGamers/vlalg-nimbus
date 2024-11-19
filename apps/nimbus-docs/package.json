@@ -23,7 +23,8 @@
     "nuxt": "^3.11.1"
   },
   "dependencies": {
-    "@vlalg-nimbus/nb-buttons": "^2.0.7",
+    "@vlalg-nimbus/nb-buttons": "^3.0.0",
+    "@vlalg-nimbus/nb-inputs": "^2.0.0",
     "@vlalg-nimbus/nb-password": "^1.0.0",
     "@vlalg-nimbus/nb-payments": "^5.0.0",
     "@vlalg-nimbus/nb-slides": "^4.0.0",
