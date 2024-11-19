@@ -3564,6 +3564,15 @@
   resolved "https://registry.yarnpkg.com/@vlalg-nimbus/master-tool/-/master-tool-1.0.5.tgz#5ad0b6ba34a1d370ed50fed196e307b2a9ca2324"
   integrity sha512-BRegwDB6J5TWsXe7N8hcnVq0AU6OSAsuh6Uw+Y/YPFCEy1UJf3Ca9Xar4a4F9ThlO6yHY8dVhQnx0TR4hGqewg==
 
+"@vlalg-nimbus/nb-inputs@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@vlalg-nimbus/nb-inputs/-/nb-inputs-2.0.0.tgz#d5eaa7c936ccd6a584cd63fabc6219f12e1c9f62"
+  integrity sha512-ciipUola7hZ2o1Oj10dC6OyvqmrOcdlxbDU+eund+2ZJhJgJ6cPjeBdDdlF3iYyyTLZEtIva+e9L20cUeCp6vA==
+  dependencies:
+    "@vlalg-nimbus/bee-css-reset" "^2.0.2"
+    "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
+    vue "^3.3.4"
+
 "@volar/language-core@1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@volar/language-core/-/language-core-1.4.1.tgz#66b5758252e35c4e5e71197ca7fa0344d306442c"

@@ -166,6 +166,7 @@ class StarRate extends HTMLElement {
         font-weight: 900;
         border-radius: 5px;
         border: 1px solid #cdcdcd;
+        background: #ffffff;
 			}
       .web-component__wrapper-content .content-icon {
         background: #f8f8f8;
@@ -176,7 +177,6 @@ class StarRate extends HTMLElement {
         border-right: 1px solid #cdcdcd;
       }
       .web-component__wrapper-content .content-count {
-        background: #ffffff;
         padding: 0 10px;
       }
       .content-icon .svg-icon {
@@ -276,14 +276,18 @@ class StarRate extends HTMLElement {
 			}
     }
 
-		const current = consoleMessage[defaultType]
-
-		console.log(
-			`%c${componentName} %c ${current.icon} ${current.type} %c ${current.msg}`,
-			`color: ${current.colorCompName}; border-radius: 3px 0 0 3px; padding: 2px 2px 1px 10px; background: ${current.bgCompName}`,
-			`color: ${current.colorType}; border-radius: 0 3px 3px 0; padding: 2px 10px 1px 2px; background: ${current.bgType}`,
-			""
-		);
+    const message = consoleMessage[defaultType];
+  
+    if (message && message.icon) {
+      console.log(
+        `%c ${componentName} %c ${message.type.toUpperCase()} %c ${message.msg}`,
+        `background: ${message.bgCompName}; color: ${message.colorCompName}`,
+        `background: ${message.bgType}; color: ${message.colorType}`,
+        ''
+      );
+    } else {
+      console.error("Mensagem de console inválida ou tipo desconhecido.");
+    }
 	}
 }
 

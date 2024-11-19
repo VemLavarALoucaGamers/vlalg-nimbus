@@ -23,6 +23,7 @@
     "nuxt": "^3.11.1"
   },
   "dependencies": {
+    "@vlalg-nimbus/github-stars-button": "^2.0.1",
     "@vlalg-nimbus/nb-buttons": "^3.0.0",
     "@vlalg-nimbus/nb-inputs": "^2.0.0",
     "@vlalg-nimbus/nb-password": "^1.0.0",
