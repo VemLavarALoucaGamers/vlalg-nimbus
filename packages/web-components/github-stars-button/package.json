@@ -1,7 +1,7 @@
 {
 	"name": "@vlalg-nimbus/github-stars-button",
 	"description": "A button that shows the number of stars of a Github repository",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"type": "module",
 	"main": "./dist/github-stars-button.min.umd.js",
 	"module": "./dist/github-stars-button.min.es.js",

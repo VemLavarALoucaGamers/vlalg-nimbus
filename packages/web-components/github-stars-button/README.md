@@ -8,22 +8,19 @@ This is a Github Stars Web Component for Frontend Projects.
 
 ##### CDN
 
-::code-group
-  ```js [Unpkg JS]
-    https://unpkg.com/@vlalg-nimbus/github-stars-button/dist/github-stars-button.min.umd.js
-  ```
-::
+```js [Unpkg JS]
+  https://unpkg.com/@vlalg-nimbus/github-stars-button/dist/github-stars-button.min.umd.js
+```
 
 ##### To install
 
-::code-group
-  ```bash [YARN]
-    yarn add @vlalg-nimbus/github-stars-button
-  ```
-  ```bash [NPM]
-    npm i @vlalg-nimbus/github-stars-button
-  ```
-::
+```bash
+npm install @vlalg-nimbus/github-stars-button
+
+# or
+
+yarn add @vlalg-nimbus/github-stars-button
+```
 
 ## Usage
 
