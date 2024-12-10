@@ -308,7 +308,7 @@ const paddingValue = computed(() => {
 const borderRadius = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  const newValue = defaultValues.borderRadius > 7 ? 7 : defaultValues.borderRadius
+  const newValue = defaultValues.boxRadius > 7 ? 7 : defaultValues.boxRadius
 
   return `${newValue}px`
 })
