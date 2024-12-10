@@ -22,23 +22,16 @@
         style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
         <h4 class="test-page__content-tile">NbInputRadio</h4>
         
-        <div style="margin-bottom: 20px;">
-          <p style="margin-bottom: 5px;">
-            <span>Unidade consumidora no Grupo A?</span>
-          </p>
-          
-          <NbInputRadio
-            nb-id="radio1"
-            display="b"
-            group-name="radio-test1"
-            :current-option="currentRadioItem"
-            :options="inputOptions"
-            direction="left"
-            text-color="white"
-            :scale="1"
-            @current-value="changeRadioItem($event)"
-          />
-        </div>
+        <NbInputRadio
+          nb-id="radio1"
+          display="b"
+          group-name="radio-test1"
+          :current-option="currentRadioItem"
+          :options="inputOptions"
+          direction="right"
+          text-color="white"
+          @current-value="changeRadioItem($event)"
+        />
 
         <p style="margin-top: 4px;">
           Text before
@@ -48,7 +41,7 @@
             group-name="radio-test2"
             :current-option="currentRadioItem"
             :options="inputOptions"
-            direction="left"
+            direction="right"
             text-color="white"
             @current-value="changeRadioItem($event)"
           />
@@ -61,14 +54,13 @@
     <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
       style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
       <h4 class="test-page__content-tile">NbInputCheckbox</h4>
-      
+
       <NbInputCheckbox
         nb-id="checkbox1"
         display="b"
         group-name="checkbox-test1"
         :current-option="currentCheckboxItem"
         :options="inputOptions"
-        direction="left"
         type="circle"
         text-color="white"
         @current-value="changeChackboxItem($event)"
@@ -82,7 +74,6 @@
           group-name="checkbox-test2"
           :current-option="currentCheckboxItem"
           :options="inputOptions"
-          direction="left"
           text-color="white"
           @current-value="changeChackboxItem($event)"
         />
@@ -99,7 +90,7 @@ import { defineAsyncComponent, ref, computed } from 'vue'
 const NbInputRadio = defineAsyncComponent(() => import('@components/NbInputRadio.vue'))
 const NbInputCheckbox = defineAsyncComponent(() => import('@components/NbInputCheckbox.vue'))
 
-const btType = ref('radio')
+const btType = ref('checkbox')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
@@ -115,6 +106,10 @@ const inputOptions = computed(() => {
     {
       value: 'fish',
       text: 'fishhhhhhhhhhhhhhhhhhhh asdasdasasdas',
+    },
+    {
+      value: 'fish2',
+      text: 'asdas',
     },
   ]
 })

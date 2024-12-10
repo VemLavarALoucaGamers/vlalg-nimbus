@@ -6,14 +6,12 @@
 	>
 		<div
 			:id="nbId"
-			:class="['nb-reset', 'component']"
-			:style="[componentStyle]"
+			:class="['nb-reset', 'component', displayClass]"
 		>
       <div
         v-for="(item, index) in options"
         :key="index"
         class="component-radio__item"
-        :class="[displayClass, currentDirection]"
       >
         <input
           :id="`${nbId}-${item.value}`"
@@ -28,7 +26,8 @@
           :for="`${nbId}-${item.value}`"
           class="component-radio__item--label"
         >
-          {{ item.text }}
+          <div></div>
+          <span :style="[componentStyle]">{{ item.text }}</span>
         </label>
       </div>
 		</div>
@@ -109,13 +108,6 @@ const props = defineProps({
       return ['boolean', 'string', 'number'].indexOf(value) !== -1
     },
   },
-  direction: {
-    type: String,
-    default: 'left',
-    validator: value => {
-      return ['left', 'right'].indexOf(value) !== -1
-    },
-  },
   textColor: {
     type: String,
     default: 'black'
@@ -187,7 +179,6 @@ const {
   valueType,
   display,
   options,
-  direction,
   textColor,
   color,
   hoverEffect,
@@ -208,7 +199,6 @@ const formatDefaultValues = computed(() => {
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
-  const directionValue = !direction.value ? 'left' : direction.value
   const textColorValue = !textColor.value ? 'black' : textColor.value
   const colorValue = !color.value ? '#767676' : color.value
   const hoverEffectValue = ![false, true].includes(hoverEffect.value) ? false : hoverEffect.value
@@ -221,7 +211,6 @@ const formatDefaultValues = computed(() => {
 	return {
 		disabled: disabledValue,
     display: displayValue,
-    direction: directionValue,
     textColor: textColorValue,
     color: colorValue,
     hoverEffect: hoverEffectValue,
@@ -244,7 +233,7 @@ const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		display: defaultValues.display,
+    display: defaultValues.display,
     transform: `scale(${defaultValues.scale})`
 	}
 })
@@ -270,11 +259,6 @@ const validList = computed(() => {
   return isArray && options.value.length > 0
 })
 
-const currentDirection = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-  return (defaultValues.direction === 'right') ? 'component-radio__item--direction-right' : 'component-radio__item--direction-left'
-})
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
@@ -299,22 +283,14 @@ const styleColorHover = computed(() => {
 const styleColorActiveHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	return !defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
+	return defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
 })
 
 const paddingValue = computed(() => {
   const defaultValues = formatDefaultValues.value
   const internalG = defaultValues.internalGap
 
-  return !internalG || internalG < 0 ? 0 : internalG
-})
-
-const paddingLeft = computed(() => {
-  return `0 0 0 2${paddingValue.value}px`
-})
-
-const paddingRight = computed(() => {
-  return `0 2${paddingValue.value}px 0 0`
+  return !internalG || internalG < 0 ? 0 : `${internalG}px`
 })
 
 const gapValue = computed(() => {
@@ -403,26 +379,49 @@ watch(currentValue, (newValue, oldValue) => {
 	outline: 0;
 	position: relative;
 
-	overflow: hidden;
+  &.component-radio__item--display-block,
+  &.component-radio__item--display-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v-bind(gapValue);
+    width: auto; /* Ou defina um tamanho específico se necessário */
+    word-break: break-word; /* Garante que palavras muito longas quebrem */
+    overflow-wrap: break-word; /* Adicional para compatibilidade */
+    white-space: normal; /* Permite quebras normais de texto */
+  }
 
-  // padding-top: 4px;
+  // inicio propDisplay
+  &.component-radio__item--display-block {
+    flex-direction: column;
+  }
+
+  &.component-radio__item--display-inline {
+    flex-direction: row;
+    
+    .component-radio__item {
+      // width: max-content;
+    }
+  }
+  // fim propDisplay
 
   .component-radio__item {
+    position: relative;
+
     .component-radio__item--input {
       display: none;
 
       &:checked {
         &+.component-radio__item--label {
           &:hover {
-            &:before {
+            div {
               border: 2px solid v-bind(styleColorActiveHover);
               color: v-bind(styleColorActiveHover);
             }
           }
 
-          &:before {
+          div:before {
             content: '\23FA'; // \f111
-            font-size: .8em; // 0.7em 0.85em;
+            font-size: 1.3em; // 0.7em 0.85em;
             text-shadow: 0;
             display: flex;
             align-items: center;
@@ -431,9 +430,9 @@ watch(currentValue, (newValue, oldValue) => {
             -webkit-box-shadow: none;
             -moz-box-shadow: none;
             box-shadow: none;
-            border: 2px solid v-bind(styleColorHover);
-            color: v-bind(styleColorHover);
-            line-height: 0.7em;
+            color: v-bind(colorHover);
+            line-height: 1.1em;
+            border-radius: 50%;
           }
         }
       }
@@ -443,111 +442,31 @@ watch(currentValue, (newValue, oldValue) => {
       --disabled-color: v-bind('styleTextColor');
       color: var(--disabled-color) !important;
 
+      display: flex;
+      flex-direction: row;
+      gap: v-bind(paddingValue);
+
+      align-items: center;
+
       &:hover {
         cursor: pointer;
 
-        &:before {
+        div {
           border: 2px solid v-bind(styleColorHover);
         }
       }
 
-      &:before {
-        content: '';
+      div {
         width: 19px;
         height: 19px;
-        position: absolute;
-        bottom: 0;
-        border: 0;
+        flex-shrink: 0;
         border-radius: 50%;
         text-shadow: 0;
         -webkit-box-shadow: none;
         -moz-box-shadow: none;
         box-shadow: none;
         border: 2px solid v-bind(styleColor);
-      }
-    }
-
-    // inicio propDisplay
-    &.component-radio__item--display-block {
-      display: block;
-
-      &:not(:first-child) {
-        margin-top: v-bind(gapValue);
-      }
-
-      .component-radio__item--label {
-        display: inline;
-        font-family: inherit;
-        font-size: inherit;
-        font-style: normal;
-        line-height: 20px;
-        position: relative;
-      }
-    }
-
-    &.component-radio__item--display-inline {
-      display: inline-block;
-
-      &:not(:first-child) {
-        margin-left: v-bind(gapValue);
-      }
-
-      .component-radio__item--label {
-        display: inline;
-        font-family: inherit;
-        font-size: inherit;
-        font-style: normal;
-        line-height: 20px;
-        position: relative;
-      }
-    }
-
-    // fim propDisplay
-
-    // inicio propDirection
-    &.component-radio__item--display-block {
-      &.component-radio__item--direction-left {
-        .component-radio__item--label {
-          display: inline-block;
-          padding: v-bind(paddingLeft);
-
-          &:before {
-            left: 0;
-          }
-        }
-      }
-
-      &.component-radio__item--direction-right {
-        .component-radio__item--label {
-          padding: v-bind(paddingRight);
-
-          &:before {
-            right: 0;
-          }
-        }
-      }
-    }
-
-    &.component-radio__item--display-inline {
-      &.component-radio__item--direction-left {
-        .component-radio__item--label {
-          display: inline-block;
-          padding: v-bind(paddingLeft);
-
-          &:before {
-            left: 0;
-          }
-        }
-      }
-
-      &.component-radio__item--direction-right {
-        .component-radio__item--label {
-          padding: v-bind(paddingRight);
-
-          &:before {
-            right: 0;
-          }
-        }
+        font-family: 'Lato', sans-serif !important;
       }
     }
   }
