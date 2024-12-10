@@ -12,14 +12,14 @@
       <div
         v-for="(item, index) in options"
         :key="index"
-        class="custom-checkbox__item"
+        class="component-checkbox__item"
         :class="[displayClass, currentDirection]"
       >
         <input
           :id="`${nbId}-${item.value}`"
           v-model="currentValue"
           type="checkbox"
-          class="custom-checkbox__item--input"
+          class="component-checkbox__item--input"
           :disabled="disabled"
           :value="item.value"
           :name="groupName"
@@ -27,7 +27,7 @@
         <label
           :for="`${nbId}-${item.value}`"
           :class="[typeCheckbox]"
-          class="custom-checkbox__item--label"
+          class="component-checkbox__item--label"
         >
           {{ item.text }}
         </label>
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, watch, watchEffect } from 'vue'
+import { defineProps, ref, toRefs, computed, onMounted, watch } from 'vue'
 
 defineOptions({
 	name: 'NbInputCheckbox',
@@ -99,11 +99,18 @@ const props = defineProps({
       if (!hasError) return item
     },
   },
-  currentOptiton: {
+  currentOption: {
     type: Array,
     default: () => {
       return []
     }
+  },
+  valueType: {
+    type: String,
+    default: 'boolean',
+    validator: value => {
+      return ['boolean', 'string', 'number'].indexOf(value) !== -1
+    },
   },
   direction: {
     type: String,
@@ -150,6 +157,10 @@ const props = defineProps({
     type: Number,
     default: 6
   },
+  scale: {
+    type: Number,
+    default: 1
+  },
   type: {
     type: String,
     default: 'box',
@@ -186,7 +197,8 @@ const props = defineProps({
 
 const currentValue = ref(null)
 const {
-  currentOptiton,
+  currentOption,
+  valueType,
   display,
   options,
   direction,
@@ -198,6 +210,7 @@ const {
   colorHover,
   itemGap,
   internalGap,
+  scale,
   type,
 	disabled,
 	fontFamily,
@@ -221,6 +234,7 @@ const formatDefaultValues = computed(() => {
   const itemGapValue = (itemGap.value !== 0 && !itemGap.value) || itemGap.value < 0 ? 15 : itemGap.value
   const internalGapValue = (internalGap.value !== 0 && !internalGap.value) || internalGap.value < 0 ? 6 : internalGap.value
   const typeValue = !['box', 'circle'].includes(type.value) ? 'box' : type.value
+  const scaleValue = !scale.value || scale.value < 0 ? 1 : scale.value
 
 	return {
 		disabled: disabledValue,
@@ -234,6 +248,7 @@ const formatDefaultValues = computed(() => {
     colorHover: colorHoverValue,
     itemGap: itemGapValue,
     internalGap: internalGapValue,
+    scale: scaleValue,
     type: typeValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
@@ -249,14 +264,15 @@ const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		display: defaultValues.display
+		display: defaultValues.display,
+    transform: `scale(${defaultValues.scale})`
 	}
 })
 
 const displayClass = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  return (defaultValues.display === 'inline-block') ? 'custom-checkbox__item--display-inline' : 'custom-checkbox__item--display-block'
+  return (defaultValues.display === 'inline-block') ? 'component-checkbox__item--display-inline' : 'component-checkbox__item--display-block'
 })
 
 const componentStyle = computed(() => {
@@ -277,7 +293,7 @@ const validList = computed(() => {
 const currentDirection = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-  return (defaultValues.direction === 'right') ? 'custom-checkbox__item--direction-right' : 'custom-checkbox__item--direction-left'
+  return (defaultValues.direction === 'right') ? 'component-checkbox__item--direction-right' : 'component-checkbox__item--direction-left'
 })
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
@@ -295,15 +311,15 @@ const styleColor = computed(() => {
 
 	return defaultValues.color
 })
-const styleColorActiveHover = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
-})
 const styleColorHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.hoverEffect ? defaultValues.colorHover : defaultValues.color
+})
+const styleColorActiveHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return !defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
 })
 
 const paddingValue = computed(() => {
@@ -344,15 +360,17 @@ const typeCheckbox = computed(() => {
 })
 
 const startValue = () => {
-  currentValue.value = currentOptiton.value
+  currentValue.value = currentOption.value
 }
 
-watch(currentOptiton, () => {
-  startValue()
+watch(currentOption, (newValue, oldValue) => {
+  if (newValue !== oldValue) startValue()
 })
-watch(currentValue, value => {
-  emit('current-value', value)
-  emit('changed', value)
+watch(currentValue, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    emit('current-value', newValue)
+    emit('changed', newValue)
+  }    
 })
 </script>
 
@@ -368,6 +386,7 @@ watch(currentValue, value => {
 	box-sizing: border-box;
 	// display: inline-block;
 	vertical-align: bottom;
+  transform-origin: top left;
 }
 
 .nb-reset {
@@ -415,12 +434,12 @@ watch(currentValue, value => {
 
   // padding-top: 4px;
 
-  .custom-checkbox__item {
-    .custom-checkbox__item--input {
+  .component-checkbox__item {
+    .component-checkbox__item--input {
       display: none;
 
       &:checked {
-        &+.custom-checkbox__item--label {
+        &+.component-checkbox__item--label {
           &:hover {
             &:before {
               border: 2px solid v-bind(styleColorActiveHover);
@@ -430,33 +449,27 @@ watch(currentValue, value => {
 
           &:before {
             content: '\2713';
-            font-size: 0.7em;
-            font-weight: 900;
-            text-align: center;
-            line-height: 17px;
+            font-size: .7em; // 0.7em 0.85em;
             text-shadow: 0;
             display: flex;
-            align-items: self-end;
+            align-items: center;
             text-align: center;
-            justify-content: space-around;
+            justify-content: center;
             -webkit-box-shadow: none;
             -moz-box-shadow: none;
             box-shadow: none;
             border-radius: v-bind(borderRadius);
-            border: 2px solid v-bind(styleColor);
-            color: v-bind(styleColor);
+            border: 2px solid v-bind(styleColorHover);
+            color: v-bind(styleColorHover);
+            line-height: 0.7em;
           }
         }
       }
     }
 
-    .custom-checkbox__item--label {
+    .component-checkbox__item--label {
       --disabled-color: v-bind('styleTextColor');
       color: var(--disabled-color) !important;
-
-      &:before {
-        border: 2px solid v-bind(styleColor);
-      }
 
       &:hover {
         cursor: pointer;
@@ -492,14 +505,14 @@ watch(currentValue, value => {
     }
 
     // inicio propDisplay
-    &.custom-checkbox__item--display-block {
+    &.component-checkbox__item--display-block {
       display: block;
 
       &:not(:first-child) {
         margin-top: v-bind(gapValue);
       }
 
-      .custom-checkbox__item--label {
+      .component-checkbox__item--label {
         display: inline;
         font-family: inherit;
         font-size: inherit;
@@ -509,14 +522,14 @@ watch(currentValue, value => {
       }
     }
 
-    &.custom-checkbox__item--display-inline {
+    &.component-checkbox__item--display-inline {
       display: inline-block;
 
       &:not(:first-child) {
         margin-left: v-bind(gapValue);
       }
 
-      .custom-checkbox__item--label {
+      .component-checkbox__item--label {
         display: inline;
         font-family: inherit;
         font-size: inherit;
@@ -529,9 +542,9 @@ watch(currentValue, value => {
     // fim propDisplay
 
     // inicio propDirection
-    &.custom-checkbox__item--display-block {
-      &.custom-checkbox__item--direction-left {
-        .custom-checkbox__item--label {
+    &.component-checkbox__item--display-block {
+      &.component-checkbox__item--direction-left {
+        .component-checkbox__item--label {
           display: inline-block;
           padding: v-bind(paddingLeft);
 
@@ -541,8 +554,8 @@ watch(currentValue, value => {
         }
       }
 
-      &.custom-checkbox__item--direction-right {
-        .custom-checkbox__item--label {
+      &.component-checkbox__item--direction-right {
+        .component-checkbox__item--label {
           padding: v-bind(paddingRight);
 
           &:before {
@@ -552,9 +565,9 @@ watch(currentValue, value => {
       }
     }
 
-    &.custom-checkbox__item--display-inline {
-      &.custom-checkbox__item--direction-left {
-        .custom-checkbox__item--label {
+    &.component-checkbox__item--display-inline {
+      &.component-checkbox__item--direction-left {
+        .component-checkbox__item--label {
           display: inline-block;
           padding: v-bind(paddingLeft);
 
@@ -564,8 +577,8 @@ watch(currentValue, value => {
         }
       }
 
-      &.custom-checkbox__item--direction-right {
-        .custom-checkbox__item--label {
+      &.component-checkbox__item--direction-right {
+        .component-checkbox__item--label {
           padding: v-bind(paddingRight);
 
           &:before {

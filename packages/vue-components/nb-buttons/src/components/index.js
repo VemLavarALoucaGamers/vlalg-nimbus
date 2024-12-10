@@ -7,6 +7,7 @@ import NbButtonHamburger from '@components/NbButtonHamburger.vue';
 import NbButtonColorOutside from '@components/NbButtonColorOutside.vue';
 import NbButtonColorHover from '@components/NbButtonColorHover.vue';
 import NbButtonAlternateText from '@components/NbButtonAlternateText.vue';
+import NbButtonBack from '@components/NbButtonBack.vue';
 
 export default {
   NbButtonVavaGame,
@@ -17,5 +18,6 @@ export default {
   NbButtonHamburger,
   NbButtonColorOutside,
   NbButtonColorHover,
-  NbButtonAlternateText
+  NbButtonAlternateText,
+  NbButtonBack
 };

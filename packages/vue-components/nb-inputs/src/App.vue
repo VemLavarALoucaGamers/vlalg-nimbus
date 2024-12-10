@@ -22,16 +22,23 @@
         style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
         <h4 class="test-page__content-tile">NbInputRadio</h4>
         
-        <NbInputRadio
-          nb-id="radio1"
-          display="b"
-          group-name="radio-test1"
-          :current-optiton="currentRadioItem"
-          :options="inputOptions"
-          direction="left"
-          text-color="white"
-          @current-value="changeRadioItem($event)"
-        />
+        <div style="margin-bottom: 20px;">
+          <p style="margin-bottom: 5px;">
+            <span>Unidade consumidora no Grupo A?</span>
+          </p>
+          
+          <NbInputRadio
+            nb-id="radio1"
+            display="b"
+            group-name="radio-test1"
+            :current-option="currentRadioItem"
+            :options="inputOptions"
+            direction="left"
+            text-color="white"
+            :scale="1"
+            @current-value="changeRadioItem($event)"
+          />
+        </div>
 
         <p style="margin-top: 4px;">
           Text before
@@ -39,7 +46,7 @@
             nb-id="radio2"
             display="ib"
             group-name="radio-test2"
-            :current-optiton="currentRadioItem"
+            :current-option="currentRadioItem"
             :options="inputOptions"
             direction="left"
             text-color="white"
@@ -59,7 +66,7 @@
         nb-id="checkbox1"
         display="b"
         group-name="checkbox-test1"
-        :current-optiton="currentCheckboxItem"
+        :current-option="currentCheckboxItem"
         :options="inputOptions"
         direction="left"
         type="circle"
@@ -73,7 +80,7 @@
           nb-id="checkbox2"
           display="ib"
           group-name="checkbox-test2"
-          :current-optiton="currentCheckboxItem"
+          :current-option="currentCheckboxItem"
           :options="inputOptions"
           direction="left"
           text-color="white"
@@ -92,14 +99,14 @@ import { defineAsyncComponent, ref, computed } from 'vue'
 const NbInputRadio = defineAsyncComponent(() => import('@components/NbInputRadio.vue'))
 const NbInputCheckbox = defineAsyncComponent(() => import('@components/NbInputCheckbox.vue'))
 
-const btType = ref('checkbox')
+const btType = ref('radio')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
   return [
     {
       value: 'dog',
-      text: 'dog',
+      text: 'dog asdas das',
     },
     {
       value: 'cat',
@@ -107,7 +114,7 @@ const inputOptions = computed(() => {
     },
     {
       value: 'fish',
-      text: 'fish',
+      text: 'fishhhhhhhhhhhhhhhhhhhh asdasdasasdas',
     },
   ]
 })

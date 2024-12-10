@@ -12,21 +12,21 @@
       <div
         v-for="(item, index) in options"
         :key="index"
-        class="custom-radio__item"
+        class="component-radio__item"
         :class="[displayClass, currentDirection]"
       >
         <input
           :id="`${nbId}-${item.value}`"
           v-model="currentValue"
           type="radio"
-          class="custom-radio__item--input"
+          class="component-radio__item--input"
           :disabled="disabled"
           :value="item.value"
           :name="groupName"
         />
         <label
           :for="`${nbId}-${item.value}`"
-          class="custom-radio__item--label"
+          class="component-radio__item--label"
         >
           {{ item.text }}
         </label>
@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, watch, watchEffect } from 'vue'
+import { defineProps, ref, toRefs, computed, onMounted, watch } from 'vue'
 
 defineOptions({
 	name: 'NbInputRadio',
@@ -98,9 +98,16 @@ const props = defineProps({
       if (!hasError) return item
     },
   },
-  currentOptiton: {
-    type: String,
+  currentOption: {
+    type: [String, Number, Boolean],
     default: null,
+  },
+  valueType: {
+    type: String,
+    default: 'boolean',
+    validator: value => {
+      return ['boolean', 'string', 'number'].indexOf(value) !== -1
+    },
   },
   direction: {
     type: String,
@@ -143,6 +150,10 @@ const props = defineProps({
     type: Number,
     default: 6
   },
+  scale: {
+    type: Number,
+    default: 1
+  },
 	disabled: {
 		type: Boolean,
 		default: false,
@@ -172,7 +183,8 @@ const props = defineProps({
 
 const currentValue = ref(null)
 const {
-  currentOptiton,
+  currentOption,
+  valueType,
   display,
   options,
   direction,
@@ -183,6 +195,7 @@ const {
   colorHover,
   itemGap,
   internalGap,
+  scale,
 	disabled,
 	fontFamily,
 	fontSize,
@@ -203,6 +216,7 @@ const formatDefaultValues = computed(() => {
   const colorHoverValue = !colorHover.value ? '#a6a6a6' : colorHover.value
   const itemGapValue = !itemGap.value || itemGap.value < 0 ? 15 : itemGap.value
   const internalGapValue = !internalGap.value || internalGap.value < 0 ? 6 : internalGap.value
+  const scaleValue = !scale.value || scale.value < 0 ? 1 : scale.value
 
 	return {
 		disabled: disabledValue,
@@ -215,6 +229,7 @@ const formatDefaultValues = computed(() => {
     colorHover: colorHoverValue,
     itemGap: itemGapValue,
     internalGap: internalGapValue,
+    scale: scaleValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue
@@ -229,14 +244,15 @@ const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		display: defaultValues.display
+		display: defaultValues.display,
+    transform: `scale(${defaultValues.scale})`
 	}
 })
 
 const displayClass = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  return (defaultValues.display === 'inline-block') ? 'custom-radio__item--display-inline' : 'custom-radio__item--display-block'
+  return (defaultValues.display === 'inline-block') ? 'component-radio__item--display-inline' : 'component-radio__item--display-block'
 })
 
 const componentStyle = computed(() => {
@@ -257,7 +273,7 @@ const validList = computed(() => {
 const currentDirection = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-  return (defaultValues.direction === 'right') ? 'custom-radio__item--direction-right' : 'custom-radio__item--direction-left'
+  return (defaultValues.direction === 'right') ? 'component-radio__item--direction-right' : 'component-radio__item--direction-left'
 })
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
@@ -275,15 +291,15 @@ const styleColor = computed(() => {
 
 	return defaultValues.color
 })
-const styleColorActiveHover = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
-})
 const styleColorHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.hoverEffect ? defaultValues.colorHover : defaultValues.color
+})
+const styleColorActiveHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return !defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
 })
 
 const paddingValue = computed(() => {
@@ -309,21 +325,25 @@ const gapValue = computed(() => {
 })
 
 const startValue = () => {
-  const initialValue = currentOptiton.value
+  const initialValue = currentOption.value
 
   if (initialValue) {
-    currentValue.value = initialValue.toString().toLowerCase()
+    if (!['string'].includes(valueType.value)) {
+      currentValue.value = initialValue
+    } else {
+      currentValue.value = initialValue.toString().toLowerCase()
+    }
   }
-  
-  emit('current-value', initialValue)
 }
 
-watch(currentOptiton, () => {
-  startValue()
+watch(currentOption, (newValue, oldValue) => {
+  if (newValue !== oldValue) startValue()
 })
-watch(currentValue, value => {
-  emit('current-value', value)
-  emit('changed', value)
+watch(currentValue, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    emit('current-value', newValue)
+    emit('changed', newValue)
+  }    
 })
 </script>
 
@@ -339,6 +359,7 @@ watch(currentValue, value => {
 	box-sizing: border-box;
 	// display: inline-block;
 	vertical-align: bottom;
+  transform-origin: top left;
 }
 
 .nb-reset {
@@ -386,12 +407,12 @@ watch(currentValue, value => {
 
   // padding-top: 4px;
 
-  .custom-radio__item {
-    .custom-radio__item--input {
+  .component-radio__item {
+    .component-radio__item--input {
       display: none;
 
       &:checked {
-        &+.custom-radio__item--label {
+        &+.component-radio__item--label {
           &:hover {
             &:before {
               border: 2px solid v-bind(styleColorActiveHover);
@@ -400,30 +421,27 @@ watch(currentValue, value => {
           }
 
           &:before {
-            content: '\25CF'; // \f111
-            font-size: 1.3em; // 0.7em 0.85em;
+            content: '\23FA'; // \f111
+            font-size: .8em; // 0.7em 0.85em;
             text-shadow: 0;
             display: flex;
-            align-items: self-end;
+            align-items: center;
             text-align: center;
-            justify-content: space-around;
+            justify-content: center;
             -webkit-box-shadow: none;
             -moz-box-shadow: none;
             box-shadow: none;
-            border: 2px solid v-bind(styleColor);
-            color: v-bind(styleColor);
+            border: 2px solid v-bind(styleColorHover);
+            color: v-bind(styleColorHover);
+            line-height: 0.7em;
           }
         }
       }
     }
 
-    .custom-radio__item--label {
+    .component-radio__item--label {
       --disabled-color: v-bind('styleTextColor');
       color: var(--disabled-color) !important;
-
-      &:before {
-        border: 2px solid v-bind(styleColor);
-      }
 
       &:hover {
         cursor: pointer;
@@ -450,14 +468,14 @@ watch(currentValue, value => {
     }
 
     // inicio propDisplay
-    &.custom-radio__item--display-block {
+    &.component-radio__item--display-block {
       display: block;
 
       &:not(:first-child) {
         margin-top: v-bind(gapValue);
       }
 
-      .custom-radio__item--label {
+      .component-radio__item--label {
         display: inline;
         font-family: inherit;
         font-size: inherit;
@@ -467,14 +485,14 @@ watch(currentValue, value => {
       }
     }
 
-    &.custom-radio__item--display-inline {
+    &.component-radio__item--display-inline {
       display: inline-block;
 
       &:not(:first-child) {
         margin-left: v-bind(gapValue);
       }
 
-      .custom-radio__item--label {
+      .component-radio__item--label {
         display: inline;
         font-family: inherit;
         font-size: inherit;
@@ -487,9 +505,9 @@ watch(currentValue, value => {
     // fim propDisplay
 
     // inicio propDirection
-    &.custom-radio__item--display-block {
-      &.custom-radio__item--direction-left {
-        .custom-radio__item--label {
+    &.component-radio__item--display-block {
+      &.component-radio__item--direction-left {
+        .component-radio__item--label {
           display: inline-block;
           padding: v-bind(paddingLeft);
 
@@ -499,8 +517,8 @@ watch(currentValue, value => {
         }
       }
 
-      &.custom-radio__item--direction-right {
-        .custom-radio__item--label {
+      &.component-radio__item--direction-right {
+        .component-radio__item--label {
           padding: v-bind(paddingRight);
 
           &:before {
@@ -510,9 +528,9 @@ watch(currentValue, value => {
       }
     }
 
-    &.custom-radio__item--display-inline {
-      &.custom-radio__item--direction-left {
-        .custom-radio__item--label {
+    &.component-radio__item--display-inline {
+      &.component-radio__item--direction-left {
+        .component-radio__item--label {
           display: inline-block;
           padding: v-bind(paddingLeft);
 
@@ -522,8 +540,8 @@ watch(currentValue, value => {
         }
       }
 
-      &.custom-radio__item--direction-right {
-        .custom-radio__item--label {
+      &.component-radio__item--direction-right {
+        .component-radio__item--label {
           padding: v-bind(paddingRight);
 
           &:before {

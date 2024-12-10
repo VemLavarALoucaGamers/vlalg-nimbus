@@ -1,14 +1,14 @@
 {
-  "name": "@vlalg-nimbus/nb-inputs",
-  "description": "Input components for Vuejs 3",
-  "version": "4.0.1",
+  "name": "@vlalg-nimbus/nb-test",
+  "description": "Loader components for Vuejs 3",
+  "version": "1.0.0",
   "type": "module",
-  "main": "./dist/nb-inputs.umd.js",
-  "module": "./dist/nb-inputs.js",
+  "main": "./dist/nb-loaders.umd.js",
+  "module": "./dist/nb-loaders.js",
   "exports": {
     ".": {
-      "import": "./dist/nb-inputs.js",
-      "require": "./dist/nb-inputs.umd.js"
+      "import": "./dist/nb-loaders.js",
+      "require": "./dist/nb-loaders.umd.js"
     },
     "./dist/style.css": "./dist/style.css",
     "./dist/images": "./dist/images"
@@ -64,12 +64,12 @@
     "vuejs",
     "vue js",
     "vue plugin",
-    "input radio",
-    "input checkbox",
     "radio",
     "checkbox",
-    "inputs",
-    "input",
+    "loaders",
+    "loader",
+    "spinner",
+    "spinners",
     "components",
     "component",
     "vue components",

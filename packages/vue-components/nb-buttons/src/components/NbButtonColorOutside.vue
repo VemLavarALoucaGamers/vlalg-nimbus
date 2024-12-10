@@ -238,7 +238,6 @@ const interacted = () => {
 	padding: 0;
 	box-sizing: border-box;
 	line-height: 1.42857143;
-	font-family: 'Lato', sans-serif;
 	font-family: v-bind('font');
 
 	user-select: none;

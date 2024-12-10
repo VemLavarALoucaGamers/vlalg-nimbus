@@ -74,7 +74,7 @@ const props = defineProps({
     validator: value => {
       return typeof value === 'boolean' && [true, false].includes(value)
     }
-  },
+  }
 })
 
 const currentValue = ref(null)
@@ -289,9 +289,6 @@ watch(currentValue, value => {
 }
 
 .nb-reset {
-  font-family: 'Lato', sans-serif;
-  font-style: normal;
-  font-weight: light;
   line-height: 1.42857143;
 
   * {
