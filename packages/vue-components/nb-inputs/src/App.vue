@@ -63,6 +63,7 @@
         :options="inputOptions"
         type="circle"
         text-color="white"
+        :background="false"
         @current-value="changeChackboxItem($event)"
       />
 
@@ -75,6 +76,7 @@
           :current-option="currentCheckboxItem"
           :options="inputOptions"
           text-color="white"
+          :background="false"
           @current-value="changeChackboxItem($event)"
         />
         text after
@@ -90,14 +92,14 @@ import { defineAsyncComponent, ref, computed } from 'vue'
 const NbInputRadio = defineAsyncComponent(() => import('@components/NbInputRadio.vue'))
 const NbInputCheckbox = defineAsyncComponent(() => import('@components/NbInputCheckbox.vue'))
 
-const btType = ref('checkbox')
+const btType = ref('radio')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
   return [
     {
       value: 'dog',
-      text: 'dog asdas das',
+      text: 'dog',
     },
     {
       value: 'cat',
@@ -105,12 +107,8 @@ const inputOptions = computed(() => {
     },
     {
       value: 'fish',
-      text: 'fishhhhhhhhhhhhhhhhhhhh asdasdasasdas',
-    },
-    {
-      value: 'fish2',
-      text: 'asdas',
-    },
+      text: 'fish',
+    }
   ]
 })
 

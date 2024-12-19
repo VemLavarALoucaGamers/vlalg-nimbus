@@ -2,7 +2,7 @@
 	<div
 		v-if="nbId && validList"
 		:class="['nb-wrapper', componentDisabled]"
-		:style="[wrapperStyle]"
+		:style="[wrapperStyle, size]"
 	>
 		<div
 			:id="nbId"
@@ -233,8 +233,7 @@ const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-    display: defaultValues.display,
-    transform: `scale(${defaultValues.scale})`
+    display: defaultValues.display
 	}
 })
 
@@ -300,6 +299,14 @@ const gapValue = computed(() => {
   return !gap || gap < 0 ? 0 : `${gap}px`
 })
 
+const size = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return {
+    zoom: defaultValues.scale
+  }
+})
+
 const startValue = () => {
   const initialValue = currentOption.value
 
@@ -309,6 +316,8 @@ const startValue = () => {
     } else {
       currentValue.value = initialValue.toString().toLowerCase()
     }
+  } else {
+    currentValue.value = initialValue
   }
 }
 
@@ -333,9 +342,7 @@ watch(currentValue, (newValue, oldValue) => {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	// display: inline-block;
-	vertical-align: bottom;
-  transform-origin: top left;
+	vertical-align: text-bottom;
 }
 
 .nb-reset {
@@ -431,7 +438,6 @@ watch(currentValue, (newValue, oldValue) => {
             -moz-box-shadow: none;
             box-shadow: none;
             color: v-bind(colorHover);
-            line-height: 1.1em;
             border-radius: 50%;
           }
         }

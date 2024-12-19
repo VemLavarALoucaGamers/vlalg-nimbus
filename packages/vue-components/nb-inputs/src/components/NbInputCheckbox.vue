@@ -2,7 +2,7 @@
 	<div
 		v-if="nbId && validList"
 		:class="['nb-wrapper', componentDisabled]"
-		:style="[wrapperStyle]"
+		:style="[wrapperStyle, size]"
 	>
 		<div
 			:id="nbId"
@@ -27,7 +27,7 @@
           :class="[typeCheckbox]"
           class="component-checkbox__item--label"
         >
-          <div></div>
+          <div :class="[ styleBackground ]"></div>
           <span :style="[componentStyle]">{{ item.text }}</span>
         </label>
       </div>
@@ -153,6 +153,13 @@ const props = defineProps({
       return ['box', 'circle'].indexOf(value) !== -1
     },
   },
+  background: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return [true, false].indexOf(value) !== -1
+    }
+  },
 	disabled: {
 		type: Boolean,
 		default: false,
@@ -195,6 +202,7 @@ const {
   internalGap,
   scale,
   type,
+  background,
 	disabled,
 	fontFamily,
 	fontSize,
@@ -217,6 +225,7 @@ const formatDefaultValues = computed(() => {
   const internalGapValue = (internalGap.value !== 0 && !internalGap.value) || internalGap.value < 0 ? 6 : internalGap.value
   const typeValue = !['box', 'circle'].includes(type.value) ? 'box' : type.value
   const scaleValue = !scale.value || scale.value < 0 ? 1 : scale.value
+  const backgroundValue = ![false, true].includes(background.value) ? false : background.value
 
 	return {
 		disabled: disabledValue,
@@ -231,7 +240,8 @@ const formatDefaultValues = computed(() => {
     internalGap: internalGapValue,
     scale: scaleValue,
     type: typeValue,
-		font: fontValue,
+    font: fontValue,
+    background: backgroundValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue
 	}
@@ -245,8 +255,7 @@ const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		display: defaultValues.display,
-    transform: `scale(${defaultValues.scale})`
+		display: defaultValues.display
 	}
 })
 
@@ -297,6 +306,26 @@ const styleColorActiveHover = computed(() => {
 
 	return defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
 })
+const styleBgColorActiveHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.activeHoverEffect && defaultValues.background ? `${defaultValues.colorHover}80` : colorHover.value
+})
+const styleBackground = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.background ? 'component-checkbox__item--with-background' : 'component-checkbox__item--without-background'
+})
+const checkBackgroundColor = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+  return defaultValues.background ? '#ffffff' : defaultValues.textColor
+})
+const iconSize = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+  return defaultValues.background ? '19px' : 'auto'
+})
 
 const paddingValue = computed(() => {
   const defaultValues = formatDefaultValues.value
@@ -327,6 +356,14 @@ const typeCheckbox = computed(() => {
   return tp === 'circle' ? 'custom-checkbox__input--type-circle' : ''
 })
 
+const size = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return {
+    zoom: defaultValues.scale
+  }
+})
+
 const startValue = () => {
   currentValue.value = currentOption.value
 }
@@ -352,9 +389,7 @@ watch(currentValue, (newValue, oldValue) => {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	// display: inline-block;
-	vertical-align: bottom;
-  transform-origin: top left;
+	vertical-align: text-bottom;
 }
 
 .nb-reset {
@@ -429,25 +464,56 @@ watch(currentValue, (newValue, oldValue) => {
         &+.component-checkbox__item--label {
           &:hover {
             div {
-              border: 2px solid v-bind(styleColorActiveHover);
+              &.component-checkbox__item--without-background {
+                border: 2px solid v-bind(styleColorActiveHover);
+                color: v-bind(colorHover);
+              }
+              &.component-checkbox__item--with-background {
+                background: v-bind(styleBgColorActiveHover);
+              }
             }
           }
 
-          div:before {
-            content: '\2713';
-            font-size: 1.3em;
-            // font-size: .7em; // 0.7em 0.85em;
-            text-shadow: 0;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            justify-content: center;
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
-            box-shadow: none;
-            border-radius: v-bind(borderRadius);
-            border: 0;
-            color: v-bind(colorHover);
+          &.custom-checkbox__input--type-circle {
+            div {
+              &::before {
+                margin-top: 0em;
+                margin-left: -1px;
+              }
+              &.component-checkbox__item--without-background {
+                font-size: 1em;
+              }
+              &.component-checkbox__item--with-background {
+                font-size: 1em;
+              }
+            }
+          }
+
+          div {
+            &.component-checkbox__item--without-background {
+              font-size: 1.2em;
+              border: 2px solid v-bind(styleColor);
+              color: v-bind(colorHover);
+            }
+            &.component-checkbox__item--with-background {
+              font-size: 1.2em;
+              border: 2px solid v-bind(colorHover);
+              background: v-bind(colorHover);
+            }
+
+            &:before {
+              content: '\2714';
+              text-shadow: 0;
+              display: flex;
+              align-items: center;
+              text-align: center;
+              justify-content: center;
+              -webkit-box-shadow: none;
+              -moz-box-shadow: none;
+              box-shadow: none;
+              border-radius: v-bind(borderRadius);
+              border: 0;
+            }
           }
         }
       }
@@ -467,7 +533,12 @@ watch(currentValue, (newValue, oldValue) => {
         cursor: pointer;
 
         div {
-          border: 2px solid v-bind(styleColorHover);
+          &.component-checkbox__item--without-background {
+            border: 2px solid v-bind(styleColorHover);
+          }
+          &.component-checkbox__item--with-background {
+            border: 2px solid v-bind(styleColorHover);
+          }
         }
       }
 
@@ -480,15 +551,27 @@ watch(currentValue, (newValue, oldValue) => {
         -moz-box-shadow: none;
         box-shadow: none;
         border-radius: v-bind(borderRadius);
-        border: 2px solid v-bind(styleColor);
-        color: v-bind(styleColor);
         font-family: 'Lato', sans-serif !important;
+        font-weight: bold;
+
+        &.component-checkbox__item--without-background {
+          border: 2px solid v-bind(styleColor);
+          color: v-bind(styleColor);
+        }
+        &.component-checkbox__item--with-background {
+          border: 2px solid v-bind(styleColor);
+          color: v-bind(checkBackgroundColor);
+        }
       }
 
       // inicio propType
       &.custom-checkbox__input--type-circle {
         div {
           border-radius: 50% !important;
+
+          &:before {
+            border-radius: 50% !important;
+          }
         }
       }
       // fim propType
@@ -504,8 +587,26 @@ watch(currentValue, (newValue, oldValue) => {
 	.component {
 		--disabled-color: v-bind('styleTextColor');
 		color: var(--disabled-color) !important;
-		opacity: 0.7;
+		opacity: 0.4;
 		border-radius: inherit;
+
+    .component-checkbox__item {
+      .component-checkbox__item--input {
+        &:checked {
+          &+.component-checkbox__item--label {
+            div {
+              &.component-checkbox__item--without-background {
+                border: 2px solid v-bind(styleColorActiveHover);
+                color: v-bind(colorHover);
+              }
+              &.component-checkbox__item--with-background {
+                background: v-bind(styleBgColorActiveHover);
+              }
+            }
+          }
+        }
+      }
+    }
 	}
 }
 </style>
