@@ -20,25 +20,23 @@
       </div>
     </div>
 
-    <div class="row">
+    <div v-if="btType === 'test'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
         
         asda
-        <NbLoaders
+        <NbTest
           nb-id="radio1"
           display="b"
-          :type="btType"
         />
         asdas
 
         <br><br><br><br><br><br><br><br>
         <p style="margin-top: 4px;">
           Text before
-          <NbLoaders
+          <NbTest
             nb-id="radio1"
             display="ib"
-            :type="btType"
           />
           text after
         </p>
@@ -50,29 +48,11 @@
 <script setup>
 import { defineAsyncComponent, ref } from 'vue'
 
-const NbLoaders = defineAsyncComponent(() => import('@components/NbLoaders.vue'))
+const NbTest = defineAsyncComponent(() => import('@components/NbTest.vue'))
 
-const btType = ref('bars')
+const btType = ref('test')
 const options = ref([
-  'clock',
-  'glass-filling',
-  'pulse-crazy',
-  'pulse',
-  'ring-pulse',
-  'double-ring-pulse',
-  'bling-ball',
-  'bars',
-  'water-drop',
-  'coin',
-  'circle-lines',
-  'solar',
-  'dots',
-  'leds',
-  'snake',
-  'zoom-ball',
-  'train',
-  'ring',
-  'partial-ring'
+  'test'
 ])
 </script>
 

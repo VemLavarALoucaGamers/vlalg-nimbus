@@ -3,12 +3,12 @@
   "description": "Loader components for Vuejs 3",
   "version": "1.0.0",
   "type": "module",
-  "main": "./dist/nb-loaders.umd.js",
-  "module": "./dist/nb-loaders.js",
+  "main": "./dist/nb-test.umd.js",
+  "module": "./dist/nb-test.js",
   "exports": {
     ".": {
-      "import": "./dist/nb-loaders.js",
-      "require": "./dist/nb-loaders.umd.js"
+      "import": "./dist/nb-test.js",
+      "require": "./dist/nb-test.umd.js"
     },
     "./dist/style.css": "./dist/style.css",
     "./dist/images": "./dist/images"
@@ -64,12 +64,7 @@
     "vuejs",
     "vue js",
     "vue plugin",
-    "radio",
-    "checkbox",
-    "loaders",
-    "loader",
-    "spinner",
-    "spinners",
+    "test",
     "components",
     "component",
     "vue components",

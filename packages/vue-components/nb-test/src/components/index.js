@@ -1,7 +1,5 @@
-import NbInputRadio from '@components/NbInputRadio.vue';
-import NbInputCheckbox from '@components/NbInputCheckbox.vue';
+import NbTest from '@components/NbTest.vue';
 
 export default {
-  NbInputRadio,
-  NbInputCheckbox
+  NbTest
 };

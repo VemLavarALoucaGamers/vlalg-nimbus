@@ -11,8 +11,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/install.js'),
-      name: 'NbLoaders',
-      fileName: 'nb-loaders',
+      name: 'NbTest',
+      fileName: 'nb-test',
       formats: ['umd', 'es'],
     },
     rollupOptions: {

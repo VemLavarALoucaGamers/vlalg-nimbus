@@ -1,18 +1,18 @@
-# nb-loaders
+# nb-test
 > This component is only for [Vue.js 3+](https://vuejs.org/)
 
 <br />
 
-This lib contains loaders components.
+This lib contains test components.
 
 ## Installation
 
 ```bash
-npm install @vlalg-nimbus/nb-loaders
+npm install @vlalg-nimbus/nb-test
 
 # or
 
-yarn add @vlalg-nimbus/nb-loaders
+yarn add @vlalg-nimbus/nb-test
 ```
 
 ## Usage
@@ -22,11 +22,11 @@ yarn add @vlalg-nimbus/nb-loaders
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import NbLoadersComponents from '@vlalg-nimbus/nb-loaders'
-import "@vlalg-nimbus/nb-loaders/dist/style.css";
+import NbTestComponents from '@vlalg-nimbus/nb-test'
+import "@vlalg-nimbus/nb-test/dist/style.css";
 
 const app = createApp(App)
-app.use(NbLoadersComponents)
+app.use(NbTestComponents)
 app.mount('#app')
 ```
 
@@ -34,7 +34,7 @@ app.mount('#app')
 
 The components that are part of this lib are:
 
-- <a href="http://nimbus.tec.br/vue-components/nb-loaders/nb-loader" target="_blank">nb-loader</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-test/nb-loader" target="_blank">nb-loader</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 
