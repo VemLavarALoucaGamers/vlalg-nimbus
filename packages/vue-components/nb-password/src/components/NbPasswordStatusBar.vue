@@ -1,4 +1,4 @@
-<template>{{ strengthColor }}
+<template>
   <div v-if="nbId" :class="['nb-wrapper']" :style="[wrapperStyle]">
     <div
       :id="nbId"
@@ -10,6 +10,7 @@
 
 <script setup>
 import { defineProps, ref, toRefs, computed, watch, onMounted } from 'vue'
+import { configRules } from './config'
 
 defineOptions({
   name: 'NbPasswordStatusBar',
@@ -17,6 +18,7 @@ defineOptions({
 })
 
 onMounted(() => {
+  rules.value = configRules
   checkPassword()
 })
 
@@ -35,7 +37,7 @@ const props = defineProps({
       return ['b', 'ib'].includes(currentValue)
     }
   },
-  value: {
+  password: {
     type: String,
     default: ''
   },
@@ -55,19 +57,13 @@ const props = defineProps({
 
 const {
   display,
-  value,
+  password,
   width,
   height,
   borderRadius
 } = toRefs(props)
 
-const rules = ref([
-  { title: 'ABC', regex: /[A-Z]+/ },
-  { title: 'abc', regex: /.*[a-z]{1}/ },
-  { title: '123', regex: /[0-9]+/ },
-  { title: '8', regex: /.{8,}/ },
-  { title: '@', regex: /.*[!@#$%^&*(),.?":{}|<>]/ }
-])
+const rules = ref([])
 const strengthColor = ref('')
 
 const formatDefaultValues = computed(() => {
@@ -105,7 +101,7 @@ const componentStyle = computed(() => {
 const checkPassword = () => {
   let status = ''
   let isValid = false
-  const currentPassword = value.value
+  const currentPassword = password.value
 
   const hasUppercase = rules.value[0].regex.test(currentPassword);
   const hasLowercase = rules.value[1].regex.test(currentPassword);
@@ -137,7 +133,7 @@ const checkPassword = () => {
   emit('valid-password', isValid)
 }
 
-watch(value, () => {
+watch(password, () => {
   checkPassword()
 })
 </script>

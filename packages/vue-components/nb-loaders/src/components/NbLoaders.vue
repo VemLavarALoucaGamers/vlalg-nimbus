@@ -10,18 +10,12 @@
 </template>
 
 <script setup>
-import { defineProps, ref, reactive, toRefs, computed, onMounted, watch } from 'vue'
+import { defineProps, reactive, toRefs, computed } from 'vue'
 
 defineOptions({
   name: 'NbLoaders',
   inheritAttrs: false
 })
-
-onMounted(() => {
-  startValue()
-})
-
-const emit = defineEmits(['changed'])
 
 const props = defineProps({
   nbId: {
@@ -77,7 +71,6 @@ const props = defineProps({
   }
 })
 
-const currentValue = ref(null)
 const loadersConfigs = reactive({
   bars: 4,
   waterDrop: 2,
@@ -269,12 +262,6 @@ const componentDisabled = computed(() => {
 
   return defaultValues.disabled
 })
-
-const startValue = () => { }
-
-watch(currentValue, value => {
-  emit('changed', value)
-})
 </script>
 
 <style lang="scss" scoped>
@@ -369,7 +356,7 @@ watch(currentValue, value => {
       }
 
       100% {
-        box-shadow: var(--type) 0 -70px v-bind(styleColorOne);
+        box-shadow: var(--type) 0 -100px v-bind(styleColorOne);
         // transform: rotateX(90deg);
       }
     }

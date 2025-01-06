@@ -24,20 +24,21 @@
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
         
-        asda
+        <input type="text" v-model="inputValue"> {{ inputValue }}
         <NbTest
-          nb-id="radio1"
-          display="b"
-        />
-        asdas
-
-        <br><br><br><br><br><br><br><br>
-        <p style="margin-top: 4px;">
+            nb-id="radio1"
+            :value="inputValue"
+            @valid-password="(value) => console.log(value)"
+          ></NbTest> <br><br>
+        <p>
           Text before
           <NbTest
             nb-id="radio1"
             display="ib"
-          />
+            :value="inputValue"
+          >
+            Mouse aqui
+          </NbTest>
           text after
         </p>
       </div>
@@ -54,6 +55,7 @@ const btType = ref('test')
 const options = ref([
   'test'
 ])
+const inputValue = ref('test')
 </script>
 
 <style lang="scss" scoped>

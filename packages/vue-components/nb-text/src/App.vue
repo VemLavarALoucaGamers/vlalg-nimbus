@@ -15,6 +15,7 @@
 				<select v-model="textType">
 					<option value="gradientText">gradientText</option>
 					<option value="highlightSelectedText">highlightSelectedText</option>
+					<option value="zoomText">zoomText</option>
 				</select>
 			</div>
 		</div>
@@ -44,7 +45,7 @@
 		</div>
 
 		<div
-			v-else
+			v-if="textType === 'highlightSelectedText'"
 			class="row"
 		>
 			<div
@@ -65,6 +66,25 @@
 				</p>
 			</div>
 		</div>
+
+		<div
+			v-if="textType === 'zoomText'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px;"
+			>
+				<h4 class="test-page__content-tile">NbZoomText</h4>
+				<p style="font-size: 26px !important">
+          Text before
+					<NbZoomText nb-id="zoom-text">
+            Mouse here
+					</NbZoomText>
+          text after
+				</p>
+			</div>
+		</div>
 	</div>
 </template>
 <script>
@@ -74,9 +94,8 @@ export default defineComponent({
 	name: 'App',
 	components: {
 		NbGradientText: defineAsyncComponent(() => import('@components/NbGradientText.vue')),
-		NbHighlightSelectedText: defineAsyncComponent(() =>
-			import('@components/NbHighlightSelectedText.vue')
-		)
+		NbHighlightSelectedText: defineAsyncComponent(() => import('@components/NbHighlightSelectedText.vue')),
+		NbZoomText: defineAsyncComponent(() => import('@components/NbZoomText.vue')),
 	},
 	emits: [],
 	props: {},

@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-loaders",
   "description": "Loader components for Vuejs 3",
-  "version": "3.0.0",
+  "version": "1.0.3",
   "type": "module",
   "main": "./dist/nb-loaders.umd.js",
   "module": "./dist/nb-loaders.js",

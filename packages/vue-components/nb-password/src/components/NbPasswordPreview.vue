@@ -23,6 +23,11 @@
 
 <script setup>
 import { defineProps, ref, toRefs, watch, computed, onMounted } from 'vue'
+import { configPatternLetter, configPatternNumber, configPatternSpecial } from './config'
+
+onMounted(() => {
+	checkComponentType()
+})
 
 defineOptions({
 	name: 'NbPasswordPreview',
@@ -146,10 +151,6 @@ const colorRed = ref('#F87676')
 
 const { type, password, length, hasNumbers, hasSpecial, hasUppercaseLowercase } = toRefs(props)
 
-const patternLetter = /[a-zA-Z]/
-const patternNumber = /[0-9]/
-const patternSpecial = /[!@#$%^&*()_+{}[\]]/
-
 const {
 	display,
 	background,
@@ -226,16 +227,16 @@ const font = computed(() => {
 })
 
 const getColor = character => {
-	const regexLetter = new RegExp(patternLetter)
-	const regexNumber = new RegExp(patternNumber)
-	const regexSpecial = new RegExp(patternSpecial)
+	const regexLetter = new RegExp(configPatternLetter)
+	const regexNumber = new RegExp(configPatternNumber)
+	const regexSpecial = new RegExp(configPatternSpecial)
 
-	if (regexNumber.test(character)) {
+  if (regexLetter.test(character)) {
+    return colorBlue.value
+  } else if (regexNumber.test(character)) {
 		return colorGreen.value
 	} else if (regexSpecial.test(character)) {
 		return colorRed.value
-	} else {
-		return colorBlue.value
 	}
 }
 const generateOneOccurrence = itemsList => {
@@ -245,20 +246,14 @@ const generatePassword = (
 	length = 8,
 	hasNumbers = true,
 	hasSpecial = true,
-	hasUppercaseLowercase = true,
-	letters = 'abcdefghijklmnopqrstuvwxyz',
-	numbers = '0123456789',
-	special = '!@#$%^&*()_+{}[]'
+	hasUppercaseLowercase = true
 ) => {
 	const lengthDefault = 8
-	const lettersDefault = 'abcdefghijklmnopqrstuvwxyz'
-	const numbersDefault = '0123456789'
-	const specialDefault = '!@#$%^&*()_+{}[]'
 
 	const stringLength = !length || length < 8 ? lengthDefault : length
-	let lettersList = !letters ? lettersDefault : letters
-	const numbersList = !numbers ? numbersDefault : numbers
-	const specialList = !special ? specialDefault : special
+	let lettersList = 'abcdefghijklmnopqrstuvwxyz'
+	const numbersList = '0123456789'
+	const specialList = '!@#$%^&*(),.?:{}|<>+-_'
 
 	let passwordGenerated = ''
 
@@ -286,8 +281,6 @@ const generatePassword = (
 		.join('')
 }
 
-const updateValue = () => {}
-
 const checkComponentType = () => {
 	if (type.value === 'generate') {
 		generated.value = generatePassword(
@@ -300,10 +293,6 @@ const checkComponentType = () => {
 		generated.value = password.value
 	}
 }
-
-onMounted(() => {
-	checkComponentType()
-})
 
 watch(props, () => {
 	checkComponentType()

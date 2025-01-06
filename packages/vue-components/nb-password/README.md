@@ -35,6 +35,8 @@ app.mount('#app')
 The components that are part of this lib are:
 
 - <a href="http://nimbus.tec.br/vue-components/nb-password/nb-password-preview" target="_blank">nb-password-preview</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-password/nb-password-status-bar" target="_blank">nb-password-status-bar</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-password/nb-password-validation-section" target="_blank">nb-password-validation-section</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 
