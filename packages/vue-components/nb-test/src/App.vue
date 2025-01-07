@@ -23,19 +23,21 @@
     <div v-if="btType === 'test'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
-        
-        <input type="text" v-model="inputValue"> {{ inputValue }}
+
         <NbTest
-            nb-id="radio1"
-            :value="inputValue"
-            @valid-password="(value) => console.log(value)"
-          ></NbTest> <br><br>
+          nb-id="radio1"
+          message="texto tooltip de teste asdas dasdasdas"
+        >Mouse aqui</NbTest>
+        
+        <br><br>
+        
         <p>
           Text before
           <NbTest
             nb-id="radio1"
             display="ib"
-            :value="inputValue"
+            direction="bottom"
+            message="texto tooltip de teste asdas dasdasdas"
           >
             Mouse aqui
           </NbTest>
@@ -55,7 +57,7 @@ const btType = ref('test')
 const options = ref([
   'test'
 ])
-const inputValue = ref('test')
+// const inputValue = ref('test')
 </script>
 
 <style lang="scss" scoped>

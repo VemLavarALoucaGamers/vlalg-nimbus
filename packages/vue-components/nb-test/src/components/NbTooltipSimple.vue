@@ -1,3 +1,24 @@
+<!--
+<NbTest
+          nb-id="radio1"
+          message="texto tooltip de teste asdas dasdasdas"
+        >Mouse aqui</NbTest>
+        
+        <br><br>
+        
+        <p>
+          Text before
+          <NbTest
+            nb-id="radio1"
+            display="ib"
+            direction="bottom"
+            message="texto tooltip de teste asdas dasdasdas"
+          >
+            Mouse aqui
+          </NbTest>
+          text after
+        </p>
+-->
 <template>
   <div
     v-if="nbId"
