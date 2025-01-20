@@ -25,9 +25,33 @@
         style="margin-top: 50px; margin-bottom: 50px;">
 
         <NbTest
-          nb-id="radio1"
-          message="texto tooltip de teste asdas dasdasdas"
-        >Mouse aqui</NbTest>
+          propId="basetoggle2"
+          propTheme="normal"
+          :propValue="true"
+          :propDisabled="false"
+          propSizeMediaQuery="xs"
+        />
+        <NbTest
+          propId="basetoggle2"
+          propTheme="normal"
+          :propValue="true"
+          :propDisabled="false"
+          propSizeMediaQuery="sm"
+        />
+        <NbTest
+          propId="basetoggle2"
+          propTheme="normal"
+          :propValue="true"
+          :propDisabled="false"
+          propSizeMediaQuery="md"
+        />
+        <NbTest
+          propId="basetoggle2"
+          propTheme="normal"
+          :propValue="true"
+          :propDisabled="false"
+          propSizeMediaQuery="lg"
+        />
         
         <br><br>
         

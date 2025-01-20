@@ -1,3 +1,6 @@
+<!--
+<VlalgToggle propId="basetoggle1" :propValue="valueToggle" @current-value="toggleValue('toggle', $event)" />
+-->
 <template>
   <div
     v-if="propId"
