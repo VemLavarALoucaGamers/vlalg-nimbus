@@ -7,6 +7,12 @@
         <p class="test-page__warning">Warning: Look at the console to see the click event</p>
       </div>
     </div>
+    
+    <div class="row">
+      <div class="col-md-12">
+        <UsePluginTheme />
+      </div>
+    </div>
 
     <div class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content" style="margin-bottom: 50px; overflow: hidden">
@@ -75,6 +81,7 @@
 <script setup>
 import { defineAsyncComponent, ref } from 'vue'
 
+const UsePluginTheme = defineAsyncComponent(() => import('@components/UsePluginTheme.vue'))
 const NbTest = defineAsyncComponent(() => import('@components/NbTest.vue'))
 
 const btType = ref('test')
