@@ -13,7 +13,7 @@ import { inject } from 'vue'
 
 // Injetando o gerenciador de tema
 const theme = inject('$theme');
-const changeTheme = inject('changeTheme');
+const changeTheme = inject('$changeTheme');
 
 const updateTheme = (newTheme) => {
   if (changeTheme) changeTheme(newTheme);

@@ -17,15 +17,26 @@ export default {
     const theme = ref('');
 
     const startSystem = () => {
-      theme.value = startTheme;
+      let currentTheme = startTheme
+      const localTheme = localStorage.getItem('theme')
+
+      if (localTheme) {
+          currentTheme = localTheme
+      } else {
+          localStorage.setItem('theme', currentTheme)
+      }
+      
+      theme.value = currentTheme;
       document.documentElement.setAttribute('data-theme', theme.value);
     };
 
     const changeTheme = (value = '') => {
       if (showConsole)
-        console.log(`changeTheme =>  old: ${theme.value} - new: ${value}`);
+          console.log(`changeTheme =>  old: ${theme.value} - new: ${value}`);
 
       const newTheme = !value ? 'default' : value;
+
+      localStorage.setItem('theme', newTheme)
       theme.value = newTheme;
       document.documentElement.setAttribute('data-theme', newTheme);
     };
@@ -34,6 +45,6 @@ export default {
     startSystem();
 
     app.provide('$theme', theme);
-    app.provide('changeTheme', changeTheme);
+    app.provide('$changeTheme', changeTheme);
   },
 };
