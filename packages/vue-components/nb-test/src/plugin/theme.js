@@ -13,6 +13,7 @@ export default {
       ? options.theme
       : 'default';
     const showConsole = (hasKey(options, 'dev')) ? options.dev : false;
+    const textList = (hasKey(options, 'texts')) ? options.texts : {}
 
     const theme = ref('');
 
@@ -41,10 +42,38 @@ export default {
       document.documentElement.setAttribute('data-theme', newTheme);
     };
 
-    // Definimos o tema inicial no HTML
+    const getThemeVariable = (prop = '') => {
+        if (typeof window === 'undefined' || typeof document === 'undefined' || !prop) return ''
+
+        try {
+            const root = document.documentElement;
+            const styles = getComputedStyle(root);
+
+            // Verifica se há um tema definido no atributo `data-theme`
+            const themeAttr = root.getAttribute('data-theme');
+            if (!themeAttr) {
+                console.warn('⚠️ No active themes found!');
+                return {};
+            }
+
+            return styles.getPropertyValue(prop).trim()
+        } catch (error) {
+            console.error('❌ Error retrieving theme variables:', error);
+            return '';
+        }
+    }
+
+    const getThemeText = (text = '') => {
+        if (!text) return ''
+
+        return textList[theme.value][text] || ''
+    }
+
     startSystem();
 
-    app.provide('$theme', theme);
-    app.provide('$changeTheme', changeTheme);
+    Vue.provide('$theme', theme);
+    Vue.provide('$changeTheme', changeTheme);
+    Vue.provide('$themeVariable', getThemeVariable);
+    Vue.provide('$themeText', getThemeText);
   },
 };
