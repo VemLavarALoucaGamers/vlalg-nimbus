@@ -21,6 +21,7 @@
           :disabled="disabled"
           :value="item.value"
           :name="groupName"
+          @click="clicked"
         />
         <label
           :for="`${nbId}-${item.value}`"
@@ -47,7 +48,7 @@ onMounted(() => {
   startValue()
 })
 
-const emit = defineEmits(['current-value', 'changed'])
+const emit = defineEmits(['current-value', 'changed', 'clicked'])
 
 const props = defineProps({
 	nbId: {
@@ -366,6 +367,9 @@ const size = computed(() => {
 
 const startValue = () => {
   currentValue.value = currentOption.value
+}
+const clicked = () => {
+  emit('clicked')
 }
 
 watch(currentOption, (newValue, oldValue) => {
