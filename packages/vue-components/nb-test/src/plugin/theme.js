@@ -71,9 +71,9 @@ export default {
 
     startSystem();
 
-    Vue.provide('$theme', theme);
-    Vue.provide('$changeTheme', changeTheme);
-    Vue.provide('$themeVariable', getThemeVariable);
-    Vue.provide('$themeText', getThemeText);
+    app.provide('$theme', theme);
+    app.provide('$changeTheme', changeTheme);
+    app.provide('$themeVariable', getThemeVariable);
+    app.provide('$themeText', getThemeText);
   },
 };
