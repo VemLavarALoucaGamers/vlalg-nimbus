@@ -1,7 +1,7 @@
 {
 	"name": "@vlalg-nimbus/magic-debounce",
 	"description": "Printing the console.log in a magical way",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"type": "module",
 	"main": "./dist/bundle.min.umd.js",
 	"module": "./dist/bundle.min.es.js",
