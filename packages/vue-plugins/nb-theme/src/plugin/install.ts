@@ -5,7 +5,7 @@ function hasKey<T extends object>(obj: T, key: keyof any): key is keyof T {
   return Object.prototype.hasOwnProperty.call(obj, key)
 }
 
-export default {
+const plugin = {
   install(Vue: App, options: ThemeOptions) {
     if (!options || !options.theme)
       throw new Error('The "theme type" is required and is missing.')
@@ -75,3 +75,5 @@ export default {
     Vue.provide('$changeTheme', changeTheme)
   },
 }
+
+export default plugin

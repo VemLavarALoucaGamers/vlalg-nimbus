@@ -17,15 +17,16 @@ yarn add @vlalg-nimbus/nb-theme
 
 ## Usage
 
+File `main.js` (_Attention to the imported theme css file_)
+
 ```js
-// main.js
 import { createApp } from 'vue'
 import App from './App.vue'
 
 import ThemePlugin from '@vlalg-nimbus/nb-theme'
 
 import './style/style.css';
-import "./style/themes.css";
+import "./style/themes.css"; // CSS file
 
 const app = createApp(App)
 
@@ -36,6 +37,38 @@ app.use(ThemePlugin, {
 
 app.mount('#app')
 ```
+
+File `theme.css`
+
+First of all, it is required to define `:root` with the names of the variables and their values.
+
+For each theme that will be used, create a group in this css file defining the values of the variables. Pay attention to the names of the variables, if they do not exist in a theme, they will end up taking the value of `:root`.
+
+Example:
+
+```css
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+}
+
+[data-theme='default'] {
+  --bg-color: #04eeff;
+  --text-color: #000000;
+}
+
+[data-theme='dark'] {
+  --bg-color: #000000;
+  --text-color: #ffffff;
+}
+
+[data-theme='other'] {
+  --bg-color: tomato;
+  --text-color: #ffffff;
+}
+```
+
+If you do not follow the above pattern it will not work as expected.
 
 ## Using with TypeScript
 
