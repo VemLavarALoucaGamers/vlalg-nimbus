@@ -54,7 +54,7 @@ function hasKey<T extends object> (obj: T, key: keyof any): key is keyof T {
   return Object.prototype.hasOwnProperty.call(obj, key)
 }
 
-export default {
+const plugin = {
   async install(vue: App, options: IOptions = {}) {
     if (typeof vue === 'undefined') throw new Error('Vue must be installed first!')
 
@@ -99,3 +99,5 @@ export default {
     }
   },
 };
+
+export default plugin;
