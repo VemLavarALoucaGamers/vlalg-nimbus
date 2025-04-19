@@ -71,7 +71,7 @@ const plugin = {
     const permitedDomains = hasKey(options, 'permitedDomains') ? options.permitedDomains! : []
 
     // Validação de domínio permitido
-    const isDomainAllowed = !permitedDomains.length || permitedDomains.some((domain) => domain == window.location.origin)
+    const isDomainAllowed = !permitedDomains.length || permitedDomains.some((domain) => domain === window.location.hostname)
 
     if (isDomainAllowed) {
         await startGtm(window, document, "script", "dataLayer", googleKey)

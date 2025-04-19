@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-gtm",
   "description": "Gtm for Vuejs 3",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "type": "module",
   "main": "./dist/nb-gtm.umd.js",
   "module": "./dist/nb-gtm.js",
