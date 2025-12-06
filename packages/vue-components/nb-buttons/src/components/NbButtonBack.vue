@@ -2,7 +2,8 @@
   <div
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
-    :style="[wrapperStyle]" 
+    :style="[wrapperStyle]"    
+    :tabIndex="tabIndex"
     @click="interacted"
   >
     <div
@@ -38,6 +39,10 @@ const props = defineProps({
     type: String,
     required: true
   },
+	tabIndex: {
+		type: Number,
+    default: 0
+	},
   color: {
     type: String,
     default: '#477e99'

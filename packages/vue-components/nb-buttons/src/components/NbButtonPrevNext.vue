@@ -11,18 +11,20 @@
 		>
 			<div
 				v-if="showPreview"
-				@click="interacted('preview')"
 				:class="['buttonNextPreview buttonPreview', previewDisabled]"
 				:style="previewStyle"
+        :tabIndex="tabIndexPrev"
+				@click="interacted('preview')"
 			>
 				<slot name="prev">← Preview</slot>
 			</div>
 
 			<div
 				v-if="showNext"
-				@click="interacted('next')"
 				:class="['buttonNextPreview buttonNext', nextDisabled]"
 				:style="nextStyle"
+        :tabIndex="tabIndexNext"
+				@click="interacted('next')"
 			>
 				<slot name="next">Next →</slot>
 			</div>
@@ -44,6 +46,14 @@ const props = defineProps({
 	nbId: {
 		type: String,
 		required: true
+	},
+	tabIndexPrev: {
+		type: Number,
+    default: 0
+	},
+	tabIndexNext: {
+		type: Number,
+    default: 0
 	},
 	colorPrimary: {
 		type: String,

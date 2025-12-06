@@ -2,6 +2,7 @@
 	<div
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
+    :tabIndex="tabIndex"
 		@click="interacted"
 	>
 		<div
@@ -36,6 +37,10 @@ const props = defineProps({
 			const currentValue = value.toLowerCase()
 			return ['b', 'ib'].includes(currentValue)
 		}
+	},
+	tabIndex: {
+		type: Number,
+    default: 0
 	},
 	textColor: {
 		type: String,
