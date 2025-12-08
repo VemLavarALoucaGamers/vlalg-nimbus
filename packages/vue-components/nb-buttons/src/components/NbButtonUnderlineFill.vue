@@ -25,7 +25,7 @@
 import { defineProps, ref, toRefs, computed } from 'vue'
 
 defineOptions({
-	name: 'NbButtonUnderlineExpand',
+	name: 'NbButtonUnderlineFill',
 	inheritAttrs: false
 })
 
