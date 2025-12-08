@@ -6,6 +6,8 @@
 	>
 		<div
 			:id="nbId"
+      role="radiogroup"
+      v-bind="computedAriaAttrs"
 			:class="['nb-reset', 'component', displayClass]"
 		>
       <div
@@ -25,7 +27,10 @@
         />
         <label
           :for="`${nbId}-${item.value}`"
+          :tabindex="disabled ? -1 : (Array.isArray(tabIndex) ? tabIndex[index] : tabIndex >= 0 ? tabIndex : index + 1)"
           class="component-radio__item--label"
+          @keydown.enter.prevent="!disabled && hasTabIndexEnter && $event.target.click()"
+          @keydown.space.prevent="!disabled && hasTabIndexSpace && $event.target.click()"
         >
           <div></div>
           <span :style="[componentStyle]">{{ item.text }}</span>
@@ -61,6 +66,33 @@ const props = defineProps({
 			const currentValue = value ? value.toLowerCase() : ''
 			return ['b', 'ib'].includes(currentValue)
 		}
+  },
+	tabIndex: {
+    type: [Number, Array],
+    default: 0,
+    validator: (value, props) => {
+      if (Array.isArray(value)) {
+        // Opcional: validar se tem o mesmo tamanho de options
+        return value.length === props.options.length
+      }
+      return true
+    }
+  },
+  hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
+    type: Boolean,
+    default: true
+  },
+  ariaLabel: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
+  ariaAttrs: {
+    type: Object,
+    default: () => ({})
   },
   groupName: {
     type: String,
@@ -176,6 +208,8 @@ const props = defineProps({
 
 const currentValue = ref(null)
 const {
+  ariaLabel,
+  ariaAttrs,
   currentOption,
   valueType,
   display,
@@ -307,6 +341,26 @@ const size = computed(() => {
     zoom: defaultValues.scale
   }
 })
+const computedAriaAttrs = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrs.value) {
+    const attrKeys = Object.keys(ariaAttrs.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrs.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabel.value,
+    'aria-disabled': disabled.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
+})
 
 const startValue = () => {
   const initialValue = currentOption.value
@@ -432,7 +486,7 @@ watch(currentValue, (newValue, oldValue) => {
 
           div:before {
             content: '\23FA'; // \f111
-            font-size: 1.3em; // 0.7em 0.85em;
+            font-size: 1.15em; // 0.7em 0.85em;
             text-shadow: 0;
             display: flex;
             align-items: center;
@@ -464,6 +518,10 @@ watch(currentValue, (newValue, oldValue) => {
         div {
           border: 2px solid v-bind(styleColorHover);
         }
+      }
+
+      &:focus {
+        outline-offset: 2px;
       }
 
       div {

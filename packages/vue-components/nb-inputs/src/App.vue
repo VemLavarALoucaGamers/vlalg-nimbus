@@ -14,6 +14,7 @@
           <option value="test">test</option>
           <option value="radio">radio</option>
           <option value="checkbox">checkbox</option>
+          <option value="input">input</option>
         </select>
       </div>
     </div>
@@ -124,6 +125,46 @@
         </p>
       </div>
     </div>
+
+    <div v-if="btType === 'input'" class="row">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
+        <h4 class="test-page__content-tile">NbInput</h4>
+        
+        <NbInput
+          nb-id="test1"
+          display="b"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test input"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+          @show-input-eye="($event) => console.log('show-input-eye', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInput>
+
+        <p style="margin-top: 4px;">
+          Text before
+          <NbInput
+            nb-id="test2"
+            display="ib"
+            @current-value="($event) => console.log($event)"
+          />
+          text after
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -133,8 +174,9 @@ import { defineAsyncComponent, ref, computed } from 'vue'
 const NbInputTest = defineAsyncComponent(() => import('@components/NbInputTest.vue'))
 const NbInputRadio = defineAsyncComponent(() => import('@components/NbInputRadio.vue'))
 const NbInputCheckbox = defineAsyncComponent(() => import('@components/NbInputCheckbox.vue'))
+const NbInput = defineAsyncComponent(() => import('@components/NbInput.vue'))
 
-const btType = ref('test')
+const btType = ref('radio')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
