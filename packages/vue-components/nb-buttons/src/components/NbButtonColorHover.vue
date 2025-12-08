@@ -1,9 +1,15 @@
 <template>
 	<div
+    v-if="nbId"
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
     :tabIndex="tabIndex"
-		@click="interacted"
+    role="button"
+    :aria-label="ariaLabel"
+    :aria-disabled="disabled"
+    @click="interacted"
+    @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div
 			:id="nbId"
@@ -39,9 +45,21 @@ const props = defineProps({
 		}
 	},
 	tabIndex: {
-		type: Number,
+    type: Number,
     default: 0
-	},
+  },
+  hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
+    type: Boolean,
+    default: true
+  },
+  ariaLabel: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
 	textColor: {
 		type: String,
 		default: '#ffffff'

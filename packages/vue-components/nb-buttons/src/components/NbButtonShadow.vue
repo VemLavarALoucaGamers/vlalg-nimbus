@@ -7,22 +7,16 @@
     role="button"
     :aria-label="ariaLabel"
     :aria-disabled="disabled"
-		@click="interacted"
+    @click="interacted"
     @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div
 			:id="nbId"
-			:class="['nb-reset', 'component']"
+      class="nb-reset component"
 			:style="[componentStyle]"
 		>
-			<div class="first-child">
-				<slot name="content">Default Text</slot>
-			</div>
-
-			<div class="last-child">
-				<slot name="content">Default Text</slot>
-			</div>
+      <slot name="content">Default Text</slot>
 		</div>
 	</div>
 </template>
@@ -31,7 +25,7 @@
 import { defineProps, ref, toRefs, computed } from 'vue'
 
 defineOptions({
-	name: 'NbButtonAlternateText',
+	name: 'NbButtonShadow',
 	inheritAttrs: false
 })
 
@@ -51,7 +45,7 @@ const props = defineProps({
 		}
 	},
 	tabIndex: {
-		type: Number,
+    type: Number,
     default: 0
   },
   hasTabIndexEnter: {
@@ -62,40 +56,37 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-	ariaLabel: {
-		type: String,
-		default: 'Alternate Text Button'
-	},
+  ariaLabel: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
 	textColor: {
-		type: String,
-		default: '#ffffff'
-	},
-	textHoverColor: {
 		type: String,
 		default: '#000000'
 	},
+	textHoverColor: {
+		type: String,
+		default: 'tomato'
+	},
 	buttonColor: {
 		type: String,
-		default: '#ffffff'
+		default: '#faf77d'
 	},
 	buttonHoverColor: {
 		type: String,
-		default: 'red'
+		default: '#faf77d'
+	},
+	buttonShadowColor: {
+		type: String,
+		default: '#01d7b0'
 	},
 	borderColor: {
 		type: String,
-		default: '#ffe54c'
-	},
-	showBorder: {
-		type: Boolean,
-		default: true,
-		validator: value => {
-			return typeof value === 'boolean' && [true, false].includes(value)
-		}
+		default: '#191a1b'
 	},
 	borderRadius: {
 		type: Number,
-		default: 0.375
+		default: 0
 	},
 	width: {
 		type: Number,
@@ -113,9 +104,9 @@ const props = defineProps({
 	},
 	paddingY: {
 		type: Number,
-		default: 0.4,
+		default: 0.2,
 		validator: value => {
-			return !value ? 0.4 : value
+			return !value ? 0.2 : value
 		}
 	},
 	disabled: {
@@ -150,7 +141,7 @@ const {
 	buttonColor,
 	borderColor,
 	buttonHoverColor,
-	showBorder,
+	buttonShadowColor,
 	borderRadius,
 	textColor,
 	textHoverColor,
@@ -160,7 +151,7 @@ const {
 	disabled,
 	fontFamily,
 	fontSize,
-	fontWeight
+  fontWeight
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
@@ -168,25 +159,25 @@ const formatDefaultValues = computed(() => {
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const buttonColorValue = !buttonColor.value ? '#ffffff' : buttonColor.value
 	const buttonHoverColorValue = !buttonHoverColor.value ? '#000000' : buttonHoverColor.value
-	const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
+	const buttonShadowColorValue = !buttonShadowColor.value ? '#01d7b0' : buttonShadowColor.value
+  const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
 	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
-	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
 	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
 	const textHoverColorValue = !textHoverColor.value ? '#000000' : textHoverColor.value
 	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.4 : paddingY.value
+	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
+  const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
 
 	return {
 		disabled: disabledValue,
 		display: displayValue,
 		buttonColor: buttonColorValue,
 		buttonHoverColor: buttonHoverColorValue,
+		buttonShadowColor: buttonShadowColorValue,
 		borderColor: borderColorValue,
-		showBorder: showBorderValue,
 		borderRadius: borderRadiusValue,
 		textColor: textColorValue,
 		textHoverColor: textHoverColorValue,
@@ -215,14 +206,9 @@ const componentStyle = computed(() => {
 
 	const newWidth = defaultValues.display === 'block' ? 'auto' : `${defaultValues.width}px`
 
-	const border = defaultValues.showBorder
-		? { border: `1px solid ${defaultValues.borderColor}` }
-		: {}
-
 	return {
-		...border,
+		border: `2px solid ${defaultValues.borderColor}`,
 		borderRadius: `${defaultValues.borderRadius}rem`,
-		background: defaultValues.buttonColor,
 		minWidth: '33px',
 		width: newWidth,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
@@ -250,7 +236,22 @@ const styleTextHoverColor = computed(() => {
 const styleButtonColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
+	return defaultValues.buttonColor
+})
+const styleButtonColorHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
 	return defaultValues.buttonHoverColor
+})
+const styleButtonShadowColor = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return `3px 3px 0 -1px ${defaultValues.buttonShadowColor}, 3px 3px 0 ${defaultValues.buttonShadowColor}`
+})
+const styleButtonShadowColorHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return `0 0 0 -1px ${defaultValues.buttonShadowColor}, 0 0 0 ${defaultValues.buttonShadowColor};`
 })
 
 const interacted = () => {
@@ -262,13 +263,13 @@ const interacted = () => {
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 
 .nb-wrapper {
-	margin: 0;
-	padding: 0;
-	font-size: 62.5%;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	// display: inline-block;
+  margin: 0;
+  padding: 0;
+  font-size: 62.5%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
 	vertical-align: bottom;
 }
 
@@ -276,25 +277,27 @@ const interacted = () => {
 	font-family: 'Lato', sans-serif;
 	font-style: normal;
 	font-weight: light;
-	line-height: 1.42857143;
+  line-height: 1.42857143;
 
-	* {
-		margin: 0;
-		padding: 0;
-	}
-	*,
-	*::before,
-	*::after {
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		box-sizing: border-box;
-	}
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  *,
+  *::before,
+  *::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
 }
 
 .component {
 	margin: 0;
+	padding: 0;
 	box-sizing: border-box;
-	line-height: 16px;
+	line-height: 1.42857143;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -310,75 +313,36 @@ const interacted = () => {
 	text-decoration-line: none;
 	white-space: nowrap;
 
-	letter-spacing: 1px;
-	outline: 0;
-	position: relative;
+  // Add new properties below
+  margin-bottom: 8px; // reset vertical align
+  
+  background-color: v-bind('styleButtonColor');
+  color: v-bind('styleTextColor');
+  box-shadow: v-bind('styleButtonShadowColor');
 
-	margin-top: 4px;
-	margin-bottom: 4px;
+  transition-duration: 0.15s;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.05s ease-in !important;
 
-	overflow: hidden;
-
-	.first-child {
-		--disabled-color: v-bind('styleTextColor');
-		color: var(--disabled-color) !important;
-		position: relative;
-		transition: color 600ms cubic-bezier(0.48, 0, 0.12, 1);
-		z-index: 10;
-	}
-	.last-child {
-		color: var(--text-color) !important;
-		--text-color: v-bind('styleTextHoverColor');
-		display: block;
-		position: absolute;
-		bottom: 0;
-		transition: all 500ms cubic-bezier(0.48, 0, 0.12, 1);
-		z-index: 100;
-		opacity: 1;
-		bottom: 0;
-		left: 50%;
-		transform: translateY(225%) translateX(-50%);
-	}
-
-	&:after {
-		--button-color: v-bind('styleButtonColor');
-		content: '';
-		position: absolute;
-		bottom: -50%;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: var(--button-color) !important;
-		transform-origin: bottom center;
-		transition: transform 600ms cubic-bezier(0.48, 0, 0.12, 1);
-		transform: skewY(7.2deg) scaleY(0);
-		z-index: 10;
-	}
-
-	&:hover {
-		&:after {
-			transform-origin: bottom center;
-			transform: skewY(0deg) scaleY(2);
-		}
-		.last-child {
-			bottom: 50%;
-			transform: translateY(50%) translateX(-50%);
-			opacity: 1;
-			transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
-		}
-	}
+  &:hover {
+    background-color: v-bind('styleButtonColorHover');
+    color: v-bind('styleTextHoverColor');
+    box-shadow: v-bind('styleButtonShadowColorHover');
+    transform: translate(3px, 3px);
+  }
 }
 
 .component-disabled {
-	cursor: not-allowed;
-	pointer-events: none;
-	user-select: none;
+  cursor: not-allowed;
+  pointer-events: none;
+  user-select: none;
 
-	.component {
+  .component {
 		--disabled-color: v-bind('styleTextColor');
 		color: var(--disabled-color) !important;
-		opacity: 0.7;
-		border-radius: inherit;
-	}
+    opacity: 0.7;
+    border-radius: inherit;
+  }
 }
 </style>

@@ -1,0 +1,57 @@
+<template>
+  <div class="preview">
+    <div class="preview__component">
+      <NbButtonShadow
+        nb-id="nb-button-shadow-one"
+        display="b"
+        text-color="#000000"
+        text-hover-color="tomato"
+        button-color="#faf77d"
+        button-hover-color="#faf77d"
+        button-shadow-color="#01d7b0"
+        border-color="#191a1b"
+        :border-radius="0"
+        :tab-index="0"
+        :has-tab-index-enter="true"
+        :has-tab-index-space="true"
+        aria-label="Botão com sombra"
+        @clicked="logEvent()"
+      >
+        <template #content>
+          Click me
+        </template>
+      </NbButtonShadow>
+      <p class="legend">Look at the console to see the triggered event</p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+const logEvent = () => {
+  console.log('clicked');
+};
+</script>
+
+<style lang="scss" scoped>
+.preview {
+  width: 100%;
+  text-align: center;
+  position: relative;
+  margin: 40px 0;
+
+  .preview__component {
+    display: block;
+    position: relative;
+    width: 50%;
+    margin: 0 auto;
+
+    .legend {
+      font-size: 0.8em;
+      font-style: italic;
+      margin: 0;
+      margin-top: 10px;
+    }
+  }
+}
+</style>
+

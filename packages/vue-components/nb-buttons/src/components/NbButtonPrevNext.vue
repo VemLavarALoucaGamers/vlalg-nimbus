@@ -14,7 +14,12 @@
 				:class="['buttonNextPreview buttonPreview', previewDisabled]"
 				:style="previewStyle"
         :tabIndex="tabIndexPrev"
+        role="button"
+        :aria-label="ariaLabelPrev"
+        :aria-disabled="disabled"
 				@click="interacted('preview')"
+        @keydown.enter="!disabled && hasTabIndexEnter && interacted('preview')"
+        @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('preview')"
 			>
 				<slot name="prev">← Preview</slot>
 			</div>
@@ -24,7 +29,12 @@
 				:class="['buttonNextPreview buttonNext', nextDisabled]"
 				:style="nextStyle"
         :tabIndex="tabIndexNext"
-				@click="interacted('next')"
+        role="button"
+        :aria-label="ariaLabelNext"
+        :aria-disabled="disabled"
+        @click="interacted('next')"
+        @keydown.enter="!disabled && hasTabIndexEnter && interacted('next')"
+        @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('next')"
 			>
 				<slot name="next">Next →</slot>
 			</div>
@@ -54,7 +64,23 @@ const props = defineProps({
 	tabIndexNext: {
 		type: Number,
     default: 0
-	},
+  },
+  hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
+    type: Boolean,
+    default: true
+  },
+  ariaLabelPrev: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
+  ariaLabelNext: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
 	colorPrimary: {
 		type: String,
 		default: 'tomato'

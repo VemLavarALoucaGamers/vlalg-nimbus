@@ -24,6 +24,12 @@
 					<option value="mechanical2">mechanical 2</option>
 					<option value="colorOutside">colorOutside</option>
 					<option value="alternateText">alternateText</option>
+					<option value="back">back</option>
+					<option value="normal">normal</option>
+          <option value="shadow">shadow</option>
+          <option value="underlineExpand">underlineExpand</option>
+          <option value="underlineFill">underlineFill</option>
+          <option value="gradientBorderToBackground">gradientBorderToBackground</option>
 				</select>
 			</div>
 		</div>
@@ -40,13 +46,9 @@
 				<NbButtonTest
 					nb-id="NbButtonTest"
 					display="b"
-					text-color="white"
-					buttonColor="blueviolet"
-					shadowColor="green"
 					@clicked="buttonAction"
 				>
-					<template #content> texto 1 </template>
-					<template #content-alternate> alternativo </template>
+					<template #content>Getting started with Go</template>
 				</NbButtonTest>
 
 				<p style="margin-top: 4px">
@@ -54,16 +56,9 @@
 					<NbButtonTest
 						nb-id="NbButtonTest"
 						display="ib"
-						text-color="white"
-						buttonColor="blueviolet"
-						:width="160"
-						shadowColor="green"
-						:show-border="true"
-						:border-radius="0"
 						@clicked="buttonAction"
 					>
-						<template #content> text 1</template>
-						<template #content-alternate> text 2</template>
+						<template #content>Getting started with Go</template>
 					</NbButtonTest>
 					text after
 				</p>
@@ -369,6 +364,193 @@
 				</p>
 			</div>
 		</div>
+
+		<div
+			v-else-if="btType === 'back'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonBack</h4>
+				<NbButtonBack
+					nb-id="NbButtonBack1"
+					color="tomato"
+					text-color="white"
+					@clicked="buttonAction"
+				/>
+
+				<p>
+					Text before
+					<NbButtonBack
+						nb-id="NbButtonBack2"
+						display="ib"
+						color="tomato"
+						text-color="white"
+						@clicked="buttonAction"
+					/>
+					text after
+				</p>
+			</div>
+		</div>
+
+    <div
+			v-else-if="btType === 'normal'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonNormal</h4>
+				<NbButtonNormal
+					nb-id="NbButtonTest"
+					display="b"
+					@clicked="buttonAction"
+				>
+					<template #content> texto 1 </template>
+				</NbButtonNormal>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonNormal
+						nb-id="NbButtonTest"
+						display="ib"
+						@clicked="buttonAction"
+					>
+						<template #content> text 1</template>
+					</NbButtonNormal>
+					text after
+				</p>
+			</div>
+		</div>
+
+    <div
+			v-else-if="btType === 'shadow'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonShadow</h4>
+				<NbButtonShadow
+					nb-id="NbButtonShadow"
+					display="b"
+					@clicked="buttonAction"
+				>
+					<template #content> texto 1 </template>
+				</NbButtonShadow>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonShadow
+						nb-id="NbButtonShadow"
+						display="ib"
+						@clicked="buttonAction"
+					>
+						<template #content> text 1</template>
+					</NbButtonShadow>
+					text after
+				</p>
+			</div>
+		</div>
+
+    <div
+			v-else-if="btType === 'underlineExpand'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonUnderlineExpand</h4>
+				<NbButtonUnderlineExpand
+					nb-id="NbButtonUnderlineExpand"
+					display="b"
+          textAlign="left"
+					@clicked="buttonAction"
+				>
+					<template #content>Texto 1</template>
+				</NbButtonUnderlineExpand>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonUnderlineExpand
+						nb-id="NbButtonUnderlineExpand"
+						display="ib"
+						@clicked="buttonAction"
+					>
+						<template #content>Texto 1</template>
+					</NbButtonUnderlineExpand>
+					text after
+				</p>
+			</div>
+		</div>
+
+    <div
+			v-else-if="btType === 'underlineFill'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonUnderlineFill</h4>
+				<NbButtonUnderlineFill
+					nb-id="NbButtonUnderlineFill"
+					display="b"
+          textAlign="left"
+					@clicked="buttonAction"
+				>
+					<template #content>Texto 1</template>
+				</NbButtonUnderlineFill>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonUnderlineFill
+						nb-id="NbButtonUnderlineFill"
+						display="ib"
+						@clicked="buttonAction"
+					>
+						<template #content>Texto 1</template>
+					</NbButtonUnderlineFill>
+					text after
+				</p>
+			</div>
+		</div>
+
+    <div
+			v-else-if="btType === 'gradientBorderToBackground'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbButtonGradientBorderToBackground</h4>
+				<NbButtonGradientBorderToBackground
+					nb-id="NbButtonGradientBorderToBackground"
+					display="b"
+					@clicked="buttonAction"
+				>
+					<template #content>Texto 1</template>
+				</NbButtonGradientBorderToBackground>
+
+				<p style="margin-top: 4px">
+					Text before
+					<NbButtonGradientBorderToBackground
+						nb-id="NbButtonGradientBorderToBackground"
+						display="ib"
+						@clicked="buttonAction"
+					>
+						<template #content>Texto 1</template>
+					</NbButtonGradientBorderToBackground>
+					text after
+				</p>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -390,7 +572,13 @@ const NbButtonColorOutside = defineAsyncComponent(() =>
 const NbButtonAlternateText = defineAsyncComponent(() =>
 	import('@components/NbButtonAlternateText.vue')
 )
+const NbButtonBack = defineAsyncComponent(() => import('@components/NbButtonBack.vue'))
 const NbButtonTest = defineAsyncComponent(() => import('@components/NbButtonTest.vue'))
+const NbButtonNormal = defineAsyncComponent(() => import('@components/NbButtonNormal.vue'))
+const NbButtonShadow = defineAsyncComponent(() => import('@components/NbButtonShadow.vue'))
+const NbButtonUnderlineExpand = defineAsyncComponent(() => import('@components/NbButtonUnderlineExpand.vue'))
+const NbButtonUnderlineFill = defineAsyncComponent(() => import('@components/NbButtonUnderlineFill.vue'))
+const NbButtonGradientBorderToBackground = defineAsyncComponent(() => import('@components/NbButtonGradientBorderToBackground.vue'))
 
 const btType = ref('test')
 
