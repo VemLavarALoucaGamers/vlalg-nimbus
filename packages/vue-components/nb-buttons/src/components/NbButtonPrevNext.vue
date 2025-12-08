@@ -15,8 +15,7 @@
 				:style="previewStyle"
         :tabIndex="tabIndexPrev"
         role="button"
-        :aria-label="ariaLabelPrev"
-        :aria-disabled="disabled"
+        v-bind="computedAriaAttrsPrev"
 				@click="interacted('preview')"
         @keydown.enter="!disabled && hasTabIndexEnter && interacted('preview')"
         @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('preview')"
@@ -30,8 +29,7 @@
 				:style="nextStyle"
         :tabIndex="tabIndexNext"
         role="button"
-        :aria-label="ariaLabelNext"
-        :aria-disabled="disabled"
+        v-bind="computedAriaAttrsNext"
         @click="interacted('next')"
         @keydown.enter="!disabled && hasTabIndexEnter && interacted('next')"
         @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('next')"
@@ -77,9 +75,17 @@ const props = defineProps({
     type: String,
     default: 'Alternate Text Button'
   },
+  ariaAttrsPrev: {
+    type: Object,
+    default: () => ({})
+  },
   ariaLabelNext: {
     type: String,
     default: 'Alternate Text Button'
+  },
+  ariaAttrsNext: {
+    type: Object,
+    default: () => ({})
   },
 	colorPrimary: {
 		type: String,
@@ -181,6 +187,10 @@ const props = defineProps({
 })
 
 const {
+  ariaLabelPrev,
+  ariaAttrsPrev,
+  ariaLabelNext,
+  ariaAttrsNext,
 	paddingX,
 	paddingY,
 	marginBetween,
@@ -266,6 +276,46 @@ const nextStyle = computed(() => {
 const font = computed(() => {
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	return `'${fontValue}'`
+})
+const computedAriaAttrsPrev = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrsPrev.value) {
+    const attrKeys = Object.keys(ariaAttrsPrev.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrsPrev.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabelPrev.value,
+    'aria-disabled': previewDisabled.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
+})
+const computedAriaAttrsNext = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrsNext.value) {
+    const attrKeys = Object.keys(ariaAttrsNext.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrsNext.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabelNext.value,
+    'aria-disabled': nextDisabled.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
 })
 
 const interacted = clickType => {

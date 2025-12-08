@@ -5,8 +5,7 @@
 		:style="[wrapperStyle]"
     :tabIndex="tabIndex"
     role="button"
-    :aria-label="ariaLabel"
-    :aria-disabled="disabled"
+    v-bind="computedAriaAttrs"
 		@click="interacted"
     @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
@@ -66,6 +65,10 @@ const props = defineProps({
 		type: String,
 		default: 'Alternate Text Button'
 	},
+  ariaAttrs: {
+    type: Object,
+    default: () => ({})
+  },
 	textColor: {
 		type: String,
 		default: '#ffffff'
@@ -147,6 +150,8 @@ const props = defineProps({
 
 const {
 	display,
+  ariaLabel,
+  ariaAttrs,
 	buttonColor,
 	borderColor,
 	buttonHoverColor,
@@ -251,6 +256,26 @@ const styleButtonColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.buttonHoverColor
+})
+const computedAriaAttrs = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrs.value) {
+    const attrKeys = Object.keys(ariaAttrs.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrs.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabel.value,
+    'aria-disabled': disabled.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
 })
 
 const interacted = () => {
