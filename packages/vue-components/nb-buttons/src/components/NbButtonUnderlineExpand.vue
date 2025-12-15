@@ -7,12 +7,13 @@
     role="button"
     v-bind="computedAriaAttrs"
     @click="interacted"
-    @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div
 			:id="nbId"
       class="nb-reset component"
+      :class="[themeStyle]"
 			:style="[componentStyle]"
 		>
       <slot name="content">Default Text</slot>
@@ -63,22 +64,56 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
-	textColor: {
+	theme: {
 		type: String,
-		default: 'rgb(0, 105, 255)'
+		default: 'light',
+		validator: (value) => {
+			const currentValue = value ? value.toLowerCase() : ''
+			return ['light', 'dark'].includes(currentValue)
+		}
 	},
-	textHoverColor: {
+	// Cores do tema light
+	lightTextColor: {
+		type: String,
+		default: '#333333'
+	},
+	lightTextColorHover: {
+		type: String,
+		default: '#000000'
+	},
+	lightBorderColor: {
+		type: String,
+		default: '#f5f5f5'
+	},
+	lightBorderColorHover: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	lightDisabledBgColor: {
+		type: String,
+		default: '#dfdfd9'
+	},
+	// Cores do tema dark
+	darkTextColor: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	darkTextColorHover: {
 		type: String,
 		default: '#ffffff'
 	},
-	borderColor: {
+	darkBorderColor: {
 		type: String,
-		default: 'rgb(0, 105, 255)'
+		default: '#2d2d2d'
 	},
-	borderHoverColor: {
+	darkBorderColorHover: {
 		type: String,
-		default: 'rgb(20, 51, 214)'
-  },
+		default: '#3d3d3d'
+	},
+	darkDisabledBgColor: {
+		type: String,
+		default: 'rgba(40, 42, 54, 1)'
+	},
   borderHeight: {
     type: Number,
     default: 1.5,
@@ -145,11 +180,18 @@ const {
 	display,
   ariaLabel,
   ariaAttrs,
-	borderColor,
-  borderHoverColor,
+	theme,
+	lightTextColor,
+	lightTextColorHover,
+	lightBorderColor,
+	lightBorderColorHover,
+	lightDisabledBgColor,
+	darkTextColor,
+	darkTextColorHover,
+	darkBorderColor,
+	darkBorderColorHover,
+	darkDisabledBgColor,
   borderHeight,
-	textColor,
-	textHoverColor,
 	width,
 	paddingX,
 	paddingY,
@@ -163,11 +205,7 @@ const {
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const borderColorValue = !borderColor.value ? '#ffffff' : borderColor.value
-	const borderHoverColorValue = !borderHoverColor.value ? '#000000' : borderHoverColor.value
   const borderHeightValue = !borderHeight.value ? 1.5 : borderHeight.value
-  const textColorValue = !textColor.value ? '#ffffff' : textColor.value
-	const textHoverColorValue = !textHoverColor.value ? '#000000' : textHoverColor.value
 	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
 	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
@@ -179,11 +217,7 @@ const formatDefaultValues = computed(() => {
 	return {
 		disabled: disabledValue,
 		display: displayValue,
-		borderColor: borderColorValue,
-		borderHoverColor: borderHoverColorValue,
 		borderHeight: borderHeightValue,
-		textColor: textColorValue,
-		textHoverColor: textHoverColorValue,
 		width: widthValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
@@ -226,29 +260,23 @@ const font = computed(() => {
 	return defaultValues.font
 })
 
-const styleTextColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textColor
+const themeStyle = computed(() => {
+	return theme.value === 'dark' ? 'component__theme--dark' : 'component__theme--light'
 })
-const styleTextHoverColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.textHoverColor
-})
-const styleBorderColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-  return defaultValues.borderColor
-})
-const styleBorderHoverColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.borderHoverColor
-})
+// Computed properties para as cores do theme (necessárias para v-bind no CSS)
+const styleLightTextColor = computed(() => lightTextColor.value)
+const styleLightTextColorHover = computed(() => lightTextColorHover.value)
+const styleLightBorderColor = computed(() => lightBorderColor.value)
+const styleLightBorderColorHover = computed(() => lightBorderColorHover.value)
+const styleLightDisabledBgColor = computed(() => lightDisabledBgColor.value)
+const styleDarkTextColor = computed(() => darkTextColor.value)
+const styleDarkTextColorHover = computed(() => darkTextColorHover.value)
+const styleDarkBorderColor = computed(() => darkBorderColor.value)
+const styleDarkBorderColorHover = computed(() => darkBorderColorHover.value)
+const styleDarkDisabledBgColor = computed(() => darkDisabledBgColor.value)
 const styleBorderHeight = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
 	return `${defaultValues.borderHeight}px`
 })
 const computedAriaAttrs = computed(() => {
@@ -332,13 +360,12 @@ const interacted = () => {
 
   // Add new properties below
   margin-bottom: -4px; // reset vertical align
+  overflow: hidden;
   position: relative;
-  color: v-bind('styleTextColor');
 
   &::after {
     content: '';
     background: currentcolor;
-    color: v-bind('styleBorderColor');
     height: v-bind('styleBorderHeight');
     left: 0px;
     bottom: 2px;
@@ -349,15 +376,43 @@ const interacted = () => {
     width: 100%;
   }
 
-  &:focus,
-  &:hover {
-    color: v-bind('styleTextHoverColor');
+	// Theme light
+	&.component__theme--light {
+		color: v-bind('styleLightTextColor');
 
-    &::after {
-      transform: scaleX(1);
-      color: v-bind('styleBorderHoverColor');
-    }
-  }
+		&::after {
+			background-color: v-bind('styleLightBorderColor');
+		}
+
+		&:focus,
+		&:hover {
+			color: v-bind('styleLightTextColorHover');
+
+			&::after {
+				transform: scaleX(1);
+				background-color: v-bind('styleLightBorderColorHover');
+			}
+		}
+	}
+
+	// Theme dark
+	&.component__theme--dark {
+		color: v-bind('styleDarkTextColor');
+
+		&::after {
+			background-color: v-bind('styleDarkBorderColor');
+		}
+
+		&:focus,
+		&:hover {
+			color: v-bind('styleDarkTextColorHover');
+
+			&::after {
+				transform: scaleX(1);
+				background-color: v-bind('styleDarkBorderColorHover');
+			}
+		}
+	}
 }
 
 .component-disabled {
@@ -366,10 +421,16 @@ const interacted = () => {
   user-select: none;
 
   .component {
-		--disabled-color: v-bind('styleTextColor');
-		color: var(--disabled-color) !important;
     opacity: 0.7;
     border-radius: inherit;
+
+		&.component__theme--light {
+			color: v-bind('styleLightTextColor') !important;
+		}
+
+		&.component__theme--dark {
+			color: v-bind('styleDarkTextColor') !important;
+		}
   }
 }
 </style>

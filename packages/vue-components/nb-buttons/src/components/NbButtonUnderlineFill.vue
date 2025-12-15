@@ -7,12 +7,13 @@
     role="button"
     v-bind="computedAriaAttrs"
     @click="interacted"
-    @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div
 			:id="nbId"
       class="nb-reset component"
+      :class="[themeStyle]"
 			:style="[componentStyle]"
 		>
       <slot name="content">Default Text</slot>
@@ -63,25 +64,55 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
-	textColor: {
+	theme: {
 		type: String,
-		default: 'rgb(0, 105, 255)'
+		default: 'light',
+		validator: (value) => {
+			const currentValue = value ? value.toLowerCase() : ''
+			return ['light', 'dark'].includes(currentValue)
+		}
 	},
-	textHoverColor: {
+	// Cores do tema light
+	lightButtonColor: {
+		type: String,
+		default: '#f5f5f5'
+	},
+	lightButtonColorHover: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	lightTextColor: {
+		type: String,
+		default: '#333333'
+	},
+	lightTextColorHover: {
+		type: String,
+		default: '#000000'
+	},
+	lightDisabledBgColor: {
+		type: String,
+		default: '#dfdfd9'
+	},
+	// Cores do tema dark
+	darkButtonColor: {
+		type: String,
+		default: '#2d2d2d'
+	},
+	darkButtonColorHover: {
+		type: String,
+		default: '#3d3d3d'
+	},
+	darkTextColor: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	darkTextColorHover: {
 		type: String,
 		default: '#ffffff'
 	},
-	buttonColor: {
+	darkDisabledBgColor: {
 		type: String,
-		default: 'rgb(0, 105, 255)'
-	},
-	buttonHoverColor: {
-		type: String,
-		default: 'rgb(20, 51, 214)'
-	},
-	borderColor: {
-		type: String,
-		default: '#ffe54c'
+		default: 'rgba(40, 42, 54, 1)'
 	},
 	width: {
 		type: Number,
@@ -142,10 +173,17 @@ const {
 	display,
   ariaLabel,
   ariaAttrs,
-	buttonColor,
-	buttonHoverColor,
-	textColor,
-	textHoverColor,
+	theme,
+	lightTextColor,
+	lightTextColorHover,
+	lightButtonColor,
+	lightButtonColorHover,
+	lightDisabledBgColor,
+	darkTextColor,
+	darkTextColorHover,
+	darkButtonColor,
+	darkButtonColorHover,
+	darkDisabledBgColor,
 	width,
 	paddingX,
 	paddingY,
@@ -159,10 +197,6 @@ const {
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const buttonColorValue = !buttonColor.value ? '#ffffff' : buttonColor.value
-	const buttonHoverColorValue = !buttonHoverColor.value ? '#000000' : buttonHoverColor.value
-	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
-	const textHoverColorValue = !textHoverColor.value ? '#000000' : textHoverColor.value
 	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
 	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
@@ -174,10 +208,6 @@ const formatDefaultValues = computed(() => {
 	return {
 		disabled: disabledValue,
 		display: displayValue,
-		buttonColor: buttonColorValue,
-		buttonHoverColor: buttonHoverColorValue,
-		textColor: textColorValue,
-		textHoverColor: textHoverColorValue,
 		width: widthValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
@@ -220,26 +250,29 @@ const font = computed(() => {
 	return defaultValues.font
 })
 
-const styleTextColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textColor
+const themeStyle = computed(() => {
+	return theme.value === 'dark' ? 'component__theme--dark' : 'component__theme--light'
 })
-const styleTextHoverColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.textHoverColor
+// Computed properties para as cores do theme (necessárias para v-bind no CSS)
+const styleLightTextColor = computed(() => lightTextColor.value)
+const styleLightTextColorHover = computed(() => lightTextColorHover.value)
+const styleLightButtonColor = computed(() => {
+	return `linear-gradient(${lightButtonColor.value}, ${lightButtonColor.value}) center bottom / 1px 1px repeat-x`
 })
-const styleButtonColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-  return `linear-gradient(${defaultValues.buttonColor}, ${defaultValues.buttonColor}) center bottom / 1px 1px repeat-x`
+const styleLightButtonColorHover = computed(() => {
+	return `linear-gradient(${lightButtonColorHover.value}, ${lightButtonColorHover.value}) center bottom / 100% 100% repeat-x`
 })
-const styleButtonColorHover = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return `linear-gradient(${defaultValues.buttonHoverColor}, ${defaultValues.buttonHoverColor}) center bottom / 100% 100% repeat-x`
+const styleLightDisabledBgColor = computed(() => lightDisabledBgColor.value)
+const styleDarkTextColor = computed(() => darkTextColor.value)
+const styleDarkTextColorHover = computed(() => darkTextColorHover.value)
+const styleDarkButtonColor = computed(() => {
+	return `linear-gradient(${darkButtonColor.value}, ${darkButtonColor.value}) center bottom / 1px 1px repeat-x`
 })
+const styleDarkButtonColorHover = computed(() => {
+	return `linear-gradient(${darkButtonColorHover.value}, ${darkButtonColorHover.value}) center bottom / 100% 100% repeat-x`
+})
+const styleDarkDisabledBgColor = computed(() => darkDisabledBgColor.value)
 const computedAriaAttrs = computed(() => {
   const newAttrs = {}
 
@@ -321,16 +354,33 @@ const interacted = () => {
 
   // Add new properties below
   margin-bottom: 3px; // reset vertical align
+  overflow: hidden;
 
-  background: v-bind('styleButtonColor');
-  color: v-bind('styleTextColor');
   transition: background 300ms ease-in-out 0s, color 300ms ease-in-out 0s;
 
-  &:focus,
-  &:hover {
-    background: v-bind('styleButtonColorHover');
-    color: v-bind('styleTextHoverColor');
-  }
+	// Theme light
+	&.component__theme--light {
+		background: v-bind('styleLightButtonColor');
+		color: v-bind('styleLightTextColor');
+
+		&:focus,
+		&:hover {
+			background: v-bind('styleLightButtonColorHover');
+			color: v-bind('styleLightTextColorHover');
+		}
+	}
+
+	// Theme dark
+	&.component__theme--dark {
+		background: v-bind('styleDarkButtonColor');
+		color: v-bind('styleDarkTextColor');
+
+		&:focus,
+		&:hover {
+			background: v-bind('styleDarkButtonColorHover');
+			color: v-bind('styleDarkTextColorHover');
+		}
+	}
 }
 
 .component-disabled {
@@ -339,10 +389,16 @@ const interacted = () => {
   user-select: none;
 
   .component {
-		--disabled-color: v-bind('styleTextColor');
-		color: var(--disabled-color) !important;
     opacity: 0.7;
     border-radius: inherit;
+
+		&.component__theme--light {
+			color: v-bind('styleLightTextColor') !important;
+		}
+
+		&.component__theme--dark {
+			color: v-bind('styleDarkTextColor') !important;
+		}
   }
 }
 </style>

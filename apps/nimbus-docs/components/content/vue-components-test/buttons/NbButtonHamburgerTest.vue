@@ -3,11 +3,7 @@
     <div class="preview__component">
       <NbButtonHamburger
         nb-id="nb-button-hamburger"
-        display="b"
-        color="#bbbbbb"
-        color-hover="yellow"
-        container-color="white"
-        container-color-hover="blue"
+        theme="light"
         :padding-x="3"
         :padding-y="3"
         :disabled="false"

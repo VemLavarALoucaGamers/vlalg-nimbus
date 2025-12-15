@@ -4,9 +4,10 @@
       <NbButtonMechanical
         nb-id="nb-button-mechanical-one"
         display="b"
-        text-color="#ffffff"
-        container-color="#ffffff"
-        button-color="#bbbbbb"
+        theme="light"
+        light-text-color="#333333"
+        light-button-color="#f5f5f5"
+        light-container-color="#e0e0e0"
         :padding-x="1"
         :padding-y="0.2"
         :disabled="false"
@@ -15,7 +16,9 @@
         font-size="1.6em"
         :font-weight="400"
         @clicked="logEvent()"
-      />
+      >
+        <template #content>Default Text</template>
+      </NbButtonMechanical>
       <p class="legend">Look at the console to see the triggered event</p>
     </div>
   </div>

@@ -7,12 +7,12 @@
     role="button"
     v-bind="computedAriaAttrs"
     @click="interacted"
-    @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
   >
     <div
       :id="nbId"
-      :class="['nb-reset', 'component']"
+      :class="['nb-reset', 'component', themeStyle]"
       :style="[componentStyle]"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
@@ -63,14 +63,40 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
-  color: {
-    type: String,
-    default: '#477e99'
-  },
-  textColor: {
-    type: String,
-    default: '#77d2ff'
-  },
+	theme: {
+		type: String,
+		default: 'light',
+		validator: (value) => {
+			const currentValue = value ? value.toLowerCase() : ''
+			return ['light', 'dark'].includes(currentValue)
+		}
+	},
+	// Cores do tema light
+	lightColor: {
+		type: String,
+		default: '#333333'
+	},
+	lightTextColor: {
+		type: String,
+		default: '#333333'
+	},
+	lightDisabledBgColor: {
+		type: String,
+		default: '#dfdfd9'
+	},
+	// Cores do tema dark
+	darkColor: {
+		type: String,
+		default: '#ffffff'
+	},
+	darkTextColor: {
+		type: String,
+		default: '#ffffff'
+	},
+	darkDisabledBgColor: {
+		type: String,
+		default: 'rgba(40, 42, 54, 1)'
+	},
   text: {
     type: String,
     default: 'back'
@@ -105,8 +131,13 @@ const props = defineProps({
 const {
   ariaLabel,
   ariaAttrs,
-  color,
-  textColor,
+	theme,
+	lightColor,
+	lightTextColor,
+	lightDisabledBgColor,
+	darkColor,
+	darkTextColor,
+	darkDisabledBgColor,
   disabled,
 	fontFamily,
 	fontSize,
@@ -115,15 +146,11 @@ const {
 
 const formatDefaultValues = computed(() => {
   const disabledValue = disabled.value ? 'component-disabled' : ''
-  const colorValue = !color.value ? '#77d2ff' : color.value
-  const textColorValue = !textColor.value ? '#6dc1ec' : textColor.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 400 : fontWeight.value
 
   return {
-    color: colorValue,
-    textColor: textColorValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
@@ -144,16 +171,17 @@ const componentStyle = computed(() => {
     fontWeight: defaultValues.fontWeight
   }
 })
-const styleColor = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return defaultValues.color
+const themeStyle = computed(() => {
+	return theme.value === 'dark' ? 'component__theme--dark' : 'component__theme--light'
 })
-const styleTextColor = computed(() => {
-  const defaultValues = formatDefaultValues.value
 
-  return defaultValues.textColor
-})
+// Computed properties para as cores do theme (necessárias para v-bind no CSS)
+const styleLightColor = computed(() => lightColor.value)
+const styleLightTextColor = computed(() => lightTextColor.value)
+const styleLightDisabledBgColor = computed(() => lightDisabledBgColor.value)
+const styleDarkColor = computed(() => darkColor.value)
+const styleDarkTextColor = computed(() => darkTextColor.value)
+const styleDarkDisabledBgColor = computed(() => darkDisabledBgColor.value)
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
@@ -203,6 +231,8 @@ const interacted = () => {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   display: inline-block;
+  vertical-align: bottom;
+  margin-bottom: 3px;
 }
 
 .nb-reset {
@@ -247,7 +277,6 @@ const interacted = () => {
   position: relative;
 
   border: none;
-  color: v-bind(styleTextColor);
   background: transparent;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -271,7 +300,6 @@ const interacted = () => {
     animation: end-animation 0.2s linear alternate;
     animation-fill-mode: forwards;
     transform: scale(2.2) translateX(0);
-    fill: v-bind(styleColor);
     height: 11px;
 
     @keyframes start-animation {
@@ -298,6 +326,24 @@ const interacted = () => {
       }
     }
   }
+
+	// Theme light
+	&.component__theme--light {
+		color: v-bind('styleLightTextColor');
+
+		svg {
+			fill: v-bind('styleLightColor');
+		}
+	}
+
+	// Theme dark
+	&.component__theme--dark {
+		color: v-bind('styleDarkTextColor');
+
+		svg {
+			fill: v-bind('styleDarkColor');
+		}
+	}
 }
 
 .component-disabled {
@@ -306,10 +352,16 @@ const interacted = () => {
   user-select: none;
 
   .component {
-		--disabled-color: v-bind('styleTextColor');
-		color: var(--disabled-color) !important;
     opacity: 0.7;
     border-radius: inherit;
+
+		&.component__theme--light {
+			color: v-bind('styleLightTextColor') !important;
+		}
+
+		&.component__theme--dark {
+			color: v-bind('styleDarkTextColor') !important;
+		}
   }
 }
 </style>

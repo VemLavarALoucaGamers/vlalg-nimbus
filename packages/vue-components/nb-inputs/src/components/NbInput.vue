@@ -28,10 +28,15 @@
       </div>
       <input
         v-model="inputValue"
+        :id="inputName"
         :name="inputName"
         :type="currentType"
         class="component__input"
-        :class="[ uppercaseStyle, hiddenDefaultEye, activeStyle]"
+        :class="[
+          uppercaseStyle,
+          hiddenDefaultEye,
+          activeStyle
+        ]"
         :placeholder="inputPlaceholder"
         :disabled="disabled || inputReadonly"
         :required="required"
@@ -39,11 +44,17 @@
         :autocomplete="inputAutocomplete"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
         role="input"
-        :style="[borderRadiusStyle]"
+        :style="[borderRadiusStyle, inputIconStyle]"
         @focus="isActive = true"
         @blur="isActive = false"
         @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
       />
+
+      <label :for="inputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
+        <slot name="icon">
+          <span>&#9829;</span>
+        </slot>
+      </label>
     </div>
     <div
       v-if="validShowMsg"
@@ -164,10 +175,7 @@ const props = defineProps({
 	},
 	fontSize: {
 		type: String,
-		default: '1.6em',
-		validator: value => {
-			return !value ? '1.6em' : value
-		}
+		default: null
 	},
 	fontWeight: {
 		type: Number,
@@ -220,7 +228,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
     validator: value => {
-      return [true, false].indexOf(value) !== -1
+      return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
   inputName: {
@@ -235,7 +243,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
     validator: value => {
-      return [true, false].indexOf(value) !== -1
+      return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
   inputEyeIcon: {
@@ -250,7 +258,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
     validator: value => {
-      return [true, false].indexOf(value) !== -1
+      return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
   activeTextStyle: {
@@ -292,7 +300,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
     validator: value => {
-      return [true, false].indexOf(value) !== -1
+      return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
   inputWidth: {
@@ -372,14 +380,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
     validator: value => {
-      return [true, false].indexOf(value) !== -1
+      return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
   hasMsg: { // Se tem erro
     type: Boolean,
     default: false,
     validator: value => {
-      return [true, false].indexOf(value) !== -1
+      return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
   message: {
@@ -390,8 +398,81 @@ const props = defineProps({
     type: Boolean,
     default: false,
     validator: value => {
-      return [true, false].indexOf(value) !== -1
+      return typeof value === 'boolean' && [true, false].includes(value)
     },
+  },
+  hasIcon: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
+  iconWidth: {
+    type: Number,
+    default: 32
+  },
+  iconDirection: {
+    type: String,
+    default: 'left',
+    validator: value => {
+      return ['left', 'right'].includes(value)
+    },
+  },
+  iconPadding: {
+    type: String,
+    default: '5px 10px',
+    validator: value => {
+      return typeof value === 'string' && value.split(' ').length === 2
+    },
+  },
+  iconPaddingInput: {
+    type: Number,
+    default: 35
+  },
+  iconMargin: {
+    type: String,
+    default: '0'
+  },
+	iconLightTextColor: {
+    type: String,
+    default: '#f8f8f2'
+  },
+  iconDarkTextColor: {
+    type: String,
+    default: '#f8f8f2'
+  },
+  iconLightBgColor: {
+    type: String,
+    default: '#353734'
+  },
+  iconLightBgColorActive: {
+    type: String,
+    default: '#272936'
+  },
+  iconDarkBgColor: {
+    type: String,
+    default: '#353734'
+  },
+  iconDarkBgColorActive: {
+    type: String,
+    default: '#272936'
+  },
+  iconDarkDisabledBgColor: {
+    type: String,
+    default: 'rgba(68, 71, 90, 0.3)'
+  },
+  iconLightDisabledBgColor: {
+    type: String,
+    default: 'rgba(53, 55, 52, 0.3)'
+  },
+  iconBorderRadius: {
+    type: Number,
+    default: 0
+  },
+  iconSize: {
+    type: Number,
+    default: 1
   },
 })
 
@@ -446,7 +527,23 @@ const {
 	lightDisabledEyeBgColor,
   textAlign,
   showMsg,
-  hasMsg
+  hasMsg,
+  hasIcon,
+  iconDirection,
+  iconPadding,
+  iconPaddingInput,
+  iconMargin,
+  iconBorderRadius,
+  iconLightTextColor,
+  iconDarkTextColor,
+  iconLightBgColor,
+  iconDarkBgColor,
+  iconLightBgColorActive,
+  iconDarkBgColorActive,
+  iconLightDisabledBgColor,
+  iconDarkDisabledBgColor,
+  iconWidth,
+  iconSize
 } = toRefs(props)
 
 const inputValue = ref('')
@@ -464,7 +561,7 @@ const formatDefaultValues = computed(() => {
   const hasBorderRadiusValue = !hasBorderRadius.value ? false : hasBorderRadius.value
 	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.6rem' : fontSize.value
+	const fontSizeValue = fontSize.value && fontSize.value >= 0 ? fontSize.value : null
 	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
   const fontFamilyMsgValue = !fontFamilyMsg.value ? `'Lato', sans-serif` : fontFamilyMsg.value
   const fontSizeMsgValue = !fontSizeMsg.value ? '1em' : fontSizeMsg.value
@@ -480,6 +577,19 @@ const formatDefaultValues = computed(() => {
   const themeValue = !theme.value ? 'normal' : theme.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
   const inputStyleValue = !inputStyle.value ? 'background' : inputStyle.value
+
+  const iconPaddingValue = !iconPadding.value ? '5px 10px' : iconPadding.value
+  const iconMarginValue = !iconMargin.value ? '0' : iconMargin.value
+  const iconPaddingInputValue = !iconPaddingInput.value ? 10 : iconPaddingInput.value
+  const iconLightTextColorValue = !iconLightTextColor.value ? '#000000' : iconLightTextColor.value
+  const iconDarkTextColorValue = !iconDarkTextColor.value ? '#000000' : iconDarkTextColor.value
+  const iconLightBgColorValue = !iconLightBgColor.value ? 'transparent' : iconLightBgColor.value
+  const iconDarkBgColorValue = !iconDarkBgColor.value ? 'transparent' : iconDarkBgColor.value
+  const iconBorderRadiusValue = !iconBorderRadius.value ? 0 : iconBorderRadius.value
+  const iconLightBgColorActiveValue = !iconLightBgColorActive.value ? 'transparent' : iconLightBgColorActive.value
+  const iconDarkBgColorActiveValue = !iconDarkBgColorActive.value ? 'transparent' : iconDarkBgColorActive.value
+  const iconWidthValue = !iconWidth.value ? 32 : iconWidth.value
+  const iconSizeValue = !iconSize.value ? 1 : iconSize.value
 
 	return {
 		disabled: disabledValue,
@@ -506,7 +616,19 @@ const formatDefaultValues = computed(() => {
     inputType: inputTypeValue,
     inputUppercase: inputUppercaseValue,
     theme: themeValue,
-    inputStyle: inputStyleValue
+    inputStyle: inputStyleValue,
+    iconPadding: iconPaddingValue,
+    iconMargin: iconMarginValue,
+    iconPaddingInput: iconPaddingInputValue,
+    iconLightTextColor: iconLightTextColorValue,
+    iconDarkTextColor: iconDarkTextColorValue,
+    iconLightBgColor: iconLightBgColorValue,
+    iconDarkBgColor: iconDarkBgColorValue,
+    iconBorderRadius: iconBorderRadiusValue,
+    iconLightBgColorActive: iconLightBgColorActiveValue,
+    iconDarkBgColorActive: iconDarkBgColorActiveValue,
+    iconWidth: iconWidthValue,
+    iconSize: iconSizeValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -521,11 +643,30 @@ const wrapperStyle = computed(() => {
 		display: defaultValues.display
 	}
 })
+const fontSizeStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.fontSize) return `${defaultValues.fontSize}em`
+
+  let newFontSize = ''
+  switch (defaultValues.sizeMediaQuery) {
+    case 'sm':
+      return '1.2em'
+    case 'md':
+      return '1.6em'
+    case 'lg':
+      return '2em'
+    default:
+      newFontSize = '1.2em'
+  }
+
+  return newFontSize
+})
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		fontSize: defaultValues.fontSize,
+		fontSize: fontSizeStyle.value,
 		fontWeight: defaultValues.fontWeight
 	}
 })
@@ -656,6 +797,7 @@ const validShowInputEye = computed(() => {
 
   return !!(defaultValues.showInputEye && defaultValues.inputType === 'password')
 })
+
 const inputIcon = computed(() => {
   if (showValue.value) return inputEyeIcon.value
 
@@ -664,7 +806,7 @@ const inputIcon = computed(() => {
 const hiddenDefaultEye = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  return defaultValues.inputType === 'password' ? 'component__eye-default--hidden' : ''
+  return defaultValues.inputType === 'password' ? 'component__input__eye-default--hidden' : ''
 })
 const activeInput = computed(() => {
   return isActive.value ? 'component__input--active' : 'component__input--no-active'
@@ -698,10 +840,50 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
+const styleIconSize = computed(() => {
+  return hasIcon.value ? `${iconSize.value}rem` : '0'
+})
+const styleIconWidth = computed(() => {
+  return hasIcon.value ? `${iconWidth.value}px` : '0'
+})
+const styleIconDirection = computed(() => {
+  return hasIcon.value ? `component__icon--${iconDirection.value}` : ''
+})
+const styleIconPadding = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return hasIcon.value ? defaultValues.iconPadding : '0'
+})
+const styleIconMargin = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return hasIcon.value ? defaultValues.iconMargin : '0'
+})
+const styleIconBgColor = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (hasIcon.value) {
+    return defaultValues.theme === 'dark' ? defaultValues.iconDarkBgColor : defaultValues.iconLightBgColor
+  }
+
+  return 'transparent'
+})
+const styleIconBorderRadius = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return hasIcon.value ? `${defaultValues.iconBorderRadius}rem` : '0'
+})
+const inputIconStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (!hasIcon.value) return {}
+
+  return iconDirection.value === 'left' ? { paddingLeft: `${defaultValues.iconPaddingInput}px` } : { paddingRight: `${defaultValues.iconPaddingInput}px` }
+})
+
 const startValue = () => {
   inputValue.value = inputText.value
 
-  console.log('aqui')
   currentType.value = inputType.value
 }
 const changeShowValue = () => {
@@ -733,9 +915,8 @@ watch(inputType, value => {
   currentType.value = value
 }, { immediate: true })
 watch(inputText, value => {
-  console.log('inputText', value)
   if (value !== inputValue.value) inputValue.value = value
-})
+}, { immediate: true })
 watch(inputValue, value => {
   if (hasTrim.value) value = value.trim()
 
@@ -755,6 +936,19 @@ watch(inputValue, value => {
   if (hasTrim.value) value = value.trim()
 
   emit('current-value', value)
+})
+watch(inputType, (newType) => {
+  if (newType === 'password') {
+    // Força o tipo password e remove qualquer botão padrão
+    nextTick(() => {
+      const input = document.getElementById(inputName.value)
+      if (input) {
+        input.type = 'password'
+        // Remove qualquer atributo que possa mostrar o botão
+        input.removeAttribute('autocomplete')
+      }
+    })
+  }
 })
 </script>
 
@@ -830,7 +1024,11 @@ watch(inputValue, value => {
       }
 
       .component__input {
-        font-size: 1.2em;
+        font-size: v-bind('fontSizeStyle');
+      }
+
+      .component__icon {
+        padding: 5px 10px;
       }
     }
     &.component__md {
@@ -842,7 +1040,11 @@ watch(inputValue, value => {
       }
 
       .component__input {
-        font-size: 1.6em;
+        font-size: v-bind('fontSizeStyle');
+      }
+
+      .component__icon {
+        padding: 10px 10px;
       }
     }
     &.component__lg {
@@ -854,12 +1056,16 @@ watch(inputValue, value => {
       }
 
       .component__input {
-        font-size: 2em;
+        font-size: v-bind('fontSizeStyle');
       }
     }
     // fim sizeMediaQuery
 
     .component__eye {
+      color: v-bind('lightTextColor');
+    }
+
+    .component__icon {
       color: v-bind('lightTextColor');
     }
 
@@ -884,6 +1090,10 @@ watch(inputValue, value => {
         color: v-bind('darkTextColor');
       }
 
+      .component__icon {
+        color: v-bind('iconDarkTextColor');
+      }
+
       .component__input {
         color: v-bind('darkTextColor');
       }
@@ -893,6 +1103,14 @@ watch(inputValue, value => {
         &.component__input--background {
           .component__eye {
             background-color: v-bind('darkDisabledEyeBgColor');
+
+            &:hover {
+              cursor: not-allowed;
+            }
+          }
+
+          .component__icon {
+            background-color: v-bind('iconDarkDisabledBgColor');
 
             &:hover {
               cursor: not-allowed;
@@ -919,6 +1137,44 @@ watch(inputValue, value => {
             }
           }
         }
+
+        &.component__input--line {
+          .component__eye {
+            opacity: 0.2;
+          }
+
+          .component__icon {
+            opacity: 0.2;
+          }
+
+          .component__input {
+            border-bottom: 1px solid v-bind('darkDisabledEyeBgColor');
+
+            &:focus,
+            &:active {
+              border-bottom: 1px solid v-bind('darkDisabledEyeBgColor');
+            }
+          }
+        }
+
+        &.component__input--border {
+          .component__eye {
+            opacity: 0.2;
+          }
+
+          .component__icon {
+            opacity: 0.2;
+          }
+
+          .component__input {
+            border: 1px solid v-bind('darkDisabledEyeBgColor');
+
+            &:focus,
+            &:active {
+              border: 1px solid v-bind('darkDisabledEyeBgColor');
+            }
+          }
+        }
       }
 
       &.component__input--background {
@@ -931,6 +1187,14 @@ watch(inputValue, value => {
 
           &.component__input--no-active {
             background-color: v-bind('darkEyeBgColor');
+          }
+        }
+
+        .component__icon {
+          background-color: v-bind('styleIconBgColor');
+
+          &:hover {
+            cursor: pointer;
           }
         }
 
@@ -955,10 +1219,62 @@ watch(inputValue, value => {
           }
         }
       }
+
+      &.component__input--line {
+        .component__eye {
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        .component__icon {
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        .component__input {
+          background-color: transparent;
+          border: 0;
+          border-bottom: 1px solid v-bind('darkEyeBgColor');
+
+          &:focus,
+          &:active {
+            background-color: transparent;
+            border: 0;
+            border-bottom: 1px solid v-bind('darkEyeBgColorActive');
+          }
+        }
+      }
+
+      &.component__input--border {
+        .component__eye {
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        .component__icon {
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        .component__input {
+          background-color: transparent;
+          border: 1px solid v-bind('darkEyeBgColor');
+
+          &:focus,
+          &:active {
+            background-color: transparent;
+            border: 1px solid v-bind('darkEyeBgColorActive');
+          }
+        }
+      }
     }
     &.component__theme--light {
       .component__eye {
         color: v-bind('lightTextColor');
+      }
+
+      .component__icon {
+        color: v-bind('iconLightTextColor');
       }
 
       .component__input {
@@ -976,11 +1292,69 @@ watch(inputValue, value => {
             }
           }
 
+          .component__icon {
+            background-color: v-bind('iconLightDisabledBgColor');
+
+            &:hover {
+              cursor: not-allowed;
+            }
+          }
+
           .component__input {
             background-color: v-bind('lightDisabledBgColor');
             &:focus,
             &:active {
               background-color: v-bind('lightDisabledBgColor');
+
+              &::placeholder,
+              &::placeholder:active,
+              &::placeholder:focus {
+                background-color: v-bind('lightDisabledBgColor');
+              }
+            }
+
+            &::placeholder,
+            &::placeholder:active,
+            &::placeholder:focus {
+              background-color: v-bind('lightDisabledBgColor');
+            }
+          }
+        }
+
+        &.component__input--line {
+          .component__eye {
+            opacity: 0.2;
+          }
+
+          .component__icon {
+            opacity: 0.2;
+          }
+
+          .component__input {
+            border-bottom: 1px solid v-bind('lightDisabledEyeBgColor');
+
+            &:focus,
+            &:active {
+              border-bottom: 1px solid v-bind('lightDisabledEyeBgColor');
+            }
+          }
+        }
+
+        &.component__input--border {
+          .component__eye {
+            opacity: 0.2;
+          }
+
+          .component__icon {
+            opacity: 0.2;
+          }
+
+          .component__input {
+            border: 1px solid v-bind('lightDisabledEyeBgColor');
+
+            &:focus,
+            &:active {
+              border: 1px solid v-bind('lightDisabledEyeBgColor');
             }
           }
         }
@@ -989,6 +1363,22 @@ watch(inputValue, value => {
       &.component__input--background {
         .component__eye {
           background-color: v-bind('lightEyeBgColor');
+
+          &.component__input--active {
+            background-color: v-bind('lightEyeBgColorActive');
+          }
+
+          &.component__input--no-active {
+            background-color: v-bind('lightEyeBgColor');
+          }
+        }
+
+        .component__icon {
+          background-color: v-bind('styleIconBgColor');
+
+          &:hover {
+            cursor: pointer;
+          }
         }
 
         .component__input {
@@ -997,131 +1387,71 @@ watch(inputValue, value => {
           &:focus,
           &:active {
             background-color: v-bind('lightBgColorFocus');
+
+            &::placeholder,
+            &::placeholder:active,
+            &::placeholder:focus {
+              opacity: 0.5;
+            }
+          }
+
+          &::placeholder,
+          &::placeholder:active,
+          &::placeholder:focus {
+            opacity: 0.5;
+          }
+        }
+      }
+
+      &.component__input--line {
+        .component__eye {
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        .component__icon {
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        .component__input {
+          background-color: transparent;
+          border: 0;
+          border-bottom: 1px solid v-bind('lightEyeBgColor');
+
+          &:focus,
+          &:active {
+            background-color: transparent;
+            border: 0;
+            border-bottom: 1px solid v-bind('lightEyeBgColorActive');
+          }
+        }
+      }
+
+      &.component__input--border {
+        .component__eye {
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        .component__icon {
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        .component__input {
+          background-color: transparent;
+          border: 1px solid v-bind('lightEyeBgColor');
+
+          &:focus,
+          &:active {
+            background-color: transparent;
+            border: 1px solid v-bind('lightEyeBgColorActive');
           }
         }
       }
     }
     // fim propTheme
-
-    // inicio inputStyle
-    &.component__input--line {
-      .component__eye {
-        background-color: transparent;
-        opacity: 1;
-      }
-
-      .component__input {
-        background-color: transparent;
-        border: 0;
-        border-bottom: 1px solid v-bind('lightEyeBgColor');
-
-        &:focus,
-        &:active {
-          background-color: transparent;
-          border: 0;
-          border-bottom: 1px solid v-bind('lightEyeBgColorActive');
-        }
-      }
-
-      &.component__theme--dark {
-        .component__input {
-          border-bottom: 1px solid v-bind('darkEyeBgColor');
-
-          &:focus,
-          &:active {
-            border-bottom: 1px solid v-bind('darkEyeBgColorActive');
-          }
-        }
-      }
-
-      &.component__input--disabled,
-      &.component__input--read-only {
-        .component__eye {
-          opacity: 0.2;
-        }
-
-        .component__input {
-          border-bottom: 1px solid v-bind('lightDisabledEyeBgColor');
-
-          &:focus,
-          &:active {
-            border-bottom: 1px solid v-bind('lightDisabledEyeBgColor');
-          }
-        }
-
-        &.component__theme--dark {
-          .component__input {
-            border-bottom: 1px solid v-bind('darkDisabledEyeBgColor');
-
-            &:focus,
-            &:active {
-              border-bottom: 1px solid v-bind('darkDisabledEyeBgColor');
-            }
-          }
-        }
-      }
-    }
-
-    &.component__input--border {
-      .component__eye {
-        background-color: transparent;
-        opacity: 1;
-      }
-
-      .component__input {
-        background-color: transparent;
-        border: 1px solid v-bind('lightEyeBgColor');
-
-        &:focus,
-        &:active {
-          background-color: transparent;
-          border: 1px solid v-bind('lightEyeBgColorActive');
-        }
-      }
-
-      &.component__theme--dark {
-        .component__input {
-          border: 1px solid v-bind('darkEyeBgColor');
-
-          &:focus,
-          &:active {
-            border: 1px solid v-bind('darkEyeBgColorActive');
-          }
-        }
-      }
-
-      &.component__input--disabled,
-      &.component__input--read-only {
-        .component__eye {
-          opacity: 0.2;
-        }
-
-        .component__input {
-          border: 1px solid v-bind('lightDisabledEyeBgColor');
-
-          &:focus,
-          &:active {
-            border: 1px solid v-bind('lightDisabledEyeBgColor');
-          }
-        }
-
-        &.component__theme--dark {
-          .component__input {
-            border: 1px solid v-bind('darkDisabledEyeBgColor');
-
-            &:focus,
-            &:active {
-              border: 1px solid v-bind('darkDisabledEyeBgColor');
-            }
-          }
-        }
-      }
-    }
-
-    &.component__input--background {
-      // Mantém o comportamento padrão com background
-    }
-    // fim inputStyle
 
     // inicio propReadonly
     &.component__input--read-only {
@@ -1151,9 +1481,35 @@ watch(inputValue, value => {
       &:hover {
         cursor: pointer;
       }
+    }
 
-      .component__eye-icon {
-        font-family: 'FontAwesome';
+    .component__icon {
+      position: absolute;
+      width: v-bind('styleIconWidth');
+      top: 0;
+      bottom: 0;
+      padding: v-bind('styleIconPadding');
+      margin: v-bind('styleIconMargin');
+      border-radius: v-bind('styleIconBorderRadius');
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: v-bind('styleIconSize');
+
+      &.component__icon--left {
+        right: auto;
+        left: 0;
+      }
+
+      &.component__icon--right {
+        right: 0;
+        left: auto;
+      }
+
+      &:hover {
+        cursor: pointer;
       }
     }
 
@@ -1184,9 +1540,34 @@ watch(inputValue, value => {
       }
 
       &.component__input__eye-default--hidden {
+        // Internet Explorer / Edge antigo
         &::-ms-reveal,
         &::-ms-clear {
           display: none;
+          width: 0;
+          height: 0;
+        }
+        
+        // Remove aparência padrão do navegador
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        
+        // Chrome / Edge moderno - força esconder qualquer elemento decorativo
+        &::-webkit-credentials-auto-fill-button {
+          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+          position: absolute !important;
+          right: -9999px !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+        
+        // Firefox
+        &::-moz-textfield-decoration-container {
+          display: none !important;
         }
       }
 

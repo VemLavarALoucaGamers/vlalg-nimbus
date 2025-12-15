@@ -3,11 +3,11 @@
     <div class="preview__component">
       <NbButtonPrevNext
         nb-id="nb-button-prev-next"
-        display="b"
-        color-primary="#bbbbbb"
-        color-secondary="tomato"
-        text-color="#ffffff"
-        text-color-hover="blue"
+        theme="light"
+        light-color-primary="#f5f5f5"
+        light-color-secondary="#e0e0e0"
+        light-text-color="#333333"
+        light-text-color-hover="#000000"
         :padding-x="1"
         :padding-y="10"
         :margin-between="2"
@@ -20,7 +20,10 @@
         font-size="1.6em"
         :font-weight="400"
         @clicked="logEvent()"
-      />
+      >
+        <template #prev>← Preview</template>
+        <template #next>Next →</template>
+      </NbButtonPrevNext>
       <p class="legend">Look at the console to see the triggered event</p>
     </div>
   </div>

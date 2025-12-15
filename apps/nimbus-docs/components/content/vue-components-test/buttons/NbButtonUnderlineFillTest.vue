@@ -4,10 +4,7 @@
       <NbButtonUnderlineFill
         nb-id="nb-button-underline-fill-one"
         display="b"
-        text-color="rgb(0, 105, 255)"
-        text-hover-color="#ffffff"
-        button-color="rgb(0, 105, 255)"
-        button-hover-color="rgb(20, 51, 214)"
+        theme="light"
         text-align="center"
         :tab-index="0"
         :has-tab-index-enter="true"

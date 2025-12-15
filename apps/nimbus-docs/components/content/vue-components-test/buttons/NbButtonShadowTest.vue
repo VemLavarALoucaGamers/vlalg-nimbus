@@ -4,12 +4,7 @@
       <NbButtonShadow
         nb-id="nb-button-shadow-one"
         display="b"
-        text-color="#000000"
-        text-hover-color="tomato"
-        button-color="#faf77d"
-        button-hover-color="#faf77d"
-        button-shadow-color="#01d7b0"
-        border-color="#191a1b"
+        theme="light"
         :border-radius="0"
         :tab-index="0"
         :has-tab-index-enter="true"

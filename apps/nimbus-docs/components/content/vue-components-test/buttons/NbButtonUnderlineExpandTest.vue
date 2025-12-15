@@ -4,10 +4,7 @@
       <NbButtonUnderlineExpand
         nb-id="nb-button-underline-expand-one"
         display="b"
-        text-color="rgb(0, 105, 255)"
-        text-hover-color="#ffffff"
-        border-color="rgb(0, 105, 255)"
-        border-hover-color="rgb(20, 51, 214)"
+        theme="light"
         :border-height="1.5"
         text-align="center"
         :tab-index="0"

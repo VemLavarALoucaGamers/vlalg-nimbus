@@ -3,11 +3,11 @@
     <div class="preview__component">
       <NbButtonBack
         nb-id="nb-button-back"
-        color="#477e99"
-        text-color="#77d2ff"
+        theme="light"
+        light-color="#477e99"
+        light-text-color="#77d2ff"
         text="back"
         :disabled="false"
-        font-family="'Lato', sans-serif"
         font-size="1.6em"
         :font-weight="400"
         :tab-index="0"

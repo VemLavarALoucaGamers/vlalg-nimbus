@@ -7,7 +7,7 @@
     role="button"
     v-bind="computedAriaAttrs"
     @click="interacted"
-    @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div

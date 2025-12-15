@@ -4,15 +4,16 @@
       <NbButtonColorOutside
         nb-id="nb-button-color-outside-one"
         display="b"
-        text-color="#ffffff"
-        border-color="#ffffff"
-        button-color="#bbbbbb"
+        theme="light"
+        light-text-color="#1e40af"
+        light-border-color="#93c5fd"
+        light-button-color="#dbeafe"
         :padding-x="1"
         :padding-y="0.2"
         :disabled="false"
-        :border-radius="0.375"
+        :border-radius="0.25"
         font-size="1.6em"
-        :font-weight="400"
+        :font-weight="200"
         @clicked="logEvent()"
       />
       <p class="legend">Look at the console to see the triggered event</p>

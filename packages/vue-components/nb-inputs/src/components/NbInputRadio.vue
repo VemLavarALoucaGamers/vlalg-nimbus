@@ -8,7 +8,7 @@
 			:id="nbId"
       role="radiogroup"
       v-bind="computedAriaAttrs"
-			:class="['nb-reset', 'component', displayClass]"
+			:class="['nb-reset', 'component', displayClass, themeStyle]"
 		>
       <div
         v-for="(item, index) in options"
@@ -141,13 +141,39 @@ const props = defineProps({
       return ['boolean', 'string', 'number'].indexOf(value) !== -1
     },
   },
-  textColor: {
+  theme: {
     type: String,
-    default: 'black'
+    default: 'light',
+    validator: (value) => {
+      const currentValue = value ? value.toLowerCase() : ''
+      return ['light', 'dark'].includes(currentValue)
+    }
   },
-  color: {
+  // Cores do tema light
+  lightTextColor: {
     type: String,
-    default: '#767676'
+    default: '#333333'
+  },
+  lightColor: {
+    type: String,
+    default: '#cccccc'
+  },
+  lightColorHover: {
+    type: String,
+    default: '#bbbbbb'
+  },
+  // Cores do tema dark
+  darkTextColor: {
+    type: String,
+    default: '#e0e0e0'
+  },
+  darkColor: {
+    type: String,
+    default: '#555555'
+  },
+  darkColorHover: {
+    type: String,
+    default: '#666666'
   },
   hoverEffect: {
     type: Boolean,
@@ -162,10 +188,6 @@ const props = defineProps({
     validator: value => {
       return [true, false].indexOf(value) !== -1
     }
-  },
-  colorHover: {
-    type: String,
-    default: '#a6a6a6'
   },
   itemGap: {
     type: Number,
@@ -214,11 +236,15 @@ const {
   valueType,
   display,
   options,
-  textColor,
-  color,
+  theme,
+  lightTextColor,
+  lightColor,
+  lightColorHover,
+  darkTextColor,
+  darkColor,
+  darkColorHover,
   hoverEffect,
   activeHoverEffect,
-  colorHover,
   itemGap,
   internalGap,
   scale,
@@ -234,11 +260,8 @@ const formatDefaultValues = computed(() => {
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
-  const textColorValue = !textColor.value ? 'black' : textColor.value
-  const colorValue = !color.value ? '#767676' : color.value
   const hoverEffectValue = ![false, true].includes(hoverEffect.value) ? false : hoverEffect.value
   const activeHoverEffectValue = ![false, true].includes(activeHoverEffect.value) ? false : activeHoverEffect.value
-  const colorHoverValue = !colorHover.value ? '#a6a6a6' : colorHover.value
   const itemGapValue = !itemGap.value || itemGap.value < 0 ? 15 : itemGap.value
   const internalGapValue = !internalGap.value || internalGap.value < 0 ? 6 : internalGap.value
   const scaleValue = !scale.value || scale.value < 0 ? 1 : scale.value
@@ -246,11 +269,8 @@ const formatDefaultValues = computed(() => {
 	return {
 		disabled: disabledValue,
     display: displayValue,
-    textColor: textColorValue,
-    color: colorValue,
     hoverEffect: hoverEffectValue,
     activeHoverEffect: activeHoverEffectValue,
-    colorHover: colorHoverValue,
     itemGap: itemGapValue,
     internalGap: internalGapValue,
     scale: scaleValue,
@@ -293,31 +313,37 @@ const validList = computed(() => {
   return isArray && options.value.length > 0
 })
 
+const themeStyle = computed(() => {
+	return theme.value === 'dark' ? 'component__theme--dark' : 'component__theme--light'
+})
+
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.font
 })
 
-const styleTextColor = computed(() => {
+// Computed properties para as cores do theme (necessárias para v-bind no CSS)
+const styleLightTextColor = computed(() => lightTextColor.value)
+const styleLightColor = computed(() => lightColor.value)
+const styleLightColorHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textColor
+	return defaultValues.hoverEffect ? lightColorHover.value : lightColor.value
 })
-const styleColor = computed(() => {
+const styleLightColorActiveHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.color
+	return defaultValues.activeHoverEffect ? lightColorHover.value : lightColor.value
 })
-const styleColorHover = computed(() => {
-	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.hoverEffect ? defaultValues.colorHover : defaultValues.color
+const styleDarkTextColor = computed(() => darkTextColor.value)
+const styleDarkColor = computed(() => darkColor.value)
+const styleDarkColorHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+	return defaultValues.hoverEffect ? darkColorHover.value : darkColor.value
 })
-const styleColorActiveHover = computed(() => {
+const styleDarkColorActiveHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
+	return defaultValues.activeHoverEffect ? darkColorHover.value : darkColor.value
 })
 
 const paddingValue = computed(() => {
@@ -477,13 +503,6 @@ watch(currentValue, (newValue, oldValue) => {
 
       &:checked {
         &+.component-radio__item--label {
-          &:hover {
-            div {
-              border: 2px solid v-bind(styleColorActiveHover);
-              color: v-bind(styleColorActiveHover);
-            }
-          }
-
           div:before {
             content: '\23FA'; // \f111
             font-size: 1.15em; // 0.7em 0.85em;
@@ -495,7 +514,6 @@ watch(currentValue, (newValue, oldValue) => {
             -webkit-box-shadow: none;
             -moz-box-shadow: none;
             box-shadow: none;
-            color: v-bind(colorHover);
             border-radius: 50%;
           }
         }
@@ -503,21 +521,13 @@ watch(currentValue, (newValue, oldValue) => {
     }
 
     .component-radio__item--label {
-      --disabled-color: v-bind('styleTextColor');
-      color: var(--disabled-color) !important;
-
       display: flex;
       flex-direction: row;
       gap: v-bind(paddingValue);
-
       align-items: center;
 
       &:hover {
         cursor: pointer;
-
-        div {
-          border: 2px solid v-bind(styleColorHover);
-        }
       }
 
       &:focus {
@@ -533,8 +543,81 @@ watch(currentValue, (newValue, oldValue) => {
         -webkit-box-shadow: none;
         -moz-box-shadow: none;
         box-shadow: none;
-        border: 2px solid v-bind(styleColor);
         font-family: 'Lato', sans-serif !important;
+      }
+    }
+  }
+
+  // Theme light
+  &.component__theme--light {
+    .component-radio__item {
+      .component-radio__item--input {
+        &:checked {
+          &+.component-radio__item--label {
+            &:hover {
+              div {
+                border: 2px solid v-bind(styleLightColorActiveHover);
+                color: v-bind(styleLightColorActiveHover);
+              }
+            }
+
+            div:before {
+              color: v-bind(styleLightColorHover);
+            }
+          }
+        }
+      }
+
+      .component-radio__item--label {
+        --disabled-color: v-bind('styleLightTextColor');
+        color: var(--disabled-color) !important;
+
+        &:hover {
+          div {
+            border: 2px solid v-bind(styleLightColorHover);
+          }
+        }
+
+        div {
+          border: 2px solid v-bind(styleLightColor);
+        }
+      }
+    }
+  }
+
+  // Theme dark
+  &.component__theme--dark {
+    .component-radio__item {
+      .component-radio__item--input {
+        &:checked {
+          &+.component-radio__item--label {
+            &:hover {
+              div {
+                border: 2px solid v-bind(styleDarkColorActiveHover);
+                color: v-bind(styleDarkColorActiveHover);
+              }
+            }
+
+            div:before {
+              color: v-bind(styleDarkColorHover);
+            }
+          }
+        }
+      }
+
+      .component-radio__item--label {
+        --disabled-color: v-bind('styleDarkTextColor');
+        color: var(--disabled-color) !important;
+
+        &:hover {
+          div {
+            border: 2px solid v-bind(styleDarkColorHover);
+          }
+        }
+
+        div {
+          border: 2px solid v-bind(styleDarkColor);
+        }
       }
     }
   }
@@ -546,10 +629,18 @@ watch(currentValue, (newValue, oldValue) => {
 	user-select: none;
 
 	.component {
-		--disabled-color: v-bind('styleTextColor');
-		color: var(--disabled-color) !important;
 		opacity: 0.7;
 		border-radius: inherit;
+
+		&.component__theme--light {
+			--disabled-color: v-bind('styleLightTextColor');
+			color: var(--disabled-color) !important;
+		}
+
+		&.component__theme--dark {
+			--disabled-color: v-bind('styleDarkTextColor');
+			color: var(--disabled-color) !important;
+		}
 	}
 }
 </style>

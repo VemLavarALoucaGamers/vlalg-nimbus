@@ -43,6 +43,13 @@ The components that are part of this lib are:
 - <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-color-outside" target="_blank">nb-button-color-outside</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-color-hover" target="_blank">nb-button-color-hover</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-alternate-text" target="_blank">nb-button-alternate-text</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-back" target="_blank">nb-button-back</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-gradient-border-to-background" target="_blank">nb-button-gradient-border-to-background</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-normal" target="_blank">nb-button-normal</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-shadow" target="_blank">nb-button-shadow</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-underline-expand" target="_blank">nb-button-underline-expand</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-underline-fill" target="_blank">nb-button-underline-fill</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-buttons/nb-button-split-dropdown" target="_blank">nb-button-split-dropdown</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

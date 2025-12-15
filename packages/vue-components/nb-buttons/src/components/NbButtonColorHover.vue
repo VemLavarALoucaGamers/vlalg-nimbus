@@ -7,12 +7,13 @@
     role="button"
     v-bind="computedAriaAttrs"
     @click="interacted"
-    @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div
 			:id="nbId"
 			class="nb-reset component component-transition"
+			:class="[themeStyle]"
 			:style="[componentStyle]"
 		>
 			<slot name="content">Default Text</slot>
@@ -63,10 +64,6 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
-	textColor: {
-		type: String,
-		default: '#ffffff'
-	},
 	paddingX: {
 		type: Number,
 		default: 1,
@@ -84,18 +81,6 @@ const props = defineProps({
 	borderRadius: {
 		type: Number,
 		default: 0.375
-	},
-	textColorHover: {
-		type: String,
-		default: '#cccccc'
-	},
-	buttonColor: {
-		type: String,
-		default: '#bbbbbb'
-	},
-	buttonColorHover: {
-		type: String,
-		default: '#959595'
 	},
 	disabled: {
 		type: Boolean,
@@ -121,6 +106,55 @@ const props = defineProps({
 		validator: value => {
 			return !value ? 700 : value
 		}
+	},
+	theme: {
+		type: String,
+		default: 'light',
+		validator: value => {
+			return ['dark', 'light'].indexOf(value) !== -1
+		}
+	},
+	// Cores do tema light
+	lightButtonColor: {
+		type: String,
+		default: '#f5f5f5'
+	},
+	lightButtonColorHover: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	lightTextColor: {
+		type: String,
+		default: '#333333'
+	},
+	lightTextColorHover: {
+		type: String,
+		default: '#000000'
+	},
+	lightDisabledBgColor: {
+		type: String,
+		default: '#dfdfd9'
+	},
+	// Cores do tema dark
+	darkButtonColor: {
+		type: String,
+		default: '#2d2d2d'
+	},
+	darkButtonColorHover: {
+		type: String,
+		default: '#3d3d3d'
+	},
+	darkTextColor: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	darkTextColorHover: {
+		type: String,
+		default: '#ffffff'
+	},
+	darkDisabledBgColor: {
+		type: String,
+		default: 'rgba(40, 42, 54, 1)'
 	}
 })
 
@@ -128,7 +162,6 @@ const {
 	display,
   ariaLabel,
   ariaAttrs,
-	textColor,
 	paddingX,
 	paddingY,
 	borderRadius,
@@ -136,24 +169,29 @@ const {
 	fontFamily,
 	fontSize,
 	fontWeight,
-	textColorHover,
-	buttonColor,
-	buttonColorHover
+	theme,
+	lightButtonColor,
+	lightButtonColorHover,
+	lightTextColor,
+	lightTextColorHover,
+	lightDisabledBgColor,
+	darkButtonColor,
+	darkButtonColorHover,
+	darkTextColor,
+	darkTextColorHover,
+	darkDisabledBgColor
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const textColorValue = !textColor ? 'ffffff' : textColor.value
 	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
 	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
 	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6rem' : fontSize.value
 	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
-	const textColorHoverValue = !textColorHover.value ? '#cccccc' : textColorHover.value
-	const buttonColorValue = !buttonColor.value ? '#bbbbbb' : buttonColor.value
-	const buttonColorHoverValue = !buttonColorHover.value ? '#959595' : buttonColorHover.value
+	const themeValue = !theme.value ? 'light' : theme.value
 
 	return {
 		disabled: disabledValue,
@@ -161,13 +199,10 @@ const formatDefaultValues = computed(() => {
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
-		textColor: textColorValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
 		borderRadius: borderRadiusValue,
-		textColorHover: textColorHoverValue,
-		buttonColor: buttonColorValue,
-		buttonColorHover: buttonColorHoverValue
+		theme: themeValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -187,7 +222,6 @@ const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		color: defaultValues.textColor,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		borderRadius: `${defaultValues.borderRadius}rem`,
 		fontSize: defaultValues.fontSize,
@@ -200,25 +234,15 @@ const font = computed(() => {
 	return defaultValues.font
 })
 
-const styleTextColor = computed(() => {
+const themeStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.textColor
-})
-const styleTextColorHover = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textColorHover
-})
-const styleButtonColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.buttonColor
-})
-const styleButtonColorHover = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.buttonColorHover
+	switch (defaultValues.theme) {
+		case 'dark':
+			return 'component__theme--dark'
+		default:
+			return 'component__theme--light'
+	}
 })
 const computedAriaAttrs = computed(() => {
   const newAttrs = {}
@@ -298,8 +322,6 @@ const interacted = () => {
 	text-decoration-line: none;
 	white-space: nowrap;
 
-	background-color: v-bind('styleButtonColor');
-
 	text-transform: none;
 	padding: 0 14px;
 	text-align: center;
@@ -308,10 +330,27 @@ const interacted = () => {
 	text-decoration: none;
 	outline: none;
 
-	&:hover {
-		color: v-bind('styleTextColorHover');
-		background: v-bind('styleButtonColorHover');
+	// inicio propTheme
+	&.component__theme--dark {
+		color: v-bind('darkTextColor');
+		background-color: v-bind('darkButtonColor');
+
+		&:hover {
+			color: v-bind('darkTextColorHover');
+			background-color: v-bind('darkButtonColorHover');
+		}
 	}
+
+	&.component__theme--light {
+		color: v-bind('lightTextColor');
+		background-color: v-bind('lightButtonColor');
+
+		&:hover {
+			color: v-bind('lightTextColorHover');
+			background-color: v-bind('lightButtonColorHover');
+		}
+	}
+	// fim propTheme
 }
 
 .component-disabled {
@@ -319,15 +358,22 @@ const interacted = () => {
 	pointer-events: none;
 	user-select: none;
 
-	background-color: #ffffff;
-	opacity: 0.8;
+	opacity: 0.7;
 
 	.component {
-		--disabled-button-color: v-bind('styleButtonColor');
-		--disabled-color: v-bind('styleTextColor');
-		background-color: var(--disabled-button-color) !important;
-		color: var(--disabled-color) !important;
 		border-radius: inherit;
+
+		// inicio propTheme disabled
+		&.component__theme--dark {
+			color: v-bind('darkTextColor');
+			background-color: v-bind('darkDisabledBgColor');
+		}
+
+		&.component__theme--light {
+			color: v-bind('lightTextColor');
+			background-color: v-bind('lightDisabledBgColor');
+		}
+		// fim propTheme disabled
 	}
 }
 </style>

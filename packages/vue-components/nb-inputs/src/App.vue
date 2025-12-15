@@ -15,6 +15,7 @@
           <option value="radio">radio</option>
           <option value="checkbox">checkbox</option>
           <option value="input">input</option>
+          <option value="inputChip">inputChip</option>
         </select>
       </div>
     </div>
@@ -62,32 +63,65 @@
     <div v-else-if="btType === 'radio'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
-        <h4 class="test-page__content-tile">NbInputRadio</h4>
+        <h4 class="test-page__content-tile">NbInputRadio - Light Theme</h4>
         
         <NbInputRadio
-          nb-id="radio1"
+          nb-id="radio-light-1"
           display="b"
-          group-name="radio-test1"
+          group-name="radio-test-light-1"
+          theme="light"
           :current-option="currentRadioItem"
           :options="inputOptions"
           direction="right"
-          text-color="white"
           @current-value="changeRadioItem($event)"
         />
 
-        <p style="margin-top: 4px;">
-          Text before
+        <p style="margin-top: 20px">
+          <h4 class="test-page__content-tile">NbInputRadio - Light Theme (Custom Colors)</h4>
           <NbInputRadio
-            nb-id="radio2"
+            nb-id="radio-light-2"
             display="ib"
-            group-name="radio-test2"
+            group-name="radio-test-light-2"
+            theme="light"
+            light-text-color="#1e40af"
+            light-color="#3b82f6"
+            light-color-hover="#60a5fa"
             :current-option="currentRadioItem"
             :options="inputOptions"
             direction="right"
-            text-color="white"
             @current-value="changeRadioItem($event)"
           />
-          text after
+        </p>
+
+        <p style="margin-top: 20px">
+          <h4 class="test-page__content-tile">NbInputRadio - Dark Theme</h4>
+          <NbInputRadio
+            nb-id="radio-dark-1"
+            display="b"
+            group-name="radio-test-dark-1"
+            theme="dark"
+            :current-option="currentRadioItem"
+            :options="inputOptions"
+            direction="right"
+            @current-value="changeRadioItem($event)"
+          />
+        </p>
+
+        <p style="margin-top: 20px">
+          <h4 class="test-page__content-tile">NbInputRadio - Dark Theme (Custom Colors)</h4>
+          <NbInputRadio
+            nb-id="radio-dark-2"
+            display="ib"
+            group-name="radio-test-dark-2"
+            theme="dark"
+            dark-text-color="#a78bfa"
+            dark-color="#8b5cf6"
+            dark-color-hover="#7c3aed"
+            :current-option="currentRadioItem"
+            :options="inputOptions"
+            direction="right"
+            @current-value="changeRadioItem($event)"
+          />
         </p>
       </div>
     </div>
@@ -95,33 +129,67 @@
     <div v-if="btType === 'checkbox'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
-        <h4 class="test-page__content-tile">NbInputCheckbox</h4>
+        <h4 class="test-page__content-tile">NbInputCheckbox - Light Theme</h4>
 
         <NbInputCheckbox
-          nb-id="checkbox1"
+          nb-id="checkbox-light-1"
           display="b"
-          group-name="checkbox-test1"
+          group-name="checkbox-test-light-1"
+          theme="light"
           :current-option="currentCheckboxItem"
           :options="inputOptions"
           type="circle"
-          text-color="white"
           :background="false"
           @current-value="changeChackboxItem($event)"
         />
 
-        <p style="margin-top: 4px;">
-          Text before
+        <p style="margin-top: 20px">
+          <h4 class="test-page__content-tile">NbInputCheckbox - Light Theme (Custom Colors)</h4>
           <NbInputCheckbox
-            nb-id="checkbox2"
+            nb-id="checkbox-light-2"
             display="ib"
-            group-name="checkbox-test2"
+            group-name="checkbox-test-light-2"
+            theme="light"
+            light-text-color="#1e40af"
+            light-color="#3b82f6"
+            light-color-hover="#60a5fa"
             :current-option="currentCheckboxItem"
             :options="inputOptions"
-            text-color="white"
             :background="false"
             @current-value="changeChackboxItem($event)"
           />
-          text after
+        </p>
+
+        <p style="margin-top: 20px">
+          <h4 class="test-page__content-tile">NbInputCheckbox - Dark Theme</h4>
+          <NbInputCheckbox
+            nb-id="checkbox-dark-1"
+            display="b"
+            group-name="checkbox-test-dark-1"
+            theme="dark"
+            :current-option="currentCheckboxItem"
+            :options="inputOptions"
+            type="circle"
+            :background="false"
+            @current-value="changeChackboxItem($event)"
+          />
+        </p>
+
+        <p style="margin-top: 20px">
+          <h4 class="test-page__content-tile">NbInputCheckbox - Dark Theme (Custom Colors)</h4>
+          <NbInputCheckbox
+            nb-id="checkbox-dark-2"
+            display="ib"
+            group-name="checkbox-test-dark-2"
+            theme="dark"
+            dark-text-color="#a78bfa"
+            dark-color="#8b5cf6"
+            dark-color-hover="#7c3aed"
+            :current-option="currentCheckboxItem"
+            :options="inputOptions"
+            :background="false"
+            @current-value="changeChackboxItem($event)"
+          />
         </p>
       </div>
     </div>
@@ -134,6 +202,8 @@
         <NbInput
           nb-id="test1"
           display="b"
+          input-name="test-input"
+          input-type="text"
           :show-msg="true"
           :has-msg="true"
           aria-label="Test input"
@@ -141,6 +211,59 @@
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          :has-icon="true"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+          @show-input-eye="($event) => console.log('show-input-eye', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInput>
+
+        <NbInput
+          nb-id="test1"
+          display="b"
+          input-style="border"
+          input-name="test-input"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test input"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          :has-icon="true"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+          @show-input-eye="($event) => console.log('show-input-eye', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInput>
+        
+        <NbInput
+          nb-id="test1"
+          display="b"
+          input-style="line"
+          input-name="test-input"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test input"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          :has-icon="true"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -165,6 +288,92 @@
         </p>
       </div>
     </div>
+
+    <div v-if="btType === 'inputChip'" class="row">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
+        <h4 class="test-page__content-tile">NbInput</h4>
+        
+        <NbInputChip
+          nb-id="chip-dark"
+          input-name="chip-input-dark"
+          theme="dark"
+          :current-list="currentChipList"
+          aria-label="Test input chip"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @changed="($event) => console.log('changed', $event)"
+          @added="($event) => console.log('added', $event)"
+          @removed="($event) => console.log('removed', $event)"
+          @input-changed="($event) => console.log('input-changed', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+        >
+          <template #chip="{ chip, removeChip }">
+            <span class="chip-text">{{ chip }}asdas</span>
+            <span class="chip-remove" @click="removeChip(chip)">×</span>
+          </template>
+        </NbInputChip>
+
+        <br><br>
+
+        <p>Example theme: light</p>
+        <NbInputChip
+          nb-id="chip-light"
+          input-name="chip-input-light"
+          theme="light"
+          :current-list="currentChipList"
+          aria-label="Test input chip"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @changed="($event) => console.log('changed', $event)"
+          @added="($event) => console.log('added', $event)"
+          @removed="($event) => console.log('removed', $event)"
+          @input-changed="($event) => console.log('input-changed', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+        />
+
+        <br><br>
+
+        <p>Example theme: light</p>
+        <NbInputChip
+          nb-id="chip-light"
+          input-name="chip-input-light"
+          theme="light"
+          input-style="line"
+          :current-list="currentChipList"
+          aria-label="Test input chip"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @changed="($event) => console.log('changed', $event)"
+          @added="($event) => console.log('added', $event)"
+          @removed="($event) => console.log('removed', $event)"
+          @input-changed="($event) => console.log('input-changed', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+        />
+
+        <p style="margin-top: 4px;">
+          Text before
+          <NbInput
+            nb-id="test2"
+            display="ib"
+            @current-value="($event) => console.log($event)"
+          />
+          text after
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -175,8 +384,9 @@ const NbInputTest = defineAsyncComponent(() => import('@components/NbInputTest.v
 const NbInputRadio = defineAsyncComponent(() => import('@components/NbInputRadio.vue'))
 const NbInputCheckbox = defineAsyncComponent(() => import('@components/NbInputCheckbox.vue'))
 const NbInput = defineAsyncComponent(() => import('@components/NbInput.vue'))
+const NbInputChip = defineAsyncComponent(() => import('@components/NbInputChip.vue'))
 
-const btType = ref('radio')
+const btType = ref('inputChip')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
@@ -195,6 +405,7 @@ const inputOptions = computed(() => {
     }
   ]
 })
+const currentChipList = ref(['item1', 'item2', 'item3'])
 
 const changeRadioItem = (event) => {
   currentRadioItem.value = event

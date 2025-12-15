@@ -13,6 +13,7 @@ import NbButtonNormal from '@components/NbButtonNormal.vue';
 import NbButtonShadow from '@components/NbButtonShadow.vue';
 import NbButtonUnderlineExpand from '@components/NbButtonUnderlineExpand.vue';
 import NbButtonUnderlineFill from '@components/NbButtonUnderlineFill.vue';
+import NbButtonSplitDropdown from '@components/NbButtonSplitDropdown.vue';
 
 export default {
   NbButtonVavaGame,
@@ -29,5 +30,6 @@ export default {
   NbButtonShadow,
   NbButtonUnderlineExpand,
   NbButtonUnderlineFill,
-  NbButtonGradientBorderToBackground
+  NbButtonGradientBorderToBackground,
+  NbButtonSplitDropdown
 };

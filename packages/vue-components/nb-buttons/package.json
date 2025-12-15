@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-buttons",
   "description": "Button components for Vuejs 3",
-  "version": "4.0.2",
+  "version": "5.0.3",
   "type": "module",
   "main": "./dist/nb-buttons.umd.js",
   "module": "./dist/nb-buttons.js",

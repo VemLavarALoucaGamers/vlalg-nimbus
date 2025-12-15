@@ -7,7 +7,7 @@
     role="button"
     v-bind="computedAriaAttrs"
     @click="interacted"
-    @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div
@@ -24,7 +24,7 @@
 import { defineProps, ref, toRefs, computed } from 'vue'
 
 defineOptions({
-	name: 'NbButtonGradientBorderToBackground',
+	name: 'NbButtonColorOutside',
 	inheritAttrs: false
 })
 
@@ -73,11 +73,11 @@ const props = defineProps({
 	},
 	buttonColor: {
 		type: String,
-		default: 'linear-gradient(120deg,#fa7faa,#ff9691 25%,#ffb287 50%,transparent 55%,transparent)'
+		default: 'tomato'
 	},
 	buttonHoverColor: {
 		type: String,
-		default: 'linear-gradient(11deg, #c83852, #b44092 50%, #6a5fc1)'
+		default: 'green'
 	},
 	borderColor: {
 		type: String,
@@ -214,9 +214,16 @@ const componentStyle = computed(() => {
 
 	const newWidth = defaultValues.display === 'block' ? 'auto' : `${defaultValues.width}px`
 
+	const border = defaultValues.showBorder
+		? { border: `1px solid ${defaultValues.borderColor}` }
+		: {}
+
 	return {
+		...border,
+		borderRadius: `${defaultValues.borderRadius}rem`,
 		minWidth: '33px',
 		width: newWidth,
+		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		lineHeight: '1.42857143',
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight
@@ -228,16 +235,6 @@ const font = computed(() => {
 	return defaultValues.font
 })
 
-const stylePadding = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`
-})
-const styleBorderRadius = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return `${defaultValues.borderRadius}rem`
-})
 const styleTextColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
@@ -339,39 +336,6 @@ const interacted = () => {
 	white-space: nowrap;
 
   // Add new properties below
-  overflow: hidden;
-  background: v-bind('styleButtonColor');
-  background-clip: padding-box;
-  background-position: 98% 0;
-  background-size: 250% 100%;
-  color: v-bind('styleTextColor');
-  position: relative;
-  transition: background-position 0.2s, outline-width 0.2s;
-  border-radius: v-bind('styleBorderRadius');
-  padding: v-bind('stylePadding');
-
-  &:hover {
-    background-position: 2% 0;
-    color: v-bind('styleTextHoverColor');
-
-    &:before {
-      opacity: 0;
-    }
-  }
-
-  &:before {
-    content: '';
-    background: v-bind('styleButtonColorHover');
-    inset: 0;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    padding: 0.125rem;
-    position: absolute;
-    transition: opacity 0.2s;
-    z-index: -1;
-    display: block;
-    border-radius: v-bind('styleBorderRadius');
-  }
 }
 
 .component-disabled {

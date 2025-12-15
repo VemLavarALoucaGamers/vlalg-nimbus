@@ -7,13 +7,13 @@
     role="button"
     v-bind="computedAriaAttrs"
     @click="interacted"
-    @keydown.enter="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
     @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div
 			:id="nbId"
       class="nb-reset component"
-      :class="{ 'component-transition': hasAnimation }"
+      :class="[{ 'component-transition': hasAnimation, 'component--no-border': !showBorder }, themeStyle]"
 			:style="[componentStyle]"
 		>
       <slot name="content">Default Text</slot>
@@ -64,26 +64,6 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
-	textColor: {
-		type: String,
-		default: '#ffffff'
-	},
-	textHoverColor: {
-		type: String,
-		default: 'blue'
-	},
-	buttonColor: {
-		type: String,
-		default: 'tomato'
-	},
-	buttonHoverColor: {
-		type: String,
-		default: 'green'
-	},
-	borderColor: {
-		type: String,
-		default: '#ffe54c'
-	},
 	showBorder: {
 		type: Boolean,
 		default: true,
@@ -155,20 +135,80 @@ const props = defineProps({
     validator: value => {
       return ['ms', 's'].indexOf(value) !== -1
     }
-  }
+  },
+	theme: {
+		type: String,
+		default: 'light',
+		validator: value => {
+			return ['dark', 'light'].indexOf(value) !== -1
+		}
+	},
+	// Cores do tema light
+	lightButtonColor: {
+		type: String,
+		default: '#f5f5f5'
+	},
+	lightButtonColorHover: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	lightTextColor: {
+		type: String,
+		default: '#333333'
+	},
+	lightTextColorHover: {
+		type: String,
+		default: '#000000'
+	},
+	lightBorderColor: {
+		type: String,
+		default: '#cccccc'
+	},
+	lightBorderColorHover: {
+		type: String,
+		default: '#bbbbbb'
+	},
+	lightDisabledBgColor: {
+		type: String,
+		default: '#dfdfd9'
+	},
+	// Cores do tema dark
+	darkButtonColor: {
+		type: String,
+		default: '#2d2d2d'
+	},
+	darkButtonColorHover: {
+		type: String,
+		default: '#3d3d3d'
+	},
+	darkTextColor: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	darkTextColorHover: {
+		type: String,
+		default: '#ffffff'
+	},
+	darkBorderColor: {
+		type: String,
+		default: '#555555'
+	},
+	darkBorderColorHover: {
+		type: String,
+		default: '#666666'
+	},
+	darkDisabledBgColor: {
+		type: String,
+		default: 'rgba(40, 42, 54, 1)'
+	}
 })
 
 const {
 	display,
   ariaLabel,
   ariaAttrs,
-	buttonColor,
-	borderColor,
-	buttonHoverColor,
 	showBorder,
 	borderRadius,
-	textColor,
-	textHoverColor,
 	width,
 	paddingX,
 	paddingY,
@@ -178,19 +218,29 @@ const {
   fontWeight,
 	hasAnimation,
 	animationDuration,
-	animationDurationType
+	animationDurationType,
+	theme,
+	lightButtonColor,
+	lightButtonColorHover,
+	lightTextColor,
+	lightTextColorHover,
+	lightBorderColor,
+	lightBorderColorHover,
+	lightDisabledBgColor,
+	darkButtonColor,
+	darkButtonColorHover,
+	darkTextColor,
+	darkTextColorHover,
+	darkBorderColor,
+	darkBorderColorHover,
+	darkDisabledBgColor
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const buttonColorValue = !buttonColor.value ? '#ffffff' : buttonColor.value
-	const buttonHoverColorValue = !buttonHoverColor.value ? '#000000' : buttonHoverColor.value
-	const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
 	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
 	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
-	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
-	const textHoverColorValue = !textHoverColor.value ? '#000000' : textHoverColor.value
 	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
 	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
@@ -200,17 +250,13 @@ const formatDefaultValues = computed(() => {
   const hasAnimationValue = hasAnimation.value ? 'component-transition' : ''
 	const animationDurationValue = !animationDuration.value || animationDuration.value < 0 ? 0.3 : animationDuration.value
 	const animationDurationTypeValue = !animationDurationType.value || animationDurationType.value < 0 ? 'ms' : animationDurationType.value
+	const themeValue = !theme.value ? 'light' : theme.value
 
 	return {
 		disabled: disabledValue,
 		display: displayValue,
-		buttonColor: buttonColorValue,
-		buttonHoverColor: buttonHoverColorValue,
-		borderColor: borderColorValue,
 		showBorder: showBorderValue,
 		borderRadius: borderRadiusValue,
-		textColor: textColorValue,
-		textHoverColor: textHoverColorValue,
 		width: widthValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
@@ -219,7 +265,8 @@ const formatDefaultValues = computed(() => {
 		fontWeight: fontWeightValue,
 		hasAnimation: hasAnimationValue,
 		animationDuration: animationDurationValue,
-		animationDurationType: animationDurationTypeValue
+		animationDurationType: animationDurationTypeValue,
+		theme: themeValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -239,12 +286,7 @@ const componentStyle = computed(() => {
 
 	const newWidth = defaultValues.display === 'block' ? 'auto' : `${defaultValues.width}px`
 
-	const border = defaultValues.showBorder
-		? { border: `1px solid ${defaultValues.borderColor}` }
-		: {}
-
 	return {
-		...border,
 		borderRadius: `${defaultValues.borderRadius}rem`,
 		minWidth: '33px',
 		width: newWidth,
@@ -260,32 +302,23 @@ const font = computed(() => {
 	return defaultValues.font
 })
 
-const styleTextColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textColor
-})
-const styleTextHoverColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textHoverColor
-})
-const styleButtonColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.buttonColor
-})
-const styleButtonColorHover = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.buttonHoverColor
-})
 const styleAnimation = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   if (!defaultValues.hasAnimation) return '';
 
 	return `all ${defaultValues.animationDuration}${defaultValues.animationDurationType} ease-in-out`
+})
+
+const themeStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	switch (defaultValues.theme) {
+		case 'dark':
+			return 'component__theme--dark'
+		default:
+			return 'component__theme--light'
+	}
 })
 const computedAriaAttrs = computed(() => {
   const newAttrs = {}
@@ -324,6 +357,8 @@ const interacted = () => {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   display: inline-block;
+	vertical-align: bottom;
+  margin-bottom: 4px;
 }
 
 .nb-reset {
@@ -372,17 +407,51 @@ const interacted = () => {
 	box-shadow: none;
 	text-decoration: none;
 	outline: none;
-
-  color: v-bind('styleTextColor');
-  background: v-bind('styleButtonColor');
   
   &.component-transition {
     transition: v-bind('styleAnimation');
   }
 
-	&:hover {
-		color: v-bind('styleTextHoverColor');
-		background: v-bind('styleButtonColorHover');
+	// inicio propTheme
+	&.component__theme--dark {
+		color: v-bind('darkTextColor');
+		background-color: v-bind('darkButtonColor');
+		
+		&:not(.component--no-border) {
+			border: 1px solid v-bind('darkBorderColor');
+		}
+
+		&:hover {
+			color: v-bind('darkTextColorHover');
+			background-color: v-bind('darkButtonColorHover');
+			
+			&:not(.component--no-border) {
+				border-color: v-bind('darkBorderColorHover');
+			}
+		}
+	}
+
+	&.component__theme--light {
+		color: v-bind('lightTextColor');
+		background-color: v-bind('lightButtonColor');
+		
+		&:not(.component--no-border) {
+			border: 1px solid v-bind('lightBorderColor');
+		}
+
+		&:hover {
+			color: v-bind('lightTextColorHover');
+			background-color: v-bind('lightButtonColorHover');
+			
+			&:not(.component--no-border) {
+				border-color: v-bind('lightBorderColorHover');
+			}
+		}
+	}
+	// fim propTheme
+
+	&.component--no-border {
+		border: none !important;
 	}
 }
 
@@ -392,10 +461,20 @@ const interacted = () => {
   user-select: none;
 
   .component {
-		--disabled-color: v-bind('styleTextColor');
-		color: var(--disabled-color) !important;
     opacity: 0.7;
     border-radius: inherit;
+
+		// inicio propTheme disabled
+		&.component__theme--dark {
+			color: v-bind('darkTextColor');
+			background-color: v-bind('darkDisabledBgColor');
+		}
+
+		&.component__theme--light {
+			color: v-bind('lightTextColor');
+			background-color: v-bind('lightDisabledBgColor');
+		}
+		// fim propTheme disabled
   }
 }
 </style>

@@ -4,11 +4,13 @@
       <NbButtonVavaGame
         nb-id="nb-button-vava-game"
         display="b"
-        text-color="#ffffff"
-        button-color="#bbbbbb"
-        text-color-hover="black"
-        button-color-hover="tomato"
-        border-color="#ffffff"
+        theme="light"
+        light-text-color="#333333"
+        light-text-color-hover="#000000"
+        light-button-color="#f5f5f5"
+        light-button-color-hover="#e0e0e0"
+        light-border-color="#333333"
+        :border-opacity="0.5"
         :padding-x-border="0.7"
         :padding-y-border="0.7"
         :padding-x-content="1"
@@ -18,7 +20,9 @@
         font-size="1.6em"
         :font-weight="400"
         @clicked="logEvent()"
-      />
+      >
+        <template #content>Default Text</template>
+      </NbButtonVavaGame>
       <p class="legend">Look at the console to see the triggered event</p>
     </div>
   </div>
