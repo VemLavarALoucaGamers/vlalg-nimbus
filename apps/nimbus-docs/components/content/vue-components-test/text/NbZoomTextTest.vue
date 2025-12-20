@@ -1,13 +1,22 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      i love to
-      <NbZoomText nb-id="nb-zoom-text">
-        drink coffee
-      </NbZoomText>
-      very much
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        i love to
+        <NbZoomText nb-id="nb-zoom-text">
+          drink coffee
+        </NbZoomText>
+        very much
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup></script>

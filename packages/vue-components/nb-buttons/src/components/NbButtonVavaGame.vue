@@ -235,17 +235,17 @@ const formatDefaultValues = computed(() => {
 			? '0.5'
 			: borderOpacity.value
 	const paddingXBorderValue =
-		!paddingXBorder.value || paddingXBorder.value < 0 ? 0.5 : paddingXBorder.value
+		((paddingXBorder.value !== 0 && !paddingXBorder.value) || paddingXBorder.value < 0) ? 0.5 : paddingXBorder.value
 	const paddingYBorderValue =
-		!paddingYBorder.value || paddingYBorder.value < 0 ? 0.5 : paddingYBorder.value
+		((paddingYBorder.value !== 0 && !paddingYBorder.value) || paddingYBorder.value < 0) ? 0.5 : paddingYBorder.value
 	const paddingXContentValue =
-		!paddingXContent.value || paddingXContent.value < 0 ? 0.5 : paddingXContent.value
+		((paddingXContent.value !== 0 && !paddingXContent.value) || paddingXContent.value < 0) ? 0.5 : paddingXContent.value
 	const paddingYContentValue =
-		!paddingYContent.value || paddingYContent.value < 0 ? 0.5 : paddingYContent.value
+		((paddingYContent.value !== 0 && !paddingYContent.value) || paddingYContent.value < 0) ? 0.5 : paddingYContent.value
 	const uppercaseValue = uppercase.value ? 'uppercase' : 'none'
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 
 	return {
 		disabled: disabledValue,

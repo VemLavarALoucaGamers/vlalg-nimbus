@@ -253,12 +253,12 @@ const formatDefaultValues = computed(() => {
 	const disabledPreviewValue = disabledPreview.value ? 'component-disabled' : ''
 	const disabledNextValue = disabledNext.value ? 'component-disabled' : ''
 	const marginBetweenValue =
-		!marginBetween.value || marginBetween.value < 0 ? 0 : marginBetween.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
-	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 10 : paddingY.value
+		((marginBetween.value !== 0 && !marginBetween.value) || marginBetween.value < 0) ? 0 : marginBetween.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
+	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
+	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 10 : paddingY.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 
 	return {
 		disabled: disabledValue,

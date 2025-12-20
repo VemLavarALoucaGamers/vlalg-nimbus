@@ -1,16 +1,25 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbToggleFlip
-        nb-id="toggle-flip-test"
-        theme="light"
-        :value="toggleValue"
-        @clicked="handleClick()"
-        @current-value="handleCurrentValue($event)"
-      />
-      <p class="legend">Look at the console to see the triggered events</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbToggleFlip
+          nb-id="toggle-flip-test"
+          theme="light"
+          :value="toggleValue"
+          @clicked="handleClick()"
+          @current-value="handleCurrentValue($event)"
+        />
+        <p class="legend">Look at the console to see the triggered events</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

@@ -1,37 +1,46 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbCountdown
-        nb-id="nb-time-countdown"
-        :day="day"
-        :month="month"
-        :year="year"
-        :hour="hour"
-        :minute="minute"
-        :second="second"
-        border-color="white"
-        text-color="tomato"
-        number-color="white"
-        :border="true"
-        :separator="true"
-        separator-color="white"
-        separator-type="/"
-        days-text="days"
-        hours-text="hours"
-        minutes-text="minutes"
-        seconds-text="seconds"
-        :show-days="true"
-        :show-hours="true"
-        :show-minutes="true"
-        :show-seconds="true"
-        :container-width="290"
-        :container-height="45"
-        @started="countdownEvent('started')"
-        @finished="countdownEvent('finished')"
-      />
-      <p class="legend">Look at the console to see the triggered event</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbCountdown
+          nb-id="nb-time-countdown"
+          :day="day"
+          :month="month"
+          :year="year"
+          :hour="hour"
+          :minute="minute"
+          :second="second"
+          border-color="white"
+          text-color="tomato"
+          number-color="white"
+          :border="true"
+          :separator="true"
+          separator-color="white"
+          separator-type="/"
+          days-text="days"
+          hours-text="hours"
+          minutes-text="minutes"
+          seconds-text="seconds"
+          :show-days="true"
+          :show-hours="true"
+          :show-minutes="true"
+          :show-seconds="true"
+          :container-width="290"
+          :container-height="45"
+          @started="countdownEvent('started')"
+          @finished="countdownEvent('finished')"
+        />
+        <p class="legend">Look at the console to see the triggered event</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

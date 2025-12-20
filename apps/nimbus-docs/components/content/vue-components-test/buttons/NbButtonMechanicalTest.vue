@@ -1,27 +1,36 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbButtonMechanical
-        nb-id="nb-button-mechanical-one"
-        display="b"
-        theme="light"
-        light-text-color="#333333"
-        light-button-color="#f5f5f5"
-        light-container-color="#e0e0e0"
-        :padding-x="1"
-        :padding-y="0.2"
-        :disabled="false"
-        :border-radius="0.375"
-        :animation-slow="false"
-        font-size="1.6em"
-        :font-weight="400"
-        @clicked="logEvent()"
-      >
-        <template #content>Default Text</template>
-      </NbButtonMechanical>
-      <p class="legend">Look at the console to see the triggered event</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbButtonMechanical
+          nb-id="nb-button-mechanical-one"
+          display="b"
+          theme="light"
+          light-text-color="#333333"
+          light-button-color="#f5f5f5"
+          light-container-color="#e0e0e0"
+          :padding-x="1"
+          :padding-y="0.2"
+          :disabled="false"
+          :border-radius="0.375"
+          :animation-slow="false"
+          font-size="1.6em"
+          :font-weight="400"
+          @clicked="logEvent()"
+        >
+          <template #content>Default Text</template>
+        </NbButtonMechanical>
+        <p class="legend">Look at the console to see the triggered event</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

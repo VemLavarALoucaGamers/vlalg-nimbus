@@ -148,7 +148,7 @@ const formatDefaultValues = computed(() => {
   const disabledValue = disabled.value ? 'component-disabled' : ''
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 400 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 400 : fontWeight.value
 
   return {
 		font: fontValue,

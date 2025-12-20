@@ -34,6 +34,25 @@ html {
         margin-left: 25px;
 
         .docs-aside-tree {
+          &.recursive {
+            ul{
+              li {
+                border-left-color: transparent !important;
+                display: flex;
+                align-items: center;
+
+
+                &::before {
+                  content: '-';
+                  color: $color-theme;
+                }
+
+                .padded {
+                  padding-left: 12px;
+                }
+              }
+            }
+          }
           li {
             &.active {
               .title-collapsible-button {

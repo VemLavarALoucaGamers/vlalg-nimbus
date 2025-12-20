@@ -1,22 +1,27 @@
 <template>
   <div class="preview">
     <div class="preview__component">
-      <NbButtonUnderlineExpand
-        nb-id="nb-button-underline-expand-one"
-        display="b"
-        theme="light"
-        :border-height="1.5"
-        text-align="center"
-        :tab-index="0"
-        :has-tab-index-enter="true"
-        :has-tab-index-space="true"
-        aria-label="Botão com underline expandido"
-        @clicked="logEvent()"
-      >
-        <template #content>
-          Hover me
+      <ClientOnly>
+        <NbButtonUnderlineExpand
+          nb-id="nb-button-underline-expand-one"
+          display="b"
+          theme="dark"
+          :border-height="1.5"
+          text-align="center"
+          :tab-index="0"
+          :has-tab-index-enter="true"
+          :has-tab-index-space="true"
+          aria-label="Botão com underline expandido"
+          @clicked="logEvent()"
+        >
+          <template #content>
+            Hover me
+          </template>
+        </NbButtonUnderlineExpand>
+        <template #fallback>
+          <p>Loading component...</p>
         </template>
-      </NbButtonUnderlineExpand>
+      </ClientOnly>
       <p class="legend">Look at the console to see the triggered event</p>
     </div>
   </div>

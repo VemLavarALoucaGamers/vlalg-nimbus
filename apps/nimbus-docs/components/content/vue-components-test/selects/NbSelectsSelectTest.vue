@@ -1,18 +1,27 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbSelect
-        nb-id="select-test"
-        select-name="select-test"
-        theme="light"
-        :options="selectOptions"
-        :selected-option-only="selectedValue"
-        @changed="handleChange($event)"
-        @user-changed="handleUserChange($event)"
-      />
-      <p class="legend">Look at the console to see the triggered events</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbSelect
+          nb-id="select-test"
+          select-name="select-test"
+          theme="light"
+          :options="selectOptions"
+          :selected-option-only="selectedValue"
+          @changed="handleChange($event)"
+          @user-changed="handleUserChange($event)"
+        />
+        <p class="legend">Look at the console to see the triggered events</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

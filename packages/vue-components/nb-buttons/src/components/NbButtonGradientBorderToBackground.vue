@@ -168,16 +168,16 @@ const formatDefaultValues = computed(() => {
 	const buttonColorValue = !buttonColor.value ? '#ffffff' : buttonColor.value
 	const buttonHoverColorValue = !buttonHoverColor.value ? '#000000' : buttonHoverColor.value
 	const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
 	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
 	const textHoverColorValue = !textHoverColor.value ? '#000000' : textHoverColor.value
 	const widthValue = !width.value || width.value < 86 ? 86 : width.value
-	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
+	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
+	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-  const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
+  const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
 
 	return {
 		disabled: disabledValue,

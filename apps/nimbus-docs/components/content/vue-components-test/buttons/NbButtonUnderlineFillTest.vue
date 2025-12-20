@@ -1,24 +1,33 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbButtonUnderlineFill
-        nb-id="nb-button-underline-fill-one"
-        display="b"
-        theme="light"
-        text-align="center"
-        :tab-index="0"
-        :has-tab-index-enter="true"
-        :has-tab-index-space="true"
-        aria-label="Botão com preenchimento de underline"
-        @clicked="logEvent()"
-      >
-        <template #content>
-          Hover me
-        </template>
-      </NbButtonUnderlineFill>
-      <p class="legend">Look at the console to see the triggered event</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbButtonUnderlineFill
+          nb-id="nb-button-underline-fill-one"
+          display="b"
+          theme="dark"
+          text-align="center"
+          :tab-index="0"
+          :has-tab-index-enter="true"
+          :has-tab-index-space="true"
+          aria-label="Botão com preenchimento de underline"
+          @clicked="logEvent()"
+        >
+          <template #content>
+            Hover me
+          </template>
+        </NbButtonUnderlineFill>
+        <p class="legend">Look at the console to see the triggered event</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

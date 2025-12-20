@@ -1,66 +1,75 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbButtonSplitDropdown
-        nb-id="nb-button-split-dropdown-one"
-        display="b"
-        main-button-text="Save"
-        :menu-items="menuItems"
-        :show-border="true"
-        border-color="hsl(220 50% 75%)"
-        border-hover-color="hsl(220 75% 50%)"
-        :border-radius="0.375"
-        :popup-border-radius="0.5"
-        button-color="hsl(220 75% 50%)"
-        button-hover-color="hsl(220 75% 45%)"
-        popup-button-hover-color="hsl(220 75% 40%)"
-        text-color="#ffffff"
-        text-hover-color="#ffffff"
-        popup-text-hover-color="#ffffff"
-        :padding-x="1"
-        :padding-y="0.2"
-        :popup-padding-x="1.5"
-        :popup-padding-y="0.4"
-        :tab-index="0"
-        :has-tab-index-enter="true"
-        :has-tab-index-space="true"
-        aria-label="Split Button Example"
-        @main-clicked="handleMainClick"
-        @menu-item-clicked="handleMenuItemClick"
-        @clicked="handleClick"
-      />
-      <NbButtonSplitDropdown
-        nb-id="nb-button-split-dropdown-two"
-        display="b"
-        main-button-text="Save"
-        :menu-items="menuItems"
-        :show-border="true"
-        border-color="hsl(220 50% 75%)"
-        border-hover-color="hsl(220 75% 50%)"
-        :border-radius="0.375"
-        :popup-border-radius="0.5"
-        button-color="hsl(220 75% 50%)"
-        button-hover-color="hsl(220 75% 45%)"
-        popup-button-hover-color="hsl(220 75% 40%)"
-        text-color="#ffffff"
-        text-hover-color="#ffffff"
-        popup-text-hover-color="#ffffff"
-        :padding-x="1"
-        :padding-y="0.2"
-        :popup-padding-x="1.5"
-        :popup-padding-y="0.4"
-        :tab-index="0"
-        :has-tab-index-enter="true"
-        :has-tab-index-space="true"
-        aria-label="Dropdown Button Example"
-        :show-popup-button="false"
-        @main-clicked="handleMainClick"
-        @menu-item-clicked="handleMenuItemClick"
-        @clicked="handleClick"
-      />
-      <p class="legend">Look at the console to see the triggered events</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbButtonSplitDropdown
+          nb-id="nb-button-split-dropdown-one"
+          display="b"
+          main-button-text="Save"
+          :menu-items="menuItems"
+          :show-border="true"
+          border-color="hsl(220 50% 75%)"
+          border-hover-color="hsl(220 75% 50%)"
+          :border-radius="0.375"
+          :popup-border-radius="0.5"
+          button-color="hsl(220 75% 50%)"
+          button-hover-color="hsl(220 75% 45%)"
+          popup-button-hover-color="hsl(220 75% 40%)"
+          text-color="#ffffff"
+          text-hover-color="#ffffff"
+          popup-text-hover-color="#ffffff"
+          :padding-x="1"
+          :padding-y="0.2"
+          :popup-padding-x="1.5"
+          :popup-padding-y="0.4"
+          :tab-index="0"
+          :has-tab-index-enter="true"
+          :has-tab-index-space="true"
+          aria-label="Split Button Example"
+          @main-clicked="handleMainClick"
+          @menu-item-clicked="handleMenuItemClick"
+          @clicked="handleClick"
+        />
+        <NbButtonSplitDropdown
+          nb-id="nb-button-split-dropdown-two"
+          display="b"
+          main-button-text="Save"
+          :menu-items="menuItems"
+          :show-border="true"
+          border-color="hsl(220 50% 75%)"
+          border-hover-color="hsl(220 75% 50%)"
+          :border-radius="0.375"
+          :popup-border-radius="0.5"
+          button-color="hsl(220 75% 50%)"
+          button-hover-color="hsl(220 75% 45%)"
+          popup-button-hover-color="hsl(220 75% 40%)"
+          text-color="#ffffff"
+          text-hover-color="#ffffff"
+          popup-text-hover-color="#ffffff"
+          :padding-x="1"
+          :padding-y="0.2"
+          :popup-padding-x="1.5"
+          :popup-padding-y="0.4"
+          :tab-index="0"
+          :has-tab-index-enter="true"
+          :has-tab-index-space="true"
+          aria-label="Dropdown Button Example"
+          :show-popup-button="false"
+          @main-clicked="handleMainClick"
+          @menu-item-clicked="handleMenuItemClick"
+          @clicked="handleClick"
+        />
+        <p class="legend">Look at the console to see the triggered events</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

@@ -559,13 +559,13 @@ const formatDefaultValues = computed(() => {
 	const selectionBgColorValue = !selectionBgColor.value ? '' : selectionBgColor.value
 	const selectionTextColorValue = !selectionTextColor.value ? '' : selectionTextColor.value
   const hasBorderRadiusValue = !hasBorderRadius.value ? false : hasBorderRadius.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = fontSize.value && fontSize.value >= 0 ? fontSize.value : null
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
   const fontFamilyMsgValue = !fontFamilyMsg.value ? `'Lato', sans-serif` : fontFamilyMsg.value
   const fontSizeMsgValue = !fontSizeMsg.value ? '1em' : fontSizeMsg.value
-  const fontWeightMsgValue = !fontWeightMsg.value || fontWeightMsg.value < 0 ? 100 : fontWeightMsg.value
+  const fontWeightMsgValue = ((fontWeightMsg.value !== 0 && !fontWeightMsg.value) || fontWeightMsg.value < 0) ? 100 : fontWeightMsg.value
   const textMessageColorValue = !textMessageColor.value ? '#f15574' : textMessageColor.value
   const inputWidthValue = !inputWidth.value ? 200 : inputWidth.value
   const activeTextStyleValue = !activeTextStyle.value ? 'normal' : activeTextStyle.value
@@ -585,7 +585,7 @@ const formatDefaultValues = computed(() => {
   const iconDarkTextColorValue = !iconDarkTextColor.value ? '#000000' : iconDarkTextColor.value
   const iconLightBgColorValue = !iconLightBgColor.value ? 'transparent' : iconLightBgColor.value
   const iconDarkBgColorValue = !iconDarkBgColor.value ? 'transparent' : iconDarkBgColor.value
-  const iconBorderRadiusValue = !iconBorderRadius.value ? 0 : iconBorderRadius.value
+  const iconBorderRadiusValue = ((iconBorderRadius.value !== 0 && !iconBorderRadius.value) || iconBorderRadius.value < 0) ? 0 : iconBorderRadius.value
   const iconLightBgColorActiveValue = !iconLightBgColorActive.value ? 'transparent' : iconLightBgColorActive.value
   const iconDarkBgColorActiveValue = !iconDarkBgColorActive.value ? 'transparent' : iconDarkBgColorActive.value
   const iconWidthValue = !iconWidth.value ? 32 : iconWidth.value

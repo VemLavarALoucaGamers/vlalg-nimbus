@@ -1,10 +1,19 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      Change this password: <input v-model="valueTest" type="text" class="input-test">
-      <NbPasswordValidationSection nb-id="nb-password-validation-section" :password="valueTest" title-color="white" />
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        Change this password: <input v-model="valueTest" type="text" class="input-test">
+        <NbPasswordValidationSection nb-id="nb-password-validation-section" :password="valueTest" title-color="white" />
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

@@ -1,23 +1,32 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      Change type:
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        Change type:
 
-      <select v-model="currentType" style="margin-bottom: 20px">
-        <option v-for="(comp, index) in options" :key="index" :value="comp">
-          {{ comp }}
-        </option>
-      </select>
+        <select v-model="currentType" style="margin-bottom: 20px">
+          <option v-for="(comp, index) in options" :key="index" :value="comp">
+            {{ comp }}
+          </option>
+        </select>
 
-      <br><br>
+        <br><br>
 
-      <NbLoaders
-        nb-id="loader"
-        display="b"
-        :type="currentType"
-      />
+        <NbLoaders
+          nb-id="loader"
+          display="b"
+          :type="currentType"
+        />
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

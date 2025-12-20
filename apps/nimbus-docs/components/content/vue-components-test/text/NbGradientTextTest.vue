@@ -1,20 +1,29 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbGradientText
-        nb-id="nb-gradient-text"
-        :line-height="1"
-        bg-first="magenta"
-        bg-second="cyan"
-        alignment="center"
-        padding-bottom="10"
-        font-size="4rem"
-        :font-weight="900"
-      >
-        <template #text> i love to<br />drink coffee<br />very much </template>
-      </NbGradientText>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbGradientText
+          nb-id="nb-gradient-text"
+          :line-height="1"
+          bg-first="magenta"
+          bg-second="cyan"
+          alignment="center"
+          padding-bottom="10"
+          font-size="4rem"
+          :font-weight="900"
+        >
+          <template #text> i love to<br />drink coffee<br />very much </template>
+        </NbGradientText>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup></script>

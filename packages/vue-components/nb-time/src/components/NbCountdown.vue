@@ -327,17 +327,17 @@ const formatDefaultValues = computed(() => {
 	const separatorColorValue = !separatorColor.value ? '#000' : separatorColor.value
 	const borderColorValue = !borderColor.value ? '#000' : borderColor.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeNumberValue = !fontSizeNumber.value ? 2.6 : fontSizeNumber.value
-	const fontSizeTextValue = !fontSizeText.value ? 1.3 : fontSizeText.value
-	const fontSizeSeparatorValue = !fontSizeSeparator.value ? 3 : fontSizeSeparator.value
+	const fontSizeNumberValue = ((fontSizeNumber.value !== 0 && !fontSizeNumber.value) || fontSizeNumber.value < 0) ? 2.6 : fontSizeNumber.value
+	const fontSizeTextValue = ((fontSizeText.value !== 0 && !fontSizeText.value) || fontSizeText.value < 0) ? 1.3 : fontSizeText.value
+	const fontSizeSeparatorValue = ((fontSizeSeparator.value !== 0 && !fontSizeSeparator.value) || fontSizeSeparator.value < 0) ? 3 : fontSizeSeparator.value
 	const fontWeightNumberValue =
-		!fontWeightNumber.value || fontWeightNumber.value < 0 ? 900 : fontWeightNumber.value
+		((fontWeightNumber.value !== 0 && !fontWeightNumber.value) || fontWeightNumber.value < 0) ? 900 : fontWeightNumber.value
 	const fontWeightTextValue =
-		!fontWeightText.value || fontWeightText.value < 0 ? 300 : fontWeightText.value
+		((fontWeightText.value !== 0 && !fontWeightText.value) || fontWeightText.value < 0) ? 300 : fontWeightText.value
 	const fontWeightSeparatorValue =
-		!fontWeightSeparator.value || fontWeightSeparator.value < 0 ? 900 : fontWeightSeparator.value
-	const containerWidthValue = !containerWidth.value ? 256 : containerWidth.value
-	const containerHeightValue = !containerHeight.value ? 43 : containerHeight.value
+		((fontWeightSeparator.value !== 0 && !fontWeightSeparator.value) || fontWeightSeparator.value < 0) ? 900 : fontWeightSeparator.value
+	const containerWidthValue = ((containerWidth.value !== 0 && !containerWidth.value) || containerWidth.value < 0) ? 256 : containerWidth.value
+	const containerHeightValue = ((containerHeight.value !== 0 && !containerHeight.value) || containerHeight.value < 0) ? 43 : containerHeight.value
 
 	return {
 		color: textColorValue,

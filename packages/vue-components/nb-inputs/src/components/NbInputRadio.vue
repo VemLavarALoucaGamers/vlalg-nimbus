@@ -259,12 +259,12 @@ const formatDefaultValues = computed(() => {
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
   const hoverEffectValue = ![false, true].includes(hoverEffect.value) ? false : hoverEffect.value
   const activeHoverEffectValue = ![false, true].includes(activeHoverEffect.value) ? false : activeHoverEffect.value
-  const itemGapValue = !itemGap.value || itemGap.value < 0 ? 15 : itemGap.value
-  const internalGapValue = !internalGap.value || internalGap.value < 0 ? 6 : internalGap.value
-  const scaleValue = !scale.value || scale.value < 0 ? 1 : scale.value
+  const itemGapValue = ((itemGap.value !== 0 && !itemGap.value) || itemGap.value < 0) ? 15 : itemGap.value
+  const internalGapValue = ((internalGap.value !== 0 && !internalGap.value) || internalGap.value < 0) ? 6 : internalGap.value
+  const scaleValue = ((scale.value !== 0 && !scale.value) || scale.value < 0) ? 1 : scale.value
 
 	return {
 		disabled: disabledValue,

@@ -68,9 +68,9 @@ const strengthColor = ref('')
 
 const formatDefaultValues = computed(() => {
   const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-  const widthValue = !width.value || width.value < 0 ? 56 : width.value
-  const heightValue = !height.value || height.value < 0 ? 5 : height.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+  const widthValue = ((width.value !== 0 && !width.value) || width.value < 0) ? 56 : width.value
+  const heightValue = ((height.value !== 0 && !height.value) || height.value < 0) ? 5 : height.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 
   return {
     display: displayValue,

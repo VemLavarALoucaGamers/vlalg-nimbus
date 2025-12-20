@@ -1,6 +1,17 @@
 <template>
-  <div v-if="nbId" :class="['nb-wrapper', componentDisabled]" :style="[wrapperStyle]">
-    <div :id="nbId" :class="['nb-reset', 'component']" :style="[componentStyle]">
+  <div
+		v-if="nbId && show"
+    :class="['nb-wrapper', componentDisabled]"
+    :style="[wrapperStyle]"
+    role="status"
+    v-bind="computedAriaAttrs"
+    @click.prevent="interacted"
+  >
+    <div
+      :id="nbId"
+      :class="['nb-reset', 'component']"
+      :style="[componentStyle, fixPulseCrazySize]"
+    >
       <div v-if="loaderMode === 'modeOne'" :class="loaderType"></div>
       <div v-else :class="[modeTwoClass]">
         <div v-for="index in numberDivs" :key="index"></div>
@@ -10,17 +21,31 @@
 </template>
 
 <script setup>
-import { defineProps, reactive, toRefs, computed } from 'vue'
+import { defineProps, reactive, toRefs, computed, watch } from 'vue'
 
 defineOptions({
   name: 'NbLoaders',
   inheritAttrs: false
 })
 
+const emit = defineEmits(['clicked', 'changed'])
+
 const props = defineProps({
   nbId: {
     type: String,
     required: true
+  },
+  show: {
+    type: Boolean,
+    default: true
+  },
+  ariaLabel: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
+  ariaAttrs: {
+    type: Object,
+    default: () => ({})
   },
   colorPrimary: {
     type: String,
@@ -86,6 +111,9 @@ const loadersConfigs = reactive({
   partialRing: 1
 })
 const {
+  show,
+  ariaLabel,
+  ariaAttrs,
   colorPrimary,
   colorSecondary,
   colorExtra,
@@ -262,6 +290,41 @@ const componentDisabled = computed(() => {
 
   return defaultValues.disabled
 })
+
+const fixPulseCrazySize = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.type === 'pulse-crazy' ? { width: '86px' } : { }
+})
+
+const computedAriaAttrs = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrs.value) {
+    const attrKeys = Object.keys(ariaAttrs.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrs.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabel.value,
+    'aria-busy': show.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
+})
+
+const interacted = () => {
+	emit('clicked')
+}
+
+watch(show, (value) => {
+  emit('changed', value)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -370,10 +433,10 @@ const componentDisabled = computed(() => {
     width: 86px;
     height: 86px;
     animation: pulse-crazy 1.5s ease-out infinite;
-    position: absolute;
+    // position: absolute;
     // left: 50%;
     // top: 50%;
-    transform: translate(-50%, -100%);
+    // transform: translate(-50%, -100%);
 
     @keyframes pulse-crazy {
       0% {

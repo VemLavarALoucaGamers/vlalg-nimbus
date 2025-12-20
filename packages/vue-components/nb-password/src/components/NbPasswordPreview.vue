@@ -170,13 +170,13 @@ const formatDefaultValues = computed(() => {
 	const backgroundValue = !background.value ? '#ffffff' : background.value
 	const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
 	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const widthValue = !width.value || width.value < 86 ? 86 : width.value
-	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.4 : paddingY.value
+	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
+	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.4 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.8em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 700 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 700 : fontWeight.value
 
 	return {
 		display: displayValue,

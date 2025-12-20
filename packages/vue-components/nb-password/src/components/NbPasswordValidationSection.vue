@@ -183,15 +183,15 @@ const formatDefaultValues = computed(() => {
   const descriptionColorValue = !descriptionColor.value ? '#000000' : descriptionColor.value
   const statusColorValue = !statusColor.value ? '#999999' : statusColor.value
   const validStatusColorValue = !validStatusColor.value ? '#72f258' : validStatusColor.value
-  const widthValue = !width.value || width.value < 0 ? 0 : width.value
-  const gapValue = !gap.value || gap.value < 0 ? 0 : gap.value
-  const labelGapValue = !labelGap.value || labelGap.value < 0 ? 10 : labelGap.value
+  const widthValue = ((width.value !== 0 && !width.value) || width.value < 0) ? 0 : width.value
+  const gapValue = ((gap.value !== 0 && !gap.value) || gap.value < 0) ? 0 : gap.value
+  const labelGapValue = ((labelGap.value !== 0 && !labelGap.value) || labelGap.value < 0) ? 10 : labelGap.value
   const descriptionsValue = !descriptions.value || !descriptions.value.length ? [] : descriptions.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
 	const fontSizeDescriptionValue = !fontSizeDescription.value ? '1em' : fontSizeDescription.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
 
 	return {
 		display: displayValue,

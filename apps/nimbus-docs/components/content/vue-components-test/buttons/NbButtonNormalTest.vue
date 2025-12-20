@@ -1,32 +1,41 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbButtonNormal
-        nb-id="nb-button-normal-one"
-        display="b"
-        text-color="#ffffff"
-        text-hover-color="blue"
-        button-color="tomato"
-        button-hover-color="green"
-        :show-border="true"
-        border-color="#ffe54c"
-        :border-radius="0.375"
-        :has-animation="true"
-        :animation-duration="0.3"
-        animation-duration-type="s"
-        :tab-index="0"
-        :has-tab-index-enter="true"
-        :has-tab-index-space="true"
-        aria-label="Botão normal"
-        @clicked="logEvent()"
-      >
-        <template #content>
-          Click me
-        </template>
-      </NbButtonNormal>
-      <p class="legend">Look at the console to see the triggered event</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbButtonNormal
+          nb-id="nb-button-normal-one"
+          display="b"
+          text-color="#ffffff"
+          text-hover-color="blue"
+          button-color="tomato"
+          button-hover-color="green"
+          :show-border="true"
+          border-color="#ffe54c"
+          :border-radius="0.375"
+          :has-animation="true"
+          :animation-duration="0.3"
+          animation-duration-type="s"
+          :tab-index="0"
+          :has-tab-index-enter="true"
+          :has-tab-index-space="true"
+          aria-label="Botão normal"
+          @clicked="logEvent()"
+        >
+          <template #content>
+            Click me
+          </template>
+        </NbButtonNormal>
+        <p class="legend">Look at the console to see the triggered event</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

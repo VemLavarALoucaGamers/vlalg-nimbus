@@ -402,7 +402,7 @@ const isToggling = ref(false)
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const popupBorderRadiusValue = popupBorderRadius.value !== null && popupBorderRadius.value !== undefined 
 		? (popupBorderRadius.value < 0 ? 0 : popupBorderRadius.value)
 		: borderRadiusValue
@@ -411,8 +411,8 @@ const formatDefaultValues = computed(() => {
 	const menuItemFocusOutlineColorValue = menuItemFocusOutlineColor.value || 'currentColor'
 	const menuItemFocusOutlineWidthValue = menuItemFocusOutlineWidth.value || '2px'
 	const menuItemFocusOutlineOffsetValue = menuItemFocusOutlineOffset.value || '-2px'
-	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.32 : paddingY.value
+	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
+	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.32 : paddingY.value
 	const popupPaddingXValue = popupPaddingX.value !== null && popupPaddingX.value !== undefined
 		? (popupPaddingX.value < 0 ? 1 : popupPaddingX.value)
 		: paddingXValue
@@ -421,7 +421,7 @@ const formatDefaultValues = computed(() => {
 		: paddingYValue
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 400 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 400 : fontWeight.value
 	const popupFontValue = popupFontFamily.value || fontValue
 	const popupFontSizeValue = popupFontSize.value || fontSizeValue
 	const popupFontWeightValue = popupFontWeight.value !== null && popupFontWeight.value !== undefined

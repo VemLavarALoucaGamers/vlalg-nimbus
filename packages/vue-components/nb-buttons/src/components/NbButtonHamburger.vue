@@ -173,8 +173,8 @@ const {
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const buttonStatusValue = buttonStatus.value ? 'change' : ''
-	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 3 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 3 : paddingY.value
+	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 3 : paddingX.value
+	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 3 : paddingY.value
 
 	return {
 		disabled: disabledValue,

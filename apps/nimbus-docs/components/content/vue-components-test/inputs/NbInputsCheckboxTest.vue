@@ -1,18 +1,27 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbInputCheckbox
-        nb-id="checkbox1"
-        display="b"
-        group-name="checkbox-test1"
-        :current-optiton="currentCheckboxItem"
-        :options="inputOptions"
-        direction="left"
-        text-color="white"
-        @current-value="changeChackboxItem($event)"
-      />
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbInputCheckbox
+          nb-id="checkbox1"
+          display="b"
+          group-name="checkbox-test1"
+          :current-optiton="currentCheckboxItem"
+          :options="inputOptions"
+          direction="left"
+          text-color="white"
+          @current-value="changeChackboxItem($event)"
+        />
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

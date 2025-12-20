@@ -561,9 +561,9 @@ const formatDefaultValues = computed(() => {
 	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6rem' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
-	const selectWidthValue = !selectWidth.value ? 200 : selectWidth.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
+	const selectWidthValue = ((selectWidth.value !== 0 && !selectWidth.value) || selectWidth.value < 0) ? 200 : selectWidth.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const hasBorderRadiusValue = !hasBorderRadius.value ? false : hasBorderRadius.value
 	const textAlignValue = !textAlign.value || !['center', 'left', 'right'].includes(textAlign.value) ? 'left' : textAlign.value
 	const inputStyleValue = !inputStyle.value || !['background', 'line', 'border'].includes(inputStyle.value) ? 'background' : inputStyle.value

@@ -1,15 +1,24 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <p class="text-test">
-        Select "
-        <NbHighlightSelectedText nb-id="nb-highlight-selected-text" background-color="tomato" text-color="blue">
-          <template #text>this part of the text</template>
-        </NbHighlightSelectedText>
-        " to see it in another color
-      </p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <p class="text-test">
+          Select "
+          <NbHighlightSelectedText nb-id="nb-highlight-selected-text" background-color="tomato" text-color="blue">
+            <template #text>this part of the text</template>
+          </NbHighlightSelectedText>
+          " to see it in another color
+        </p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup></script>

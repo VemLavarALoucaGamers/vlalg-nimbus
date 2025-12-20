@@ -1,26 +1,35 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbButtonAlternateText
-        nb-id="nb-button-alternate-text-one"
-        display="b"
-        theme="light"
-        light-text-color="#1e40af"
-        light-text-color-hover="#ffffff"
-        light-button-color="#dbeafe"
-        light-button-color-hover="#bfdbfe"
-        light-border-color="#93c5fd"
-        :padding-x="1"
-        :padding-y="0.4"
-        :disabled="false"
-        :border-radius="0.375"
-        font-size="1.6em"
-        :font-weight="200"
-        @clicked="logEvent()"
-      />
-      <p class="legend">Look at the console to see the triggered event</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbButtonAlternateText
+          nb-id="nb-button-alternate-text-one"
+          display="b"
+          theme="light"
+          light-text-color="#1e40af"
+          light-text-color-hover="#ffffff"
+          light-button-color="#dbeafe"
+          light-button-color-hover="#bfdbfe"
+          light-border-color="#93c5fd"
+          :padding-x="1"
+          :padding-y="0.4"
+          :disabled="false"
+          :border-radius="0.375"
+          font-size="1.6em"
+          :font-weight="200"
+          @clicked="logEvent()"
+        />
+        <p class="legend">Look at the console to see the triggered event</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>
