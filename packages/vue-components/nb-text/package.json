@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-text",
   "description": "Text components for Vuejs 3",
-  "version": "4.0.1",
+  "version": "5.0.2",
   "type": "module",
   "main": "./dist/nb-text.umd.js",
   "module": "./dist/nb-text.js",
@@ -66,6 +66,9 @@
     "vue js",
     "vue plugin",
     "text",
+    "gradient",
+    "zoom",
+    "highlight",
     "components",
     "component",
     "vue components",

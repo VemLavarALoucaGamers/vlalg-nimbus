@@ -1,7 +1,7 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <ClientOnly>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
         <NbSlideDivFixedSize
           nb-id="nb-slide"
           display="b"
@@ -29,10 +29,17 @@
             </div>
           </template>
         </NbSlideDivFixedSize>
-      </ClientOnly>
-      <p class="legend">Look at the console to see the triggered event</p>
+        <p class="legend">Look at the console to see the triggered event</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup></script>

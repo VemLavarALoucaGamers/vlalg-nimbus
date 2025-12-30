@@ -1,0 +1,80 @@
+{
+	"name": "@vlalg-nimbus/magic-debounce",
+	"description": "Printing the console.log in a magical way",
+	"version": "3.0.2",
+	"type": "module",
+	"main": "./dist/bundle.min.umd.js",
+	"module": "./dist/bundle.min.es.js",
+	"exports": {
+		".": {
+			"import": "./dist/bundle.min.es.js",
+			"require": "./dist/bundle.min.umd.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./package.json": "./package.json"
+	},
+	"browser": {
+		"./style.css": ""
+	},
+	"typeScriptVersion": "^5.2.2",
+	"types": "./dist/index.d.ts",
+	"typings": "./dist/index.d.ts",
+	"sideEffects": true,
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"dev:only": "cross-env NODE_ENV=development yarn rollup",
+		"dev:watch-prod": "cross-env NODE_ENV=production yarn rollup:watch",
+		"dev": "concurrently \"yarn clean\" \"yarn dev:watch-prod\" \"yarn generate-typing:watch\"",
+		"prod:minify": "cross-env NODE_ENV=production yarn rollup",
+		"rollup": "rollup --config",
+		"rollup:watch": "rollup --config --watch",
+		"generate-typing": "npx tsc",
+		"generate-typing:watch": "npx tsc -w",
+		"clean": "rimraf dist",
+		"lint": "eslint ./modules --ext .ts --fix",
+		"npm:publish": "yarn clean && yarn lint && yarn prod:minify && yarn generate-typing && npm login && npm publish --access=public"
+	},
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "^25.0.4",
+		"@rollup/plugin-eslint": "^9.0.4",
+		"@rollup/plugin-node-resolve": "^15.2.1",
+		"@rollup/plugin-replace": "^5.0.2",
+		"@typescript-eslint/eslint-plugin": "^8.46.0",
+		"@typescript-eslint/parser": "^8.46.0",
+		"concurrently": "^8.2.1",
+		"cross-env": "^7.0.3",
+		"eslint": "^8.48.0",
+		"rimraf": "^5.0.5",
+		"rollup": "^3.28.1",
+		"rollup-plugin-esbuild": "^6.2.1",
+		"rollup-plugin-license": "^3.1.0",
+		"rollup-plugin-uglify": "^6.0.4",
+		"typescript": "^5.8.3"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus"
+	},
+	"bugs": {
+		"url": "https://github.com/VemLavarALoucaGamers/vlalg-nimbus/issues"
+	},
+	"homepage": "https://nimbus.tec.br",
+	"license": "MIT",
+	"keywords": [
+		"module",
+		"lib",
+		"awesome",
+		"consolelog",
+		"awesome consolelog",
+		"magic",
+		"consolelog",
+		"magic consolelog"
+	],
+	"author": "Antonio and Felipe <Vem Lavar a Louca Gamers> (https://vemlavaralouca.com.br)",
+	"contributors": [
+		"TonhaoSantos (https://github.com/TonhaoSantos)",
+		"Felipecss (https://github.com/lipecss)"
+	]
+}

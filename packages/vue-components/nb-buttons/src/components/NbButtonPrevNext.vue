@@ -6,23 +6,33 @@
 	>
 		<div
 			:id="nbId"
-			:class="['nb-reset', 'component']"
+			:class="['nb-reset', 'component', themeStyle]"
 			:style="componentStyle"
 		>
 			<div
 				v-if="showPreview"
-				@click="interacted('preview')"
 				:class="['buttonNextPreview buttonPreview', previewDisabled]"
 				:style="previewStyle"
+        :tabIndex="tabIndexPrev"
+        role="button"
+        v-bind="computedAriaAttrsPrev"
+				@click="interacted('preview')"
+        @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted('preview')"
+        @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('preview')"
 			>
 				<slot name="prev">← Preview</slot>
 			</div>
 
 			<div
 				v-if="showNext"
-				@click="interacted('next')"
 				:class="['buttonNextPreview buttonNext', nextDisabled]"
 				:style="nextStyle"
+        :tabIndex="tabIndexNext"
+        role="button"
+        v-bind="computedAriaAttrsNext"
+        @click="interacted('next')"
+        @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted('next')"
+        @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('next')"
 			>
 				<slot name="next">Next →</slot>
 			</div>
@@ -45,21 +55,87 @@ const props = defineProps({
 		type: String,
 		required: true
 	},
-	colorPrimary: {
-		type: String,
-		default: 'tomato'
+	tabIndexPrev: {
+		type: Number,
+    default: 0
 	},
-	colorSecondary: {
+	tabIndexNext: {
+		type: Number,
+    default: 0
+  },
+  hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
+    type: Boolean,
+    default: true
+  },
+  ariaLabelPrev: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
+  ariaAttrsPrev: {
+    type: Object,
+    default: () => ({})
+  },
+  ariaLabelNext: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
+  ariaAttrsNext: {
+    type: Object,
+    default: () => ({})
+  },
+	theme: {
 		type: String,
-		default: 'blue'
+		default: 'light',
+		validator: (value) => {
+			const currentValue = value ? value.toLowerCase() : ''
+			return ['light', 'dark'].includes(currentValue)
+		}
 	},
-	textColor: {
+	// Cores do tema light
+	lightColorPrimary: {
 		type: String,
-		default: '#fff'
+		default: '#f5f5f5'
 	},
-	textColorHover: {
+	lightColorSecondary: {
 		type: String,
-		default: 'yellow'
+		default: '#e0e0e0'
+	},
+	lightTextColor: {
+		type: String,
+		default: '#333333'
+	},
+	lightTextColorHover: {
+		type: String,
+		default: '#000000'
+	},
+	lightDisabledBgColor: {
+		type: String,
+		default: '#dfdfd9'
+	},
+	// Cores do tema dark
+	darkColorPrimary: {
+		type: String,
+		default: '#2d2d2d'
+	},
+	darkColorSecondary: {
+		type: String,
+		default: '#3d3d3d'
+	},
+	darkTextColor: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	darkTextColorHover: {
+		type: String,
+		default: '#ffffff'
+	},
+	darkDisabledBgColor: {
+		type: String,
+		default: 'rgba(40, 42, 54, 1)'
 	},
 	paddingX: {
 		type: Number,
@@ -145,6 +221,21 @@ const props = defineProps({
 })
 
 const {
+  ariaLabelPrev,
+  ariaAttrsPrev,
+  ariaLabelNext,
+  ariaAttrsNext,
+	theme,
+	lightColorPrimary,
+	lightColorSecondary,
+	lightTextColor,
+	lightTextColorHover,
+	lightDisabledBgColor,
+	darkColorPrimary,
+	darkColorSecondary,
+	darkTextColor,
+	darkTextColorHover,
+	darkDisabledBgColor,
 	paddingX,
 	paddingY,
 	marginBetween,
@@ -162,12 +253,12 @@ const formatDefaultValues = computed(() => {
 	const disabledPreviewValue = disabledPreview.value ? 'component-disabled' : ''
 	const disabledNextValue = disabledNext.value ? 'component-disabled' : ''
 	const marginBetweenValue =
-		!marginBetween.value || marginBetween.value < 0 ? 0 : marginBetween.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
-	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 10 : paddingY.value
+		((marginBetween.value !== 0 && !marginBetween.value) || marginBetween.value < 0) ? 0 : marginBetween.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
+	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
+	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 10 : paddingY.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 
 	return {
 		disabled: disabledValue,
@@ -227,9 +318,65 @@ const nextStyle = computed(() => {
 		padding: `${defaultValues.paddingX} ${defaultValues.paddingY}`
 	}
 })
+const themeStyle = computed(() => {
+	return theme.value === 'dark' ? 'component__theme--dark' : 'component__theme--light'
+})
+
+// Computed properties para as cores do theme (necessárias para v-bind no CSS)
+const styleLightColorPrimary = computed(() => lightColorPrimary.value)
+const styleLightColorSecondary = computed(() => lightColorSecondary.value)
+const styleLightTextColor = computed(() => lightTextColor.value)
+const styleLightTextColorHover = computed(() => lightTextColorHover.value)
+const styleLightDisabledBgColor = computed(() => lightDisabledBgColor.value)
+const styleDarkColorPrimary = computed(() => darkColorPrimary.value)
+const styleDarkColorSecondary = computed(() => darkColorSecondary.value)
+const styleDarkTextColor = computed(() => darkTextColor.value)
+const styleDarkTextColorHover = computed(() => darkTextColorHover.value)
+const styleDarkDisabledBgColor = computed(() => darkDisabledBgColor.value)
+
 const font = computed(() => {
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	return `'${fontValue}'`
+})
+const computedAriaAttrsPrev = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrsPrev.value) {
+    const attrKeys = Object.keys(ariaAttrsPrev.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrsPrev.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabelPrev.value,
+    'aria-disabled': previewDisabled.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
+})
+const computedAriaAttrsNext = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrsNext.value) {
+    const attrKeys = Object.keys(ariaAttrsNext.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrsNext.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabelNext.value,
+    'aria-disabled': nextDisabled.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
 })
 
 const interacted = clickType => {
@@ -294,23 +441,49 @@ const interacted = clickType => {
 		}
 	}
 
-	.buttonPreview {
-		background-color: v-bind('colorPrimary');
-		color: v-bind('textColor');
+	// Theme light
+	&.component__theme--light {
+		.buttonPreview {
+			background-color: v-bind('styleLightColorPrimary');
+			color: v-bind('styleLightTextColor');
 
-		&:hover {
-			background-color: v-bind('colorSecondary');
-			color: v-bind('textColorHover');
+			&:hover {
+				background-color: v-bind('styleLightColorSecondary');
+				color: v-bind('styleLightTextColorHover');
+			}
+		}
+
+		.buttonNext {
+			color: v-bind('styleLightTextColor');
+			background-color: v-bind('styleLightColorSecondary');
+
+			&:hover {
+				background-color: v-bind('styleLightColorPrimary');
+				color: v-bind('styleLightTextColorHover');
+			}
 		}
 	}
 
-	.buttonNext {
-		color: v-bind('textColor');
-		background-color: v-bind('colorSecondary');
+	// Theme dark
+	&.component__theme--dark {
+		.buttonPreview {
+			background-color: v-bind('styleDarkColorPrimary');
+			color: v-bind('styleDarkTextColor');
 
-		&:hover {
-			background-color: v-bind('colorPrimary');
-			color: v-bind('textColorHover');
+			&:hover {
+				background-color: v-bind('styleDarkColorSecondary');
+				color: v-bind('styleDarkTextColorHover');
+			}
+		}
+
+		.buttonNext {
+			color: v-bind('styleDarkTextColor');
+			background-color: v-bind('styleDarkColorSecondary');
+
+			&:hover {
+				background-color: v-bind('styleDarkColorPrimary');
+				color: v-bind('styleDarkTextColorHover');
+			}
 		}
 	}
 }

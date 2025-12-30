@@ -15,6 +15,8 @@
 			>
 				<select v-model="passwordType">
 					<option value="preview">preview</option>
+          <option value="statusBar">statusBar</option>
+          <option value="validationSection">validationSection</option>
 				</select>
 			</div>
 		</div>
@@ -62,6 +64,59 @@
 				/>
 			</div>
 		</div>
+
+    <div
+			v-if="passwordType === 'statusBar'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbPasswordStatusBar</h4>
+				<br />
+
+				<input
+					type="text"
+					v-model="testPassword"
+				/>
+
+				<br />
+				<br />
+
+				<NbPasswordStatusBar
+					nb-id="test"
+					:password="testPassword"
+				/>
+			</div>
+		</div>
+
+    <div
+			v-if="passwordType === 'validationSection'"
+			class="row"
+		>
+			<div
+				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+				style="margin-top: 50px; margin-bottom: 50px; overflow: hidden"
+			>
+				<h4 class="test-page__content-tile">NbPasswordValidationSection</h4>
+				<br />
+
+				<input
+					type="text"
+					v-model="testPassword"
+				/>
+
+				<br />
+				<br />
+
+				<NbPasswordValidationSection
+					nb-id="test"
+					:password="testPassword"
+          title-color="white"
+				/>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -69,10 +124,12 @@
 import { defineAsyncComponent, ref, computed } from 'vue'
 
 const NbPasswordPreview = defineAsyncComponent(() => import('@components/NbPasswordPreview.vue'))
+const NbPasswordStatusBar = defineAsyncComponent(() => import('@components/NbPasswordStatusBar.vue'))
+const NbPasswordValidationSection = defineAsyncComponent(() => import('@components/NbPasswordValidationSection.vue'))
 
-const passwordType = ref('preview')
+const passwordType = ref('validationSection')
 const passwordPreviewType = ref('preview')
-const testPassword = ref('RPD2%_S_')
+const testPassword = ref('RPd2%_S_')
 
 const passwordPreviewTypeParse = computed(() => {
 	return passwordPreviewType.value === 'preview' ? 'insert' : 'generate'

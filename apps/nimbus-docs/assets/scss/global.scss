@@ -34,6 +34,25 @@ html {
         margin-left: 25px;
 
         .docs-aside-tree {
+          &.recursive {
+            ul{
+              li {
+                border-left-color: transparent !important;
+                display: flex;
+                align-items: center;
+
+
+                &::before {
+                  content: '-';
+                  color: $color-theme;
+                }
+
+                .padded {
+                  padding-left: 12px;
+                }
+              }
+            }
+          }
           li {
             &.active {
               .title-collapsible-button {
@@ -265,4 +284,17 @@ html {
 .test-container {
   height: 100px;
   background-color: goldenrod;
+}
+
+/* Banner Test Styles - Ajustes aplicados via JavaScript */
+html.has-banner {
+  #__nuxt {
+    header {
+      z-index: 9999;
+    }
+    
+    aside {
+      z-index: 9998;
+    }
+  }
 }

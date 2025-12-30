@@ -1,0 +1,29 @@
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+}
+
+[data-theme='default'] {
+  --bg-color: #04eeff;
+  --text-color: #000000;
+}
+
+[data-theme='dark'] {
+  --bg-color: #000000;
+  --text-color: #ffffff;
+}
+
+[data-theme='test'] {
+  --bg-color: tomato;
+  --text-color: #ffffff;
+}
+
+[data-theme='other'] {
+  --bg-color: rgb(47, 0, 255);
+  --text-color: #ffffff;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}

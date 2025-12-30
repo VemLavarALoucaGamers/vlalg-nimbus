@@ -1,21 +1,26 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbButtonHamburger
-        nb-id="nb-button-hamburger"
-        display="b"
-        color="#bbbbbb"
-        color-hover="yellow"
-        container-color="white"
-        container-color-hover="blue"
-        :padding-x="3"
-        :padding-y="3"
-        :disabled="false"
-        @clicked="logEvent()"
-      />
-      <p class="legend">Look at the console to see the triggered event</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbButtonHamburger
+          nb-id="nb-button-hamburger"
+          theme="light"
+          :padding-x="3"
+          :padding-y="3"
+          :disabled="false"
+          @clicked="logEvent()"
+        />
+        <p class="legend">Look at the console to see the triggered event</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

@@ -36,6 +36,7 @@ The components that are part of this lib are:
 
 - <a href="http://nimbus.tec.br/vue-components/nb-text/nb-gradient-text" target="_blank">nb-gradient-text</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-text/nb-highlight-selected-text" target="_blank">nb-highlight-selected-text</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-text/nb-zoom-text" target="_blank">nb-zoom-text</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

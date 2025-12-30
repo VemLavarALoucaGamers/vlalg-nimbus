@@ -3,11 +3,16 @@
 		v-if="nbId"
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
-		@click="interacted"
+    :tabIndex="tabIndex"
+    role="button"
+    v-bind="computedAriaAttrs"
+    @click="interacted"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
+    @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
 	>
 		<div
 			:id="nbId"
-			:class="['nb-reset', 'component', 'component-transition', transitionSlow]"
+			:class="['nb-reset', 'component', 'component-transition', transitionSlow, themeStyle]"
 			:style="[componentStyle]"
 		>
 			<slot name="content">Default Text</slot>
@@ -38,17 +43,67 @@ const props = defineProps({
 			return ['b', 'ib'].includes(currentValue)
 		}
 	},
-	textColor: {
+	tabIndex: {
+    type: Number,
+    default: 0
+  },
+  hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
+    type: Boolean,
+    default: true
+  },
+  ariaLabel: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
+  ariaAttrs: {
+    type: Object,
+    default: () => ({})
+  },
+	theme: {
 		type: String,
-		default: '#ffffff'
+		default: 'light',
+		validator: (value) => {
+			const currentValue = value ? value.toLowerCase() : ''
+			return ['light', 'dark'].includes(currentValue)
+		}
 	},
-	containerColor: {
+	// Cores do tema light
+	lightTextColor: {
 		type: String,
-		default: '#ffffff'
+		default: '#333333'
 	},
-	buttonColor: {
+	lightButtonColor: {
 		type: String,
-		default: '#bbbbbb'
+		default: '#f5f5f5'
+	},
+	lightContainerColor: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	lightDisabledBgColor: {
+		type: String,
+		default: '#dfdfd9'
+	},
+	// Cores do tema dark
+	darkTextColor: {
+		type: String,
+		default: '#e0e0e0'
+	},
+	darkButtonColor: {
+		type: String,
+		default: '#2d2d2d'
+	},
+	darkContainerColor: {
+		type: String,
+		default: '#3d3d3d'
+	},
+	darkDisabledBgColor: {
+		type: String,
+		default: 'rgba(40, 42, 54, 1)'
 	},
 	paddingX: {
 		type: Number,
@@ -101,9 +156,17 @@ const props = defineProps({
 
 const {
 	display,
-	buttonColor,
-	textColor,
-	containerColor,
+  ariaLabel,
+  ariaAttrs,
+	theme,
+	lightTextColor,
+	lightButtonColor,
+	lightContainerColor,
+	lightDisabledBgColor,
+	darkTextColor,
+	darkButtonColor,
+	darkContainerColor,
+	darkDisabledBgColor,
 	paddingX,
 	paddingY,
 	borderRadius,
@@ -117,23 +180,17 @@ const {
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const containerColorValue = !containerColor.value ? '#ffffff' : containerColor.value
-	const buttonColorValue = !buttonColor.value ? '#bbbbbb' : buttonColor.value
-	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
-	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.2 : paddingY.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
+	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const animationSlowValue = !animationSlow.value ? 'component-transition__no-slow' : ''
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 100 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 
 	return {
 		disabled: disabledValue,
 		display: displayValue,
-		containerColor: containerColorValue,
-		buttonColor: buttonColorValue,
-		textColor: textColorValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
 		borderRadius: borderRadiusValue,
@@ -155,13 +212,14 @@ const wrapperStyle = computed(() => {
 		display: defaultValues.display
 	}
 })
+const themeStyle = computed(() => {
+	return theme.value === 'dark' ? 'component__theme--dark' : 'component__theme--light'
+})
+
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		border: `2px solid ${defaultValues.containerColor}`,
-		color: defaultValues.textColor,
-		backgroundColor: defaultValues.buttonColor,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		borderRadius: `${defaultValues.borderRadius}rem`,
 		fontSize: defaultValues.fontSize,
@@ -179,15 +237,34 @@ const font = computed(() => {
 	return defaultValues.font
 })
 
-const styleTextColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
+// Computed properties para as cores do theme (necessárias para v-bind no CSS)
+const styleLightTextColor = computed(() => lightTextColor.value)
+const styleLightButtonColor = computed(() => lightButtonColor.value)
+const styleLightContainerColor = computed(() => lightContainerColor.value)
+const styleLightDisabledBgColor = computed(() => lightDisabledBgColor.value)
+const styleDarkTextColor = computed(() => darkTextColor.value)
+const styleDarkButtonColor = computed(() => darkButtonColor.value)
+const styleDarkContainerColor = computed(() => darkContainerColor.value)
+const styleDarkDisabledBgColor = computed(() => darkDisabledBgColor.value)
+const computedAriaAttrs = computed(() => {
+  const newAttrs = {}
 
-	return defaultValues.textColor
-})
-const styleButtonColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
+  if (ariaAttrs.value) {
+    const attrKeys = Object.keys(ariaAttrs.value)
 
-	return defaultValues.buttonColor
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrs.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabel.value,
+    'aria-disabled': disabled.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
 })
 
 const interacted = () => {
@@ -233,7 +310,6 @@ const interacted = () => {
 	padding: 0;
 	box-sizing: border-box;
 	line-height: 1.42857143;
-	font-family: 'Lato', sans-serif;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -251,9 +327,6 @@ const interacted = () => {
 	margin-bottom: 5px;
 
 	margin-right: 3px;
-	box-shadow:
-		3px 3px 0 -1px v-bind('buttonColor'),
-		3px 3px 0 v-bind('buttonColor');
 
 	&.component-transition {
 		transition-duration: 0.15s;
@@ -264,11 +337,38 @@ const interacted = () => {
 		}
 	}
 
-	&:hover {
+	// Theme light
+	&.component__theme--light {
+		border: 2px solid v-bind('styleLightContainerColor');
+		color: v-bind('styleLightTextColor');
+		background-color: v-bind('styleLightButtonColor');
 		box-shadow:
-			0 0 0 -1px v-bind('buttonColor'),
-			0 0 0 v-bind('buttonColor');
-		transform: translate(3px, 3px);
+			3px 3px 0 -1px v-bind('styleLightButtonColor'),
+			3px 3px 0 v-bind('styleLightButtonColor');
+
+		&:hover {
+			box-shadow:
+				0 0 0 -1px v-bind('styleLightButtonColor'),
+				0 0 0 v-bind('styleLightButtonColor');
+			transform: translate(3px, 3px);
+		}
+	}
+
+	// Theme dark
+	&.component__theme--dark {
+		border: 2px solid v-bind('styleDarkContainerColor');
+		color: v-bind('styleDarkTextColor');
+		background-color: v-bind('styleDarkButtonColor');
+		box-shadow:
+			3px 3px 0 -1px v-bind('styleDarkButtonColor'),
+			3px 3px 0 v-bind('styleDarkButtonColor');
+
+		&:hover {
+			box-shadow:
+				0 0 0 -1px v-bind('styleDarkButtonColor'),
+				0 0 0 v-bind('styleDarkButtonColor');
+			transform: translate(3px, 3px);
+		}
 	}
 
 	&:active,
@@ -293,12 +393,18 @@ const interacted = () => {
 	user-select: none;
 
 	.component {
-		--disabled-button-color: v-bind('styleButtonColor');
-		--disabled-color: v-bind('styleTextColor');
-		background-color: var(--disabled-button-color) !important;
-		color: var(--disabled-color) !important;
 		opacity: 0.7;
 		border-radius: inherit;
+
+		&.component__theme--light {
+			background-color: v-bind('styleLightButtonColor') !important;
+			color: v-bind('styleLightTextColor') !important;
+		}
+
+		&.component__theme--dark {
+			background-color: v-bind('styleDarkButtonColor') !important;
+			color: v-bind('styleDarkTextColor') !important;
+		}
 	}
 }
 </style>

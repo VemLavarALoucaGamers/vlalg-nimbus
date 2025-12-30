@@ -2,34 +2,39 @@
 	<div
 		v-if="nbId && validList"
 		:class="['nb-wrapper', componentDisabled]"
-		:style="[wrapperStyle]"
+		:style="[wrapperStyle, size]"
 	>
 		<div
 			:id="nbId"
-			:class="['nb-reset', 'component']"
-			:style="[componentStyle]"
+      role="group"
+      v-bind="computedAriaAttrs"
+			:class="['nb-reset', 'component', displayClass, themeStyle]"
 		>
       <div
         v-for="(item, index) in options"
         :key="index"
-        class="custom-checkbox__item"
-        :class="[displayClass, currentDirection]"
+        class="component-checkbox__item"
       >
         <input
           :id="`${nbId}-${item.value}`"
           v-model="currentValue"
           type="checkbox"
-          class="custom-checkbox__item--input"
+          class="component-checkbox__item--input"
           :disabled="disabled"
           :value="item.value"
           :name="groupName"
+          @click="clicked"
         />
         <label
           :for="`${nbId}-${item.value}`"
           :class="[typeCheckbox]"
-          class="custom-checkbox__item--label"
+          :tabindex="disabled ? -1 : (Array.isArray(tabIndex) ? tabIndex[index] : tabIndex >= 0 ? tabIndex : index + 1)"
+          class="component-checkbox__item--label"
+          @keydown.enter.prevent="!disabled && hasTabIndexEnter && $event.target.click()"
+          @keydown.space.prevent="!disabled && hasTabIndexSpace && $event.target.click()"
         >
-          {{ item.text }}
+          <div :class="[ styleBackground ]"></div>
+          <span :style="[componentStyle]">{{ item.text }}</span>
         </label>
       </div>
 		</div>
@@ -37,7 +42,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, watch, watchEffect } from 'vue'
+import { defineProps, ref, toRefs, computed, onMounted, watch } from 'vue'
 
 defineOptions({
 	name: 'NbInputCheckbox',
@@ -48,7 +53,7 @@ onMounted(() => {
   startValue()
 })
 
-const emit = defineEmits(['current-value', 'changed'])
+const emit = defineEmits(['current-value', 'changed', 'clicked'])
 
 const props = defineProps({
 	nbId: {
@@ -62,6 +67,33 @@ const props = defineProps({
 			const currentValue = value ? value.toLowerCase() : ''
 			return ['b', 'ib'].includes(currentValue)
 		}
+  },
+	tabIndex: {
+    type: [Number, Array],
+    default: 0,
+    validator: (value, props) => {
+      if (Array.isArray(value)) {
+        // Opcional: validar se tem o mesmo tamanho de options
+        return value.length === props.options.length
+      }
+      return true
+    }
+  },
+  hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
+    type: Boolean,
+    default: true
+  },
+  ariaLabel: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
+  ariaAttrs: {
+    type: Object,
+    default: () => ({})
   },
   groupName: {
     type: String,
@@ -99,22 +131,45 @@ const props = defineProps({
       if (!hasError) return item
     },
   },
-  currentOptiton: {
+  currentOption: {
     type: Array,
     default: () => {
       return []
     }
   },
-  direction: {
+  theme: {
     type: String,
-    default: 'left',
-    validator: value => {
-      return ['left', 'right'].indexOf(value) !== -1
-    },
+    default: 'light',
+    validator: (value) => {
+      const currentValue = value ? value.toLowerCase() : ''
+      return ['light', 'dark'].includes(currentValue)
+    }
   },
-  textColor: {
+  // Cores do tema light
+  lightTextColor: {
     type: String,
-    default: 'black'
+    default: '#333333'
+  },
+  lightColor: {
+    type: String,
+    default: '#cccccc'
+  },
+  lightColorHover: {
+    type: String,
+    default: '#bbbbbb'
+  },
+  // Cores do tema dark
+  darkTextColor: {
+    type: String,
+    default: '#e0e0e0'
+  },
+  darkColor: {
+    type: String,
+    default: '#555555'
+  },
+  darkColorHover: {
+    type: String,
+    default: '#666666'
   },
   boxRadius: {
     type: Number,
@@ -138,10 +193,6 @@ const props = defineProps({
       return [true, false].indexOf(value) !== -1
     }
   },
-  colorHover: {
-    type: String,
-    default: '#a6a6a6'
-  },
   itemGap: {
     type: Number,
     default: 15
@@ -150,12 +201,23 @@ const props = defineProps({
     type: Number,
     default: 6
   },
+  scale: {
+    type: Number,
+    default: 1
+  },
   type: {
     type: String,
     default: 'box',
     validator: value => {
       return ['box', 'circle'].indexOf(value) !== -1
     },
+  },
+  background: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return [true, false].indexOf(value) !== -1
+    }
   },
 	disabled: {
 		type: Boolean,
@@ -186,19 +248,26 @@ const props = defineProps({
 
 const currentValue = ref(null)
 const {
-  currentOptiton,
+  ariaLabel,
+  ariaAttrs,
+  currentOption,
   display,
   options,
-  direction,
-  textColor,
+  theme,
+  lightTextColor,
+  lightColor,
+  lightColorHover,
+  darkTextColor,
+  darkColor,
+  darkColorHover,
   boxRadius,
-  color,
   hoverEffect,
   activeHoverEffect,
-  colorHover,
   itemGap,
   internalGap,
+  scale,
   type,
+  background,
 	disabled,
 	fontFamily,
 	fontSize,
@@ -210,32 +279,28 @@ const formatDefaultValues = computed(() => {
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = (fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0 ? 200 : fontWeight.value
-  const directionValue = !direction.value ? 'left' : direction.value
-  const textColorValue = !textColor.value ? 'black' : textColor.value
-  const boxRadiusValue = (boxRadius.value !== 0 && !boxRadius.value) || boxRadius.value < 0 ? 0 : boxRadius.value
-  const colorValue = !color.value ? '#767676' : color.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
+  const boxRadiusValue = ((boxRadius.value !== 0 && !boxRadius.value) || boxRadius.value < 0) ? 0 : boxRadius.value
   const hoverEffectValue = ![false, true].includes(hoverEffect.value) ? false : hoverEffect.value
   const activeHoverEffectValue = ![false, true].includes(activeHoverEffect.value) ? false : activeHoverEffect.value
-  const colorHoverValue = !colorHover.value ? '#a6a6a6' : colorHover.value
-  const itemGapValue = (itemGap.value !== 0 && !itemGap.value) || itemGap.value < 0 ? 15 : itemGap.value
-  const internalGapValue = (internalGap.value !== 0 && !internalGap.value) || internalGap.value < 0 ? 6 : internalGap.value
+  const itemGapValue = ((itemGap.value !== 0 && !itemGap.value) || itemGap.value < 0) ? 15 : itemGap.value
+  const internalGapValue = ((internalGap.value !== 0 && !internalGap.value) || internalGap.value < 0) ? 6 : internalGap.value
   const typeValue = !['box', 'circle'].includes(type.value) ? 'box' : type.value
+  const scaleValue = ((scale.value !== 0 && !scale.value) || scale.value < 0) ? 1 : scale.value
+  const backgroundValue = ![false, true].includes(background.value) ? false : background.value
 
 	return {
 		disabled: disabledValue,
     display: displayValue,
-    direction: directionValue,
-    textColor: textColorValue,
     boxRadius: boxRadiusValue,
-    color: colorValue,
     hoverEffect: hoverEffectValue,
     activeHoverEffect: activeHoverEffectValue,
-    colorHover: colorHoverValue,
     itemGap: itemGapValue,
     internalGap: internalGapValue,
+    scale: scaleValue,
     type: typeValue,
-		font: fontValue,
+    font: fontValue,
+    background: backgroundValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue
 	}
@@ -256,7 +321,7 @@ const wrapperStyle = computed(() => {
 const displayClass = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  return (defaultValues.display === 'inline-block') ? 'custom-checkbox__item--display-inline' : 'custom-checkbox__item--display-block'
+  return (defaultValues.display === 'inline-block') ? 'component-checkbox__item--display-inline' : 'component-checkbox__item--display-block'
 })
 
 const componentStyle = computed(() => {
@@ -274,57 +339,74 @@ const validList = computed(() => {
   return isArray && options.value.length > 0
 })
 
-const currentDirection = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-  return (defaultValues.direction === 'right') ? 'custom-checkbox__item--direction-right' : 'custom-checkbox__item--direction-left'
+const themeStyle = computed(() => {
+	return theme.value === 'dark' ? 'component__theme--dark' : 'component__theme--light'
 })
+
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.font
 })
 
-const styleTextColor = computed(() => {
+// Computed properties para as cores do theme (necessárias para v-bind no CSS)
+const styleLightTextColor = computed(() => lightTextColor.value)
+const styleLightColor = computed(() => lightColor.value)
+const styleLightColorHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textColor
+	return defaultValues.hoverEffect ? lightColorHover.value : lightColor.value
 })
-const styleColor = computed(() => {
+const styleLightColorActiveHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.color
+	return defaultValues.activeHoverEffect ? lightColorHover.value : lightColor.value
 })
-const styleColorActiveHover = computed(() => {
+const styleLightBgColorActiveHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
+	return defaultValues.activeHoverEffect && defaultValues.background ? `${lightColorHover.value}80` : lightColorHover.value
 })
-const styleColorHover = computed(() => {
+
+const styleDarkTextColor = computed(() => darkTextColor.value)
+const styleDarkColor = computed(() => darkColor.value)
+const styleDarkColorHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+	return defaultValues.hoverEffect ? darkColorHover.value : darkColor.value
+})
+const styleDarkColorActiveHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+	return defaultValues.activeHoverEffect ? darkColorHover.value : darkColor.value
+})
+const styleDarkBgColorActiveHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+	return defaultValues.activeHoverEffect && defaultValues.background ? `${darkColorHover.value}80` : darkColorHover.value
+})
+const styleBackground = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.hoverEffect ? defaultValues.colorHover : defaultValues.color
+	return defaultValues.background ? 'component-checkbox__item--with-background' : 'component-checkbox__item--without-background'
+})
+const checkBackgroundColor = computed(() => {
+	const defaultValues = formatDefaultValues.value
+	const textColorValue = theme.value === 'dark' ? darkTextColor.value : lightTextColor.value
+
+  return defaultValues.background ? '#ffffff' : textColorValue
+})
+const iconSize = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+  return defaultValues.background ? '19px' : 'auto'
 })
 
 const paddingValue = computed(() => {
   const defaultValues = formatDefaultValues.value
   const internalG = defaultValues.internalGap
 
-  return !internalG || internalG < 0 ? 0 : internalG
-})
-
-const paddingLeft = computed(() => {
-  return `0 0 0 2${paddingValue.value}px`
-})
-
-const paddingRight = computed(() => {
-  return `0 2${paddingValue.value}px 0 0`
+  return !internalG || internalG < 0 ? 0 : `${internalG}px`
 })
 
 const borderRadius = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  const newValue = defaultValues.borderRadius > 7 ? 7 : defaultValues.borderRadius
+  const newValue = defaultValues.boxRadius > 7 ? 7 : defaultValues.boxRadius
 
   return `${newValue}px`
 })
@@ -343,16 +425,49 @@ const typeCheckbox = computed(() => {
   return tp === 'circle' ? 'custom-checkbox__input--type-circle' : ''
 })
 
+const size = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return {
+    zoom: defaultValues.scale
+  }
+})
+const computedAriaAttrs = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrs.value) {
+    const attrKeys = Object.keys(ariaAttrs.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrs.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabel.value,
+    'aria-disabled': disabled.value,
+    ...newAttrs
+  }
+  
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
+})
+
 const startValue = () => {
-  currentValue.value = currentOptiton.value
+  currentValue.value = currentOption.value
+}
+const clicked = () => {
+  emit('clicked')
 }
 
-watch(currentOptiton, () => {
-  startValue()
+watch(currentOption, (newValue, oldValue) => {
+  if (newValue !== oldValue) startValue()
 })
-watch(currentValue, value => {
-  emit('current-value', value)
-  emit('changed', value)
+watch(currentValue, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    emit('current-value', newValue)
+    emit('changed', newValue)
+  }    
 })
 </script>
 
@@ -366,8 +481,7 @@ watch(currentValue, value => {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	// display: inline-block;
-	vertical-align: bottom;
+	vertical-align: text-bottom;
 }
 
 .nb-reset {
@@ -411,165 +525,233 @@ watch(currentValue, value => {
 	outline: 0;
 	position: relative;
 
-	overflow: hidden;
+  &.component-checkbox__item--display-block,
+  &.component-checkbox__item--display-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v-bind(gapValue);
+    width: auto;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
 
-  // padding-top: 4px;
+  // inicio propDisplay
+  &.component-checkbox__item--display-block {
+    flex-direction: column;
+  }
 
-  .custom-checkbox__item {
-    .custom-checkbox__item--input {
+  &.component-checkbox__item--display-inline {
+    flex-direction: row;
+  }
+  // fim propDisplay
+
+  .component-checkbox__item {
+    position: relative;
+
+    .component-checkbox__item--input {
       display: none;
 
       &:checked {
-        &+.custom-checkbox__item--label {
-          &:hover {
-            &:before {
-              border: 2px solid v-bind(styleColorActiveHover);
-              color: v-bind(styleColorActiveHover);
+        &+.component-checkbox__item--label {
+          &.custom-checkbox__input--type-circle {
+            div {
+              &::before {
+                margin-top: 0em;
+                margin-left: -1px;
+              }
+              &.component-checkbox__item--without-background {
+                font-size: 1em;
+              }
+              &.component-checkbox__item--with-background {
+                font-size: 1em;
+              }
             }
           }
 
-          &:before {
-            content: '\2713';
-            font-size: 0.7em;
-            font-weight: 900;
-            text-align: center;
-            line-height: 17px;
-            text-shadow: 0;
-            display: flex;
-            align-items: self-end;
-            text-align: center;
-            justify-content: space-around;
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
-            box-shadow: none;
-            border-radius: v-bind(borderRadius);
-            border: 2px solid v-bind(styleColor);
-            color: v-bind(styleColor);
+          div {
+            &.component-checkbox__item--without-background {
+              font-size: 1.2em;
+            }
+            &.component-checkbox__item--with-background {
+              font-size: 1.2em;
+            }
+
+            &:before {
+              content: '\2714';
+              text-shadow: 0;
+              display: flex;
+              align-items: center;
+              text-align: center;
+              justify-content: center;
+              -webkit-box-shadow: none;
+              -moz-box-shadow: none;
+              box-shadow: none;
+              border-radius: v-bind(borderRadius);
+              border: 0;
+            }
           }
         }
       }
     }
 
-    .custom-checkbox__item--label {
-      --disabled-color: v-bind('styleTextColor');
-      color: var(--disabled-color) !important;
-
-      &:before {
-        border: 2px solid v-bind(styleColor);
-      }
+    .component-checkbox__item--label {
+      display: flex;
+      flex-direction: row;
+      gap: v-bind(paddingValue);
+      align-items: center;
 
       &:hover {
         cursor: pointer;
-
-        &:before {
-          border: 2px solid v-bind(styleColorHover);
-        }
       }
 
-      &:before {
-        content: '';
+      &:focus {
+        outline-offset: 2px;
+      }
+
+      div {
         width: 19px;
         height: 19px;
-        position: absolute;
-        bottom: 0;
-        border: 0;
+        flex-shrink: 0;
         text-shadow: 0;
         -webkit-box-shadow: none;
         -moz-box-shadow: none;
         box-shadow: none;
         border-radius: v-bind(borderRadius);
-        border: 2px solid v-bind(styleColor);
-        color: v-bind(styleColor);
+        font-family: 'Lato', sans-serif !important;
+        font-weight: bold;
       }
 
       // inicio propType
       &.custom-checkbox__input--type-circle {
-        &:before {
+        div {
           border-radius: 50% !important;
+
+          &:before {
+            border-radius: 50% !important;
+          }
         }
       }
       // fim propType
     }
+  }
 
-    // inicio propDisplay
-    &.custom-checkbox__item--display-block {
-      display: block;
+  // Theme light
+  &.component__theme--light {
+    .component-checkbox__item {
+      .component-checkbox__item--input {
+        &:checked {
+          &+.component-checkbox__item--label {
+            &:hover {
+              div {
+                &.component-checkbox__item--without-background {
+                  border: 2px solid v-bind(styleLightColorActiveHover);
+                  color: v-bind(styleLightColorHover);
+                }
+                &.component-checkbox__item--with-background {
+                  background: v-bind(styleLightBgColorActiveHover);
+                }
+              }
+            }
 
-      &:not(:first-child) {
-        margin-top: v-bind(gapValue);
-      }
-
-      .custom-checkbox__item--label {
-        display: inline;
-        font-family: inherit;
-        font-size: inherit;
-        font-style: normal;
-        line-height: 20px;
-        position: relative;
-      }
-    }
-
-    &.custom-checkbox__item--display-inline {
-      display: inline-block;
-
-      &:not(:first-child) {
-        margin-left: v-bind(gapValue);
-      }
-
-      .custom-checkbox__item--label {
-        display: inline;
-        font-family: inherit;
-        font-size: inherit;
-        font-style: normal;
-        line-height: 20px;
-        position: relative;
-      }
-    }
-
-    // fim propDisplay
-
-    // inicio propDirection
-    &.custom-checkbox__item--display-block {
-      &.custom-checkbox__item--direction-left {
-        .custom-checkbox__item--label {
-          display: inline-block;
-          padding: v-bind(paddingLeft);
-
-          &:before {
-            left: 0;
+            div {
+              &.component-checkbox__item--without-background {
+                border: 2px solid v-bind(styleLightColor);
+                color: v-bind(styleLightColorHover);
+              }
+              &.component-checkbox__item--with-background {
+                border: 2px solid v-bind(styleLightColorHover);
+                background: v-bind(styleLightColorHover);
+              }
+            }
           }
         }
       }
 
-      &.custom-checkbox__item--direction-right {
-        .custom-checkbox__item--label {
-          padding: v-bind(paddingRight);
+      .component-checkbox__item--label {
+        --disabled-color: v-bind('styleLightTextColor');
+        color: var(--disabled-color) !important;
 
-          &:before {
-            right: 0;
+        &:hover {
+          div {
+            &.component-checkbox__item--without-background {
+              border: 2px solid v-bind(styleLightColorHover);
+            }
+            &.component-checkbox__item--with-background {
+              border: 2px solid v-bind(styleLightColorHover);
+            }
+          }
+        }
+
+        div {
+          &.component-checkbox__item--without-background {
+            border: 2px solid v-bind(styleLightColor);
+            color: v-bind(styleLightColor);
+          }
+          &.component-checkbox__item--with-background {
+            border: 2px solid v-bind(styleLightColor);
+            color: v-bind(checkBackgroundColor);
           }
         }
       }
     }
+  }
 
-    &.custom-checkbox__item--display-inline {
-      &.custom-checkbox__item--direction-left {
-        .custom-checkbox__item--label {
-          display: inline-block;
-          padding: v-bind(paddingLeft);
+  // Theme dark
+  &.component__theme--dark {
+    .component-checkbox__item {
+      .component-checkbox__item--input {
+        &:checked {
+          &+.component-checkbox__item--label {
+            &:hover {
+              div {
+                &.component-checkbox__item--without-background {
+                  border: 2px solid v-bind(styleDarkColorActiveHover);
+                  color: v-bind(styleDarkColorHover);
+                }
+                &.component-checkbox__item--with-background {
+                  background: v-bind(styleDarkBgColorActiveHover);
+                }
+              }
+            }
 
-          &:before {
-            left: 0;
+            div {
+              &.component-checkbox__item--without-background {
+                border: 2px solid v-bind(styleDarkColor);
+                color: v-bind(styleDarkColorHover);
+              }
+              &.component-checkbox__item--with-background {
+                border: 2px solid v-bind(styleDarkColorHover);
+                background: v-bind(styleDarkColorHover);
+              }
+            }
           }
         }
       }
 
-      &.custom-checkbox__item--direction-right {
-        .custom-checkbox__item--label {
-          padding: v-bind(paddingRight);
+      .component-checkbox__item--label {
+        --disabled-color: v-bind('styleDarkTextColor');
+        color: var(--disabled-color) !important;
 
-          &:before {
-            right: 0;
+        &:hover {
+          div {
+            &.component-checkbox__item--without-background {
+              border: 2px solid v-bind(styleDarkColorHover);
+            }
+            &.component-checkbox__item--with-background {
+              border: 2px solid v-bind(styleDarkColorHover);
+            }
+          }
+        }
+
+        div {
+          &.component-checkbox__item--without-background {
+            border: 2px solid v-bind(styleDarkColor);
+            color: v-bind(styleDarkColor);
+          }
+          &.component-checkbox__item--with-background {
+            border: 2px solid v-bind(styleDarkColor);
+            color: v-bind(checkBackgroundColor);
           }
         }
       }
@@ -583,10 +765,72 @@ watch(currentValue, value => {
 	user-select: none;
 
 	.component {
-		--disabled-color: v-bind('styleTextColor');
-		color: var(--disabled-color) !important;
-		opacity: 0.7;
+		opacity: 0.4;
 		border-radius: inherit;
+
+    .component-checkbox__item {
+      .component-checkbox__item--input {
+        &:checked {
+          &+.component-checkbox__item--label {
+            div {
+              &.component-checkbox__item--without-background {
+                border: 2px solid v-bind(styleLightColorActiveHover);
+                color: v-bind(styleLightColorHover);
+              }
+              &.component-checkbox__item--with-background {
+                background: v-bind(styleLightBgColorActiveHover);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.component__theme--light {
+      --disabled-color: v-bind('styleLightTextColor');
+      color: var(--disabled-color) !important;
+
+      .component-checkbox__item {
+        .component-checkbox__item--input {
+          &:checked {
+            &+.component-checkbox__item--label {
+              div {
+                &.component-checkbox__item--without-background {
+                  border: 2px solid v-bind(styleLightColorActiveHover);
+                  color: v-bind(styleLightColorHover);
+                }
+                &.component-checkbox__item--with-background {
+                  background: v-bind(styleLightBgColorActiveHover);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.component__theme--dark {
+      --disabled-color: v-bind('styleDarkTextColor');
+      color: var(--disabled-color) !important;
+
+      .component-checkbox__item {
+        .component-checkbox__item--input {
+          &:checked {
+            &+.component-checkbox__item--label {
+              div {
+                &.component-checkbox__item--without-background {
+                  border: 2px solid v-bind(styleDarkColorActiveHover);
+                  color: v-bind(styleDarkColorHover);
+                }
+                &.component-checkbox__item--with-background {
+                  background: v-bind(styleDarkBgColorActiveHover);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 	}
 }
 </style>

@@ -8,6 +8,10 @@ export default defineNuxtConfig({
     transpile: ['@vlalg-nimbus/github-stars-button']
   },
 
+  devtools: {
+    enabled: false
+  },
+
   modules: [
     // https://github.com/nuxt-modules/plausible
     '@nuxtjs/plausible',

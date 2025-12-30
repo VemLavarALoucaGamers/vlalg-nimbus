@@ -245,14 +245,14 @@ const formatDefaultValues = computed(() => {
 	const nbIdValue = !nbId.value ? '' : nbId.value
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const slideTypeValue = !slideType.value ? 'transform' : slideType.value
-	const slideWidthValue = !slideWidth.value ? 200 : slideWidth.value
-	const slideHeightValue = !slideHeight.value ? 200 : slideHeight.value
-	const slideIntervalValue = !slideInterval.value ? 5000 : slideInterval.value
-	const buttonsSizeValue = !buttonsSize.value ? 10 : buttonsSize.value
-	const buttonMarginTopValue = !buttonMarginTop.value ? 10 : buttonMarginTop.value
-	const buttonMarginBottomValue = !buttonMarginBottom.value ? 10 : buttonMarginBottom.value
+	const slideWidthValue = ((slideWidth.value !== 0 && !slideWidth.value) || slideWidth.value < 0) ? 200 : slideWidth.value
+	const slideHeightValue = ((slideHeight.value !== 0 && !slideHeight.value) || slideHeight.value < 0) ? 200 : slideHeight.value
+	const slideIntervalValue = ((slideInterval.value !== 0 && !slideInterval.value) || slideInterval.value < 0) ? 5000 : slideInterval.value
+	const buttonsSizeValue = ((buttonsSize.value !== 0 && !buttonsSize.value) || buttonsSize.value < 0) ? 10 : buttonsSize.value
+	const buttonMarginTopValue = ((buttonMarginTop.value !== 0 && !buttonMarginTop.value) || buttonMarginTop.value < 0) ? 10 : buttonMarginTop.value
+	const buttonMarginBottomValue = ((buttonMarginBottom.value !== 0 && !buttonMarginBottom.value) || buttonMarginBottom.value < 0) ? 10 : buttonMarginBottom.value
 	const buttonsColorValue = !buttonsColor ? 'tomato' : buttonsColor.value
 	const buttonsColorHoverValue = !buttonsColorHover ? 'blue' : buttonsColorHover.value
 	const progressColorValue = !progressColor.value ? 'blue' : progressColor.value

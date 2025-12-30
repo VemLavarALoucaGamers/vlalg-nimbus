@@ -23,6 +23,11 @@
 
 <script setup>
 import { defineProps, ref, toRefs, watch, computed, onMounted } from 'vue'
+import { configPatternLetter, configPatternNumber, configPatternSpecial } from './config'
+
+onMounted(() => {
+	checkComponentType()
+})
 
 defineOptions({
 	name: 'NbPasswordPreview',
@@ -146,10 +151,6 @@ const colorRed = ref('#F87676')
 
 const { type, password, length, hasNumbers, hasSpecial, hasUppercaseLowercase } = toRefs(props)
 
-const patternLetter = /[a-zA-Z]/
-const patternNumber = /[0-9]/
-const patternSpecial = /[!@#$%^&*()_+{}[\]]/
-
 const {
 	display,
 	background,
@@ -169,13 +170,13 @@ const formatDefaultValues = computed(() => {
 	const backgroundValue = !background.value ? '#ffffff' : background.value
 	const borderColorValue = !borderColor.value ? '#ffe54c' : borderColor.value
 	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
-	const borderRadiusValue = !borderRadius.value || borderRadius.value < 0 ? 0 : borderRadius.value
+	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const widthValue = !width.value || width.value < 86 ? 86 : width.value
-	const paddingXValue = !paddingX.value || paddingX.value < 0 ? 1 : paddingX.value
-	const paddingYValue = !paddingY.value || paddingY.value < 0 ? 0.4 : paddingY.value
+	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
+	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.4 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.8em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 700 : fontWeight.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 700 : fontWeight.value
 
 	return {
 		display: displayValue,
@@ -226,16 +227,16 @@ const font = computed(() => {
 })
 
 const getColor = character => {
-	const regexLetter = new RegExp(patternLetter)
-	const regexNumber = new RegExp(patternNumber)
-	const regexSpecial = new RegExp(patternSpecial)
+	const regexLetter = new RegExp(configPatternLetter)
+	const regexNumber = new RegExp(configPatternNumber)
+	const regexSpecial = new RegExp(configPatternSpecial)
 
-	if (regexNumber.test(character)) {
+  if (regexLetter.test(character)) {
+    return colorBlue.value
+  } else if (regexNumber.test(character)) {
 		return colorGreen.value
 	} else if (regexSpecial.test(character)) {
 		return colorRed.value
-	} else {
-		return colorBlue.value
 	}
 }
 const generateOneOccurrence = itemsList => {
@@ -245,20 +246,14 @@ const generatePassword = (
 	length = 8,
 	hasNumbers = true,
 	hasSpecial = true,
-	hasUppercaseLowercase = true,
-	letters = 'abcdefghijklmnopqrstuvwxyz',
-	numbers = '0123456789',
-	special = '!@#$%^&*()_+{}[]'
+	hasUppercaseLowercase = true
 ) => {
 	const lengthDefault = 8
-	const lettersDefault = 'abcdefghijklmnopqrstuvwxyz'
-	const numbersDefault = '0123456789'
-	const specialDefault = '!@#$%^&*()_+{}[]'
 
 	const stringLength = !length || length < 8 ? lengthDefault : length
-	let lettersList = !letters ? lettersDefault : letters
-	const numbersList = !numbers ? numbersDefault : numbers
-	const specialList = !special ? specialDefault : special
+	let lettersList = 'abcdefghijklmnopqrstuvwxyz'
+	const numbersList = '0123456789'
+	const specialList = '!@#$%^&*(),.?:{}|<>+-_'
 
 	let passwordGenerated = ''
 
@@ -286,8 +281,6 @@ const generatePassword = (
 		.join('')
 }
 
-const updateValue = () => {}
-
 const checkComponentType = () => {
 	if (type.value === 'generate') {
 		generated.value = generatePassword(
@@ -300,10 +293,6 @@ const checkComponentType = () => {
 		generated.value = password.value
 	}
 }
-
-onMounted(() => {
-	checkComponentType()
-})
 
 watch(props, () => {
 	checkComponentType()

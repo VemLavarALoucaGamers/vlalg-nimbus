@@ -1,25 +1,33 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbButtonShowHover
-        nb-id="nb-button-show-hover"
-        display="b"
-        text-color="#ffffff"
-        text-color-hover="#ffffff"
-        button-color-hover="255,99,71"
-        :button-color-opacity-hover="0.5"
-        :padding-x="1"
-        :padding-y="0.2"
-        :disabled="false"
-        :border-radius="0.375"
-        vertical-align="middle"
-        font-size="1.6em"
-        :font-weight="400"
-        @clicked="logEvent()"
-      />
-      <p class="legend">Look at the console to see the triggered event</p>
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbButtonShowHover
+          nb-id="nb-button-show-hover"
+          display="b"
+          theme="light"
+          :padding-x="1"
+          :padding-y="0.2"
+          :disabled="false"
+          :border-radius="0.375"
+          vertical-align="middle"
+          font-size="1.6em"
+          :font-weight="400"
+          @clicked="logEvent()"
+        >
+          <template #content>Hover me</template>
+        </NbButtonShowHover>
+        <p class="legend">Look at the console to see the triggered event</p>
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

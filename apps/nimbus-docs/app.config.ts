@@ -45,7 +45,7 @@ export default defineAppConfig({
       },
       textLinks: [
         {
-          text: 'Apoie (em construção)',
+          text: 'Support (under construction)',
           href: '#',
           target: '_blank',
           rel: 'noopener noreferrer external'

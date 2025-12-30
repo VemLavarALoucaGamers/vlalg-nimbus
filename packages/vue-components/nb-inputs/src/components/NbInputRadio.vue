@@ -2,33 +2,38 @@
 	<div
 		v-if="nbId && validList"
 		:class="['nb-wrapper', componentDisabled]"
-		:style="[wrapperStyle]"
+		:style="[wrapperStyle, size]"
 	>
 		<div
 			:id="nbId"
-			:class="['nb-reset', 'component']"
-			:style="[componentStyle]"
+      role="radiogroup"
+      v-bind="computedAriaAttrs"
+			:class="['nb-reset', 'component', displayClass, themeStyle]"
 		>
       <div
         v-for="(item, index) in options"
         :key="index"
-        class="custom-radio__item"
-        :class="[displayClass, currentDirection]"
+        class="component-radio__item"
       >
         <input
           :id="`${nbId}-${item.value}`"
           v-model="currentValue"
           type="radio"
-          class="custom-radio__item--input"
+          class="component-radio__item--input"
           :disabled="disabled"
           :value="item.value"
           :name="groupName"
+          @click="clicked"
         />
         <label
           :for="`${nbId}-${item.value}`"
-          class="custom-radio__item--label"
+          :tabindex="disabled ? -1 : (Array.isArray(tabIndex) ? tabIndex[index] : tabIndex >= 0 ? tabIndex : index + 1)"
+          class="component-radio__item--label"
+          @keydown.enter.prevent="!disabled && hasTabIndexEnter && $event.target.click()"
+          @keydown.space.prevent="!disabled && hasTabIndexSpace && $event.target.click()"
         >
-          {{ item.text }}
+          <div></div>
+          <span :style="[componentStyle]">{{ item.text }}</span>
         </label>
       </div>
 		</div>
@@ -36,7 +41,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, watch, watchEffect } from 'vue'
+import { defineProps, ref, toRefs, computed, onMounted, watch } from 'vue'
 
 defineOptions({
 	name: 'NbInputRadio',
@@ -47,7 +52,7 @@ onMounted(() => {
   startValue()
 })
 
-const emit = defineEmits(['current-value', 'changed'])
+const emit = defineEmits(['current-value', 'changed', 'clicked'])
 
 const props = defineProps({
 	nbId: {
@@ -61,6 +66,33 @@ const props = defineProps({
 			const currentValue = value ? value.toLowerCase() : ''
 			return ['b', 'ib'].includes(currentValue)
 		}
+  },
+	tabIndex: {
+    type: [Number, Array],
+    default: 0,
+    validator: (value, props) => {
+      if (Array.isArray(value)) {
+        // Opcional: validar se tem o mesmo tamanho de options
+        return value.length === props.options.length
+      }
+      return true
+    }
+  },
+  hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
+    type: Boolean,
+    default: true
+  },
+  ariaLabel: {
+    type: String,
+    default: 'Alternate Text Button'
+  },
+  ariaAttrs: {
+    type: Object,
+    default: () => ({})
   },
   groupName: {
     type: String,
@@ -98,24 +130,50 @@ const props = defineProps({
       if (!hasError) return item
     },
   },
-  currentOptiton: {
-    type: String,
+  currentOption: {
+    type: [String, Number, Boolean],
     default: null,
   },
-  direction: {
+  valueType: {
     type: String,
-    default: 'left',
+    default: 'boolean',
     validator: value => {
-      return ['left', 'right'].indexOf(value) !== -1
+      return ['boolean', 'string', 'number'].indexOf(value) !== -1
     },
   },
-  textColor: {
+  theme: {
     type: String,
-    default: 'black'
+    default: 'light',
+    validator: (value) => {
+      const currentValue = value ? value.toLowerCase() : ''
+      return ['light', 'dark'].includes(currentValue)
+    }
   },
-  color: {
+  // Cores do tema light
+  lightTextColor: {
     type: String,
-    default: '#767676'
+    default: '#333333'
+  },
+  lightColor: {
+    type: String,
+    default: '#cccccc'
+  },
+  lightColorHover: {
+    type: String,
+    default: '#bbbbbb'
+  },
+  // Cores do tema dark
+  darkTextColor: {
+    type: String,
+    default: '#e0e0e0'
+  },
+  darkColor: {
+    type: String,
+    default: '#555555'
+  },
+  darkColorHover: {
+    type: String,
+    default: '#666666'
   },
   hoverEffect: {
     type: Boolean,
@@ -131,10 +189,6 @@ const props = defineProps({
       return [true, false].indexOf(value) !== -1
     }
   },
-  colorHover: {
-    type: String,
-    default: '#a6a6a6'
-  },
   itemGap: {
     type: Number,
     default: 15
@@ -142,6 +196,10 @@ const props = defineProps({
   internalGap: {
     type: Number,
     default: 6
+  },
+  scale: {
+    type: Number,
+    default: 1
   },
 	disabled: {
 		type: Boolean,
@@ -172,17 +230,24 @@ const props = defineProps({
 
 const currentValue = ref(null)
 const {
-  currentOptiton,
+  ariaLabel,
+  ariaAttrs,
+  currentOption,
+  valueType,
   display,
   options,
-  direction,
-  textColor,
-  color,
+  theme,
+  lightTextColor,
+  lightColor,
+  lightColorHover,
+  darkTextColor,
+  darkColor,
+  darkColorHover,
   hoverEffect,
   activeHoverEffect,
-  colorHover,
   itemGap,
   internalGap,
+  scale,
 	disabled,
 	fontFamily,
 	fontSize,
@@ -194,27 +259,21 @@ const formatDefaultValues = computed(() => {
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = !fontWeight.value || fontWeight.value < 0 ? 200 : fontWeight.value
-  const directionValue = !direction.value ? 'left' : direction.value
-  const textColorValue = !textColor.value ? 'black' : textColor.value
-  const colorValue = !color.value ? '#767676' : color.value
+	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
   const hoverEffectValue = ![false, true].includes(hoverEffect.value) ? false : hoverEffect.value
   const activeHoverEffectValue = ![false, true].includes(activeHoverEffect.value) ? false : activeHoverEffect.value
-  const colorHoverValue = !colorHover.value ? '#a6a6a6' : colorHover.value
-  const itemGapValue = !itemGap.value || itemGap.value < 0 ? 15 : itemGap.value
-  const internalGapValue = !internalGap.value || internalGap.value < 0 ? 6 : internalGap.value
+  const itemGapValue = ((itemGap.value !== 0 && !itemGap.value) || itemGap.value < 0) ? 15 : itemGap.value
+  const internalGapValue = ((internalGap.value !== 0 && !internalGap.value) || internalGap.value < 0) ? 6 : internalGap.value
+  const scaleValue = ((scale.value !== 0 && !scale.value) || scale.value < 0) ? 1 : scale.value
 
 	return {
 		disabled: disabledValue,
     display: displayValue,
-    direction: directionValue,
-    textColor: textColorValue,
-    color: colorValue,
     hoverEffect: hoverEffectValue,
     activeHoverEffect: activeHoverEffectValue,
-    colorHover: colorHoverValue,
     itemGap: itemGapValue,
     internalGap: internalGapValue,
+    scale: scaleValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue
@@ -229,14 +288,14 @@ const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		display: defaultValues.display
+    display: defaultValues.display
 	}
 })
 
 const displayClass = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  return (defaultValues.display === 'inline-block') ? 'custom-radio__item--display-inline' : 'custom-radio__item--display-block'
+  return (defaultValues.display === 'inline-block') ? 'component-radio__item--display-inline' : 'component-radio__item--display-block'
 })
 
 const componentStyle = computed(() => {
@@ -254,51 +313,44 @@ const validList = computed(() => {
   return isArray && options.value.length > 0
 })
 
-const currentDirection = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-  return (defaultValues.direction === 'right') ? 'custom-radio__item--direction-right' : 'custom-radio__item--direction-left'
+const themeStyle = computed(() => {
+	return theme.value === 'dark' ? 'component__theme--dark' : 'component__theme--light'
 })
+
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.font
 })
 
-const styleTextColor = computed(() => {
+// Computed properties para as cores do theme (necessárias para v-bind no CSS)
+const styleLightTextColor = computed(() => lightTextColor.value)
+const styleLightColor = computed(() => lightColor.value)
+const styleLightColorHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textColor
+	return defaultValues.hoverEffect ? lightColorHover.value : lightColor.value
 })
-const styleColor = computed(() => {
+const styleLightColorActiveHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.color
+	return defaultValues.activeHoverEffect ? lightColorHover.value : lightColor.value
 })
-const styleColorActiveHover = computed(() => {
-	const defaultValues = formatDefaultValues.value
 
-	return defaultValues.activeHoverEffect ? defaultValues.colorHover : defaultValues.color
+const styleDarkTextColor = computed(() => darkTextColor.value)
+const styleDarkColor = computed(() => darkColor.value)
+const styleDarkColorHover = computed(() => {
+	const defaultValues = formatDefaultValues.value
+	return defaultValues.hoverEffect ? darkColorHover.value : darkColor.value
 })
-const styleColorHover = computed(() => {
+const styleDarkColorActiveHover = computed(() => {
 	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.hoverEffect ? defaultValues.colorHover : defaultValues.color
+	return defaultValues.activeHoverEffect ? darkColorHover.value : darkColor.value
 })
 
 const paddingValue = computed(() => {
   const defaultValues = formatDefaultValues.value
   const internalG = defaultValues.internalGap
 
-  return !internalG || internalG < 0 ? 0 : internalG
-})
-
-const paddingLeft = computed(() => {
-  return `0 0 0 2${paddingValue.value}px`
-})
-
-const paddingRight = computed(() => {
-  return `0 2${paddingValue.value}px 0 0`
+  return !internalG || internalG < 0 ? 0 : `${internalG}px`
 })
 
 const gapValue = computed(() => {
@@ -308,22 +360,59 @@ const gapValue = computed(() => {
   return !gap || gap < 0 ? 0 : `${gap}px`
 })
 
-const startValue = () => {
-  const initialValue = currentOptiton.value
+const size = computed(() => {
+  const defaultValues = formatDefaultValues.value
 
-  if (initialValue) {
-    currentValue.value = initialValue.toString().toLowerCase()
+  return {
+    zoom: defaultValues.scale
+  }
+})
+const computedAriaAttrs = computed(() => {
+  const newAttrs = {}
+
+  if (ariaAttrs.value) {
+    const attrKeys = Object.keys(ariaAttrs.value)
+
+    attrKeys.forEach(key => newAttrs[`aria-${key}`] = ariaAttrs.value[key])
+  }
+
+  const attrs = {
+    'aria-label': ariaLabel.value,
+    'aria-disabled': disabled.value,
+    ...newAttrs
   }
   
-  emit('current-value', initialValue)
+  // Remove atributos undefined/null
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
+  )
+})
+
+const startValue = () => {
+  const initialValue = currentOption.value
+
+  if (initialValue) {
+    if (!['string'].includes(valueType.value)) {
+      currentValue.value = initialValue
+    } else {
+      currentValue.value = initialValue.toString().toLowerCase()
+    }
+  } else {
+    currentValue.value = initialValue
+  }
+}
+const clicked = () => {
+  emit('clicked')
 }
 
-watch(currentOptiton, () => {
-  startValue()
+watch(currentOption, (newValue, oldValue) => {
+  if (newValue !== oldValue) startValue()
 })
-watch(currentValue, value => {
-  emit('current-value', value)
-  emit('changed', value)
+watch(currentValue, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    emit('current-value', newValue)
+    emit('changed', newValue)
+  }    
 })
 </script>
 
@@ -337,8 +426,7 @@ watch(currentValue, value => {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	// display: inline-block;
-	vertical-align: bottom;
+	vertical-align: text-bottom;
 }
 
 .nb-reset {
@@ -382,153 +470,153 @@ watch(currentValue, value => {
 	outline: 0;
 	position: relative;
 
-	overflow: hidden;
+  &.component-radio__item--display-block,
+  &.component-radio__item--display-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v-bind(gapValue);
+    width: auto; /* Ou defina um tamanho específico se necessário */
+    word-break: break-word; /* Garante que palavras muito longas quebrem */
+    overflow-wrap: break-word; /* Adicional para compatibilidade */
+    white-space: normal; /* Permite quebras normais de texto */
+  }
 
-  // padding-top: 4px;
+  // inicio propDisplay
+  &.component-radio__item--display-block {
+    flex-direction: column;
+  }
 
-  .custom-radio__item {
-    .custom-radio__item--input {
+  &.component-radio__item--display-inline {
+    flex-direction: row;
+    
+    .component-radio__item {
+      // width: max-content;
+    }
+  }
+  // fim propDisplay
+
+  .component-radio__item {
+    position: relative;
+
+    .component-radio__item--input {
       display: none;
 
       &:checked {
-        &+.custom-radio__item--label {
-          &:hover {
-            &:before {
-              border: 2px solid v-bind(styleColorActiveHover);
-              color: v-bind(styleColorActiveHover);
-            }
-          }
-
-          &:before {
-            content: '\25CF'; // \f111
-            font-size: 1.3em; // 0.7em 0.85em;
+        &+.component-radio__item--label {
+          div:before {
+            content: '\23FA'; // \f111
+            font-size: 1.15em; // 0.7em 0.85em;
             text-shadow: 0;
             display: flex;
-            align-items: self-end;
+            align-items: center;
             text-align: center;
-            justify-content: space-around;
+            justify-content: center;
             -webkit-box-shadow: none;
             -moz-box-shadow: none;
             box-shadow: none;
-            border: 2px solid v-bind(styleColor);
-            color: v-bind(styleColor);
+            border-radius: 50%;
           }
         }
       }
     }
 
-    .custom-radio__item--label {
-      --disabled-color: v-bind('styleTextColor');
-      color: var(--disabled-color) !important;
-
-      &:before {
-        border: 2px solid v-bind(styleColor);
-      }
+    .component-radio__item--label {
+      display: flex;
+      flex-direction: row;
+      gap: v-bind(paddingValue);
+      align-items: center;
 
       &:hover {
         cursor: pointer;
-
-        &:before {
-          border: 2px solid v-bind(styleColorHover);
-        }
       }
 
-      &:before {
-        content: '';
+      &:focus {
+        outline-offset: 2px;
+      }
+
+      div {
         width: 19px;
         height: 19px;
-        position: absolute;
-        bottom: 0;
-        border: 0;
+        flex-shrink: 0;
         border-radius: 50%;
         text-shadow: 0;
         -webkit-box-shadow: none;
         -moz-box-shadow: none;
         box-shadow: none;
-        border: 2px solid v-bind(styleColor);
+        font-family: 'Lato', sans-serif !important;
       }
     }
+  }
 
-    // inicio propDisplay
-    &.custom-radio__item--display-block {
-      display: block;
+  // Theme light
+  &.component__theme--light {
+    .component-radio__item {
+      .component-radio__item--input {
+        &:checked {
+          &+.component-radio__item--label {
+            &:hover {
+              div {
+                border: 2px solid v-bind(styleLightColorActiveHover);
+                color: v-bind(styleLightColorActiveHover);
+              }
+            }
 
-      &:not(:first-child) {
-        margin-top: v-bind(gapValue);
-      }
-
-      .custom-radio__item--label {
-        display: inline;
-        font-family: inherit;
-        font-size: inherit;
-        font-style: normal;
-        line-height: 20px;
-        position: relative;
-      }
-    }
-
-    &.custom-radio__item--display-inline {
-      display: inline-block;
-
-      &:not(:first-child) {
-        margin-left: v-bind(gapValue);
-      }
-
-      .custom-radio__item--label {
-        display: inline;
-        font-family: inherit;
-        font-size: inherit;
-        font-style: normal;
-        line-height: 20px;
-        position: relative;
-      }
-    }
-
-    // fim propDisplay
-
-    // inicio propDirection
-    &.custom-radio__item--display-block {
-      &.custom-radio__item--direction-left {
-        .custom-radio__item--label {
-          display: inline-block;
-          padding: v-bind(paddingLeft);
-
-          &:before {
-            left: 0;
+            div:before {
+              color: v-bind(styleLightColorHover);
+            }
           }
         }
       }
 
-      &.custom-radio__item--direction-right {
-        .custom-radio__item--label {
-          padding: v-bind(paddingRight);
+      .component-radio__item--label {
+        --disabled-color: v-bind('styleLightTextColor');
+        color: var(--disabled-color) !important;
 
-          &:before {
-            right: 0;
+        &:hover {
+          div {
+            border: 2px solid v-bind(styleLightColorHover);
           }
+        }
+
+        div {
+          border: 2px solid v-bind(styleLightColor);
         }
       }
     }
+  }
 
-    &.custom-radio__item--display-inline {
-      &.custom-radio__item--direction-left {
-        .custom-radio__item--label {
-          display: inline-block;
-          padding: v-bind(paddingLeft);
+  // Theme dark
+  &.component__theme--dark {
+    .component-radio__item {
+      .component-radio__item--input {
+        &:checked {
+          &+.component-radio__item--label {
+            &:hover {
+              div {
+                border: 2px solid v-bind(styleDarkColorActiveHover);
+                color: v-bind(styleDarkColorActiveHover);
+              }
+            }
 
-          &:before {
-            left: 0;
+            div:before {
+              color: v-bind(styleDarkColorHover);
+            }
           }
         }
       }
 
-      &.custom-radio__item--direction-right {
-        .custom-radio__item--label {
-          padding: v-bind(paddingRight);
+      .component-radio__item--label {
+        --disabled-color: v-bind('styleDarkTextColor');
+        color: var(--disabled-color) !important;
 
-          &:before {
-            right: 0;
+        &:hover {
+          div {
+            border: 2px solid v-bind(styleDarkColorHover);
           }
+        }
+
+        div {
+          border: 2px solid v-bind(styleDarkColor);
         }
       }
     }
@@ -541,10 +629,18 @@ watch(currentValue, value => {
 	user-select: none;
 
 	.component {
-		--disabled-color: v-bind('styleTextColor');
-		color: var(--disabled-color) !important;
 		opacity: 0.7;
 		border-radius: inherit;
+
+		&.component__theme--light {
+			--disabled-color: v-bind('styleLightTextColor');
+			color: var(--disabled-color) !important;
+		}
+
+		&.component__theme--dark {
+			--disabled-color: v-bind('styleDarkTextColor');
+			color: var(--disabled-color) !important;
+		}
 	}
 }
 </style>

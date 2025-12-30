@@ -36,6 +36,8 @@ The components that are part of this lib are:
 
 - <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input-radio" target="_blank">nb-input-radio</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-checkbox" target="_blank">nb-input-checkbox</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input" target="_blank">nb-input</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input-chip" target="_blank">nb-input-chip</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

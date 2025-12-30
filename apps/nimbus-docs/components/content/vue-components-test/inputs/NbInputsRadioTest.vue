@@ -1,18 +1,27 @@
 <template>
-  <div class="preview">
-    <div class="preview__component">
-      <NbInputRadio
-        nb-id="radio1"
-        display="b"
-        group-name="radio-test1"
-        :current-optiton="currentRadioItem"
-        :options="inputOptions"
-        direction="left"
-        text-color="white"
-        @changed="changeRadioItem($event)"
-      />
+  <ClientOnly>
+    <div class="preview">
+      <div class="preview__component">
+        <NbInputRadio
+          nb-id="radio1"
+          display="b"
+          group-name="radio-test1"
+          :current-optiton="currentRadioItem"
+          :options="inputOptions"
+          direction="left"
+          text-color="white"
+          @changed="changeRadioItem($event)"
+        />
+      </div>
     </div>
-  </div>
+    <template #fallback>
+      <div class="preview">
+        <div class="preview__component">
+          <p>Loading component...</p>
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>

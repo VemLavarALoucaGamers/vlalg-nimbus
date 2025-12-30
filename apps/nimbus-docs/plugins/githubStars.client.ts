@@ -1,5 +1,5 @@
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin(async () => {
   if (import.meta.client) {
-    import('@vlalg-nimbus/github-stars-button');
+    await import('@vlalg-nimbus/github-stars-button');
   }
 });
