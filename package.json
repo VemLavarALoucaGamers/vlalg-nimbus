@@ -58,7 +58,7 @@
   },
   "packageManager": "yarn@1.22.22",
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.15.0",
-    "@typescript-eslint/parser": "^8.15.0"
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0"
   }
 }
