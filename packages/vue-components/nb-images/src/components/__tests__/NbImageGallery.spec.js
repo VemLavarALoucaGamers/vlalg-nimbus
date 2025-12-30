@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 
 import { mount } from '@vue/test-utils';
-import NbImagePreview from '../NbImagePreview.vue';
+import NbImageGallery from '../NbImageGallery.vue';
 
-describe('NbImagePreview', () => {
+describe('NbImageGallery', () => {
   it('renders properly', () => {
-    const wrapper = mount(NbImagePreview, { props: { txt: 'Hello Vitest' } });
+    const wrapper = mount(NbImageGallery, { props: { txt: 'Hello Vitest' } });
     expect(wrapper.text()).toContain('Hello Vitest');
   });
 });

@@ -1,3 +1,7 @@
-import NbImagePreview from '@components/NbImagePreview.vue';
+import NbImageGallery from '@components/NbImageGallery.vue';
+import NbImage from '@components/NbImage.vue';
 
-export default { NbImagePreview };
+export default { 
+  NbImageGallery,
+  NbImage
+};

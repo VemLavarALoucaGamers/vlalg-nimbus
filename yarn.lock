@@ -3247,7 +3247,7 @@
   resolved "file:packages/scss/mystery-box-css-framework"
 
 "@vlalg-nimbus/nb-buttons@^5.0.3", "@vlalg-nimbus/nb-buttons@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-buttons":
-  version "5.0.3"
+  version "5.0.5"
   resolved "file:packages/vue-components/nb-buttons"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3262,8 +3262,8 @@
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
     vue "^3.3.4"
 
-"@vlalg-nimbus/nb-images@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-images":
-  version "1.0.2"
+"@vlalg-nimbus/nb-images@^2.0.3", "@vlalg-nimbus/nb-images@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-images":
+  version "2.0.3"
   resolved "file:packages/vue-components/nb-images"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3271,7 +3271,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-inputs@^7.0.2", "@vlalg-nimbus/nb-inputs@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-inputs":
-  version "7.0.2"
+  version "7.0.3"
   resolved "file:packages/vue-components/nb-inputs"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3288,7 +3288,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-loaders@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-loaders":
-  version "3.0.0"
+  version "3.0.1"
   resolved "file:packages/vue-components/nb-loaders"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3296,7 +3296,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-overlays@^1.0.2", "@vlalg-nimbus/nb-overlays@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-overlays":
-  version "1.0.2"
+  version "1.0.4"
   resolved "file:packages/vue-components/nb-overlays"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3304,7 +3304,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-password@^5.0.0", "@vlalg-nimbus/nb-password@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-password":
-  version "5.0.0"
+  version "5.0.1"
   resolved "file:packages/vue-components/nb-password"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3321,7 +3321,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-selects@^1.0.2", "@vlalg-nimbus/nb-selects@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-selects":
-  version "1.0.2"
+  version "1.0.3"
   resolved "file:packages/vue-components/nb-selects"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3329,7 +3329,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-slides@^4.0.2", "@vlalg-nimbus/nb-slides@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-slides":
-  version "4.0.2"
+  version "4.0.3"
   resolved "file:packages/vue-components/nb-slides"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3337,7 +3337,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-text@^5.0.1", "@vlalg-nimbus/nb-text@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-text":
-  version "5.0.1"
+  version "5.0.2"
   resolved "file:packages/vue-components/nb-text"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3354,7 +3354,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-time@^1.0.4", "@vlalg-nimbus/nb-time@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-time":
-  version "1.0.4"
+  version "1.0.5"
   resolved "file:packages/vue-components/nb-time"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -10279,6 +10279,7 @@ negotiator@0.6.3:
   dependencies:
     "@vlalg-nimbus/github-stars-button" "^2.0.1"
     "@vlalg-nimbus/nb-buttons" "^5.0.3"
+    "@vlalg-nimbus/nb-images" "^2.0.2"
     "@vlalg-nimbus/nb-inputs" "^7.0.2"
     "@vlalg-nimbus/nb-loaders" "^1.0.3"
     "@vlalg-nimbus/nb-overlays" "^1.0.2"

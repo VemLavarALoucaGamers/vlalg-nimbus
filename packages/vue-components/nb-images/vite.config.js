@@ -15,6 +15,12 @@ export default defineConfig({
       fileName: 'nb-images',
       formats: ['umd', 'es'],
     },
+    minify: 'terser',
+    terserOptions: {
+      format: {
+        comments: false,
+      },
+    },
     rollupOptions: {
       // Make sure to externalize deps that shouldn't into your library
       external: ['vue'],

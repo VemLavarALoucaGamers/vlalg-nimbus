@@ -34,7 +34,8 @@ app.mount('#app')
 
 The components that are part of this lib are:
 
-- <a href="http://nimbus.tec.br/vue-components/nb-images/nb-image-preview" target="_blank">nb-image-preview</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-images/nb-image" target="_blank">nb-image</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-images/nb-image-gallery" target="_blank">nb-image-gallery</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

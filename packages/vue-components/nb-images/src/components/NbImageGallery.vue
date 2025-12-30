@@ -1,6 +1,3 @@
-<!--
-  TODO: Adicionar o tabIndex e o disable (testar tbm)
--->
 <template>
 	<div
 		v-if="nbId"
@@ -14,18 +11,33 @@
 			:style="[componentStyle]"
 		>
       <div class="component__gallery">
-        <div class="component__gallery-preview" :style="styleMainImage">
+        <div
+          class="component__gallery-preview"
+          :style="styleMainImage"
+          @click="previewImage(currentImage?.url)"
+        >
           <div
-            v-if="hasZoom"
+            v-if="hasZoom && !selectedImg"
             class="component__gallery-preview-zoom-button"
             :style="styleZoomButton"
-            @click="previewImage(currentImage.url)"
           >{{ zoomButtonIcon }}</div>
           <img
             v-if="currentImage"
             :src="currentImage.url"
             :alt="currentImage.alt || 'Main image'"
+            :srcset="currentImage.srcset"
+            :sizes="currentImage.sizes || '100vw'"
+            :width="currentImage.width"
+            :height="currentImage.height"
+            :loading="loading"
+            :decoding="decoding"
+            :crossorigin="crossorigin || undefined"
+            :referrerpolicy="referrerpolicy"
+            :integrity="integrity || undefined"
+            :fetchpriority="fetchpriority"
             class="component__gallery-preview-image"
+            :tabIndex="disabled ? -1 : tabIndex"
+            role="button"
           />
         </div>
 
@@ -35,9 +47,12 @@
             :aria-disabled="isLeftArrowDisabled"
             class="component__thumbnails-arrow component__thumbnails-arrow--left"
             :class="{ 'component__thumbnails-arrow--disabled': isLeftArrowDisabled }"
-            :style="styleZIndex"
-            :disabled="isLeftArrowDisabled"
+            :style="styleZIndexThumbnailArrow"
+            :tabIndex="disabled || isLeftArrowDisabled ? -1 : tabIndex"
+            :disabled="isLeftArrowDisabled || disabled"
             @click="scrollThumbnails('left')"
+            @keydown.enter.prevent="!disabled && !isLeftArrowDisabled && hasTabIndexEnter && scrollThumbnails('left')"
+            @keydown.space.prevent="!disabled && !isLeftArrowDisabled && hasTabIndexSpace && scrollThumbnails('left')"
           >
             ‹
           </button>
@@ -55,12 +70,27 @@
                 { 'component__thumbnail--active': selectedIndex === index }
               ]"
               :style="thumbnailStyle"
+              :tabIndex="disabled ? -1 : tabIndex"
+              role="button"
+              :aria-label="`Select image ${index + 1}: ${image.alt || 'Image'}`"
               @click="selectImage(index)"
+              @keydown.enter.prevent="!disabled && hasTabIndexEnter && selectImage(index)"
+              @keydown.space.prevent="!disabled && hasTabIndexSpace && selectImage(index)"
             >
               <div class="component__thumbnail-inner">
                 <img
                   :src="image.url"
                   :alt="image.alt || `Thumbnail ${index + 1}`"
+                  :srcset="image.srcset"
+                  :sizes="image.sizes || `${thumbnailSize}px`"
+                  :width="image.width"
+                  :height="image.height"
+                  :loading="loading"
+                  :decoding="decoding"
+                  :crossorigin="crossorigin || undefined"
+                  :referrerpolicy="referrerpolicy"
+                  :integrity="integrity || undefined"
+                  :fetchpriority="fetchpriority"
                   class="component__thumbnail-inner-image"
                 />
               </div>
@@ -72,73 +102,93 @@
             :aria-disabled="isRightArrowDisabled"
             class="component__thumbnails-arrow component__thumbnails-arrow--right"
             :class="{ 'component__thumbnails-arrow--disabled': isRightArrowDisabled }"
-            :style="styleZIndex"
-            :disabled="isRightArrowDisabled"
+            :style="styleZIndexThumbnailArrow"
+            :tabIndex="disabled || isRightArrowDisabled ? -1 : tabIndex"
+            :disabled="isRightArrowDisabled || disabled"
             @click="scrollThumbnails('right')"
+            @keydown.enter.prevent="!disabled && !isRightArrowDisabled && hasTabIndexEnter && scrollThumbnails('right')"
+            @keydown.space.prevent="!disabled && !isRightArrowDisabled && hasTabIndexSpace && scrollThumbnails('right')"
           >
             ›
           </button>
         </div>
       </div>
 
-      <div
-        v-if="selectedImg"
-        :class="['component__modal', { 'has-blur': hasBackdropBlur }]"
-        :style="[styleZIndexPlusOne]"
-        @click.self="closeImage"
+      <ImageModal
+        v-model="selectedImg"
+        :images="images"
+        :selected-index="selectedIndex"
+        :has-backdrop-blur="hasBackdropBlur"
+        :backdrop-blur="backdropBlur"
+        :backdrop-r-g-b-color="backdropRGBColor"
+        :backdrop-alpha="backdropAlpha"
+        :controls-bg-color="controlsBgColor"
+        :controls-text-color="controlsTextColor"
+        :controls-text-color-hover="controlsTextColorHover"
+        :controls-border-radius="controlsBorderRadius"
+        :controls-padding-x="controlsPaddingX"
+        :controls-padding-y="controlsPaddingY"
+        :controls-gap="controlsGap"
+        :controls-font-size="controlsFontSize"
+        :controls-font-weight="controlsFontWeight"
+        :z-index="zIndex"
+        :decoding="decoding"
+        :crossorigin="crossorigin || undefined"
+        :referrerpolicy="referrerpolicy"
+        :integrity="integrity || undefined"
+        :fetchpriority="fetchpriority"
+        @close="closeImage"
+        @select-image="handleSelectImage"
       >
-        <div
-          class="component__modal-controls"
-          :style="styleZIndexPlusTwo"
-        >
+        <template #preview-controls="{ previewRotateLeft, previewRotateRight, previewZoomIn, previewZoomOut, previewClose, previewFirst, previewPrevious, previewNext, previewLast, previewInfos }">
           <slot
             name="preview-controls"
-            :previewRotateLeft="() => rotateImage('left')"
-            :previewRotateRight="() => rotateImage('right')"
-            :previewZoomIn="() => zoomImage('in')"
-            :previewZoomOut="() => zoomImage('out')"
-            :previewClose="() => closeImage()"
-            :previewFirst="() => selectPreviewImage(0)"
-            :previewPrevious="() => selectPreviewImage(selectedIndex - 1)"
-            :previewNext="() => selectPreviewImage(selectedIndex + 1)"
-            :previewLast="() => selectPreviewImage(images.length - 1)"
-            :previewInfos="{ currentIndex: selectedIndex + 1, totalImages: images.length }"
+            :previewRotateLeft="previewRotateLeft"
+            :previewRotateRight="previewRotateRight"
+            :previewZoomIn="previewZoomIn"
+            :previewZoomOut="previewZoomOut"
+            :previewClose="previewClose"
+            :previewFirst="previewFirst"
+            :previewPrevious="previewPrevious"
+            :previewNext="previewNext"
+            :previewLast="previewLast"
+            :previewInfos="previewInfos"
           >
             <div class="component__modal-controls-buttons">
               <button
                 aria-label="Rotate image left"
                 class="component__modal-controls-buttons-button"
-                @click.stop="rotateImage('left')"
+                @click.stop="previewRotateLeft"
               >
-                <slot name="preview-rotate-left-icon" :previewRotateLeft="() => rotateImage('left')"> ↺ </slot>
+                <slot name="preview-rotate-left-icon" :previewRotateLeft="previewRotateLeft"> ↺ </slot>
               </button>
               <button
                 aria-label="Rotate image right"
                 class="component__modal-controls-buttons-button"
-                @click.stop="rotateImage('right')"
+                @click.stop="previewRotateRight"
               >
-                <slot name="preview-rotate-right-icon" :previewRotateRight="() => rotateImage('right')"> ↻ </slot>
+                <slot name="preview-rotate-right-icon" :previewRotateRight="previewRotateRight"> ↻ </slot>
               </button>
               <button
                 aria-label="Zoom image in"
                 class="component__modal-controls-buttons-button"
-                @click.stop="zoomImage('in')"
+                @click.stop="previewZoomIn"
               >
-                <slot name="preview-zoom-in-icon" :previewZoomIn="() => zoomImage('in')"> + </slot>
+                <slot name="preview-zoom-in-icon" :previewZoomIn="previewZoomIn"> + </slot>
               </button>
               <button
                 aria-label="Zoom image out"
                 class="component__modal-controls-buttons-button"
-                @click.stop="zoomImage('out')"
+                @click.stop="previewZoomOut"
               >
-                <slot name="preview-zoom-out-icon" :previewZoomOut="() => zoomImage('out')"> - </slot>
+                <slot name="preview-zoom-out-icon" :previewZoomOut="previewZoomOut"> - </slot>
               </button>
               <button
                 aria-label="Close image"
                 class="component__modal-controls-buttons-button"
-                @click.stop="closeImage"
+                @click.stop="previewClose"
               >
-                <slot name="preview-close-icon" :previewClose="() => closeImage()">x</slot>
+                <slot name="preview-close-icon" :previewClose="previewClose">x</slot>
               </button>
             </div>
             <div class="component__modal-controls-buttons">
@@ -146,7 +196,7 @@
                 aria-label="First image"
                 class="component__modal-controls-buttons-button"
                 :disabled="selectedIndex === 0"
-                @click.stop="selectPreviewImage(0)"
+                @click.stop="previewFirst"
               >
                 <slot name="preview-first-icon"><<</slot>
               </button>
@@ -154,7 +204,7 @@
                 aria-label="Previous image"
                 class="component__modal-controls-buttons-button"
                 :disabled="selectedIndex === 0"
-                @click.stop="selectPreviewImage(selectedIndex - 1)"
+                @click.stop="previewPrevious"
               >
                 <slot name="preview-previous-icon">‹</slot>
               </button>
@@ -165,7 +215,7 @@
                 aria-label="Next image"
                 class="component__modal-controls-buttons-button"
                 :disabled="selectedIndex === images.length - 1"
-                @click.stop="selectPreviewImage(selectedIndex + 1)"
+                @click.stop="previewNext"
               >
                 <slot name="preview-next-icon">></slot>
               </button>
@@ -173,27 +223,51 @@
                 aria-label="Last image"
                 class="component__modal-controls-buttons-button"
                 :disabled="selectedIndex === images.length - 1"
-                @click.stop="selectPreviewImage(images.length - 1)"
+                @click.stop="previewLast"
               >
                 <slot name="preview-last-icon">>></slot>
               </button>
             </div>
           </slot>
-        </div>
-        <img 
-          :src="selectedImg" 
-          alt="Image preview"
-          class="component__modal-image"
-          :style="imageTransformStyle"
-          @click.stop
-        />
-      </div>
+        </template>
+        <template #preview-rotate-left-icon="{ previewRotateLeft }">
+          <slot name="preview-rotate-left-icon" :previewRotateLeft="previewRotateLeft"> ↺ </slot>
+        </template>
+        <template #preview-rotate-right-icon="{ previewRotateRight }">
+          <slot name="preview-rotate-right-icon" :previewRotateRight="previewRotateRight"> ↻ </slot>
+        </template>
+        <template #preview-zoom-in-icon="{ previewZoomIn }">
+          <slot name="preview-zoom-in-icon" :previewZoomIn="previewZoomIn"> + </slot>
+        </template>
+        <template #preview-zoom-out-icon="{ previewZoomOut }">
+          <slot name="preview-zoom-out-icon" :previewZoomOut="previewZoomOut"> - </slot>
+        </template>
+        <template #preview-close-icon="{ previewClose }">
+          <slot name="preview-close-icon" :previewClose="previewClose">x</slot>
+        </template>
+        <template #preview-first-icon>
+          <slot name="preview-first-icon"><<</slot>
+        </template>
+        <template #preview-previous-icon>
+          <slot name="preview-previous-icon">‹</slot>
+        </template>
+        <template #preview-next-icon>
+          <slot name="preview-next-icon">></slot>
+        </template>
+        <template #preview-last-icon>
+          <slot name="preview-last-icon">>></slot>
+        </template>
+        <template #preview-infos>
+          <slot name="preview-infos">{{ selectedIndex + 1 }} / {{ images.length }}</slot>
+        </template>
+      </ImageModal>
 		</div>
 	</div>
 </template>
 
 <script setup>
 import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import ImageModal from './ImageModal.vue'
 
 defineOptions({
 	name: 'NbImageGallery',
@@ -224,15 +298,19 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  // Remove o overflow do body
   document.body.style.overflow = ''
   // Remove listener de resize
   window.removeEventListener('resize', handleResize)
   
   // Limpa timeouts pendentes
   if (scrollTimeout) {
+    // Cancela o animation frame
     cancelAnimationFrame(scrollTimeout)
   }
+
   if (resizeTimeout) {
+    // Limpa o timeout
     clearTimeout(resizeTimeout)
   }
 })
@@ -244,6 +322,18 @@ const props = defineProps({
 		type: String,
 		required: true
 	},
+  tabIndex: {
+    type: Number,
+    default: 0
+  },
+  hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
+    type: Boolean,
+    default: true
+  },
 	ariaLabel: {
     type: String,
     default: 'Image Gallery'
@@ -252,11 +342,11 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
-  imageBackground: {
+  imageBackground: { // transparent, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9), #ffffff, #000000
     type: String,
     default: 'transparent'
   },
-  hasThumbnailBorder: {
+  hasThumbnailBorder: { // has border or not
     type: Boolean,
 		default: true,
 		validator: value => {
@@ -271,11 +361,11 @@ const props = defineProps({
 		type: Number,
 		default: 1
 	},
-	thumbnailGap: {
+	thumbnailGap: { // gap between thumbnails in pixels
 		type: Number,
 		default: 8
 	},
-	thumbnailSize: {
+	thumbnailSize: { // size of thumbnails in pixels
 		type: Number,
 		default: 80
   },
@@ -328,43 +418,73 @@ const props = defineProps({
 			return !value ? 200 : value
 		}
   },
-  images: {
+  images: { // array of images
     type: Array,
     default: () => [],
     validator: value => {
       return Array.isArray(value) && value.every(img => img && img.url)
     }
   },
-  initialImageIndex: {
+  loading: { // type of loading: lazy, eager
+    type: String,
+    default: 'lazy',
+    validator: value => ['lazy', 'eager'].includes(value)
+  },
+  decoding: { // type of decoding: async, sync, auto
+    type: String,
+    default: 'async',
+    validator: value => ['async', 'sync', 'auto'].includes(value)
+  },
+  crossorigin: {
+    type: [String, null],
+    default: null,
+    validator: value => value === null || value === '' || ['anonymous', 'use-credentials'].includes(value)
+  },
+  referrerpolicy: { // como a imagem deve lidar com referrer policy
+    type: String,
+    default: 'no-referrer',
+    validator: value => ['no-referrer', 'no-referrer-when-downgrade', 'origin', 'origin-when-cross-origin', 'same-origin', 'strict-origin', 'strict-origin-when-cross-origin', 'unsafe-url'].includes(value)
+  },
+  integrity: { // integrity da imagem
+    type: String,
+    default: '',
+    validator: value => typeof value === 'string'
+  },
+  fetchpriority: { // prioridade de fetch da imagem
+    type: String,
+    default: 'auto',
+    validator: value => ['high', 'low', 'auto'].includes(value)
+  },
+  initialImageIndex: { // index of the initial image
     type: Number,
     default: 0,
     validator: value => {
       return typeof value === 'number' && value >= 0
     }
   },
-  maxWidth: {
+  maxWidth: { // max width of the component
     type: String,
     default: 'auto'
   },
-  hasZoom: {
+  hasZoom: { // has zoom button or not
     type: Boolean,
     default: true,
 		validator: value => {
 			return typeof value === 'boolean' && [true, false].includes(value)
 		}
   },
-  zoomButtonType: {
+  zoomButtonType: { // type of zoom button: eye, zoom
     type: String,
     default: 'eye',
     validator: value => {
       return ['eye', 'zoom'].includes(value)
     }
   },
-  zoomButtonColor: {
+  zoomButtonColor: { // color of the zoom button icon
     type: String,
     default: '#ffffff'
   },
-  zoomButtonBgType: {
+  zoomButtonBgType: { // type of zoom button background: solid, blur
     type: String,
     default: 'solid',
     validator: value => {
@@ -507,14 +627,15 @@ const {
   controlsGap,
   controlsFontSize,
   controlsFontWeight,
-  zIndex
+  zIndex,
+  tabIndex,
+  hasTabIndexEnter,
+  hasTabIndexSpace
 } = toRefs(props)
 
 const selectedIndex = ref(0)
-const selectedImg = ref(null)
+const selectedImg = ref(false)
 const thumbnailsContainer = ref(null)
-const imageRotation = ref(0)
-const imageZoom = ref(1)
 const isLeftArrowDisabled = ref(false)
 const isRightArrowDisabled = ref(false)
 
@@ -643,6 +764,7 @@ const currentImage = computed(() => {
 	return images.value[selectedIndex.value] || images.value[0]
 })
 
+
 const thumbnailStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	
@@ -693,90 +815,44 @@ const styleThumbnailBorderRadius = computed(() => {
 	return `${defaultValues.thumbnailButtonBorderRadius}rem`
 })
 
+const styleThumbnailInnerBackground = computed(() => {
+	return '#f5f5f5'
+})
+
 const styleThumbnailGap = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	return `${defaultValues.thumbnailGap}px`
 })
 
-const styleBackdropColor = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return `rgba(${defaultValues.backdropRGBColor.r}, ${defaultValues.backdropRGBColor.g}, ${defaultValues.backdropRGBColor.b}, ${defaultValues.backdropAlpha})`
-})
-const styleBackdropBlur = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return hasBackdropBlur.value ? `blur(${defaultValues.backdropBlur}px)` : 'none'
-})
-const styleZIndex = computed(() => {
+const styleZIndexThumbnailArrow = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return {
     zIndex: `${defaultValues.zIndex} !important`
   }
 })
-const styleZIndexPlusOne = computed(() => {
+
+const styleZIndexZoomButton = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  return {
-    zIndex: `${defaultValues.zIndex + 1} !important`
-  }
-})
-const styleZIndexPlusTwo = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return {
-    zIndex: `${defaultValues.zIndex + 2} !important`
-  }
+  return defaultValues.zIndex + 2
 })
 
-const styleControlsBgColor = computed(() => {
+const styleZIndexPreviewImage = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  return defaultValues.controlsBgColor
+  return defaultValues.zIndex + 1
 })
 
-const styleControlsTextColor = computed(() => {
+const styleZIndexThumbnailActive = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  return defaultValues.controlsTextColor
-})
-
-const styleControlsTextColorHover = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return defaultValues.controlsTextColorHover
+  return defaultValues.zIndex
 })
 
 const styleBorderRadius = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	return `${defaultValues.borderRadius}rem`
-})
-
-const styleControlsBorderRadius = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return `${defaultValues.controlsBorderRadius}px`
-})
-const styleControlsPadding = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return `${defaultValues.controlsPaddingX}px ${defaultValues.controlsPaddingY}px`
-})
-const styleControlsGap = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return `${defaultValues.controlsGap}px`
-})
-const styleControlsFontSize = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return `${defaultValues.controlsFontSize}em !important`
-})
-const styleControlsFontWeight = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return defaultValues.controlsFontWeight
 })
 
 const styleMainImage = computed(() => {
@@ -838,64 +914,72 @@ const styleZoomButtonOpacity = computed(() => {
   return defaultValues.zoomButtonOpacity
 })
 
-const imageTransformStyle = computed(() => {
-	return {
-		transform: `rotate(${imageRotation.value}deg) scale(${imageZoom.value})`,
-		transition: 'transform 0.3s ease'
-	}
-})
-
 const previewImage = (img) => {
+	if (!img) return
+	
 	// Encontra o índice da imagem baseado na URL
 	const imageIndex = images.value.findIndex(image => image.url === img)
 	if (imageIndex !== -1) {
 		selectedIndex.value = imageIndex
+	} else {
+		// Se não encontrar, usa o índice atual
+		selectedIndex.value = selectedIndex.value
 	}
 	
-	selectedImg.value = img
-	// Reset transformações ao abrir nova imagem
-  resetImageTransform()
-
-  const html = document.documentElement
-  if (img) {
-    document.body.style.overflow = 'hidden'
-    html.style.overflow = 'hidden'
-  } else {
-    document.body.style.overflow = ''
-    html.style.overflow = ''
-  }
+	selectedImg.value = true
 }
 
+// Função para selecionar uma imagem
 const selectImage = (index) => {
+  // Se o componente estiver desabilitado, retorna
 	if (disabled.value) return
-	
-	selectedIndex.value = index
+
+  // Atualiza o índice selecionado
+  selectedIndex.value = index
+
+  // Emite o evento clicked
 	emit('clicked', { index, image: images.value[index] })
+  // Emite o evento image-changed
 	emit('image-changed', { index, image: images.value[index] })
 	
 	// Scroll para a thumbnail selecionada
 	scrollToThumbnail(index)
 }
 
+// Função para scrollar as thumbnails
 const scrollThumbnails = (direction) => {
+  // Se o container das thumbnails não estiver disponível, retorna
 	if (!thumbnailsContainer.value) return
 	
 	// Previne scroll se a seta estiver desabilitada
+	// Se a seta esquerda estiver desabilitada, não scrolla para a esquerda
 	if (direction === 'left' && isLeftArrowDisabled.value) return
+	// Se a seta direita estiver desabilitada, não scrolla para a direita
 	if (direction === 'right' && isRightArrowDisabled.value) return
-	
+
+  // Obtém o container das thumbnails
 	const container = thumbnailsContainer.value
+
+  // Obtém os valores padrão
 	const defaultValues = formatDefaultValues.value
+
+  // Calcula o scroll amount
 	// Scroll exatamente o tamanho de uma thumbnail + gap
 	const scrollAmount = defaultValues.thumbnailSize + defaultValues.thumbnailGap
-	const currentScroll = container.scrollLeft
-	
-	if (direction === 'left') {
+
+  // Obtém o scroll atual
+  const currentScroll = container.scrollLeft
+
+  // Se a direção for esquerda, scrolla para a esquerda
+	// Scrolla para a esquerda exatamente o tamanho de uma thumbnail + gap
+  if (direction === 'left') {
+    // Scrolla para a esquerda exatamente o tamanho de uma thumbnail + gap
 		container.scrollTo({
 			left: currentScroll - scrollAmount,
 			behavior: 'smooth'
 		})
 	} else {
+    // Scrolla para a direita exatamente o tamanho de uma thumbnail + gap
 		container.scrollTo({
 			left: currentScroll + scrollAmount,
 			behavior: 'smooth'
@@ -903,21 +987,35 @@ const scrollThumbnails = (direction) => {
 	}
 }
 
+// Função para scrollar para uma thumbnail específica
 const scrollToThumbnail = (index) => {
+  // Se o container das thumbnails não estiver disponível, retorna
 	if (!thumbnailsContainer.value) return
 	
+  // Obtém o container das thumbnails
+  // Obtém as thumbnails
+  // Se a thumbnail existe, obtém a thumbnail e o container rect
+  // Calcula a posição para centralizar a thumbnail
+  // Scrolla para a posição calculada
 	nextTick(() => {
+    // Obtém o container das thumbnails
 		const container = thumbnailsContainer.value
-		const thumbnails = container.querySelectorAll('.component__thumbnail')
-		
+    // Obtém as thumbnails
+    const thumbnails = container.querySelectorAll('.component__thumbnail')
+
+    // Se a thumbnail existe, obtém a thumbnail e o container rect
 		if (thumbnails[index]) {
+      // Obtém a thumbnail
 			const thumbnail = thumbnails[index]
-			const containerRect = container.getBoundingClientRect()
+      // Obtém o container rect
+			const containerRect = container.getBoundingClientRect() 
+      // Obtém a thumbnail rect
 			const thumbnailRect = thumbnail.getBoundingClientRect()
 			
 			// Calcula a posição para centralizar a thumbnail
-			const scrollLeft = thumbnail.offsetLeft - (container.clientWidth / 2) + (thumbnailRect.width / 2)
+			const scrollLeft = thumbnail.offsetLeft - (container.clientWidth / 2) + (thumbnailRect.width / 2) // offsetLeft é a posição da thumbnail em relação ao container
 			
+			// Scrolla para a posição calculada
 			container.scrollTo({
 				left: scrollLeft,
 				behavior: 'smooth'
@@ -926,67 +1024,35 @@ const scrollToThumbnail = (index) => {
 	})
 }
 
-const rotateImage = (direction) => {
-	if (!selectedImg.value) return
-	
-	if (direction === 'left') {
-		imageRotation.value -= 90
-	} else if (direction === 'right') {
-		imageRotation.value += 90
-	}
-}
-
-const zoomImage = (direction) => {
-	if (!selectedImg.value) return
-	
-	if (direction === 'in') {
-		imageZoom.value = Math.min(imageZoom.value + 0.25, 5) // Máximo 5x
-	} else if (direction === 'out') {
-		imageZoom.value = Math.max(imageZoom.value - 0.25, 0.5) // Mínimo 0.5x
-	}
-}
-
-const resetImageTransform = () => {
-	imageRotation.value = 0
-	imageZoom.value = 1
-}
-
+// Função para fechar a imagem selecionada
 const closeImage = () => {
-	selectedImg.value = null
-  resetImageTransform()
-
-  const html = document.documentElement
-  document.body.style.overflow = ''
-  html.style.overflow = ''
+  // Atualiza o estado da imagem selecionada
+	selectedImg.value = false
 }
 
-const selectPreviewImage = (index) => {
-	if (!images.value || images.value.length === 0) return
-	
-	// Valida se o índice está dentro do range válido
-	const maxIndex = images.value.length - 1
-	const validIndex = Math.max(0, Math.min(index, maxIndex))
-	
-	// Atualiza o índice selecionado e a imagem no preview
-	if (images.value[validIndex] && images.value[validIndex].url) {
-		selectedIndex.value = validIndex
-		selectedImg.value = images.value[validIndex].url
-		// Reset transformações ao mudar de imagem
-		resetImageTransform()
-		// Scroll para a thumbnail correspondente
-		scrollToThumbnail(validIndex)
-	}
+// Função para selecionar uma imagem
+const handleSelectImage = ({ index, image }) => {
+  // Atualiza o índice selecionado
+	selectedIndex.value = index
+	// Scroll para a thumbnail correspondente
+	scrollToThumbnail(index)
 }
 
 // Função para atualizar estado das setas (desabilitar quando necessário)
 const updateArrowVisibility = () => {
+  // Se o container das thumbnails não estiver disponível, retorna
 	if (!thumbnailsContainer.value) {
+		// Desabilita seta esquerda
 		isLeftArrowDisabled.value = true
-		isRightArrowDisabled.value = true
+		// Desabilita seta direita
+    isRightArrowDisabled.value = true
+
 		return
 	}
 	
+  // Obtém o container das thumbnails
 	const container = thumbnailsContainer.value
+  // Obtém o scroll left, scroll width e client width
 	const { scrollLeft, scrollWidth, clientWidth } = container
 	
 	// Desabilita seta esquerda quando está no começo
@@ -999,41 +1065,58 @@ const updateArrowVisibility = () => {
 
 // Handler otimizado para scroll com throttle
 const handleScroll = () => {
+  // Se o timeout de scroll estiver pendente, cancela o animation frame
 	if (scrollTimeout) {
+    // Cancela o animation frame
 		cancelAnimationFrame(scrollTimeout)
-	}
-	
+  }
+
+	// Atualiza a visibilidade das setas
 	scrollTimeout = requestAnimationFrame(() => {
+    // Atualiza a visibilidade das setas
 		updateArrowVisibility()
+    // Limpa o timeout de scroll
 		scrollTimeout = null
 	})
 }
 
 // Handler otimizado para resize com throttle
 const handleResize = () => {
+  // Se o timeout de resize estiver pendente, limpa o timeout
 	if (resizeTimeout) {
+    // Limpa o timeout de resize
 		clearTimeout(resizeTimeout)
-	}
-	
+  }
+
+	// Atualiza a visibilidade das setas
 	resizeTimeout = setTimeout(() => {
+    // Atualiza a visibilidade das setas
 		updateArrowVisibility()
+    // Limpa o timeout de resize
 		resizeTimeout = null
 	}, 150) // Throttle de 150ms
 }
 
 // Observa mudanças no initialImageIndex para atualizar a imagem selecionada
 watch(() => initialImageIndex.value, (newIndex) => {
+  // Se o array de imagens estiver disponível e tiver imagens, atualiza a imagem selecionada
   if (images.value && images.value.length > 0) {
-    // Valida se o índice está dentro do range válido
+    // Obtém o índice máximo -1 (para evitar problemas de indexação)
     const maxIndex = images.value.length - 1
+
+    // Obtém o índice válido
     const validIndex = Math.max(0, Math.min(newIndex, maxIndex))
-    
+
+    // Se o índice selecionado não for o índice válido, atualiza o índice selecionado
     if (selectedIndex.value !== validIndex) {
+      // Atualiza o índice selecionado
       selectedIndex.value = validIndex
       
-      // Scroll para a thumbnail selecionada
+      // Scroll para a thumbnail selecionada após o nextTick
       nextTick(() => {
+        // Scroll para a thumbnail selecionada
         scrollToThumbnail(validIndex)
+        // Atualiza a visibilidade das setas
         updateArrowVisibility()
       })
     }
@@ -1046,16 +1129,22 @@ watch(() => images.value?.length, (newLength, oldLength) => {
   if (newLength && newLength > 0) {
     // Valida se o índice selecionado ainda é válido após mudança nas imagens
     const maxIndex = newLength - 1
+
+    // Se o índice selecionado for maior que o índice máximo, atualiza o índice selecionado
     if (selectedIndex.value > maxIndex) {
+      // Atualiza o índice selecionado
       selectedIndex.value = maxIndex
     }
     
     // Scroll para a thumbnail selecionada
     nextTick(() => {
+      // Scroll para a thumbnail selecionada
       scrollToThumbnail(selectedIndex.value)
+      // Atualiza a visibilidade das setas
       updateArrowVisibility()
     })
   } else {
+    // Atualiza a visibilidade das setas
     updateArrowVisibility()
   }
 })
@@ -1072,6 +1161,7 @@ watch(() => images.value?.length, (newLength, oldLength) => {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
+  cursor: default !important;
 }
 
 .nb-reset {
@@ -1125,10 +1215,11 @@ watch(() => images.value?.length, (newLength, oldLength) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow: visible;
       background: v-bind('styleImageBackground');
       border-radius: v-bind('styleBorderRadius');
       position: relative;
+      padding: 2px;
 
       .component__gallery-preview-zoom-button {
         position: absolute;
@@ -1145,22 +1236,44 @@ watch(() => images.value?.length, (newLength, oldLength) => {
         cursor: pointer;
         transition: opacity 0.3s ease, visibility 0.3s ease;
         pointer-events: none;
+        z-index: v-bind('styleZIndexZoomButton') !important;
       }
 
       &:hover {
-        div {
+        .component__gallery-preview-zoom-button {
           opacity: v-bind('styleZoomButtonOpacity');
           visibility: visible;
           pointer-events: auto;
         }
       }
-
+      
       .component__gallery-preview-image {
         width: 100%;
         height: auto;
         max-height: 600px;
         object-fit: contain;
         display: block;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        border-radius: v-bind('styleBorderRadius');
+        position: relative;
+        z-index: v-bind('styleZIndexPreviewImage') !important;
+      }
+
+      .component__gallery-preview-image:focus {
+        outline: 2px solid !important;
+        outline-offset: 2px !important;
+        outline-style: solid !important;
+      }
+
+      .component__gallery-preview-image:focus-visible {
+        outline: 2px solid !important;
+        outline-offset: 2px !important;
+        outline-style: solid !important;
+      }
+
+      .component__gallery-preview-image:hover:not([tabindex="-1"]) {
+        // transform: scale(1.02);
       }
     }
 
@@ -1195,6 +1308,11 @@ watch(() => images.value?.length, (newLength, oldLength) => {
 
         &:active:not(:disabled) {
           background: v-bind('styleThumbnailButtonBgColorActive');
+        }
+
+        &:focus:not(:disabled):not([tabindex="-1"]) {
+          outline: 2px solid v-bind('styleThumbnailButtonTextColor');
+          outline-offset: 2px;
         }
 
         &:disabled,
@@ -1257,112 +1375,27 @@ watch(() => images.value?.length, (newLength, oldLength) => {
             }
           }
 
-          &:hover {
+          &:hover:not([tabindex="-1"]) {
             .component__thumbnail-inner {
               transform: scale(1.05);
             }
           }
 
+          &:focus:not([tabindex="-1"]) {
+            // outline: 2px solid v-bind('styleThumbnailBorderColor');
+            // outline-offset: 2px;
+          }
+
           &--active {
             border-color: v-bind('styleThumbnailBorderColor');
             border-width: v-bind('styleThumbnailBorderWidth');
-            z-index: 1;
+            z-index: v-bind('styleZIndexThumbnailActive') !important;
           }
         }
       }
     }
   }
 
-  .component__modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: v-bind('styleBackdropColor');
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    padding: 20px;
-    box-sizing: border-box;
-
-    &.has-blur {
-      background-color: inherit !important;
-      -webkit-backdrop-filter: v-bind('styleBackdropBlur');
-      backdrop-filter: v-bind('styleBackdropBlur');
-    }
-
-    .component__modal-controls {
-      position: absolute;
-      top: 20px;
-      right: 2%;
-      // left: 50%;
-      // transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: v-bind('styleControlsGap');
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 90%;
-
-      .component__modal-controls-buttons {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: v-bind('styleControlsGap');
-        background: v-bind('styleControlsBgColor');
-        padding: v-bind('styleControlsPadding');
-        border-radius: v-bind('styleControlsBorderRadius');
-        cursor: default;
-        font-size: v-bind('styleControlsFontSize');
-        font-weight: v-bind('styleControlsFontWeight');
-        transition: background 0.2s ease, transform 0.1s ease;
-
-        span {
-          color: v-bind('styleControlsTextColor');
-        }
-        .component__modal-controls-buttons-button {
-          padding: 10px 15px;
-          background: transparent;
-          color: v-bind('styleControlsTextColor');
-          border: none;
-          padding: 3px 7px;
-          cursor: pointer;
-          transition: background 0.2s ease, transform 0.1s ease;
-          border-radius: 20px;
-
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-
-            &:hover {
-              background: transparent;
-            }
-          }
-
-          &:hover {
-            background: transparent;
-            color: v-bind('styleControlsTextColorHover');
-          }
-
-          &:active {
-            transform: scale(0.95);
-          }
-        }
-      }
-    }
-
-    .component__modal-image {
-      max-width: 90vw;
-      max-height: 80vh;
-      object-fit: contain;
-      cursor: default;
-    }
-  }
 }
 
 .component-disabled {

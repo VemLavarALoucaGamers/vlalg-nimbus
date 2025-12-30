@@ -285,3 +285,16 @@ html {
   height: 100px;
   background-color: goldenrod;
 }
+
+/* Banner Test Styles - Ajustes aplicados via JavaScript */
+html.has-banner {
+  #__nuxt {
+    header {
+      z-index: 9999;
+    }
+    
+    aside {
+      z-index: 9998;
+    }
+  }
+}

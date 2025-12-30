@@ -25,6 +25,7 @@
   "dependencies": {
     "@vlalg-nimbus/github-stars-button": "^2.0.1",
     "@vlalg-nimbus/nb-buttons": "^5.0.3",
+    "@vlalg-nimbus/nb-images": "^2.0.3",
     "@vlalg-nimbus/nb-inputs": "^7.0.2",
     "@vlalg-nimbus/nb-loaders": "^1.0.3",
     "@vlalg-nimbus/nb-overlays": "^1.0.2",
