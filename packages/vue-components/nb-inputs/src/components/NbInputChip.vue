@@ -7,6 +7,13 @@
     v-bind="computedAriaAttrs"
     @click="interacted"
   >
+    <label
+      v-if="showLabel"
+      :for="computedInputName"
+      class="component__label"
+      :style="[styleLabel]"
+    >{{ label }}</label>
+    
     <div
       :id="nbId"
       ref="chipsContainer"
@@ -34,8 +41,9 @@
         ref="chipInput"
         type="text"
         v-model="chipInputValue"
-        :name="inputName"
-        :placeholder="inputPlaceholder"
+        :id="computedInputName"
+        :name="computedInputName"
+        :placeholder="computedPlaceholder"
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
         :required="required"
@@ -349,10 +357,92 @@ const props = defineProps({
 	darkDisabledBorderColor: {
 		type: String,
 		default: 'rgba(68, 71, 90, 0.3)'
+	},
+	// Label props
+	showLabel: {
+		type: Boolean,
+		default: false,
+		validator: value => {
+			return typeof value === 'boolean' && [true, false].includes(value)
+		},
+	},
+	label: {
+		type: String,
+		default: 'Label text',
+	},
+	labelBackground: {
+		type: String,
+		default: 'transparent',
+	},
+	labelPadding: {
+		type: String,
+		default: '1px 5px',
+	},
+	labelBorderRadius: {
+		type: Number,
+		default: 0
+	},
+	labelLeft: {
+		type: Number,
+		default: 5,
+	},
+	inputLabelMarginActive: {
+		type: Number,
+		default: 15,
+	},
+	labelActiveTop: {
+		type: Number,
+		default: 13,
+	},
+	labelActiveLeft: {
+		type: Number,
+		default: 5,
+	},
+	fontFamilyLabel: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	fontSizeLabel: {
+		type: String,
+		default: '1em',
+		validator: value => {
+			return !value ? '1em' : value
+		}
+	},
+	fontSizeLabelActive: {
+		type: String,
+		default: '0.8em',
+		validator: value => {
+			return !value ? '0.8em' : value
+		}
+	},
+	fontWeightLabel: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 700 : value
+		}
+	},
+	lightTextColorLabel: {
+		type: String,
+		default: '#333333'
+	},
+	lightTextColorLabelActive: {
+		type: String,
+		default: '#333333'
+	},
+	darkTextColorLabel: {
+		type: String,
+		default: '#ffffff'
+	},
+	darkTextColorLabelActive: {
+		type: String,
+		default: '#ffffff'
 	}
 })
 
 const {
+	nbId,
 	display,
 	textColor,
 	paddingX,
@@ -405,7 +495,24 @@ const {
 	ariaAttrs,
 	caretColor,
 	selectionBgColor,
-	selectionTextColor
+	selectionTextColor,
+	showLabel,
+	label,
+	labelBackground,
+	labelPadding,
+	labelBorderRadius,
+	labelLeft,
+	inputLabelMarginActive,
+	labelActiveTop,
+	labelActiveLeft,
+	fontFamilyLabel,
+	fontSizeLabel,
+	fontSizeLabelActive,
+	fontWeightLabel,
+	lightTextColorLabel,
+	lightTextColorLabelActive,
+	darkTextColorLabel,
+	darkTextColorLabelActive
 } = toRefs(props)
 
 const chipInputValue = ref('');
@@ -435,6 +542,24 @@ const formatDefaultValues = computed(() => {
 	const inputStyleValue = !inputStyle.value || !['background', 'line', 'border'].includes(inputStyle.value) ? 'background' : inputStyle.value
 	const themeValue = !theme.value ? 'light' : theme.value
 
+	// Label default values
+	const showLabelValue = !showLabel.value ? false : showLabel.value
+	const labelLeftValue = ((labelLeft.value !== 0 && !labelLeft.value) || labelLeft.value < 0) ? 5 : labelLeft.value
+	const labelBackgroundValue = !labelBackground.value ? 'transparent' : labelBackground.value
+	const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
+	const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
+	const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
+	const labelActiveTopValue = ((labelActiveTop.value !== 0 && !labelActiveTop.value) || labelActiveTop.value < 0) ? 13 : labelActiveTop.value
+	const labelActiveLeftValue = ((labelActiveLeft.value !== 0 && !labelActiveLeft.value) || labelActiveLeft.value < 0) ? 5 : labelActiveLeft.value
+	const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
+	const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
+	const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
+	const fontWeightLabelValue = !fontWeightLabel.value ? 400 : fontWeightLabel.value
+	const lightTextColorLabelValue = !lightTextColorLabel.value ? '#333333' : lightTextColorLabel.value
+	const darkTextColorLabelValue = !darkTextColorLabel.value ? '#ffffff' : darkTextColorLabel.value
+	const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#333333' : lightTextColorLabelActive.value
+	const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#ffffff' : darkTextColorLabelActive.value
+
 	return {
 		disabled: disabledValue,
 		display: displayValue,
@@ -453,7 +578,23 @@ const formatDefaultValues = computed(() => {
     maxChips: maxChipsValue,
     inputPosition: inputPositionValue,
     inputStyle: inputStyleValue,
-		theme: themeValue
+		theme: themeValue,
+		showLabel: showLabelValue,
+		labelLeft: labelLeftValue,
+		labelBackground: labelBackgroundValue,
+		inputLabelMarginActive: inputLabelMarginActiveValue,
+		labelPadding: labelPaddingValue,
+		labelBorderRadius: labelBorderRadiusValue,
+		labelActiveTop: labelActiveTopValue,
+		labelActiveLeft: labelActiveLeftValue,
+		fontFamilyLabel: fontFamilyLabelValue,
+		fontSizeLabel: fontSizeLabelValue,
+		fontSizeLabelActive: fontSizeLabelActiveValue,
+		fontWeightLabel: fontWeightLabelValue,
+		lightTextColorLabel: lightTextColorLabelValue,
+		darkTextColorLabel: darkTextColorLabelValue,
+		lightTextColorLabelActive: lightTextColorLabelActiveValue,
+		darkTextColorLabelActive: darkTextColorLabelActiveValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -463,20 +604,25 @@ const componentDisabled = computed(() => {
 })
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
+	const isActive = isLabelActive.value
 
 	return {
-		display: defaultValues.display
+		display: defaultValues.display,
+		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
+		paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
 	}
 })
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
+	const isActive = isLabelActive.value
 
 	return {
 		color: defaultValues.textColor,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight,
-		textAlign: textAlign.value
+		textAlign: textAlign.value,
+		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
 	}
 })
 const activeTextStyleClass = computed(() => {
@@ -566,6 +712,42 @@ const styleWidth = computed(() => {
 
   return defaultValues.display === 'block' ? { width: 'auto' } : widthIb
 })
+const computedInputName = computed(() => {
+  return inputName.value ? inputName.value : `${nbId.value}-name-label`
+})
+const isLabelActive = computed(() => {
+  // Label está ativo se o input estiver focado OU se tiver chips OU se tiver conteúdo no input
+  return isActive.value || chipList.value.length > 0 || (chipInputValue.value && chipInputValue.value.trim().length > 0)
+})
+const computedPlaceholder = computed(() => {
+  // Se não houver label, sempre mostra o placeholder
+  if (!showLabel.value) {
+    return inputPlaceholder.value
+  }
+  // Se houver label, mostra o placeholder quando o input estiver ativo OU quando houver pelo menos um chip
+  return (isActive.value || chipList.value.length > 0) ? inputPlaceholder.value : ''
+})
+const styleLabel = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  const isActive = isLabelActive.value
+
+  const lightTextColorLabel = isActive ? defaultValues.lightTextColorLabelActive : defaultValues.lightTextColorLabel
+  const darkTextColorLabel = isActive ? defaultValues.darkTextColorLabelActive : defaultValues.darkTextColorLabel
+
+  return {
+    fontFamily: defaultValues.fontFamilyLabel,
+    fontSize: isActive ? defaultValues.fontSizeLabelActive : defaultValues.fontSizeLabel,
+    fontWeight: defaultValues.fontWeightLabel,
+    color: defaultValues.theme === 'dark' ? darkTextColorLabel : lightTextColorLabel,
+    top: isActive ? `${defaultValues.labelActiveTop}px` : '50%',
+    left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
+    transform: isActive ? 'translateY(0)' : 'translateY(-50%)',
+    transition: 'all 0.2s ease',
+    backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
+    padding: isActive ? defaultValues.labelPadding : '0',
+    borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
+  }
+})
 const themeStyle = computed(() => {
 	switch (theme.value) {
 		case 'dark':
@@ -641,6 +823,9 @@ watch(chipInputValue, (newValue) => {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	vertical-align: bottom;
+	position: relative;
+	// Permite que o label fique visível quando está na posição ativa
+	overflow: visible;
 }
 
 .nb-reset {
@@ -661,6 +846,17 @@ watch(chipInputValue, (newValue) => {
 		box-sizing: border-box;
 	}
 }
+
+.component__label {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 1;
+    transition: top 0.2s ease;
+    pointer-events: none;
+    // Quando ativo, o label pode sair do componente, mas o wrapper tem padding-top para acomodá-lo
+  }
 
 .component {
 	margin: 0;
@@ -686,6 +882,7 @@ watch(chipInputValue, (newValue) => {
   flex-wrap: wrap;
   flex-direction: v-bind('styleInputPosition');
   overflow: hidden;
+  position: relative;
 
   // inicio propTheme
   &.component__theme--light {
@@ -794,6 +991,8 @@ watch(chipInputValue, (newValue) => {
     overflow: hidden;
     display: flex;
     flex-wrap: wrap;
+    // Limita a largura para evitar que os chips saiam do container
+    max-width: 100%;
 
     .chip {
       display: inline-flex;
