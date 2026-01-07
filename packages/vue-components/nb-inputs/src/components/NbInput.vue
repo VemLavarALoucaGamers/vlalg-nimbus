@@ -12,24 +12,34 @@
       :style="[componentStyle, inputWidthStyle, borderRadiusStyle]"
       @click="interacted"
     >
+      <label
+        v-if="showLabel"
+        :for="computedInputName"
+        class="component__label"
+        :style="[styleLabel]"
+      >{{ label }}</label>
+
       <div
         v-if="validShowInputEye"
         :class="['component__eye', activeInput]"
         :style="[borderRadiusStyle]"
         @click="changeShowValue"
       >
-        <span :class="['component__eye-icon', 'fas']">
+        <label
+          :for="computedInputName"
+          :class="['component__eye-icon', 'fas']"
+        >
           <span v-if="!inputEyeCustomIcon">{{ inputIcon }}</span>
           <span v-else>
             <slot v-if="showValue" name="eye-icon-show">show</slot>
             <slot v-else name="eye-icon-hidden">hidden</slot>
           </span>
-        </span>
+        </label>
       </div>
       <input
         v-model="inputValue"
-        :id="inputName"
-        :name="inputName"
+        :id="computedInputName"
+        :name="computedInputName"
         :type="currentType"
         class="component__input"
         :class="[
@@ -37,7 +47,7 @@
           hiddenDefaultEye,
           activeStyle
         ]"
-        :placeholder="inputPlaceholder"
+        :placeholder="computedPlaceholder"
         :disabled="disabled || inputReadonly"
         :required="required"
         :readonly="inputReadonly"
@@ -50,7 +60,7 @@
         @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
       />
 
-      <label :for="inputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
+      <label :for="computedInputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
         <slot name="icon">
           <span>&#9829;</span>
         </slot>
@@ -474,9 +484,90 @@ const props = defineProps({
     type: Number,
     default: 1
   },
+  showLabel: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
+  label: {
+    type: String,
+    default: 'Label text',
+  },
+  labelBackground: {
+    type: String,
+    default: 'transparent',
+  },
+  labelPadding: {
+    type: String,
+    default: '1px 5px',
+  },
+	labelBorderRadius: {
+		type: Number,
+		default: 0
+	},
+  labelLeft: {
+    type: Number,
+    default: 5,
+  },
+  inputLabelMarginActive: {
+    type: Number,
+    default: 15,
+  },
+  labelActiveTop: {
+    type: Number,
+    default: -13,
+  },
+  labelActiveLeft: {
+    type: Number,
+    default: 5,
+  },
+  fontFamilyLabel: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	fontSizeLabel: {
+		type: String,
+		default: '1em',
+		validator: value => {
+			return !value ? '1em' : value
+		}
+	},
+	fontSizeLabelActive: {
+		type: String,
+		default: '0.8em',
+		validator: value => {
+			return !value ? '0.8em' : value
+		}
+	},
+	fontWeightLabel: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 700 : value
+		}
+	},
+	lightTextColorLabel: {
+		type: String,
+		default: '#333333'
+	},
+	lightTextColorLabelActive: {
+		type: String,
+		default: '#333333'
+	},
+	darkTextColorLabel: {
+		type: String,
+		default: '#ffffff'
+	},
+	darkTextColorLabelActive: {
+		type: String,
+		default: '#ffffff'
+	}
 })
 
 const {
+  nbId,
 	display,
   hasTabIndexEnter,
   ariaLabel,
@@ -543,7 +634,23 @@ const {
   iconLightDisabledBgColor,
   iconDarkDisabledBgColor,
   iconWidth,
-  iconSize
+  iconSize,
+  showLabel,
+  labelBackground,
+  labelPadding,
+  labelBorderRadius,
+  labelLeft,
+  inputLabelMarginActive,
+  labelActiveTop,
+  labelActiveLeft,
+  fontFamilyLabel,
+  fontSizeLabel,
+  fontSizeLabelActive,
+  fontWeightLabel,
+  lightTextColorLabel,
+  lightTextColorLabelActive,
+  darkTextColorLabel,
+  darkTextColorLabelActive
 } = toRefs(props)
 
 const inputValue = ref('')
@@ -591,6 +698,23 @@ const formatDefaultValues = computed(() => {
   const iconWidthValue = !iconWidth.value ? 32 : iconWidth.value
   const iconSizeValue = !iconSize.value ? 1 : iconSize.value
 
+  const showLabelValue = !showLabel.value ? false : showLabel.value
+  const labelLeftValue = ((labelLeft.value !== 0 && !labelLeft.value) || labelLeft.value < 0) ? 5 : labelLeft.value
+  const labelBackgroundValue = !labelBackground.value ? 'transparent' : labelBackground.value
+  const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
+  const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
+  const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
+  const labelActiveTopValue = ((labelActiveTop.value !== 0 && !labelActiveTop.value) || labelActiveTop.value < 0) ? -13 : labelActiveTop.value
+  const labelActiveLeftValue = ((labelActiveLeft.value !== 0 && !labelActiveLeft.value) || labelActiveLeft.value < 0) ? -10 : labelActiveLeft.value
+  const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
+  const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
+  const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
+  const fontWeightLabelValue = !fontWeightLabel.value ? 400 : fontWeightLabel.value
+  const lightTextColorLabelValue = !lightTextColorLabel.value ? '#ffffff' : lightTextColorLabel.value
+  const darkTextColorLabelValue = !darkTextColorLabel.value ? '#000000' : darkTextColorLabel.value
+  const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#ffffff' : lightTextColorLabelActive.value
+  const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#000000' : darkTextColorLabelActive.value
+
 	return {
 		disabled: disabledValue,
 		display: displayValue,
@@ -628,7 +752,23 @@ const formatDefaultValues = computed(() => {
     iconLightBgColorActive: iconLightBgColorActiveValue,
     iconDarkBgColorActive: iconDarkBgColorActiveValue,
     iconWidth: iconWidthValue,
-    iconSize: iconSizeValue
+    iconSize: iconSizeValue,
+    showLabel: showLabelValue,
+    labelBackground: labelBackgroundValue,
+    labelPadding: labelPaddingValue,
+    labelBorderRadius: labelBorderRadiusValue,
+    labelLeft: labelLeftValue,
+    inputLabelMarginActive: inputLabelMarginActiveValue,
+    labelActiveTop: labelActiveTopValue,
+    labelActiveLeft: labelActiveLeftValue,
+    fontFamilyLabel: fontFamilyLabelValue,
+    fontSizeLabel: fontSizeLabelValue,
+    fontSizeLabelActive: fontSizeLabelActiveValue,
+    fontWeightLabel: fontWeightLabelValue,
+    lightTextColorLabel: lightTextColorLabelValue,
+    darkTextColorLabel: darkTextColorLabelValue,
+    lightTextColorLabelActive: lightTextColorLabelActiveValue,
+    darkTextColorLabelActive: darkTextColorLabelActiveValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -663,11 +803,14 @@ const fontSizeStyle = computed(() => {
   return newFontSize
 })
 const componentStyle = computed(() => {
-	const defaultValues = formatDefaultValues.value
+  const defaultValues = formatDefaultValues.value
+
+  const isActive = isLabelActive.value
 
 	return {
 		fontSize: fontSizeStyle.value,
-		fontWeight: defaultValues.fontWeight
+		fontWeight: defaultValues.fontWeight,
+		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
 	}
 })
 const borderRadiusStyle = computed(() => {
@@ -803,6 +946,21 @@ const inputIcon = computed(() => {
 
   return inputEyeIconHidden.value
 })
+const computedInputName = computed(() => {
+  return inputName.value ? inputName.value : `${nbId.value}-name-label`
+})
+const computedPlaceholder = computed(() => {
+  // Se não houver label, sempre mostra o placeholder
+  if (!showLabel.value) {
+    return inputPlaceholder.value
+  }
+  // Se houver label, só mostra o placeholder quando o input estiver ativo
+  return isActive.value ? inputPlaceholder.value : ''
+})
+const isLabelActive = computed(() => {
+  // Label está ativo se o input estiver focado OU se tiver conteúdo
+  return isActive.value || (inputValue.value && inputValue.value.trim().length > 0)
+})
 const hiddenDefaultEye = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -881,6 +1039,32 @@ const inputIconStyle = computed(() => {
   return iconDirection.value === 'left' ? { paddingLeft: `${defaultValues.iconPaddingInput}px` } : { paddingRight: `${defaultValues.iconPaddingInput}px` }
 })
 
+const styleLabel = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  const isActive = isLabelActive.value
+
+  const lightTextColorLabel = isActive ? defaultValues.lightTextColorLabelActive : defaultValues.lightTextColorLabel
+  const darkTextColorLabel = isActive ? defaultValues.darkTextColorLabelActive : defaultValues.darkTextColorLabel
+
+  return {
+    fontFamily: defaultValues.fontFamilyLabel,
+    fontSize: isActive ? defaultValues.fontSizeLabelActive : defaultValues.fontSizeLabel,
+    fontWeight: defaultValues.fontWeightLabel,
+    color: defaultValues.theme === 'dark' ? darkTextColorLabel : lightTextColorLabel,
+    top: isActive ? `${defaultValues.labelActiveTop}px` : '50%',
+    left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
+    transform: isActive ? 'translateY(0)' : 'translateY(-50%)',
+    transition: 'all 0.2s ease',
+    backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
+    padding: isActive ? defaultValues.labelPadding : '0',
+    borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
+  }
+})
+const styleLabelActive = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkTextColorLabelActive : defaultValues.lightTextColorLabelActive
+})
 const startValue = () => {
   inputValue.value = inputText.value
 
@@ -1468,6 +1652,21 @@ watch(inputType, (newType) => {
       }
     }
     // fim propReadonly
+
+    .component__label {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      z-index: 1;
+      transition: top 0.2s ease;
+    }
+
+    &:has(.component__input:focus) .component__label,
+    &:has(.component__input:active) .component__label {
+      top: -10px;
+      transform: translateY(0);
+    }
 
     .component__eye {
       position: absolute;

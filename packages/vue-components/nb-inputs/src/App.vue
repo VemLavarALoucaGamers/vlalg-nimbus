@@ -202,7 +202,7 @@
         <NbInput
           nb-id="test1"
           display="b"
-          input-name="test-input"
+          input-name="test-input1"
           input-type="text"
           :show-msg="true"
           :has-msg="true"
@@ -226,10 +226,10 @@
         </NbInput>
 
         <NbInput
-          nb-id="test1"
+          nb-id="test2"
           display="b"
           input-style="border"
-          input-name="test-input"
+          input-name="test-input2"
           :show-msg="true"
           :has-msg="true"
           aria-label="Test input"
@@ -252,10 +252,10 @@
         </NbInput>
         
         <NbInput
-          nb-id="test1"
+          nb-id="test3"
           display="b"
           input-style="line"
-          input-name="test-input"
+          input-name="test-input3"
           :show-msg="true"
           :has-msg="true"
           aria-label="Test input"
@@ -280,12 +280,69 @@
         <p style="margin-top: 4px;">
           Text before
           <NbInput
-            nb-id="test2"
+            nb-id="test4"
             display="ib"
             @current-value="($event) => console.log($event)"
           />
           text after
         </p>
+
+        <br /><br />
+
+        <NbInput
+          nb-id="test1"
+          input-name="test-input4"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="background"
+        />
+        <NbInput
+          nb-id="test1"
+          input-name="test-input5"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="border"
+        />
+        <NbInput
+          nb-id="test1"
+          input-name="test-input6"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="line"
+        />
+
+        <br /><br />
+
+        <NbInput
+          nb-id="test1"
+          input-name="test-input7"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="background"
+          theme="dark"
+        />
+        <NbInput
+          nb-id="test1"
+          input-name="test-input8"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="border"
+          theme="dark"
+        />
+        <NbInput
+          nb-id="test1"
+          input-name="test-input9"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="line"
+          theme="dark"
+        />
       </div>
     </div>
 
@@ -372,6 +429,138 @@
           />
           text after
         </p>
+
+        <br><br>
+
+        <h4 class="test-page__content-tile">NbInputChip - Light Theme (with Label)</h4>
+        <NbInputChip
+          nb-id="chip-light-label"
+          input-name="chip-input-light-label"
+          theme="light"
+          input-style="background"
+          input-placeholder="Type and press Enter"
+          :show-label="true"
+          label="Label Light Theme"
+          :current-list="currentChipList"
+          aria-label="Test input chip light with label"
+          @clicked="() => console.log('clicked')"
+          @changed="($event) => console.log('changed', $event)"
+          @added="($event) => console.log('added', $event)"
+          @removed="($event) => console.log('removed', $event)"
+          @input-changed="($event) => console.log('input-changed', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+        />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile">NbInputChip - Dark Theme (with Label)</h4>
+        <NbInputChip
+          nb-id="chip-dark-label"
+          input-name="chip-input-dark-label"
+          theme="dark"
+          input-style="background"
+          input-placeholder="Type and press Enter"
+          :show-label="true"
+          label="Label Dark Theme"
+          :current-list="currentChipList"
+          aria-label="Test input chip dark with label"
+          @clicked="() => console.log('clicked')"
+          @changed="($event) => console.log('changed', $event)"
+          @added="($event) => console.log('added', $event)"
+          @removed="($event) => console.log('removed', $event)"
+          @input-changed="($event) => console.log('input-changed', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+        />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile">NbInputChip - Light Theme (Line Style with Label)</h4>
+        <NbInputChip
+          nb-id="chip-light-line-label"
+          input-name="chip-input-light-line-label"
+          theme="light"
+          input-style="line"
+          input-placeholder="Type and press Enter"
+          :show-label="true"
+          label="Label Line Style"
+          :current-list="currentChipList"
+          aria-label="Test input chip light line with label"
+          @changed="($event) => console.log('changed', $event)"
+        />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile">NbInputChip - Dark Theme (Border Style with Label)</h4>
+        <NbInputChip
+          nb-id="chip-dark-border-label"
+          input-name="chip-input-dark-border-label"
+          theme="dark"
+          input-style="border"
+          input-placeholder="Type and press Enter"
+          :show-label="true"
+          label="Label Border Style"
+          :current-list="currentChipList"
+          aria-label="Test input chip dark border with label"
+          @changed="($event) => console.log('changed', $event)"
+        />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile">NbInputChip - Empty (no chips, with Label)</h4>
+        <NbInputChip
+          nb-id="chip-empty-label"
+          input-name="chip-input-empty-label"
+          theme="light"
+          input-style="background"
+          input-placeholder="Type and press Enter"
+          :show-label="true"
+          label="Label Empty"
+          :current-list="[]"
+          aria-label="Test input chip empty with label"
+          @changed="($event) => console.log('changed', $event)"
+          @added="($event) => console.log('added', $event)"
+          @removed="($event) => console.log('removed', $event)"
+        />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile">NbInputChip - Input Position Top (with Label)</h4>
+        <NbInputChip
+          nb-id="chip-top-position"
+          input-name="chip-input-top-position"
+          theme="light"
+          input-style="background"
+          input-position="top"
+          input-placeholder="Type and press Enter"
+          :show-label="true"
+          label="Label Input Top"
+          :current-list="currentChipList"
+          aria-label="Test input chip with input on top"
+          @changed="($event) => console.log('changed', $event)"
+          @added="($event) => console.log('added', $event)"
+          @removed="($event) => console.log('removed', $event)"
+        />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile">NbInputChip - Input Position Top (with Label)</h4>
+        <NbInputChip
+          nb-id="chip-top-position"
+          input-name="chip-input-top-position"
+          theme="light"
+          input-style="border"
+          input-position="bottom"
+          input-placeholder="Type and press Enter"
+          :show-label="true"
+          label="Label Input Top"
+          :current-list="currentChipList"
+          aria-label="Test input chip with input on top"
+          @changed="($event) => console.log('changed', $event)"
+          @added="($event) => console.log('added', $event)"
+          @removed="($event) => console.log('removed', $event)"
+        />
       </div>
     </div>
   </div>
