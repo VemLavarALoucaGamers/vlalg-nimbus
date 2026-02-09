@@ -1,14 +1,14 @@
 {
-  "name": "@vlalg-nimbus/nb-inputs",
-  "description": "Input components for Vuejs 3",
-  "version": "8.0.6",
+  "name": "@vlalg-nimbus/nb-calendar",
+  "description": "Calendar components for Vuejs 3",
+  "version": "1.0.0",
   "type": "module",
-  "main": "./dist/nb-inputs.umd.js",
-  "module": "./dist/nb-inputs.js",
+  "main": "./dist/nb-calendar.umd.js",
+  "module": "./dist/nb-calendar.js",
   "exports": {
     ".": {
-      "import": "./dist/nb-inputs.js",
-      "require": "./dist/nb-inputs.umd.js"
+      "import": "./dist/nb-calendar.js",
+      "require": "./dist/nb-calendar.umd.js"
     },
     "./dist/style.css": "./dist/style.css",
     "./dist/images": "./dist/images"
@@ -33,7 +33,6 @@
   "dependencies": {
     "@vlalg-nimbus/bee-css-reset": "^2.0.2",
     "@vlalg-nimbus/chameleon-grid-layout": "^1.0.2",
-    "@vlalg-nimbus/nb-calendar": "^1.0.0",
     "vue": "^3.3.4"
   },
   "devDependencies": {
@@ -65,15 +64,10 @@
     "vuejs",
     "vue js",
     "vue plugin",
-    "input radio",
-    "input checkbox",
-    "radio",
-    "checkbox",
-    "inputs",
-    "input",
-    "date picker",
-    "time picker",
-    "datetime picker",
+    "calendar",
+    "datepicker",
+    "timepicker",
+    "datetimepicker",
     "date range picker",
     "time range picker",
     "datetime range picker",

@@ -9,6 +9,8 @@ import NbTextComponents from '@vlalg-nimbus/nb-text';
 import NbTimeComponents from '@vlalg-nimbus/nb-time';
 import NbOverlaysComponents from '@vlalg-nimbus/nb-overlays';
 import NbImagesComponents from '@vlalg-nimbus/nb-images';
+import NbPaginationComponents from '@vlalg-nimbus/nb-pagination';
+import NbCalendarComponents from '@vlalg-nimbus/nb-calendar';
 
 import "@vlalg-nimbus/nb-buttons/dist/style.css";
 import "@vlalg-nimbus/nb-loaders/dist/style.css";
@@ -21,6 +23,8 @@ import "@vlalg-nimbus/nb-text/dist/style.css";
 import "@vlalg-nimbus/nb-time/dist/style.css";
 import "@vlalg-nimbus/nb-overlays/dist/style.css";
 import "@vlalg-nimbus/nb-images/dist/style.css";
+import "@vlalg-nimbus/nb-pagination/dist/style.css";
+import "@vlalg-nimbus/nb-calendar/dist/style.css";
 
 export default defineNuxtPlugin(context => {
   context.vueApp.use(NbButtonsComponents)
@@ -34,4 +38,6 @@ export default defineNuxtPlugin(context => {
   context.vueApp.use(NbTimeComponents)
   context.vueApp.use(NbOverlaysComponents)
   context.vueApp.use(NbImagesComponents)
+  context.vueApp.use(NbPaginationComponents)
+  context.vueApp.use(NbCalendarComponents)
 })
