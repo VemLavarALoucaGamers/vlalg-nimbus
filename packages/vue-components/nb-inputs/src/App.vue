@@ -16,13 +16,15 @@
           <option value="checkbox">checkbox</option>
           <option value="input">input</option>
           <option value="inputChip">inputChip</option>
+          <option value="textarea">textarea</option>
+          <option value="datePicker">datePicker</option>
         </select>
       </div>
     </div>
 
     <div v-if="btType === 'test'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
-        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
+        style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbInputRadio</h4>
         
         <NbInputTest
@@ -62,7 +64,7 @@
 
     <div v-else-if="btType === 'radio'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
-        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
+        style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbInputRadio - Light Theme</h4>
         
         <NbInputRadio
@@ -128,7 +130,7 @@
 
     <div v-if="btType === 'checkbox'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
-        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
+        style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbInputCheckbox - Light Theme</h4>
 
         <NbInputCheckbox
@@ -196,7 +198,7 @@
 
     <div v-if="btType === 'input'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
-        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
+        style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbInput</h4>
         
         <NbInput
@@ -348,7 +350,7 @@
 
     <div v-if="btType === 'inputChip'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
-        style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
+        style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbInput</h4>
         
         <NbInputChip
@@ -563,6 +565,797 @@
         />
       </div>
     </div>
+
+    <div v-if="btType === 'textarea'" class="row">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px;">
+        <h4 class="test-page__content-tile">NbTextarea</h4>
+        
+        <NbTextarea
+          nb-id="textarea-1"
+          display="b"
+          input-name="test-textarea1"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test textarea"
+          :aria-attrs="{ 'describedby': 'test-textarea-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #message>
+            <div>Erro teste</div>
+          </template>
+        </NbTextarea>
+
+        <NbTextarea
+          nb-id="textarea-2"
+          display="b"
+          input-style="border"
+          input-name="test-textarea2"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test textarea"
+          :aria-attrs="{ 'describedby': 'test-textarea-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #message>
+            <div>Erro teste</div>
+          </template>
+        </NbTextarea>
+        
+        <NbTextarea
+          nb-id="textarea-3"
+          display="b"
+          input-style="line"
+          input-name="test-textarea3"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test textarea"
+          :aria-attrs="{ 'describedby': 'test-textarea-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #message>
+            <div>Erro teste</div>
+          </template>
+        </NbTextarea>
+
+        <p style="margin-top: 4px;">
+          Text before
+          <NbTextarea
+            nb-id="textarea-4"
+            display="ib"
+            input-name="test-textarea4"
+            @current-value="($event) => console.log($event)"
+          />
+          text after
+        </p>
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Light Theme (with Label)</h4>
+        <NbTextarea
+          nb-id="textarea-5"
+          input-name="test-textarea5"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="background"
+          :rows="4"
+        />
+        <NbTextarea
+          nb-id="textarea-6"
+          input-name="test-textarea6"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="border"
+          :rows="4"
+        />
+        <NbTextarea
+          nb-id="textarea-7"
+          input-name="test-textarea7"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="line"
+          :rows="4"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Dark Theme (with Label)</h4>
+        <NbTextarea
+          nb-id="textarea-8"
+          input-name="test-textarea8"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="background"
+          theme="dark"
+          :rows="4"
+        />
+        <NbTextarea
+          nb-id="textarea-9"
+          input-name="test-textarea9"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="border"
+          theme="dark"
+          :rows="4"
+        />
+        <NbTextarea
+          nb-id="textarea-10"
+          input-name="test-textarea10"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="line"
+          theme="dark"
+          :rows="4"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Com Placeholder</h4>
+        <NbTextarea
+          nb-id="textarea-11"
+          input-name="test-textarea11"
+          display="b"
+          input-placeholder="Digite sua mensagem aqui..."
+          :rows="5"
+        />
+        <NbTextarea
+          nb-id="textarea-12"
+          input-name="test-textarea12"
+          display="b"
+          show-label
+          label="Mensagem"
+          input-placeholder="Digite sua mensagem aqui..."
+          input-style="border"
+          :rows="5"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Estados (Disabled/Readonly)</h4>
+        <NbTextarea
+          nb-id="textarea-13"
+          input-name="test-textarea13"
+          display="b"
+          :disabled="true"
+          input-text="Este textarea está desabilitado"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-14"
+          input-name="test-textarea14"
+          display="b"
+          :input-readonly="true"
+          input-text="Este textarea está somente leitura"
+          input-style="border"
+          :rows="3"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Limites de Caracteres</h4>
+        <NbTextarea
+          nb-id="textarea-15"
+          input-name="test-textarea15"
+          display="b"
+          :maxlength="100"
+          input-placeholder="Máximo 100 caracteres"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-16"
+          input-name="test-textarea16"
+          display="b"
+          :minlength="10"
+          input-placeholder="Mínimo 10 caracteres"
+          input-style="border"
+          :rows="3"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Redimensionamento</h4>
+        <NbTextarea
+          nb-id="textarea-17"
+          input-name="test-textarea17"
+          display="b"
+          resize="both"
+          input-placeholder="Redimensionável em ambas direções"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-18"
+          input-name="test-textarea18"
+          display="b"
+          resize="none"
+          input-placeholder="Sem redimensionamento"
+          input-style="border"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-19"
+          input-name="test-textarea19"
+          display="b"
+          resize="horizontal"
+          input-placeholder="Redimensionável horizontalmente"
+          :rows="3"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Quebra de Linha (Wrap)</h4>
+        <NbTextarea
+          nb-id="textarea-20"
+          input-name="test-textarea20"
+          display="b"
+          wrap="soft"
+          input-placeholder="Wrap soft (padrão)"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-21"
+          input-name="test-textarea21"
+          display="b"
+          wrap="hard"
+          input-placeholder="Wrap hard"
+          input-style="border"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-22"
+          input-name="test-textarea22"
+          display="b"
+          wrap="off"
+          input-placeholder="Wrap off (sem quebra visual)"
+          :rows="3"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Tamanhos Customizados</h4>
+        <NbTextarea
+          nb-id="textarea-23"
+          input-name="test-textarea23"
+          display="b"
+          :rows="2"
+          :cols="30"
+          input-placeholder="2 linhas, 30 colunas"
+        />
+        <NbTextarea
+          nb-id="textarea-24"
+          input-name="test-textarea24"
+          display="b"
+          :rows="6"
+          :cols="50"
+          input-placeholder="6 linhas, 50 colunas"
+          input-style="border"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Com Texto Inicial</h4>
+        <NbTextarea
+          nb-id="textarea-25"
+          input-name="test-textarea25"
+          display="b"
+          input-text="Este é um texto inicial pré-preenchido no textarea."
+          :rows="4"
+        />
+        <NbTextarea
+          nb-id="textarea-26"
+          input-name="test-textarea26"
+          display="b"
+          show-label
+          label="Comentário"
+          input-text="Este é um texto inicial com label."
+          input-style="border"
+          :rows="4"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Uppercase e Alinhamento</h4>
+        <NbTextarea
+          nb-id="textarea-27"
+          input-name="test-textarea27"
+          display="b"
+          :input-uppercase="true"
+          input-placeholder="Texto em maiúsculas"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-28"
+          input-name="test-textarea28"
+          display="b"
+          text-align="center"
+          input-placeholder="Texto centralizado"
+          input-style="border"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-29"
+          input-name="test-textarea29"
+          display="b"
+          text-align="right"
+          input-placeholder="Texto alinhado à direita"
+          :rows="3"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbTextarea - Com Border Radius</h4>
+        <NbTextarea
+          nb-id="textarea-30"
+          input-name="test-textarea30"
+          display="b"
+          :has-border-radius="true"
+          :border-radius="1"
+          input-placeholder="Com border radius"
+          :rows="3"
+        />
+        <NbTextarea
+          nb-id="textarea-31"
+          input-name="test-textarea31"
+          display="b"
+          :has-border-radius="true"
+          :border-radius="0.5"
+          input-style="border"
+          input-placeholder="Border radius menor"
+          :rows="3"
+        />
+      </div>
+    </div>
+
+    <div v-if="btType === 'datePicker'" class="row">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px;">
+        <h4 class="test-page__content-tile">NbDatePicker</h4>
+        
+        <NbDatePicker
+          nb-id="datepicker-1"
+          display="b"
+          input-name="test-datepicker1"
+          input-type="date"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test datepicker"
+          :aria-attrs="{ 'describedby': 'test-datepicker-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #message>
+            <div>Erro teste</div>
+          </template>
+        </NbDatePicker>
+
+        <NbDatePicker
+          nb-id="datepicker-2"
+          display="b"
+          input-style="border"
+          light-text-color="#ffffff"
+          input-name="test-datepicker2"
+          input-type="date"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test datepicker"
+          :aria-attrs="{ 'describedby': 'test-datepicker-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #message>
+            <div>Erro teste</div>
+          </template>
+        </NbDatePicker>
+        
+        <NbDatePicker
+          nb-id="datepicker-3"
+          display="b"
+          input-style="line"
+          light-text-color="#ffffff"
+          input-name="test-datepicker3"
+          input-type="date"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test datepicker"
+          :aria-attrs="{ 'describedby': 'test-datepicker-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #message>
+            <div>Erro teste</div>
+          </template>
+        </NbDatePicker>
+
+        <p style="margin-top: 4px;">
+          Text before
+          <NbDatePicker
+            nb-id="datepicker-4"
+            display="ib"
+            input-name="test-datepicker4"
+            input-type="date"
+            @current-value="($event) => console.log($event)"
+          />
+          text after
+        </p>
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Tipos de Input</h4>
+        <NbDatePicker
+          nb-id="datepicker-date"
+          input-name="test-datepicker-date"
+          display="b"
+          show-label
+          label="Data"
+          input-type="date"
+          input-style="background"
+        />
+        <NbDatePicker
+          nb-id="datepicker-datetime"
+          input-name="test-datepicker-datetime"
+          display="b"
+          show-label
+          label="Data e Hora"
+          input-type="datetime-local"
+          input-style="border"
+          light-text-color="#ffffff"
+        />
+        <NbDatePicker
+          nb-id="datepicker-time"
+          input-name="test-datepicker-time"
+          display="b"
+          show-label
+          label="Hora"
+          input-type="time"
+          input-style="line"
+          light-text-color="#ffffff"
+        />
+        <NbDatePicker
+          nb-id="datepicker-month"
+          input-name="test-datepicker-month"
+          display="b"
+          show-label
+          label="Mês"
+          input-type="month"
+          input-style="background"
+        />
+        <NbDatePicker
+          nb-id="datepicker-week"
+          input-name="test-datepicker-week"
+          display="b"
+          show-label
+          label="Semana"
+          input-type="week"
+          input-style="border"
+          light-text-color="#ffffff"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Light Theme (with Label)</h4>
+        <NbDatePicker
+          nb-id="datepicker-5"
+          input-name="test-datepicker5"
+          display="b"
+          show-label
+          label="Data"
+          input-style="background"
+          input-type="date"
+        />
+        <NbDatePicker
+          nb-id="datepicker-6"
+          input-name="test-datepicker6"
+          display="b"
+          show-label
+          label="Data"
+          input-style="border"
+          light-text-color="#ffffff"
+          input-type="date"
+        />
+        <NbDatePicker
+          nb-id="datepicker-7"
+          input-name="test-datepicker7"
+          display="b"
+          show-label
+          label="Data"
+          input-style="line"
+          light-text-color="#ffffff"
+          input-type="date"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Dark Theme (with Label)</h4>
+        <NbDatePicker
+          nb-id="datepicker-8"
+          input-name="test-datepicker8"
+          display="b"
+          show-label
+          label="Data"
+          input-style="background"
+          theme="dark"
+          input-type="date"
+        />
+        <NbDatePicker
+          nb-id="datepicker-9"
+          input-name="test-datepicker9"
+          display="b"
+          show-label
+          label="Data"
+          input-style="border"
+          theme="dark"
+          input-type="date"
+        />
+        <NbDatePicker
+          nb-id="datepicker-10"
+          input-name="test-datepicker10"
+          display="b"
+          show-label
+          label="Data"
+          input-style="line"
+          theme="dark"
+          input-type="date"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Com Limites (Min/Max)</h4>
+        <NbDatePicker
+          nb-id="datepicker-minmax"
+          input-name="test-datepicker-minmax"
+          display="b"
+          show-label
+          label="Data com limites"
+          input-type="date"
+          min="2024-01-01"
+          max="2024-12-31"
+          input-style="border"
+          light-text-color="#ffffff"
+        />
+        <NbDatePicker
+          nb-id="datepicker-datetime-minmax"
+          input-name="test-datepicker-datetime-minmax"
+          display="b"
+          show-label
+          label="Data/Hora com limites"
+          input-type="datetime-local"
+          min="2024-01-01T00:00"
+          max="2024-12-31T23:59"
+          input-style="background"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Estados (Disabled/Readonly)</h4>
+        <NbDatePicker
+          nb-id="datepicker-disabled"
+          input-name="test-datepicker-disabled"
+          display="b"
+          :disabled="true"
+          input-text="2024-01-15"
+          input-type="date"
+        />
+        <NbDatePicker
+          nb-id="datepicker-readonly"
+          input-name="test-datepicker-readonly"
+          display="b"
+          :input-readonly="true"
+          input-text="2024-01-15"
+          input-style="border"
+          light-text-color="#ffffff"
+          input-type="date"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Range Selection</h4>
+        <NbDatePicker
+          nb-id="datepicker-range"
+          input-name="test-datepicker-range"
+          display="b"
+          show-label
+          label="Selecionar período"
+          input-type="date"
+          :allow-range="true"
+          input-style="background"
+        />
+        <NbDatePicker
+          nb-id="datepicker-range-border"
+          input-name="test-datepicker-range-border"
+          display="b"
+          show-label
+          label="Selecionar período (border)"
+          input-type="date"
+          :allow-range="true"
+          input-style="border"
+          light-text-color="#ffffff"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Locales</h4>
+        <NbDatePicker
+          nb-id="datepicker-ptbr"
+          input-name="test-datepicker-ptbr"
+          display="b"
+          show-label
+          label="Português (pt-BR)"
+          input-type="date"
+          locale="pt-BR"
+          input-style="background"
+        />
+        <NbDatePicker
+          nb-id="datepicker-enus"
+          input-name="test-datepicker-enus"
+          display="b"
+          show-label
+          label="English (en-US)"
+          input-type="date"
+          locale="en-US"
+          input-style="border"
+          light-text-color="#ffffff"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Com Valor Inicial</h4>
+        <NbDatePicker
+          nb-id="datepicker-initial-date"
+          input-name="test-datepicker-initial-date"
+          display="b"
+          show-label
+          label="Data inicial"
+          input-type="date"
+          input-text="2024-06-15"
+          input-style="background"
+        />
+        <NbDatePicker
+          nb-id="datepicker-initial-datetime"
+          input-name="test-datepicker-initial-datetime"
+          display="b"
+          show-label
+          label="Data/Hora inicial"
+          input-type="datetime-local"
+          input-text="2024-06-15T14:30"
+          input-style="border"
+          light-text-color="#ffffff"
+        />
+        <NbDatePicker
+          nb-id="datepicker-initial-time"
+          input-name="test-datepicker-initial-time"
+          display="b"
+          show-label
+          label="Hora inicial"
+          input-type="time"
+          input-text="14:30"
+          input-style="line"
+          light-text-color="#ffffff"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Com Step</h4>
+        <NbDatePicker
+          nb-id="datepicker-step-time"
+          input-name="test-datepicker-step-time"
+          display="b"
+          show-label
+          label="Hora (step 15min)"
+          input-type="time"
+          step="900"
+          input-style="background"
+        />
+        <NbDatePicker
+          nb-id="datepicker-step-datetime"
+          input-name="test-datepicker-step-datetime"
+          display="b"
+          show-label
+          label="Data/Hora (step 30min)"
+          input-type="datetime-local"
+          step="1800"
+          input-style="border"
+          light-text-color="#ffffff"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Com Border Radius</h4>
+        <NbDatePicker
+          nb-id="datepicker-radius"
+          input-name="test-datepicker-radius"
+          display="b"
+          :has-border-radius="true"
+          :border-radius="1"
+          input-type="date"
+          input-style="background"
+        />
+        <NbDatePicker
+          nb-id="datepicker-radius-border"
+          input-name="test-datepicker-radius-border"
+          display="b"
+          :has-border-radius="true"
+          :border-radius="0.5"
+          input-style="border"
+          light-text-color="#ffffff"
+          input-type="date"
+        />
+
+        <br /><br />
+
+        <h4 class="test-page__content-tile">NbDatePicker - Custom Calendar vs Native</h4>
+        <NbDatePicker
+          nb-id="datepicker-custom"
+          input-name="test-datepicker-custom"
+          display="b"
+          show-label
+          label="Calendário Customizado (padrão)"
+          input-type="date"
+          :use-custom-calendar="true"
+          input-style="background"
+        />
+        <NbDatePicker
+          nb-id="datepicker-native"
+          input-name="test-datepicker-native"
+          display="b"
+          show-label
+          label="Calendário Nativo"
+          input-type="date"
+          :use-custom-calendar="false"
+          input-style="border"
+          light-text-color="#ffffff"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -574,8 +1367,10 @@ const NbInputRadio = defineAsyncComponent(() => import('@components/NbInputRadio
 const NbInputCheckbox = defineAsyncComponent(() => import('@components/NbInputCheckbox.vue'))
 const NbInput = defineAsyncComponent(() => import('@components/NbInput.vue'))
 const NbInputChip = defineAsyncComponent(() => import('@components/NbInputChip.vue'))
+const NbTextarea = defineAsyncComponent(() => import('@components/NbTextarea.vue'))
+const NbDatePicker = defineAsyncComponent(() => import('@components/NbDatePicker.vue'))
 
-const btType = ref('inputChip')
+const btType = ref('datePicker')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
@@ -643,7 +1438,7 @@ const changeChackboxItem = (event) => {
 
   .test-page__content {
     text-align: left;
-    overflow: hidden;
+   
   }
 }
 </style>
