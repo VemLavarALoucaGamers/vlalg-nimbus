@@ -581,7 +581,7 @@ const formatDefaultValues = computed(() => {
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 400 : fontWeight.value
 	const themeValue = !theme.value ? 'light' : theme.value
-	const widthValue = !width.value || width.value < 350 ? 350 : width.value
+	const widthValue = !width.value || width.value < 280 ? 280 : width.value
 	const primaryColorValue = !primaryColor.value ? '#007bff' : primaryColor.value
 	const selectionColorValue = !selectionColor.value ? '#1976d2' : selectionColor.value
 	const eventColorValue = !eventColor.value ? '#4caf50' : eventColor.value
@@ -853,7 +853,7 @@ const wrapperStyle = computed(() => {
 		display: defaultValues.display,
 		width: widthFull.value ? '100%' : undefined,
 		maxWidth: widthFull.value ? '100%' : undefined,
-        minWidth: widthFull.value ? '350px' : undefined
+        minWidth: widthFull.value ? '280px' : undefined
 	}
 })
 
@@ -1426,7 +1426,7 @@ const formattedWidth = computed(() => {
         return {
             width: '100%',
             maxWidth: '100%',
-            minWidth: '350px'
+            minWidth: '280px'
         }
     }
 
@@ -2856,7 +2856,7 @@ const getEventsForDate = (date) => {
 */
 const formatDimension = (value) => {
     // Se o valor for null ou undefined, retornar valor padrão
-    if (value === null || value === undefined) return '350px'
+    if (value === null || value === undefined) return '280px'
     
     // Agora sempre recebe um número, então apenas adiciona 'px'
     return `${value}px`
@@ -4506,7 +4506,7 @@ onUnmounted(() => {
         background: #fff;
         border-radius: v-bind('styleBorderRadius');
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 16px;
+        padding: 12px;
         user-select: none;
         font-family: inherit;
         overflow: hidden;
@@ -4523,17 +4523,20 @@ onUnmounted(() => {
             margin-bottom: 9px;
             padding-bottom: 9px;
             border-bottom: 1px solid #e0e0e0;
+            gap: 4px;
+            min-width: 0;
 
             .calendar__nav-button {
                 background: none;
                 border: none;
-                font-size: 20px;
+                font-size: 18px;
                 color: #666;
-	cursor: pointer;
-                padding: 4px 12px;
+                cursor: pointer;
+                padding: 4px 8px;
                 border-radius: 4px;
                 transition: all 0.2s;
                 font-family: inherit;
+                flex-shrink: 0;
 
                 &:hover:not(:disabled) {
                     background: #f0f0f0;
@@ -4549,13 +4552,14 @@ onUnmounted(() => {
             .calendar__clear-button {
                 background: none;
                 border: none;
-                font-size: 24px;
+                font-size: 20px;
                 color: #666;
                 cursor: pointer;
-                padding: 0 8px;
+                padding: 0 6px;
                 line-height: 1;
                 transition: all 0.2s;
                 font-family: inherit;
+                flex-shrink: 0;
 
                 &:hover:not(:disabled) {
                     color: #d32f2f;
@@ -4570,23 +4574,27 @@ onUnmounted(() => {
 
             .calendar__month-year {
                 display: flex;
-                gap: 8px;
+                gap: 6px;
                 align-items: center;
                 flex: 1;
                 justify-content: center;
+                min-width: 0;
             }
 
             .calendar__month-year-button {
-                padding: 6px 12px;
+                padding: 6px 8px;
                 border: none;
                 border-radius: 4px;
-                font-size: 16px;
+                font-size: 14px;
                 font-weight: 600;
                 color: #333;
                 background: transparent;
                 cursor: pointer;
                 transition: all 0.2s;
                 font-family: v-bind('font') !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
 
                 &:hover:not(:disabled) {
                     background: #f0f0f0;
@@ -4606,9 +4614,12 @@ onUnmounted(() => {
 
             .calendar__view-title {
                 font-weight: 600;
-                font-size: 18px;
+                font-size: 16px;
                 color: #333;
                 font-family: inherit;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
         }
 
@@ -4722,24 +4733,28 @@ onUnmounted(() => {
 
         .calendar__weekdays {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 1px;
             margin-bottom: 8px;
 
             .calendar__weekday {
                 text-align: center;
-                font-size: 12px;
+                font-size: 10px;
                 font-weight: 500;
                 color: #888;
-                padding: 8px 0;
+                padding: 8px 1px;
                 font-family: inherit;
+                white-space: nowrap;
+                overflow: visible;
+                min-width: 0;
+                box-sizing: border-box;
             }
         }
 
         .calendar__days {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 2px;
             min-height: 272px;
 
             .calendar__day {
@@ -4753,7 +4768,9 @@ onUnmounted(() => {
                 border-radius: 6px;
                 transition: all 0.2s;
                 position: relative;
-                padding: 4px;
+                padding: 2px;
+                min-width: 0;
+                box-sizing: border-box;
 
                 &:hover:not(.calendar__day--disabled):not(.calendar__day--selected):not(.calendar__day--range-start):not(.calendar__day--range-end) {
                     background: v-bind('dayHoverBgComputed');
@@ -4765,9 +4782,11 @@ onUnmounted(() => {
                 }
 
                 .calendar__day-number {
-                    font-size: 14px;
+                    font-size: 13px;
                     color: #333;
                     font-family: inherit;
+                    white-space: nowrap;
+                    overflow: visible;
                 }
 
                 .calendar__day-events {

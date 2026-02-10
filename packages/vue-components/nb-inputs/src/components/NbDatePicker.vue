@@ -57,38 +57,40 @@
         <slot name="message">{{ message }}</slot>
       </div>
       
-      <!-- Calendário customizado -->
-      <div
-        v-if="shouldUseCustomCalendar && showCustomCalendar"
-        ref="calendarRef"
-        class="datepicker__custom-calendar-wrapper"
-        :style="calendarPositionStyle"
-        @click.stop="isCalendarInteraction = true"
-        @mousedown.stop="isCalendarInteraction = true"
-      >
-        <Calendar
-          :nb-id="`${nbId}-calendar`"
-          :value="calendarValue"
-          :input-type="inputType"
-          :min="min"
-          :max="max"
-          :step="step"
-          :disabled="disabled"
-          :width="350"
-          :locale="locale"
-          :theme="theme"
-          :allow-range="allowRange"
-          @changed="handleCalendarChanged"
-          @date-selected="handleCalendarDateSelected"
-          @mousedown="isCalendarInteraction = true"
-          @click="isCalendarInteraction = true"
-        />
-      </div>
+      <!-- Calendário customizado usando Teleport para renderizar no body -->
+      <Teleport to="body">
+        <div
+          v-if="shouldUseCustomCalendar && showCustomCalendar"
+          ref="calendarRef"
+          class="datepicker__custom-calendar-wrapper"
+          :style="calendarPositionStyle"
+          @click.stop="isCalendarInteraction = true"
+          @mousedown.stop="isCalendarInteraction = true"
+        >
+          <Calendar
+            :nb-id="`${nbId}-calendar`"
+            :value="calendarValue"
+            :input-type="inputType"
+            :min="min"
+            :max="max"
+            :step="step"
+            :disabled="disabled"
+            :width="350"
+            :locale="locale"
+            :theme="theme"
+            :allow-range="allowRange"
+            @changed="handleCalendarChanged"
+            @date-selected="handleCalendarDateSelected"
+            @mousedown="isCalendarInteraction = true"
+            @click="isCalendarInteraction = true"
+          />
+        </div>
+      </Teleport>
     </div>
   </template>
   
   <script setup>
-  import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+  import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from 'vue'
   import { defineAsyncComponent } from 'vue'
   
 // Importar do pacote npm (funciona localmente via Yarn workspaces e após publicação)
@@ -287,6 +289,13 @@ const Calendar = defineAsyncComponent(() =>
       default: false,
       validator: value => {
         return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarZIndex: {
+      type: Number,
+      default: 10000,
+      validator: value => {
+        return typeof value === 'number' && value >= 0
       }
     },
     hasTrim: {
@@ -534,6 +543,7 @@ const Calendar = defineAsyncComponent(() =>
     locale,
     theme,
     allowRange,
+    calendarZIndex,
     tabindex,
       lightBgColor,
       lightBgColorFocus,
@@ -1629,6 +1639,7 @@ const Calendar = defineAsyncComponent(() =>
     Função para calcular posição do calendário customizado
     Esta função é usada para calcular a posição do calendário customizado em relação ao input.
     Ela posiciona o calendário abaixo do input com um espaçamento de 4px.
+    Como o calendário é renderizado via Teleport no body, sempre usa position: fixed.
   */
   const calculateCalendarPosition = () => {
     // Verificar se o inputRef existe
@@ -1636,42 +1647,16 @@ const Calendar = defineAsyncComponent(() =>
     
     // Usar nextTick para garantir que o DOM atualizou
     nextTick(() => {
-      // Obter o wrapper (elemento com position: relative)
-      const wrapper = inputRef.value.closest('.nb-wrapper')
+      // Obter o rect do input em relação à viewport
+      const inputRect = inputRef.value.getBoundingClientRect()
       
       const spacing = 4 // Espaçamento entre input e calendário
       
-      if (wrapper) {
-        // Método preferido: calcular posição relativa ao wrapper
-        // Obter o rect do wrapper e do input
-        const wrapperRect = wrapper.getBoundingClientRect()
-        const inputRect = inputRef.value.getBoundingClientRect()
-        
-        // Calcular posição relativa ao wrapper
-        // top: distância do topo do wrapper até o bottom do input + spacing
-        const top = inputRect.bottom - wrapperRect.top + spacing
-        // left: distância da esquerda do wrapper até a esquerda do input
-        const left = inputRect.left - wrapperRect.left
-        
-        // Sempre posicionar abaixo do input
-        calendarPosition.value = {
-          top: `${top}px`,
-          left: `${left}px`
-        }
-      } else {
-        // Fallback: usar coordenadas absolutas (compatibilidade com projetos antigos)
-        // Obter o rect do input
-        const inputRect = inputRef.value.getBoundingClientRect()
-        
-        // Obter o scrollY e scrollX da janela
-        const scrollY = window.scrollY || window.pageYOffset
-        const scrollX = window.scrollX || window.pageXOffset
-        
-        // Sempre posicionar abaixo do input
-        calendarPosition.value = {
-          top: `${inputRect.bottom + scrollY + spacing}px`,
-          left: `${inputRect.left + scrollX}px`
-        }
+      // Como o calendário é renderizado no body via Teleport, sempre usar coordenadas da viewport
+      // Sempre posicionar abaixo do input usando position: fixed
+      calendarPosition.value = {
+        top: `${inputRect.bottom + spacing}px`,
+        left: `${inputRect.left}px`
       }
     })
   }
@@ -1679,15 +1664,17 @@ const Calendar = defineAsyncComponent(() =>
   /*
     Computed para estilo de posição do calendário
     Este computed é usado para gerar o estilo CSS de posição do calendário customizado.
-    Ele retorna um objeto com position absolute, top, left e zIndex.
+    Como o calendário é renderizado via Teleport no body, sempre usa position: fixed.
+    Ele retorna um objeto com position fixed, top, left e zIndex.
   */
   const calendarPositionStyle = computed(() => {
-    // Retornar objeto com position absolute, top, left e zIndex
+    // Retornar objeto com position fixed, top, left e zIndex
+    // z-index configurável via prop calendarZIndex (padrão: 10000)
     return {
-      position: 'absolute',
+      position: 'fixed',
       top: calendarPosition.value.top,
       left: calendarPosition.value.left,
-      zIndex: 1000
+      zIndex: calendarZIndex.value
     }
   })
   
@@ -2322,14 +2309,14 @@ const Calendar = defineAsyncComponent(() =>
   
   /*
     Handler para recalcular posição ao redimensionar a janela
-    Esta função é usada para recalcular a posição do calendário quando a janela é redimensionada.
-    Ela só recalcula se o calendário estiver aberto e se o calendário customizado estiver ativo.
+    Esta função é usada para fechar o calendário quando a janela é redimensionada.
+    Isso evita problemas de posicionamento e melhora a experiência do usuário.
   */
   const handleResize = () => {
     // Verificar se o calendário estiver aberto e se o calendário customizado estiver ativo
     if (showCustomCalendar.value && shouldUseCustomCalendar.value) {
-      // Recalcular posição do calendário
-      calculateCalendarPosition()
+      // Fechar calendário ao redimensionar para evitar problemas de posicionamento
+      showCustomCalendar.value = false
     }
   }
   
@@ -2350,32 +2337,14 @@ const Calendar = defineAsyncComponent(() =>
       return
     }
     
-    // Obter o wrapper (elemento com position: relative)
-    const wrapper = inputRef.value.closest('.nb-wrapper')
-    
     // Obter o espaçamento entre o input e o calendário
     const spacing = 4
     
-    let newTop, newLeft
+    // Como o calendário é renderizado no body via Teleport, sempre usar coordenadas da viewport
+    const inputRect = inputRef.value.getBoundingClientRect()
     
-    if (wrapper) {
-      // Método preferido: calcular posição relativa ao wrapper
-      // Obter o rect do wrapper e do input
-      const wrapperRect = wrapper.getBoundingClientRect()
-      const inputRect = inputRef.value.getBoundingClientRect()
-      
-      // Calcular posição relativa ao wrapper
-      newTop = inputRect.bottom - wrapperRect.top + spacing
-      newLeft = inputRect.left - wrapperRect.left
-    } else {
-      // Fallback: usar coordenadas absolutas (compatibilidade com projetos antigos)
-      const inputRect = inputRef.value.getBoundingClientRect()
-      const scrollY = window.scrollY || window.pageYOffset
-      const scrollX = window.scrollX || window.pageXOffset
-      
-      newTop = inputRect.bottom + scrollY + spacing
-      newLeft = inputRect.left + scrollX
-    }
+    const newTop = `${inputRect.bottom + spacing}px`
+    const newLeft = `${inputRect.left}px`
     
     // Só atualizar se a posição mudou
     if (lastPosition.top !== newTop || lastPosition.left !== newLeft) {
@@ -2385,8 +2354,8 @@ const Calendar = defineAsyncComponent(() =>
       lastPosition.left = newLeft
       // Atualizar a posição do calendário
       calendarPosition.value = {
-        top: `${newTop}px`,
-        left: `${newLeft}px`
+        top: newTop,
+        left: newLeft
       }
     }
     
@@ -3196,8 +3165,8 @@ const Calendar = defineAsyncComponent(() =>
   }
   
   .datepicker__custom-calendar-wrapper {
-    position: absolute;
-    z-index: 1000;
+    /* position e z-index são definidos dinamicamente via :style="calendarPositionStyle" */
+    /* Como é renderizado via Teleport no body, sempre usa position: fixed */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     margin-top: 4px;
