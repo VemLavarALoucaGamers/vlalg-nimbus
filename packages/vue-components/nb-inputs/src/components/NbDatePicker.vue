@@ -17,6 +17,7 @@
           :for="computedInputName"
           class="component__label"
           :style="[styleLabel]"
+          @click="handleLabelClick"
         >{{ label }}</label>
   
         <input
@@ -1623,6 +1624,36 @@ const Calendar = defineAsyncComponent(() =>
   */
   const interacted = () => {
       emit('clicked')
+  }
+  /*
+    Handler para quando o label é clicado
+    Esta função é usada para processar quando o usuário clica no label.
+    Ela previne a propagação do evento para o elemento pai e foca o input explicitamente.
+    Se estiver usando calendário customizado, também abre o calendário.
+  */
+  const handleLabelClick = (event) => {
+    // Prevenir que o evento seja capturado pelo @click="interacted" do elemento pai
+    event.stopPropagation()
+    
+    // Verificar se o componente está desabilitado ou readonly
+    if (disabled.value || formatDefaultValues.value.inputReadonly) {
+      return
+    }
+    
+    // Focar o input explicitamente
+    if (inputRef.value) {
+      inputRef.value.focus()
+      
+      // Se estiver usando calendário customizado, também abrir o calendário
+      if (shouldUseCustomCalendar.value) {
+        // Recalcular posição e abrir calendário
+        showCustomCalendar.value = false
+        requestAnimationFrame(() => {
+          calculateCalendarPosition()
+          showCustomCalendar.value = true
+        })
+      }
+    }
   }
   /*
     Função para confirmar entrada com Enter

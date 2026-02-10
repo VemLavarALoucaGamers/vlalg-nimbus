@@ -54,7 +54,7 @@
           today-color="#ab47bc"
           :value="selectedDate3"
           @changed="($event) => { selectedDate3 = $event; console.log('changed:', $event) }"
-        />
+          />
 
         <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Com Range)</h4>
         <NbCalendar
@@ -70,12 +70,12 @@
         <NbCalendar
           nb-id="calendar-date-limits-1"
           input-type="date"
-          theme="light"
+            theme="light"
           :min="minDate"
           :max="maxDate"
           :value="selectedDate4"
           @changed="($event) => { selectedDate4 = $event; console.log('changed:', $event) }"
-        />
+          />
 
         <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Com Eventos)</h4>
         <NbCalendar
@@ -95,7 +95,7 @@
           :start-week-on-monday="true"
           :value="selectedDate6"
           @changed="($event) => { selectedDate6 = $event; console.log('changed:', $event) }"
-        />
+          />
 
         <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Locale EN-US)</h4>
         <NbCalendar
@@ -111,10 +111,10 @@
         <NbCalendar
           nb-id="calendar-date-disabled-1"
           input-type="date"
-          theme="light"
+            theme="light"
           :disabled="true"
           :value="new Date()"
-        />
+          />
 
         <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Largura Customizada)</h4>
         <NbCalendar
@@ -124,7 +124,7 @@
           :width="450"
           :value="selectedDate8"
           @changed="($event) => { selectedDate8 = $event; console.log('changed:', $event) }"
-        />
+          />
 
         <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Com Border Radius)</h4>
         <NbCalendar
@@ -134,7 +134,7 @@
           :border-radius="1"
           :value="selectedDate9"
           @changed="($event) => { selectedDate9 = $event; console.log('changed:', $event) }"
-        />
+          />
       </div>
     </div>
 
