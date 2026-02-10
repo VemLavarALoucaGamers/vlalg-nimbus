@@ -940,6 +940,41 @@
         style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbDatePicker</h4>
         
+        
+        <div v-if="showModal" class="fakemodal">
+          <p>Simulação de modal</p>
+          <br />
+          <NbDatePicker
+            nb-id="datepicker-1"
+            display="b"
+            input-name="test-datepicker1"
+            input-type="date"
+            :show-msg="true"
+            :has-msg="true"
+            aria-label="Test datepicker"
+            :aria-attrs="{ 'describedby': 'test-datepicker-description' }"
+            caret-color="cyan"
+            selection-bg-color="magenta"
+            selection-text-color="yellow"
+            calendar-z-index="2147483642"
+            @clicked="() => console.log('clicked')"
+            @current-value="($event) => console.log('current-value', $event)"
+            @changed="($event) => console.log('changed:',$event)"
+            @focused="() => console.log('focused')"
+            @blurred="() => console.log('blurred')"
+            @entered="($event) => console.log('entered', $event)"
+          >
+            <template #message>
+              <div>Erro teste</div>
+            </template>
+          </NbDatePicker>
+          ASDASDAS1
+
+          <p>ASDASDAS2</p>
+          <p>ASDASDAS3</p>
+          <p>ASDASDAS4</p>
+        </div>
+
         <NbDatePicker
           nb-id="datepicker-1"
           display="b"
@@ -1390,6 +1425,7 @@ const inputOptions = computed(() => {
   ]
 })
 const currentChipList = ref(['item1', 'item2', 'item3'])
+const showModal = ref(false)
 
 const changeRadioItem = (event) => {
   currentRadioItem.value = event
@@ -1440,5 +1476,33 @@ const changeChackboxItem = (event) => {
     text-align: left;
    
   }
+}
+
+.fakemodal {
+  position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 90%;
+    background: #888787;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 6px #0000001a, 0 2px 4px #0000000f;
+    transition: transform .3s ease-out;
+    border-radius: 0rem;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+    padding: 10px;
+    min-width: 225px !important;
+    max-width: 500px !important;
+    height: auto;
+    min-height: 100px !important;
+    max-height: 300px !important;
+    z-index: 2147483642 !important;
+    width: 500px;
+    height: 272px;
+
+    color: #000;
 }
 </style>
