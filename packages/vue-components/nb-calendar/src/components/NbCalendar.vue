@@ -291,9 +291,9 @@ const props = defineProps({
 	width: { // largura do calendário em pixels
         type: Number,
         default: 350,
-		validator: value => {
-            return typeof value === 'number' && value >= 350
-        }
+      validator: value => {
+        return typeof value === 'number' && value >= 280
+      }
     },
     widthFull: { // se true, o calendário ocupará a largura total do container
         type: Boolean,

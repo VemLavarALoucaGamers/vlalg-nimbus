@@ -571,7 +571,7 @@ const formatDefaultValues = computed(() => {
   const hasBorderRadiusValue = !hasBorderRadius.value ? false : hasBorderRadius.value
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = fontSize.value && fontSize.value >= 0 ? fontSize.value : null
+  const fontSizeValue = !fontSize.value ? '1.4em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
   const fontFamilyMsgValue = !fontFamilyMsg.value ? `'Lato', sans-serif` : fontFamilyMsg.value
   const fontSizeMsgValue = !fontSizeMsg.value ? '1em' : fontSizeMsg.value
@@ -591,8 +591,8 @@ const formatDefaultValues = computed(() => {
   const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
   const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
   const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
-  const labelActiveTopValue = ((labelActiveTop.value !== 0 && !labelActiveTop.value) || labelActiveTop.value < 0) ? -13 : labelActiveTop.value
-  const labelActiveLeftValue = ((labelActiveLeft.value !== 0 && !labelActiveLeft.value) || labelActiveLeft.value < 0) ? -10 : labelActiveLeft.value
+  const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
+  const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? -10 : labelActiveLeft.value
   const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
   const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
   const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
@@ -680,10 +680,10 @@ const wrapperStyle = computed(() => {
 })
 const fontSizeStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
+  
+  if (defaultValues.fontSize) return defaultValues.fontSize
 
-  if (defaultValues.fontSize) return `${defaultValues.fontSize}em`
-
-  return '1.2em'
+  return '1.4em'
 })
 const componentStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
@@ -691,7 +691,6 @@ const componentStyle = computed(() => {
   const isActive = isLabelActive.value
 
 	return {
-		fontSize: fontSizeStyle.value,
 		fontWeight: defaultValues.fontWeight,
 		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
 	}
@@ -1297,7 +1296,7 @@ watch(inputValue, () => {
       font-family: inherit;
       font-style: normal;
       font-weight: normal;
-      font-size: 1em;
+      font-size: v-bind('fontSizeStyle');
       line-height: 1.5;
       border: 0;
       border-radius: 0;

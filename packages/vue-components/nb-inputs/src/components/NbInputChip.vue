@@ -171,10 +171,7 @@ const props = defineProps({
 	},
 	fontSize: {
 		type: String,
-		default: '1.6em',
-		validator: value => {
-			return !value ? '1.6em' : value
-		}
+		default: null
 	},
 	fontWeight: {
 		type: Number,
@@ -534,7 +531,7 @@ const formatDefaultValues = computed(() => {
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.6rem' : fontSize.value
+	const fontSizeValue = !fontSize.value ? '1.4em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 	const minChipsValue = ((minChips.value !== 0 && !minChips.value) || minChips.value < 0) ? 0 : minChips.value
 	const maxChipsValue = ((maxChips.value !== 0 && !maxChips.value) || maxChips.value < 0) ? 10 : maxChips.value
@@ -549,8 +546,8 @@ const formatDefaultValues = computed(() => {
 	const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
 	const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
 	const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
-	const labelActiveTopValue = ((labelActiveTop.value !== 0 && !labelActiveTop.value) || labelActiveTop.value < 0) ? 13 : labelActiveTop.value
-	const labelActiveLeftValue = ((labelActiveLeft.value !== 0 && !labelActiveLeft.value) || labelActiveLeft.value < 0) ? 5 : labelActiveLeft.value
+	const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? 13 : labelActiveTop.value
+	const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
 	const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
 	const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
 	const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
@@ -612,6 +609,14 @@ const wrapperStyle = computed(() => {
 		paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
 	}
 })
+const fontSizeStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+	
+	if (defaultValues.fontSize) return defaultValues.fontSize
+
+	return '1.4em'
+})
+
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	const isActive = isLabelActive.value
@@ -619,7 +624,6 @@ const componentStyle = computed(() => {
 	return {
 		color: defaultValues.textColor,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
-		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight,
 		textAlign: textAlign.value,
 		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
@@ -1022,7 +1026,7 @@ watch(chipInputValue, (newValue) => {
     flex: 1;
     min-width: 100px;
     margin: 5px;
-    font-size: 14px;
+    font-size: v-bind('fontSizeStyle');
     background-color: transparent;
     caret-color: v-bind('styleCaretColor');
     

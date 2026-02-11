@@ -987,6 +987,8 @@
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          :calendar-width="650"
+          font-size="1.2em"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"

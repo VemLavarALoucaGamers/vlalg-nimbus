@@ -76,7 +76,7 @@
             :max="max"
             :step="step"
             :disabled="disabled"
-            :width="350"
+            :width="formatCalendarWidth"
             :locale="locale"
             :theme="theme"
             :allow-range="allowRange"
@@ -209,8 +209,8 @@ const Calendar = defineAsyncComponent(() =>
           default: `'Lato', sans-serif`
       },
       fontSize: {
-          type: String,
-          default: null
+        type: String,
+        default: null
       },
       fontWeight: {
           type: Number,
@@ -299,6 +299,13 @@ const Calendar = defineAsyncComponent(() =>
         return typeof value === 'number' && value >= 0
       }
     },
+    calendarWidth: {
+      type: Number,
+      default: 350,
+      validator: value => {
+        return typeof value === 'number' && value >= 280
+      }
+    },
     hasTrim: {
       type: Boolean,
       default: false,
@@ -340,7 +347,7 @@ const Calendar = defineAsyncComponent(() =>
     },
     inputAutocomplete: {
       type: String,
-      default: 'on',
+      default: 'off',
       validator: value => {
         return ['on', 'off'].indexOf(value) !== -1
       },
@@ -545,6 +552,7 @@ const Calendar = defineAsyncComponent(() =>
     theme,
     allowRange,
     calendarZIndex,
+    calendarWidth,
     tabindex,
       lightBgColor,
       lightBgColorFocus,
@@ -582,6 +590,10 @@ const Calendar = defineAsyncComponent(() =>
   const currentType = ref('') // Tipo atual do input
   const isActive = ref(false) // Flag para indicar se o input está ativo (focado)
   const isCalendarInteraction = ref(false) // Flag para indicar interação com calendário
+
+  const formatCalendarWidth = computed(() => {
+    return !calendarWidth.value || calendarWidth.value < 280 ? 280 : parseInt(calendarWidth.value, 10)
+  })
   
   /*
     Computed para converter inputValue para formato esperado pelo Calendar
@@ -1103,7 +1115,7 @@ const Calendar = defineAsyncComponent(() =>
     const hasBorderRadiusValue = !hasBorderRadius.value ? false : hasBorderRadius.value
       const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
       const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-      const fontSizeValue = fontSize.value && fontSize.value >= 0 ? fontSize.value : null
+      const fontSizeValue = !fontSize.value ? '1.4em' : fontSize.value
       const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
     const fontFamilyMsgValue = !fontFamilyMsg.value ? `'Lato', sans-serif` : fontFamilyMsg.value
     const fontSizeMsgValue = !fontSizeMsg.value ? '1em' : fontSizeMsg.value
@@ -1126,8 +1138,8 @@ const Calendar = defineAsyncComponent(() =>
     const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
     const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
     const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
-    const labelActiveTopValue = ((labelActiveTop.value !== 0 && !labelActiveTop.value) || labelActiveTop.value < 0) ? -13 : labelActiveTop.value
-    const labelActiveLeftValue = ((labelActiveLeft.value !== 0 && !labelActiveLeft.value) || labelActiveLeft.value < 0) ? -10 : labelActiveLeft.value
+    const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
+    const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? -10 : labelActiveLeft.value
     const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
     const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
     const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
@@ -1209,7 +1221,7 @@ const Calendar = defineAsyncComponent(() =>
   const fontSizeStyle = computed(() => {
     const defaultValues = formatDefaultValues.value
   
-    if (defaultValues.fontSize) return `${defaultValues.fontSize}em`
+    if (defaultValues.fontSize) return defaultValues.fontSize
 
     /*let newFontSize = ''
     switch (defaultValues.sizeMediaQuery) {
@@ -1226,7 +1238,7 @@ const Calendar = defineAsyncComponent(() =>
     return newFontSize*/
   
     // Sempre usa tamanho 'sm', mas mantém estrutura para facilitar volta no futuro
-    return '1.2em'
+    return '1.4em'
   })
   /*
     Computed para estilo do componente
@@ -1239,7 +1251,6 @@ const Calendar = defineAsyncComponent(() =>
     const isActive = isLabelActive.value
   
       return {
-          fontSize: fontSizeStyle.value,
           fontWeight: defaultValues.fontWeight,
           marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
       }
@@ -2252,10 +2263,15 @@ const Calendar = defineAsyncComponent(() =>
       return
     }
     
-    // Se o evento foi prevenido ou parado, não fazer nada
-    if (event.defaultPrevented || event.cancelBubble) {
+    // Verificar se o clique está dentro do wrapper do componente (incluindo label quando ativo)
+    // Isso deve ser verificado ANTES de verificar event.defaultPrevented, pois o sidebar pode usar @click.prevent
+    if (componentWrapper && (clickedElement === componentWrapper || componentWrapper.contains(clickedElement))) {
+      // Clique está dentro do wrapper deste componente, não fechar
       return
     }
+    
+    // Não verificar event.defaultPrevented aqui, pois o sidebar pode usar @click.prevent
+    // mas ainda queremos processar o clique para fechar o calendário se estiver fora do wrapper
     
     // Verificar imediatamente se está dentro do wrapper (antes de qualquer mudança de DOM)
     if (calendarRef.value && calendarRef.value.contains(clickedElement)) {
@@ -2310,9 +2326,15 @@ const Calendar = defineAsyncComponent(() =>
         inputRef.value.contains(clickedElement)
       )
       
-      // Só fechar se não clicou dentro do calendário nem dentro do input deste componente
+      // Verificar se clicou dentro do wrapper do componente (incluindo label quando ativo)
+      const clickedInsideWrapper = componentWrapper && (
+        clickedElement === componentWrapper ||
+        componentWrapper.contains(clickedElement)
+      )
+      
+      // Só fechar se não clicou dentro do calendário, nem dentro do input, nem dentro do wrapper deste componente
       // Se clicar em outro DatePicker, o calendário atual fecha normalmente (o outro abrirá seu próprio calendário)
-      if (!clickedInsideInput) {
+      if (!clickedInsideInput && !clickedInsideWrapper) {
         // Fechar calendário customizado
         showCustomCalendar.value = false
         // Verificar se o input estiver vazio
@@ -3053,7 +3075,7 @@ const Calendar = defineAsyncComponent(() =>
         font-family: inherit;
         font-style: normal;
         font-weight: normal;
-        font-size: 1em;
+        font-size: v-bind('fontSizeStyle');
         line-height: 1.5;
         border: 0;
         border-radius: 0;
