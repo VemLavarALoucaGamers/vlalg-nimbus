@@ -28,10 +28,11 @@
             :chip="chip"
             :removeChip="removeChip"
           >
-            <span class="chip-text">{{ chip }}</span>
+            <span class="chip-text" :style="[fontSizeChipStyle]">{{ chip }}</span>
             <span 
               v-if="!disabled && !inputReadonly"
-              class="chip-remove" 
+              class="chip-remove"
+              :style="[fontSizeChipStyle]"
               @click="removeChip(chip)">×</span>
           </slot>
         </div>
@@ -389,7 +390,7 @@ const props = defineProps({
 	},
 	labelActiveTop: {
 		type: Number,
-		default: 13,
+		default: -13,
 	},
 	labelActiveLeft: {
 		type: Number,
@@ -435,7 +436,22 @@ const props = defineProps({
 	darkTextColorLabelActive: {
 		type: String,
 		default: '#ffffff'
-	}
+	},
+	fontFamilyChip: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	fontSizeChip: {
+		type: String,
+		default: '1.2em'
+	},
+	fontWeightChip: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 700 : value
+		}
+  },
 })
 
 const {
@@ -509,7 +525,10 @@ const {
 	lightTextColorLabel,
 	lightTextColorLabelActive,
 	darkTextColorLabel,
-	darkTextColorLabelActive
+	darkTextColorLabelActive,
+	fontFamilyChip,
+	fontSizeChip,
+	fontWeightChip,
 } = toRefs(props)
 
 const chipInputValue = ref('');
@@ -531,7 +550,7 @@ const formatDefaultValues = computed(() => {
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.4em' : fontSize.value
+	const fontSizeValue = !fontSize.value ? '1.2em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 	const minChipsValue = ((minChips.value !== 0 && !minChips.value) || minChips.value < 0) ? 0 : minChips.value
 	const maxChipsValue = ((maxChips.value !== 0 && !maxChips.value) || maxChips.value < 0) ? 10 : maxChips.value
@@ -546,7 +565,7 @@ const formatDefaultValues = computed(() => {
 	const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
 	const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
 	const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
-	const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? 13 : labelActiveTop.value
+	const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
 	const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
 	const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
 	const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
@@ -556,6 +575,11 @@ const formatDefaultValues = computed(() => {
 	const darkTextColorLabelValue = !darkTextColorLabel.value ? '#ffffff' : darkTextColorLabel.value
 	const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#333333' : lightTextColorLabelActive.value
 	const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#ffffff' : darkTextColorLabelActive.value
+
+  // Chip default values
+  const fontFamilyChipValue = !fontFamilyChip.value ? `'Lato', sans-serif` : fontFamilyChip.value
+  const fontSizeChipValue = !fontSizeChip.value ? '1.2em' : fontSizeChip.value
+  const fontWeightChipValue = !fontWeightChip.value ? 400 : fontWeightChip.value
 
 	return {
 		disabled: disabledValue,
@@ -591,7 +615,10 @@ const formatDefaultValues = computed(() => {
 		lightTextColorLabel: lightTextColorLabelValue,
 		darkTextColorLabel: darkTextColorLabelValue,
 		lightTextColorLabelActive: lightTextColorLabelActiveValue,
-		darkTextColorLabelActive: darkTextColorLabelActiveValue
+		darkTextColorLabelActive: darkTextColorLabelActiveValue,
+		fontFamilyChip: fontFamilyChipValue,
+		fontSizeChip: fontSizeChipValue,
+		fontWeightChip: fontWeightChipValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -601,12 +628,9 @@ const componentDisabled = computed(() => {
 })
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
-	const isActive = isLabelActive.value
 
 	return {
-		display: defaultValues.display,
-		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
-		paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+		display: defaultValues.display
 	}
 })
 const fontSizeStyle = computed(() => {
@@ -614,7 +638,7 @@ const fontSizeStyle = computed(() => {
 	
 	if (defaultValues.fontSize) return defaultValues.fontSize
 
-	return '1.4em'
+	return '1.2em'
 })
 
 const componentStyle = computed(() => {
@@ -751,6 +775,15 @@ const styleLabel = computed(() => {
     padding: isActive ? defaultValues.labelPadding : '0',
     borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
   }
+})
+const fontSizeChipStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return {
+    fontSize: defaultValues.fontSizeChip,
+    fontWeight: defaultValues.fontWeightChip,
+    fontFamily: defaultValues.fontFamilyChip
+	}
 })
 const themeStyle = computed(() => {
 	switch (theme.value) {
@@ -1010,7 +1043,6 @@ watch(chipInputValue, (newValue) => {
       border-radius: 16px;
       padding: 5px 10px;
       margin: 5px;
-      font-size: 14px;
       overflow-wrap: anywhere;
 
       .chip-remove {

@@ -1437,7 +1437,7 @@ const NbInputChip = defineAsyncComponent(() => import('@components/NbInputChip.v
 const NbTextarea = defineAsyncComponent(() => import('@components/NbTextarea.vue'))
 const NbDatePicker = defineAsyncComponent(() => import('@components/NbDatePicker.vue'))
 
-const btType = ref('input')
+const btType = ref('inputChip')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
