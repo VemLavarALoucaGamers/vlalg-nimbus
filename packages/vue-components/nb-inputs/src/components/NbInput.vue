@@ -233,7 +233,7 @@ const props = defineProps({
   },
   inputText: {
     type: [String, Number],
-    default: '',
+    default: null,
   },
   inputType: {
     type: String,
@@ -1102,13 +1102,26 @@ const changeShowValue = () => {
   showValue.value = newShow
 }
 
+const formatValueForEmit = (value) => {
+  // Converte para número se inputType for 'number'
+  if (inputType.value === 'number') {
+    if (value === '' || value === null || value === undefined) {
+      return ''
+    } else {
+      const numValue = typeof value === 'number' ? value : Number(value)
+      return isNaN(numValue) ? value : numValue
+    }
+  }
+  return value
+}
+
 const interacted = () => {
 	emit('clicked')
 }
 const enterConfirm = () => {
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
 
-  emit('entered', inputValue.value)
+  emit('entered', formatValueForEmit(inputValue.value))
 }
 
 watch(inputType, value => {
@@ -1131,7 +1144,7 @@ watch(inputValue, value => {
     value = value.trim()
   }
 
-  emit('changed', value)
+  emit('changed', formatValueForEmit(value))
 })
 watch(isActive, value => {
   if (value) {
@@ -1148,7 +1161,7 @@ watch(inputValue, value => {
     value = value.trim()
   }
 
-  emit('current-value', value)
+  emit('current-value', formatValueForEmit(value))
 })
 watch(inputType, (newType) => {
   if (newType === 'password') {
@@ -1870,3 +1883,4 @@ watch(inputType, (newType) => {
 	}
 }
 </style>
+
