@@ -53,6 +53,9 @@
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
+        :min="supportsMinMaxStep ? min : undefined"
+        :max="supportsMinMaxStep ? max : undefined"
+        :step="supportsMinMaxStep ? step : undefined"
         role="input"
         :style="[borderRadiusStyle, inputIconStyle]"
         @focus="isActive = true"
@@ -241,6 +244,18 @@ const props = defineProps({
     validator: value => { // TESTAR AINDA: 'tel', 'url'
       return ['text', 'number', 'email', 'password'].indexOf(value) !== -1
     },
+  },
+  min: {
+    type: String,
+    default: '',
+  },
+  max: {
+    type: String,
+    default: '',
+  },
+  step: {
+    type: [String, Number],
+    default: '',
   },
   hasTrim: {
     type: Boolean,
@@ -1101,6 +1116,12 @@ const changeShowValue = () => {
 
   showValue.value = newShow
 }
+
+const supportsMinMaxStep = computed(() => {
+  // Apenas 'number' suporta min, max e step no validator atual
+  // Se no futuro adicionar date, datetime-local, etc., adicionar aqui
+  return currentType.value === 'number'
+})
 
 const formatValueForEmit = (value) => {
   // Converte para número se inputType for 'number'
