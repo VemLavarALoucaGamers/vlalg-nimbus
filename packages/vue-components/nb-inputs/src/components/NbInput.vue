@@ -84,7 +84,15 @@ defineOptions({
 })
 
 onMounted(() => {
-  inputValue.value = inputText.value
+  if (inputText.value != null) {
+    if (inputType.value === 'number' && typeof inputText.value === 'number') {
+      inputValue.value = inputText.value
+    } else {
+      inputValue.value = String(inputText.value)
+    }
+  } else {
+    inputValue.value = ''
+  }
 })
 onUnmounted(() => {
   startValue()
@@ -224,7 +232,7 @@ const props = defineProps({
     },
   },
   inputText: {
-    type: String,
+    type: [String, Number],
     default: '',
   },
   inputType: {
@@ -958,7 +966,8 @@ const computedPlaceholder = computed(() => {
 })
 const isLabelActive = computed(() => {
   // Label está ativo se o input estiver focado OU se tiver conteúdo
-  return isActive.value || (inputValue.value && inputValue.value.trim().length > 0)
+  const value = inputValue.value
+  return isActive.value || (value != null && String(value).trim().length > 0)
 })
 const hiddenDefaultEye = computed(() => {
   const defaultValues = formatDefaultValues.value
@@ -1065,7 +1074,15 @@ const styleLabelActive = computed(() => {
   return defaultValues.theme === 'dark' ? defaultValues.darkTextColorLabelActive : defaultValues.lightTextColorLabelActive
 })
 const startValue = () => {
-  inputValue.value = inputText.value
+  if (inputText.value != null) {
+    if (inputType.value === 'number' && typeof inputText.value === 'number') {
+      inputValue.value = inputText.value
+    } else {
+      inputValue.value = String(inputText.value)
+    }
+  } else {
+    inputValue.value = ''
+  }
 
   currentType.value = inputType.value
 }
@@ -1098,10 +1115,21 @@ watch(inputType, value => {
   currentType.value = value
 }, { immediate: true })
 watch(inputText, value => {
-  if (value !== inputValue.value) inputValue.value = value
+  if (value != null) {
+    if (inputType.value === 'number' && typeof value === 'number') {
+      if (value !== inputValue.value) inputValue.value = value
+    } else {
+      const stringValue = String(value)
+      if (stringValue !== inputValue.value) inputValue.value = stringValue
+    }
+  } else {
+    if (inputValue.value !== '') inputValue.value = ''
+  }
 }, { immediate: true })
 watch(inputValue, value => {
-  if (hasTrim.value) value = value.trim()
+  if (hasTrim.value && typeof value === 'string') {
+    value = value.trim()
+  }
 
   emit('changed', value)
 })
@@ -1116,7 +1144,9 @@ watch(showValue, value => {
   emit('show-input-eye', value)
 }, { immediate: true })
 watch(inputValue, value => {
-  if (hasTrim.value) value = value.trim()
+  if (hasTrim.value && typeof value === 'string') {
+    value = value.trim()
+  }
 
   emit('current-value', value)
 })

@@ -199,6 +199,36 @@
     <div v-if="btType === 'input'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
+        <h4 class="test-page__content-tile">NbInput - number</h4>
+        
+        {{ inputNumberValue }}
+        <NbInput
+          nb-id="test1"
+          display="b"
+          input-name="test-input1"
+          input-type="number"
+          :input-text="inputNumberValue"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test input"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          :has-icon="true"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+          @show-input-eye="($event) => console.log('show-input-eye', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInput>
+
         <h4 class="test-page__content-tile">NbInput</h4>
         
         <NbInput
@@ -1407,7 +1437,7 @@ const NbInputChip = defineAsyncComponent(() => import('@components/NbInputChip.v
 const NbTextarea = defineAsyncComponent(() => import('@components/NbTextarea.vue'))
 const NbDatePicker = defineAsyncComponent(() => import('@components/NbDatePicker.vue'))
 
-const btType = ref('datePicker')
+const btType = ref('input')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
@@ -1428,6 +1458,7 @@ const inputOptions = computed(() => {
 })
 const currentChipList = ref(['item1', 'item2', 'item3'])
 const showModal = ref(false)
+const inputNumberValue = ref(100)
 
 const changeRadioItem = (event) => {
   currentRadioItem.value = event
