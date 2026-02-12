@@ -33,7 +33,7 @@
           class="component__dropdown-field"
           :class="{ 'has-selection': currentOptionOnly !== null && currentOptionOnly !== emptyOptionValue }"
           :style="[borderRadiusStyle]"
-          :tabindex="disabled ? -1 : (tabIndex >= 0 ? tabIndex : tabindex)"
+          :tabindex="disabled ? -1 : tabIndex"
           @click="toggleDropdownSingle"
           @keydown="handleKeyDownSingle"
         >
@@ -120,7 +120,7 @@
           class="component__dropdown-field"
           :class="{ 'has-selection': safeCurrentOptionMultiple.length > 0 }"
           :style="[borderRadiusStyle]"
-          :tabindex="disabled ? -1 : (tabIndex >= 0 ? tabIndex : tabindex)"
+          :tabindex="disabled ? -1 : tabIndex"
           @click="toggleDropdown"
           @keydown="handleKeyDownMultiple"
         >
@@ -225,10 +225,6 @@ const props = defineProps({
 			const currentValue = value.toLowerCase()
 			return ['b', 'ib'].includes(currentValue)
 		}
-	},
-	textColor: {
-		type: String,
-		default: '#ffffff'
 	},
 	theme: {
 		type: String,
@@ -362,6 +358,32 @@ const props = defineProps({
 		type: String,
 		default: 'Select: '
 	},
+	labelMarginBottom: {
+		type: Number,
+		default: 0
+	},
+	labelMarginLeft: {
+		type: Number,
+		default: 0
+  },
+  fontFamilyLabel: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+  fontSizeLabel: {
+		type: String,
+		default: '1em',
+		validator: value => {
+			return !value ? '1em' : value
+		}
+	},
+	fontWeightLabel: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 700 : value
+		}
+	},
 	// Cores do tema light
 	lightBgColor: {
 		type: String,
@@ -452,10 +474,6 @@ const props = defineProps({
 		type: String,
 		default: '#999999'
 	},
-	tabindex: {
-		type: [String, Number],
-		default: 0
-	},
 	tabIndex: {
 		type: Number,
 		default: 0
@@ -480,7 +498,6 @@ const props = defineProps({
 
 const {
 	display,
-	textColor,
 	theme,
 	hasBorderRadius,
 	borderRadius,
@@ -504,6 +521,11 @@ const {
 	dropdownScrollClass,
 	hasLabel,
 	labelText,
+	labelMarginBottom,
+	labelMarginLeft,
+	fontFamilyLabel,
+	fontSizeLabel,
+	fontWeightLabel,
 	emptyOptionText,
 	lightBgColor,
 	lightBgColorFocus,
@@ -527,7 +549,6 @@ const {
 	darkOptionTextColorSelected,
 	darkOptionBgColorSelected,
 	darkPlaceholderColor,
-	tabindex,
 	tabIndex,
 	hasTabIndexEnter,
 	hasTabIndexSpace,
@@ -558,7 +579,6 @@ const safeCurrentOptionMultiple = computed({
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6rem' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
@@ -574,7 +594,6 @@ const formatDefaultValues = computed(() => {
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
-		textColor: textColorValue,
 		selectWidth: selectWidthValue,
 		borderRadius: borderRadiusValue,
 		hasBorderRadius: hasBorderRadiusValue,
@@ -598,7 +617,6 @@ const wrapperStyle = computed(() => {
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	return {
-		color: defaultValues.textColor,
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight,
 		textAlign: defaultValues.textAlign
@@ -611,8 +629,27 @@ const font = computed(() => {
 })
 
 const styleTextColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-	return defaultValues.textColor
+	return theme.value === 'dark' ? darkTextColor.value : lightTextColor.value
+})
+
+const labelMarginBottomStyle = computed(() => {
+	return `${labelMarginBottom.value}px`
+})
+
+const labelMarginLeftStyle = computed(() => {
+	return `${labelMarginLeft.value}px`
+})
+
+const labelFontFamilyStyle = computed(() => {
+	return fontFamilyLabel.value || `'Lato', sans-serif`
+})
+
+const labelFontSizeStyle = computed(() => {
+	return fontSizeLabel.value || '1em'
+})
+
+const labelFontWeightStyle = computed(() => {
+	return fontWeightLabel.value || 400
 })
 
 const selectWidthStyle = computed(() => {
@@ -1240,7 +1277,11 @@ watch(selectedOptionMultiple, (newValue, oldValue) => {
 
 	.component__label {
 		display: block;
-		margin-bottom: 0.5rem;
+		margin-bottom: v-bind('labelMarginBottomStyle');
+		margin-left: v-bind('labelMarginLeftStyle');
+		font-family: v-bind('labelFontFamilyStyle');
+		font-size: v-bind('labelFontSizeStyle');
+		font-weight: v-bind('labelFontWeightStyle');
 
 		.component__label--required {
 			color: red;

@@ -342,6 +342,23 @@
 				</p>
 
         <p>Texto depois</p>
+
+				<h4 class="test-page__content-tile">NbSelect - Multiple Selection (with label)</h4>
+
+				<div style="width: 100%; margin-bottom: 30px;">
+					<NbSelect
+						nb-id="select-multiple-dark"
+						select-name="select-multiple-dark"
+						theme="dark"
+						:multiple="true"
+						has-label
+						label-text="Select: "
+						:options="selectOptions"
+						:selected-option-multiple="selectedMultiple2"
+						@changed="($event) => { selectedMultiple2 = $event; console.log('changed', $event) }"
+						@user-changed="($event) => console.log('user-changed', $event)"
+					/>
+				</div>
 			</div>
 		</div>
 
@@ -594,7 +611,7 @@ const selectOptions = [
 	{ value: 'option5', text: 'Option 5' }
 ]
 
-const btType = ref('test')
+const btType = ref('select')
 const selectedValue = ref('option1')
 const selectedValue2 = ref('option2')
 const selectedValue3 = ref('option3')
