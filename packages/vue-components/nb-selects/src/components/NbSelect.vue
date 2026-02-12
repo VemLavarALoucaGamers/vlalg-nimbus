@@ -431,6 +431,10 @@ const props = defineProps({
 		type: String,
 		default: '#999999'
 	},
+	lightTextColorLabel: {
+		type: String,
+		default: '#000000'
+	},
 	// Cores do tema dark
 	darkBgColor: {
 		type: String,
@@ -475,6 +479,10 @@ const props = defineProps({
 	darkPlaceholderColor: {
 		type: String,
 		default: '#999999'
+	},
+	darkTextColorLabel: {
+		type: String,
+		default: '#ffffff'
 	},
 	tabIndex: {
 		type: Number,
@@ -528,6 +536,8 @@ const {
 	fontFamilyLabel,
 	fontSizeLabel,
 	fontWeightLabel,
+	lightTextColorLabel,
+	darkTextColorLabel,
 	emptyOptionText,
 	lightBgColor,
 	lightBgColorFocus,
@@ -652,6 +662,10 @@ const labelFontSizeStyle = computed(() => {
 
 const labelFontWeightStyle = computed(() => {
 	return fontWeightLabel.value || 400
+})
+
+const labelTextColorStyle = computed(() => {
+	return theme.value === 'dark' ? darkTextColorLabel.value : lightTextColorLabel.value
 })
 
 const selectWidthStyle = computed(() => {
@@ -1284,6 +1298,7 @@ watch(selectedOptionMultiple, (newValue, oldValue) => {
 		font-family: v-bind('labelFontFamilyStyle');
 		font-size: v-bind('labelFontSizeStyle');
 		font-weight: v-bind('labelFontWeightStyle');
+		color: v-bind('labelTextColorStyle');
 
 		.component__label--required {
 			color: red;
