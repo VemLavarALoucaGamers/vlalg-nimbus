@@ -170,9 +170,9 @@ const props = defineProps({
 	},
 	fontWeight: {
 		type: Number,
-		default: 200,
+		default: 400,
 		validator: value => {
-			return !value ? 200 : value
+			return !value ? 400 : value
 		}
 	},
 	hasAnimation: {
@@ -400,7 +400,7 @@ watch(value, () => {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 
-	cursor: pointer;
+	cursor: pointer !important;
 	text-align: center;
 	-webkit-text-decoration-line: none;
 	text-decoration-line: none;
@@ -425,6 +425,10 @@ watch(value, () => {
     padding-top: 4px;
     height: 100%;
 
+    &:hover {
+      cursor: pointer !important;
+    }
+
     // inicio propAnimation
     &.component-label-text-animation {
       .component-label-text {
@@ -447,9 +451,9 @@ watch(value, () => {
       width: 100%;
       top: 0;
       bottom: 0;
-      padding: 4px 0px;
       user-select: none;
       border-radius: v-bind('borderRadiusValue');
+      align-content: center;
     }
 
     &.component-button--left {

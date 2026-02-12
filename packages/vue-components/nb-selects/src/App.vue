@@ -611,7 +611,7 @@ const selectOptions = [
 	{ value: 'option5', text: 'Option 5' }
 ]
 
-const btType = ref('select')
+const btType = ref('toggle-skewed')
 const selectedValue = ref('option1')
 const selectedValue2 = ref('option2')
 const selectedValue3 = ref('option3')
