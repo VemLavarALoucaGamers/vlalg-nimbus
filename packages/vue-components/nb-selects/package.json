@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-selects",
   "description": "Select components for Vuejs 3",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "main": "./dist/nb-selects.umd.js",
   "module": "./dist/nb-selects.js",

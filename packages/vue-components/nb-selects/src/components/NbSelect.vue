@@ -10,7 +10,7 @@
       :id="nbId"
       :ref="nbId"
       :class="['nb-reset', 'component', themeStyle, inputStyleClass]"
-      :style="[componentStyle, selectWidthStyle, borderRadiusStyle]"
+      :style="[selectWidthStyle, borderRadiusStyle]"
       v-bind="computedAriaAttrs"
     >
       <label
@@ -26,6 +26,7 @@
         v-if="!multiple"
         class="component__dropdown"
         :class="{ 'open': isDropdownOpenSingle, 'disabled': disabled }"
+        :style="[componentStyle]"
       >
         <!-- Campo que simula um select -->
         <div
@@ -51,6 +52,7 @@
           v-if="isDropdownOpenSingle"
           class="component__option-group"
           :class="dropdownScrollClass"
+          :style="[componentStyle]"
           role="listbox"
         >
           <!-- Opção vazia (placeholder) -->
