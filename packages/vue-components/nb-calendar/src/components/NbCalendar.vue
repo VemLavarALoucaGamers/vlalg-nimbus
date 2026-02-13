@@ -395,6 +395,13 @@ const props = defineProps({
             })
 		}
 	},
+    blockClicksWithoutEvents: {
+        type: Boolean,
+        default: false,
+		validator: value => {
+			return typeof value === 'boolean' && [true, false].includes(value)
+		}
+	},
     startWeekOnMonday: {
 		type: Boolean,
 		default: false,
@@ -2997,6 +3004,11 @@ const selectDate = (day) => {
     
     // Se está arrastando, não processar o click
     if (isDragging.value) {
+        return
+    }
+    
+    // Se blockClicksWithoutEvents estiver ativo e a data não tiver eventos, bloquear o click
+    if (props.blockClicksWithoutEvents && (!day.events || day.events.length === 0)) {
         return
     }
     

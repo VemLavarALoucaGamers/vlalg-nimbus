@@ -80,6 +80,7 @@
             :locale="locale"
             :theme="theme"
             :allow-range="allowRange"
+            :block-clicks-without-events="blockClicksWithoutEvents"
             @changed="handleCalendarChanged"
             @date-selected="handleCalendarDateSelected"
             @mousedown="isCalendarInteraction = true"
@@ -304,6 +305,13 @@ const Calendar = defineAsyncComponent(() =>
       default: 350,
       validator: value => {
         return typeof value === 'number' && value >= 280
+      }
+    },
+    blockClicksWithoutEvents: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
       }
     },
     hasTrim: {
@@ -568,6 +576,7 @@ const Calendar = defineAsyncComponent(() =>
     allowRange,
     calendarZIndex,
     calendarWidth,
+    blockClicksWithoutEvents,
     tabindex,
       lightBgColor,
       lightBgColorFocus,

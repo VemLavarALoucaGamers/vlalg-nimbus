@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-calendar",
   "description": "Calendar components for Vuejs 3",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "type": "module",
   "main": "./dist/nb-calendar.umd.js",
   "module": "./dist/nb-calendar.js",

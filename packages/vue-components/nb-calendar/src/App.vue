@@ -87,6 +87,17 @@
           @changed="($event) => { selectedDate5 = $event; console.log('changed:', $event) }"
         />
 
+        <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Com Eventos e Block Clicks Without Events)</h4>
+        <NbCalendar
+          nb-id="calendar-date-events-1"
+          input-type="date"
+          theme="light"
+          :events="calendarEvents"
+          :value="selectedDate5"
+          :block-clicks-without-events="true"
+          @changed="($event) => { selectedDate5 = $event; console.log('changed:', $event) }"
+        />
+
         <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Semana Começa Segunda)</h4>
         <NbCalendar
           nb-id="calendar-date-monday-1"
@@ -135,6 +146,31 @@
           :value="selectedDate9"
           @changed="($event) => { selectedDate9 = $event; console.log('changed:', $event) }"
           />
+
+        <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Abre no Mês Atual - Sem Data Selecionada)</h4>
+        <p style="margin-bottom: 10px; color: #888;">
+          Quando não há data selecionada, o calendário abre no mês/ano atual.
+        </p>
+        <NbCalendar
+          nb-id="calendar-date-current-month-1"
+          input-type="date"
+          theme="light"
+          :value="null"
+          @changed="($event) => { console.log('changed:', $event) }"
+        />
+
+        <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Abre no Mês da Data Selecionada)</h4>
+        <p style="margin-bottom: 10px; color: #888;">
+          Quando há uma data selecionada, o calendário abre automaticamente no mês/ano dessa data.
+          Este exemplo tem uma data em Março de 2024 pré-selecionada.
+        </p>
+        <NbCalendar
+          nb-id="calendar-date-selected-month-1"
+          input-type="date"
+          theme="light"
+          :value="preSelectedDate"
+          @changed="($event) => { preSelectedDate = $event; console.log('changed:', $event) }"
+        />
       </div>
     </div>
 
@@ -261,6 +297,8 @@ const selectedDate7 = ref(null)
 const selectedDate8 = ref(null)
 const selectedDate9 = ref(null)
 const selectedDateRange1 = ref(null)
+// Data pré-selecionada para demonstrar abertura no mês da data selecionada
+const preSelectedDate = ref(new Date(2024, 2, 15)) // 15 de Março de 2024
 
 // Estados para Month
 const selectedMonth1 = ref(null)
