@@ -114,13 +114,6 @@ const props = defineProps({
 		type: String,
 		default: 'rgba(40, 42, 54, 1)'
 	},
-	width: {
-		type: Number,
-		default: 86,
-		validator: value => {
-			return !value ? 86 : value
-		}
-	},
 	paddingX: {
 		type: Number,
 		default: 1,
@@ -184,7 +177,6 @@ const {
 	darkButtonColor,
 	darkButtonColorHover,
 	darkDisabledBgColor,
-	width,
 	paddingX,
 	paddingY,
 	disabled,
@@ -197,7 +189,6 @@ const {
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
@@ -208,7 +199,6 @@ const formatDefaultValues = computed(() => {
 	return {
 		disabled: disabledValue,
 		display: displayValue,
-		width: widthValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
 		font: fontValue,
@@ -233,11 +223,7 @@ const wrapperStyle = computed(() => {
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	const newWidth = defaultValues.display === 'block' ? 'auto' : `${defaultValues.width}px`
-
 	return {
-		minWidth: '33px',
-		width: newWidth,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		lineHeight: '1.42857143',
 		fontSize: defaultValues.fontSize,

@@ -75,13 +75,6 @@ const props = defineProps({
 		type: Number,
 		default: 0.375
 	},
-	width: {
-		type: Number,
-		default: 86,
-		validator: value => {
-			return !value ? 86 : value
-		}
-	},
 	paddingX: {
 		type: Number,
 		default: 1,
@@ -209,7 +202,6 @@ const {
   ariaAttrs,
 	showBorder,
 	borderRadius,
-	width,
 	paddingX,
 	paddingY,
 	disabled,
@@ -241,7 +233,6 @@ const formatDefaultValues = computed(() => {
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
-	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
@@ -257,7 +248,6 @@ const formatDefaultValues = computed(() => {
 		display: displayValue,
 		showBorder: showBorderValue,
 		borderRadius: borderRadiusValue,
-		width: widthValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
 		font: fontValue,
@@ -284,12 +274,8 @@ const wrapperStyle = computed(() => {
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	const newWidth = defaultValues.display === 'block' ? 'auto' : `${defaultValues.width}px`
-
 	return {
 		borderRadius: `${defaultValues.borderRadius}rem`,
-		minWidth: '33px',
-		width: newWidth,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		lineHeight: '1.42857143',
 		fontSize: defaultValues.fontSize,
