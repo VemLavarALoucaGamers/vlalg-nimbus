@@ -17,7 +17,7 @@
         :for="computedInputName"
         class="component__label"
         :style="[styleLabel]"
-      >{{ label }}</label>
+      >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
 
       <textarea
         v-model="inputValue"
@@ -36,7 +36,7 @@
         :autocomplete="inputAutocomplete"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
         role="textbox"
-        :style="[borderRadiusStyle, textareaResizeStyle, textareaWrapStyle]"
+        :style="[borderRadiusStyle, textareaResizeStyle, textareaWrapStyle, textareaMinWidthStyle, textareaMaxWidthStyle, textareaMinHeightStyle, textareaMaxHeightStyle]"
         @focus="isActive = true"
         @blur="isActive = false"
         @input="handleCurrentValue"
@@ -464,6 +464,22 @@ const props = defineProps({
       return ['none', 'both', 'vertical', 'horizontal'].indexOf(value) !== -1
     },
   },
+  minWidth: { // Largura mínima do textarea
+    type: String,
+    default: 'auto',
+  },
+  maxWidth: { // Largura máxima do textarea
+    type: String,
+    default: 'auto',
+  },
+  minHeight: { // Altura mínima do textarea
+    type: String,
+    default: 'auto',
+  },
+  maxHeight: { // Altura máxima do textarea
+    type: String,
+    default: 'auto',
+  },
   autoResize: { // Redimensionamento automático
     type: Boolean,
     default: false,
@@ -553,6 +569,10 @@ const {
   spellcheck,
   autofocus,
   resize,
+  minWidth,
+  maxWidth,
+  minHeight,
+  maxHeight,
   autoResize,
   minRows,
   maxRows
@@ -610,6 +630,10 @@ const formatDefaultValues = computed(() => {
   const spellcheckValue = spellcheck.value !== undefined ? spellcheck.value : 'default'
   const autofocusValue = autofocus.value !== undefined ? autofocus.value : false
   const resizeValue = resize.value && ['none', 'both', 'vertical', 'horizontal'].includes(resize.value) ? resize.value : 'vertical'
+  const minWidthValue = !minWidth.value ? 'auto' : minWidth.value
+  const maxWidthValue = !maxWidth.value ? 'auto' : maxWidth.value
+  const minHeightValue = !minHeight.value ? 'auto' : minHeight.value
+  const maxHeightValue = !maxHeight.value ? 'auto' : maxHeight.value
   const autoResizeValue = autoResize.value !== undefined ? autoResize.value : false
   const minRowsValue = minRows.value !== null && minRows.value > 0 ? minRows.value : null
   const maxRowsValue = maxRows.value !== null && maxRows.value > 0 ? maxRows.value : null
@@ -661,6 +685,10 @@ const formatDefaultValues = computed(() => {
     spellcheck: spellcheckValue,
     autofocus: autofocusValue,
     resize: resizeValue,
+    minWidth: minWidthValue,
+    maxWidth: maxWidthValue,
+    minHeight: minHeightValue,
+    maxHeight: maxHeightValue,
     autoResize: autoResizeValue,
     minRows: minRowsValue,
     maxRows: maxRowsValue,
@@ -917,6 +945,50 @@ const textareaWrapStyle = computed(() => {
   }
 
   return {}
+})
+const textareaMinWidthStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.minWidth === 'auto') {
+    return {}
+  }
+
+  return {
+    minWidth: defaultValues.minWidth
+  }
+})
+const textareaMaxWidthStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.maxWidth === 'auto') {
+    return {}
+  }
+
+  return {
+    maxWidth: defaultValues.maxWidth
+  }
+})
+const textareaMinHeightStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.minHeight === 'auto') {
+    return {}
+  }
+
+  return {
+    minHeight: defaultValues.minHeight
+  }
+})
+const textareaMaxHeightStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.maxHeight === 'auto') {
+    return {}
+  }
+
+  return {
+    maxHeight: defaultValues.maxHeight
+  }
 })
 const startValue = () => {
   inputValue.value = inputText.value
@@ -1279,6 +1351,10 @@ watch(inputValue, () => {
       transform: translateY(-50%);
       z-index: 1;
       transition: top 0.2s ease;
+
+      .component__label--required {
+        color: red;
+      }
     }
 
     &:has(.component__input:focus) .component__label,

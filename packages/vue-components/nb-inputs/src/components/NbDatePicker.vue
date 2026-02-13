@@ -18,7 +18,7 @@
           class="component__label"
           :style="[styleLabel]"
           @click="handleLabelClick"
-        >{{ label }}</label>
+        >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
   
         <input
           ref="inputRef"
@@ -444,6 +444,13 @@ const Calendar = defineAsyncComponent(() =>
       type: String,
       default: 'Label text',
     },
+    labelBreakOnActive: {
+      type: Boolean,
+      default: true,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      },
+    },
     labelBackground: {
       type: String,
       default: 'transparent',
@@ -471,6 +478,14 @@ const Calendar = defineAsyncComponent(() =>
     labelActiveLeft: {
       type: Number,
       default: 5,
+    },
+    labelRight: {
+      type: Number,
+      default: 0,
+    },
+    labelActiveRight: {
+      type: Number,
+      default: 0,
     },
     fontFamilyLabel: {
           type: String,
@@ -566,6 +581,8 @@ const Calendar = defineAsyncComponent(() =>
     showMsg,
     hasMsg,
     showLabel,
+    label,
+    labelBreakOnActive,
     labelBackground,
     labelPadding,
     labelBorderRadius,
@@ -573,6 +590,8 @@ const Calendar = defineAsyncComponent(() =>
     inputLabelMarginActive,
     labelActiveTop,
     labelActiveLeft,
+    labelRight,
+    labelActiveRight,
     fontFamilyLabel,
     fontSizeLabel,
     fontSizeLabelActive,
@@ -1140,6 +1159,8 @@ const Calendar = defineAsyncComponent(() =>
     const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
     const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
     const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? -10 : labelActiveLeft.value
+    const labelRightValue = (labelRight.value === null || labelRight.value === undefined) ? 0 : labelRight.value
+    const labelActiveRightValue = (labelActiveRight.value === null || labelActiveRight.value === undefined) ? 0 : labelActiveRight.value
     const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
     const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
     const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
@@ -1181,6 +1202,8 @@ const Calendar = defineAsyncComponent(() =>
       inputLabelMarginActive: inputLabelMarginActiveValue,
       labelActiveTop: labelActiveTopValue,
       labelActiveLeft: labelActiveLeftValue,
+      labelRight: labelRightValue,
+      labelActiveRight: labelActiveRightValue,
       fontFamilyLabel: fontFamilyLabelValue,
       fontSizeLabel: fontSizeLabelValue,
       fontSizeLabelActive: fontSizeLabelActiveValue,
@@ -1208,9 +1231,12 @@ const Calendar = defineAsyncComponent(() =>
   */
   const wrapperStyle = computed(() => {
       const defaultValues = formatDefaultValues.value
+      const isActive = isLabelActive.value
   
       return {
-          display: defaultValues.display
+          display: defaultValues.display,
+          // Adiciona padding-top quando o label está ativo para evitar que seja cortado
+          paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
       }
   })
   /*
@@ -1599,11 +1625,21 @@ const Calendar = defineAsyncComponent(() =>
       color: defaultValues.theme === 'dark' ? darkTextColorLabel : lightTextColorLabel,
       top: isActive ? `${defaultValues.labelActiveTop}px` : '50%',
       left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
+      right: isActive ? `${defaultValues.labelActiveRight}px` : `${defaultValues.labelRight}px`,
       transform: isActive ? 'translateY(0)' : 'translateY(-50%)',
       transition: 'all 0.2s ease',
       backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
       padding: isActive ? defaultValues.labelPadding : '0',
       borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
+      // Se labelBreakOnActive for true (padrão), usa ellipsis quando ativo. Se false, quebra linha
+      ...(isActive ? {
+        whiteSpace: !labelBreakOnActive.value ? 'normal' : 'nowrap',
+        wordWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+        overflowWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+        maxWidth: '100%',
+        textOverflow: labelBreakOnActive.value ? 'ellipsis' : 'clip',
+        overflow: labelBreakOnActive.value ? 'hidden' : 'visible',
+      } : {}),
     }
   })
 
@@ -2722,6 +2758,8 @@ const Calendar = defineAsyncComponent(() =>
       box-sizing: border-box;
       vertical-align: bottom;
       position: relative;
+      // Permite que o label fique visível quando está na posição ativa
+      overflow: hidden;
   }
   
   .nb-reset {
@@ -3060,6 +3098,14 @@ const Calendar = defineAsyncComponent(() =>
         transform: translateY(-50%);
         z-index: 1;
         transition: top 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+
+        .component__label--required {
+          color: red;
+        }
       }
   
       &:has(.component__input:focus) .component__label,

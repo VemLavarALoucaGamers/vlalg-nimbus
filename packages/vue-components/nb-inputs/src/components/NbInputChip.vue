@@ -12,7 +12,7 @@
       :for="computedInputName"
       class="component__label"
       :style="[styleLabel]"
-    >{{ label }}</label>
+    >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
     
     <div
       :id="nbId"
@@ -893,6 +893,10 @@ watch(chipInputValue, (newValue) => {
     transition: top 0.2s ease;
     pointer-events: none;
     // Quando ativo, o label pode sair do componente, mas o wrapper tem padding-top para acomodá-lo
+
+    .component__label--required {
+      color: red;
+    }
   }
 
 .component {

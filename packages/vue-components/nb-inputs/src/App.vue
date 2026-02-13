@@ -196,7 +196,7 @@
       </div>
     </div>
 
-    <div v-if="btType === 'input'" class="row">
+    <div v-if="btType === 'input'" class="row" style="background-color: #d5d0fd;">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbInput - number</h4>
@@ -309,11 +309,40 @@
           </template>
         </NbInput>
 
+        <h4 class="test-page__content-tile" style="margin-top: 40px;">NbInput com Label (handleLabelClick)</h4>
+        <p style="margin-top: 10px; margin-bottom: 10px;">
+          Clique no label para focar o input. O evento não será capturado pelo @click="interacted" do elemento pai.
+        </p>
+        <NbInput
+          nb-id="test-label-1"
+          display="b"
+          input-name="test-input-label"
+          input-type="text"
+          :show-label="true"
+          label="Nome completo"
+          :required="true"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Input com label"
+          @clicked="() => console.log('clicked - não deve aparecer ao clicar no label')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInput>
+
         <p style="margin-top: 4px;">
           Text before
           <NbInput
             nb-id="test4"
             display="ib"
+            :show-label="true"
+            label="Este é um label gigante para ver se sai para fora do componente"
             @current-value="($event) => console.log($event)"
           />
           text after
@@ -378,7 +407,7 @@
       </div>
     </div>
 
-    <div v-if="btType === 'inputChip'" class="row">
+    <div v-if="btType === 'inputChip'" class="row"  style="background-color: #d5d0fd;">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbInput</h4>
@@ -473,6 +502,7 @@
           input-placeholder="Type and press Enter"
           :show-label="true"
           label="Label Light Theme"
+          :required="true"
           :current-list="currentChipList"
           aria-label="Test input chip light with label"
           @clicked="() => console.log('clicked')"
@@ -596,10 +626,42 @@
       </div>
     </div>
 
-    <div v-if="btType === 'textarea'" class="row">
+    <div v-if="btType === 'textarea'" class="row"  style="background-color: #d5d0fd;">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbTextarea</h4>
+
+        <div style="background-color: tomato; padding: 0; max-width: 400px;">
+          <NbTextarea
+            nb-id="textarea-1"
+            display="b"
+            input-name="test-textarea1"
+            :show-msg="true"
+            :has-msg="true"
+            aria-label="Test textarea"
+            :aria-attrs="{ 'describedby': 'test-textarea-description' }"
+            caret-color="cyan"
+            selection-bg-color="magenta"
+            selection-text-color="yellow"
+            resize="none"
+            min-width="300px"
+            max-width="400px"
+            min-height="300px"
+            max-height="700px"
+            @clicked="() => console.log('clicked')"
+            @current-value="($event) => console.log('current-value', $event)"
+            @changed="($event) => console.log('changed:',$event)"
+            @focused="() => console.log('focused')"
+            @blurred="() => console.log('blurred')"
+            @entered="($event) => console.log('entered', $event)"
+          >
+            <template #message>
+              <div>Erro teste</div>
+            </template>
+          </NbTextarea>
+        </div>
+
+        <br />
         
         <NbTextarea
           nb-id="textarea-1"
@@ -694,6 +756,7 @@
           label="Test label"
           input-style="background"
           :rows="4"
+          :required="true"
         />
         <NbTextarea
           nb-id="textarea-6"
@@ -965,7 +1028,7 @@
       </div>
     </div>
 
-    <div v-if="btType === 'datePicker'" class="row">
+    <div v-if="btType === 'datePicker'" class="row"  style="background-color: #d5d0fd;">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbDatePicker</h4>
@@ -1113,6 +1176,7 @@
           display="b"
           show-label
           label="Data e Hora"
+          :required="true"
           input-type="datetime-local"
           input-style="border"
           light-text-color="#ffffff"
@@ -1220,26 +1284,43 @@
         <NbDatePicker
           nb-id="datepicker-minmax"
           input-name="test-datepicker-minmax"
-          display="b"
+          display="ib"
           show-label
-          label="Data com limites"
+          label="Data com limites gigante para ver se sai para fora do componente"
           input-type="date"
           min="2024-01-01"
           max="2024-12-31"
           input-style="border"
           light-text-color="#ffffff"
         />
+
+        <br />
         <NbDatePicker
           nb-id="datepicker-datetime-minmax"
           input-name="test-datepicker-datetime-minmax"
-          display="b"
+          display="ib"
           show-label
-          label="Data/Hora com limites"
+          label="Data/Hora com limites gigante para ver se sai para fora do componente"
           input-type="datetime-local"
           min="2024-01-01T00:00"
           max="2024-12-31T23:59"
           input-style="background"
         />
+
+        <br />
+        <NbDatePicker
+          nb-id="datepicker-datetime-minmax-break-on-active"
+          input-name="test-datepicker-datetime-minmax-break-on-active"
+          display="ib"
+          show-label
+          label="Data/Hora com limites gigante para ver se sai para fora do componente"
+          :label-break-on-active="true"
+          input-type="datetime-local"
+          min="2024-01-01T00:00"
+          max="2024-12-31T23:59"
+          input-style="background"
+        />
+
 
         <br /><br />
 
@@ -1437,7 +1518,7 @@ const NbInputChip = defineAsyncComponent(() => import('@components/NbInputChip.v
 const NbTextarea = defineAsyncComponent(() => import('@components/NbTextarea.vue'))
 const NbDatePicker = defineAsyncComponent(() => import('@components/NbDatePicker.vue'))
 
-const btType = ref('inputChip')
+const btType = ref('input')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
