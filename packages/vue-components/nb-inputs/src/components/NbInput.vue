@@ -63,6 +63,7 @@
         @focus="isActive = true"
         @blur="isActive = false"
         @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+        @paste="handlePaste"
       />
 
       <label :for="computedInputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
@@ -110,7 +111,8 @@ const emit = defineEmits([
   'blurred',
   'show-input-eye',
   'clicked',
-  'entered'
+  'entered',
+  'paste'
 ])
 
 const props = defineProps({
@@ -322,6 +324,13 @@ const props = defineProps({
     default: false,
     validator: value => {
 			return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  blockPaste: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
     }
   },
   inputAutocomplete: {
@@ -631,6 +640,7 @@ const {
 	activeTextStyle,
 	sizeMediaQuery,
 	inputReadonly,
+	blockPaste,
 	showInputEye,
 	inputType,
   hasTrim,
@@ -1203,6 +1213,19 @@ const enterConfirm = () => {
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
 
   emit('entered', formatValueForEmit(inputValue.value))
+}
+
+const handlePaste = async (event) => {
+  // Capturar o valor do clipboard
+  const pastedValue = event.clipboardData?.getData('text') || ''
+  
+  // Sempre emitir o evento
+  emit('paste', pastedValue)
+  
+  // Bloquear o paste se blockPaste for true
+  if (blockPaste.value) {
+    event.preventDefault()
+  }
 }
 
 watch(inputType, value => {

@@ -4,6 +4,7 @@
     ref="wrapperRef"
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle, selectWidthStyle]"
+    @focusin="handleFocusIn"
     @focusout="handleWrapperFocusOut"
   >
     <div
@@ -213,7 +214,7 @@ onUnmounted(() => {
   document.removeEventListener('nbselect:close-all', handleCloseAllDropdowns)
 })
 
-const emit = defineEmits(['clicked', 'changed', 'user-changed'])
+const emit = defineEmits(['clicked', 'changed', 'user-changed', 'focused', 'blurred'])
 
 const props = defineProps({
 	nbId: {
@@ -579,6 +580,8 @@ const dropdownFieldSingleRef = ref(null)
 const dropdownFieldMultipleRef = ref(null)
 const focusedOptionIndexSingle = ref(-1)
 const focusedOptionIndexMultiple = ref(-1)
+const isActive = ref(false)
+const isReturningFocus = ref(false)
 
 // Computed para garantir que o v-model sempre seja um array para selects múltiplos
 const safeCurrentOptionMultiple = computed({
@@ -789,8 +792,33 @@ const closeDropdown = (event) => {
 	}
 }
 
+// Função para gerenciar foco quando entra no componente
+const handleFocusIn = () => {
+	// Se estamos retornando o foco programaticamente após uma seleção, não emitir focused
+	if (isReturningFocus.value) {
+		// Resetar a flag após um pequeno delay para garantir que o watch não dispare
+		setTimeout(() => {
+			isReturningFocus.value = false
+		}, 50)
+		// Manter isActive como true, mas não mudar o valor para evitar que o watch dispare
+		return
+	}
+	// Só mudar isActive se realmente mudou de false para true
+	if (!isActive.value) {
+		isActive.value = true
+	}
+}
+
 // Função para fechar dropdown quando o foco sair do componente
 const handleWrapperFocusOut = (event) => {
+	// Verificar se o foco saiu completamente do componente
+	// Mas não setar como false se estamos clicando em uma opção ou retornando o foco programaticamente
+	setTimeout(() => {
+		if (!wrapperRef.value?.contains(document.activeElement) && !isReturningFocus.value && !isClickingOption.value) {
+			isActive.value = false
+		}
+	}, 0)
+	
 	// Fechar dropdown quando o foco sair completamente do componente
 	if ((isDropdownOpen.value || isDropdownOpenSingle.value) && !wrapperRef.value?.contains(event.relatedTarget)) {
 		// Usar setTimeout para permitir que o clique na opção seja processado primeiro
@@ -961,6 +989,14 @@ const toggleDropdownSingle = (event) => {
 const selectOptionSingle = (value) => {
 	if (disabled.value) return
 	isClickingOption.value = true
+	// Manter isActive como true durante a seleção para evitar que handleWrapperFocusOut o set como false
+	const wasActive = isActive.value
+	// Garantir que isActive permaneça true durante a seleção
+	if (wasActive) {
+		isActive.value = true
+		// Setar flag para não emitir focused novamente quando retornarmos o foco
+		isReturningFocus.value = true
+	}
 	currentOptionOnly.value = value
 	isDropdownOpenSingle.value = false
 	focusedOptionIndexSingle.value = -1
@@ -968,11 +1004,24 @@ const selectOptionSingle = (value) => {
 	setTimeout(() => {
 		isClickingOption.value = false
 		// Retornar foco ao campo de seleção
-		nextTick(() => {
-			if (dropdownFieldSingleRef.value) {
-				dropdownFieldSingleRef.value.focus()
-			}
-		})
+		if (wasActive) {
+			nextTick(() => {
+				if (dropdownFieldSingleRef.value) {
+					dropdownFieldSingleRef.value.focus()
+				}
+				// Resetar a flag após um pequeno delay para garantir que o watch não dispare
+				setTimeout(() => {
+					isReturningFocus.value = false
+				}, 100)
+			})
+		} else {
+			// Se não estava ativo antes, não precisa da flag
+			nextTick(() => {
+				if (dropdownFieldSingleRef.value) {
+					dropdownFieldSingleRef.value.focus()
+				}
+			})
+		}
 	}, 150)
 }
 
@@ -1244,6 +1293,22 @@ watch(currentOptionMultiple, (newValue, oldValue) => {
 
 watch(selectedOptionMultiple, (newValue, oldValue) => {
 	if (newValue !== oldValue) currentOptionMultiple.value = newValue || []
+})
+
+watch(isActive, (value, oldValue) => {
+	// Não emitir eventos na primeira inicialização
+	if (oldValue === undefined) {
+		return
+	}
+	// Não emitir focused se estamos retornando o foco programaticamente
+	if (value && !oldValue && isReturningFocus.value) {
+		return
+	}
+	if (value) {
+		emit('focused')
+	} else {
+		emit('blurred')
+	}
 })
 </script>
 
@@ -1815,7 +1880,7 @@ watch(selectedOptionMultiple, (newValue, oldValue) => {
 		outline: none;
 
 		&:focus {
-			outline: 2px solid rgba(25, 118, 210, 0.5);
+			// outline: 2px solid rgba(25, 118, 210, 0.5);
 			outline-offset: 2px;
 		}
 

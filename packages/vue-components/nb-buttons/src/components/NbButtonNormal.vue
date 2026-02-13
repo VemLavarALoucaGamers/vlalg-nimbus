@@ -407,6 +407,7 @@ const interacted = () => {
 	box-shadow: none;
 	text-decoration: none;
 	outline: none;
+  overflow: hidden;
   
   &.component-transition {
     transition: v-bind('styleAnimation');

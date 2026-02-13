@@ -41,6 +41,7 @@
         @blur="isActive = false"
         @input="handleCurrentValue"
         @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+        @paste="handlePaste"
       ></textarea>
     </div>
     <div
@@ -73,7 +74,8 @@ const emit = defineEmits([
   'focused',
   'blurred',
   'clicked',
-  'entered'
+  'entered',
+  'paste'
 ])
 
 const props = defineProps({
@@ -235,6 +237,14 @@ const props = defineProps({
   inputReadonly: {
     type: Boolean,
     default: false,
+  },
+  blockPaste: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
     validator: value => {
 			return typeof value === 'boolean' && [true, false].includes(value)
     }
@@ -527,6 +537,7 @@ const {
       inputStyle,
       activeTextStyle,
       inputReadonly,
+      blockPaste,
   hasTrim,
   inputUppercase,
   inputName,
@@ -1002,6 +1013,20 @@ const enterConfirm = () => {
 
   emit('entered', inputValue.value)
 }
+
+const handlePaste = async (event) => {
+  // Capturar o valor do clipboard
+  const pastedValue = event.clipboardData?.getData('text') || ''
+  
+  // Sempre emitir o evento
+  emit('paste', pastedValue)
+  
+  // Bloquear o paste se blockPaste for true
+  if (blockPaste.value) {
+    event.preventDefault()
+  }
+}
+
 const handleCurrentValue = () => {
   let value = inputValue.value
   if (hasTrim.value) value = value.trim()

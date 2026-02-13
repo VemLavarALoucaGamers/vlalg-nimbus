@@ -216,6 +216,7 @@
           selection-bg-color="magenta"
           selection-text-color="yellow"
           :has-icon="true"
+          :block-paste="true"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -223,6 +224,7 @@
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
           @show-input-eye="($event) => console.log('show-input-eye', $event)"
+          @paste="($event) => console.log('paste', $event)"
         >
           <template #error>
             <div>Erro teste</div>
@@ -244,6 +246,7 @@
           selection-bg-color="magenta"
           selection-text-color="yellow"
           :has-icon="true"
+          :block-paste="false"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -251,6 +254,7 @@
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
           @show-input-eye="($event) => console.log('show-input-eye', $event)"
+          @paste="($event) => console.log('paste', $event)"
         >
           <template #error>
             <div>Erro teste</div>

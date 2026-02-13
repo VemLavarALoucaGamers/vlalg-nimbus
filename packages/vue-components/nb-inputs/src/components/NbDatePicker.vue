@@ -49,6 +49,7 @@
           @blur="handleInputBlur"
           @click="handleInputClick"
           @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+          @paste="handlePaste"
         />
       </div>
       <div
@@ -127,7 +128,8 @@ const Calendar = defineAsyncComponent(() =>
     'focused',
     'blurred',
     'clicked',
-    'entered'
+    'entered',
+    'paste'
   ])
   
   const props = defineProps({
@@ -353,6 +355,13 @@ const Calendar = defineAsyncComponent(() =>
               return typeof value === 'boolean' && [true, false].includes(value)
       }
     },
+    blockPaste: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
     inputAutocomplete: {
       type: String,
       default: 'off',
@@ -562,6 +571,7 @@ const Calendar = defineAsyncComponent(() =>
       activeTextStyle,
       sizeMediaQuery,
       inputReadonly,
+      blockPaste,
       inputType,
     hasTrim,
       inputUppercase,
@@ -1720,6 +1730,19 @@ const Calendar = defineAsyncComponent(() =>
     if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
   
     emit('entered', inputValue.value)
+  }
+
+  const handlePaste = async (event) => {
+    // Capturar o valor do clipboard
+    const pastedValue = event.clipboardData?.getData('text') || ''
+    
+    // Sempre emitir o evento
+    emit('paste', pastedValue)
+    
+    // Bloquear o paste se blockPaste for true
+    if (blockPaste.value) {
+      event.preventDefault()
+    }
   }
   
   /*

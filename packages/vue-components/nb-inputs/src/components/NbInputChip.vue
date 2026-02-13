@@ -54,6 +54,7 @@
         @keydown.enter="!disabled && hasTabIndexEnter && handleKeyDown($event)"
         @focus="handleFocus"
         @blur="handleBlur"
+        @paste="handlePaste"
       />
     </div>
   </div>
@@ -71,7 +72,7 @@ onMounted(() => {
   if (currentList.value.length > 0) chipList.value = currentList.value;
 })
 
-const emit = defineEmits(['clicked', 'changed', 'removed', 'added', 'input-changed', 'focused', 'blurred'])
+const emit = defineEmits(['clicked', 'changed', 'removed', 'added', 'input-changed', 'focused', 'blurred', 'paste'])
 
 const props = defineProps({
 	nbId: {
@@ -226,6 +227,13 @@ const props = defineProps({
 		}
 	},
 	inputReadonly: {
+		type: Boolean,
+		default: false,
+		validator: value => {
+			return typeof value === 'boolean' && [true, false].includes(value)
+		}
+	},
+	blockPaste: {
 		type: Boolean,
 		default: false,
 		validator: value => {
@@ -475,6 +483,7 @@ const {
 	inputPlaceholder,
 	inputUppercase,
 	inputReadonly,
+	blockPaste,
 	inputAutocomplete,
 	required,
 	textAlign,
@@ -815,6 +824,20 @@ const handleBlur = () => {
   isActive.value = false
   emit('blurred')
 }
+
+const handlePaste = async (event) => {
+  // Capturar o valor do clipboard
+  const pastedValue = event.clipboardData?.getData('text') || ''
+  
+  // Sempre emitir o evento
+  emit('paste', pastedValue)
+  
+  // Bloquear o paste se blockPaste for true
+  if (blockPaste.value) {
+    event.preventDefault()
+  }
+}
+
 const handleKeyDown = (event) => {
   if (disabled.value || inputReadonly.value) {
     return;
