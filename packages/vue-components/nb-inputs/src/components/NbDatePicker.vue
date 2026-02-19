@@ -140,8 +140,10 @@
             :time-display-label-text="calendarTimeDisplayLabelText"
             :clear-button-title="calendarClearButtonTitle"
             :clear-button-symbol="calendarClearButtonSymbol"
+            :iso-string-timezone-format="calendarIsoStringTimezoneFormat"
             @changed="handleCalendarChanged"
             @date-selected="handleCalendarDateSelected"
+            @month-changed="handleCalendarMonthChanged"
             @valid="handleCalendarValid"
             @mousedown="isCalendarInteraction = true"
             @click="isCalendarInteraction = true"
@@ -154,6 +156,10 @@
   <script setup>
   import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from 'vue'
   import { defineAsyncComponent } from 'vue'
+  // Importar funções utilitárias do nb-calendar
+  // Em desenvolvimento (monorepo), usar caminho relativo
+  // Em produção, será resolvido pelo build do pacote
+  import { formatTimeValue, formatISOLocal, formatISOString as formatISOStringUtil, isSameDay, parseLocalDate, buildCompleteDataFromInputText as buildCompleteDataFromInputTextUtil } from '../../../nb-calendar/src/utils/dateUtils.js'
   
 // Importar do pacote npm (funciona localmente via Yarn workspaces e após publicação)
 // Durante desenvolvimento: Yarn workspaces resolve automaticamente
@@ -184,12 +190,16 @@ const Calendar = defineAsyncComponent(() =>
   const emit = defineEmits([
     'current-value',
     'changed',
+    'current-value-complete',
+    'changed-complete',
     'focused',
     'blurred',
     'clicked',
     'entered',
     'paste',
-    'valid'
+    'valid',
+    'date-selected',
+    'month-changed'
   ])
   
   const props = defineProps({
@@ -738,6 +748,13 @@ const Calendar = defineAsyncComponent(() =>
     calendarClearButtonSymbol: {
       type: String,
       default: '×'
+    },
+    calendarIsoStringTimezoneFormat: {
+      type: String,
+      default: 'Z',
+      validator: value => {
+        return ['Z', '+00:00'].includes(value)
+      }
     },
     hasTrim: {
       type: Boolean,
@@ -2905,6 +2922,14 @@ const Calendar = defineAsyncComponent(() =>
   }
   
   /*
+    Handler para quando o Calendar emite evento month-changed
+    Esta função repassa o evento month-changed do Calendar para o componente pai.
+  */
+  const handleCalendarMonthChanged = (data) => {
+    emit('month-changed', data)
+  }
+  
+  /*
     Função auxiliar para converter Date para string no formato correto baseado no inputType
     Esta função é usada para converter objetos Date para strings no formato esperado pelo input HTML.
     Para date: YYYY-MM-DD
@@ -3319,11 +3344,13 @@ const Calendar = defineAsyncComponent(() =>
   /*
     Handler para quando o calendário emite evento date-selected
     Esta função é usada para processar eventos de seleção de data do calendário.
-    Por enquanto, apenas sincroniza via handleCalendarChanged, mas pode ser usado para lógica adicional se necessário.
+    Emite os eventos changed-complete e current-value-complete com os dados completos do calendário.
   */
   const handleCalendarDateSelected = (data) => {
-    // Pode ser usado para lógica adicional se necessário
-    // Por enquanto, apenas sincroniza via handleCalendarChanged
+    // Emitir evento changed-complete com os dados completos do calendário
+    emit('changed-complete', data)
+    // Emitir evento current-value-complete (mesmo valor, nome diferente para compatibilidade)
+    emit('current-value-complete', data)
   }
   
   /*
@@ -3705,6 +3732,26 @@ const Calendar = defineAsyncComponent(() =>
     Esta função é usada para atualizar o inputValue e displayValue quando o inputText mudar.
     Ela atualiza o inputValue com o valor do inputText e o displayValue com o valor do inputText formatado.
   */
+  /*
+    Wrapper para formatISOString usando função utilitária com prop
+  */
+  const formatISOString = (date) => {
+    return formatISOStringUtil(date, props.calendarIsoStringTimezoneFormat)
+  }
+
+  /*
+    Função para construir objeto completo a partir do inputText usando função utilitária
+  */
+  const buildCompleteDataFromInputText = (value) => {
+    return buildCompleteDataFromInputTextUtil(value, {
+      inputType: inputType.value,
+      hasSeconds: props.hasSeconds,
+      allowRange: allowRange.value,
+      timezoneFormat: props.calendarIsoStringTimezoneFormat,
+      locale: props.calendarLocale
+    })
+  }
+
   watch(inputText, value => {
       // Verificar se o valor do inputText é diferente do inputValue
     if (value !== inputValue.value) {
@@ -3772,6 +3819,13 @@ const Calendar = defineAsyncComponent(() =>
 
       // Atualizar o lastValidDisplayValue com o valor do inputText formatado
       lastValidDisplayValue.value = formatted
+
+      // Emitir eventos changed-complete e current-value-complete quando inputText muda
+      const completeData = buildCompleteDataFromInputText(nextValue)
+      if (completeData) {
+        emit('changed-complete', completeData)
+        emit('current-value-complete', completeData)
+      }
     }
   }, { immediate: true })
 

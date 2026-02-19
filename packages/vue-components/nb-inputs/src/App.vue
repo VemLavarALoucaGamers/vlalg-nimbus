@@ -40,6 +40,8 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
@@ -220,6 +222,8 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
@@ -250,6 +254,8 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
@@ -277,6 +283,8 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
@@ -303,6 +311,8 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
@@ -681,6 +691,8 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
@@ -705,6 +717,8 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
@@ -729,6 +743,8 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
@@ -1057,9 +1073,14 @@
             @clicked="() => console.log('clicked')"
             @current-value="($event) => console.log('current-value', $event)"
             @changed="($event) => console.log('changed:',$event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
             @focused="() => console.log('focused')"
             @blurred="() => console.log('blurred')"
             @entered="($event) => console.log('entered', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
           >
             <template #message>
               <div>Erro teste</div>
@@ -1089,9 +1110,14 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         >
           <template #message>
             <div>Erro teste</div>
@@ -1115,9 +1141,14 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         >
           <template #message>
             <div>Erro teste</div>
@@ -1141,9 +1172,14 @@
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
           @entered="($event) => console.log('entered', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         >
           <template #message>
             <div>Erro teste</div>
@@ -1158,6 +1194,11 @@
             input-name="test-datepicker4"
             input-type="date"
             @current-value="($event) => console.log($event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
           />
           text after
         </p>
@@ -1173,6 +1214,11 @@
           label="Data"
           input-type="date"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-datetime"
@@ -1184,6 +1230,11 @@
           input-type="datetime-local"
           input-style="border"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-time"
@@ -1194,6 +1245,11 @@
           input-type="time"
           input-style="line"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-month"
@@ -1203,6 +1259,11 @@
           label="Mês"
           input-type="month"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-week"
@@ -1213,6 +1274,11 @@
           input-type="week"
           input-style="border"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1226,6 +1292,11 @@
           label="Data"
           input-style="background"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-6"
@@ -1236,6 +1307,11 @@
           input-style="border"
           light-text-color="#ffffff"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-7"
@@ -1246,6 +1322,11 @@
           input-style="line"
           light-text-color="#ffffff"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1260,6 +1341,11 @@
           input-style="background"
           theme="dark"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-9"
@@ -1270,6 +1356,11 @@
           input-style="border"
           theme="dark"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-10"
@@ -1280,6 +1371,11 @@
           input-style="line"
           theme="dark"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1296,6 +1392,11 @@
           max="2024-12-31"
           input-style="border"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br />
@@ -1309,6 +1410,11 @@
           min="2024-01-01T00:00"
           max="2024-12-31T23:59"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br />
@@ -1323,6 +1429,11 @@
           min="2024-01-01T00:00"
           max="2024-12-31T23:59"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
 
@@ -1336,6 +1447,11 @@
           :disabled="true"
           input-text="2024-01-15"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-readonly"
@@ -1346,6 +1462,11 @@
           input-style="border"
           light-text-color="#ffffff"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1360,6 +1481,11 @@
           input-type="date"
           :allow-range="true"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-range-border"
@@ -1371,6 +1497,11 @@
           :allow-range="true"
           input-style="border"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1385,6 +1516,11 @@
           input-type="date"
           locale="pt-BR"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-enus"
@@ -1396,6 +1532,11 @@
           locale="en-US"
           input-style="border"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1410,6 +1551,11 @@
           input-type="date"
           input-text="2024-06-15"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-initial-datetime"
@@ -1421,6 +1567,11 @@
           input-text="2024-06-15T14:30"
           input-style="border"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-initial-time"
@@ -1432,6 +1583,11 @@
           input-text="14:30"
           input-style="line"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1446,6 +1602,11 @@
           input-type="time"
           step="900"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-step-datetime"
@@ -1457,6 +1618,11 @@
           step="1800"
           input-style="border"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1470,6 +1636,11 @@
           :border-radius="1"
           input-type="date"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-radius-border"
@@ -1480,6 +1651,11 @@
           input-style="border"
           light-text-color="#ffffff"
           input-type="date"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <br /><br />
@@ -1494,6 +1670,11 @@
           input-type="date"
           :use-custom-calendar="true"
           input-style="background"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         <NbDatePicker
           nb-id="datepicker-native"
@@ -1505,6 +1686,11 @@
           :use-custom-calendar="false"
           input-style="border"
           light-text-color="#ffffff"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <div style="margin: 438px 0;">
@@ -1521,6 +1707,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: Time com min e max, inputText dentro do range -->
@@ -1537,6 +1728,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: Time com min e max, inputText fora do range (deve não definir) -->
@@ -1553,6 +1749,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: Time com min e max usando Date objects -->
@@ -1568,6 +1769,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: Time apenas com min -->
@@ -1582,6 +1788,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: Time apenas com max -->
@@ -1596,6 +1807,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: Time com min e max, inputText no limite mínimo -->
@@ -1612,6 +1828,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: Time com min e max, inputText no limite máximo -->
@@ -1628,6 +1849,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- ========== EXEMPLOS DATETIME-LOCAL ========== -->
@@ -1646,6 +1872,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local com min e max, inputText fora do range (deve não definir) -->
@@ -1662,6 +1893,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local com min e max usando Date objects -->
@@ -1677,6 +1913,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local apenas com min -->
@@ -1691,6 +1932,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local apenas com max -->
@@ -1705,6 +1951,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local com min e max, inputText no limite mínimo -->
@@ -1721,6 +1972,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
@@ -1737,6 +1993,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
@@ -1751,6 +2012,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
@@ -1765,6 +2031,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
@@ -1779,6 +2050,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
@@ -1793,6 +2069,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <NbDatePicker
@@ -1806,6 +2087,11 @@
           input-style="border"
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
 
         <NbDatePicker
@@ -1822,6 +2108,11 @@
           :calendar-show-today-button="true"
           :calendar-show-clear-button="true"
           @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+          @month-changed="($event) => console.log('month-changed:', $event)"
+          @valid="($event) => console.log('valid:', $event)"
         />
         
 
@@ -1842,6 +2133,11 @@
             input-style="border"
             light-text-color="#ffffff"
             @changed="($event) => inputNativeDate = $event"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
           />
         </div>
 
@@ -1967,6 +2263,10 @@
             input-style="border"
             light-text-color="#ffffff"
             @changed="($event) => { testValidationValue = $event; console.log('changed:', $event) }"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
             @valid="handleValidationTest"
           />
 

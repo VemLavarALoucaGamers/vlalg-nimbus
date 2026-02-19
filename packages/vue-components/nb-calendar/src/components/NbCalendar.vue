@@ -239,6 +239,7 @@
 
 <script setup>
 import { ref, computed, watch, onBeforeMount, onMounted, onUnmounted, nextTick, toRefs } from 'vue'
+import { formatTimeValue, formatISOLocal as formatISOLocalUtil, formatISOString as formatISOStringUtil, isSameDay as isSameDayUtil, parseLocalDate as parseLocalDateUtil } from '../utils/dateUtils.js'
 
 defineOptions({
     name: 'NbCalendar',
@@ -319,7 +320,7 @@ const props = defineProps({
 	},
 	width: { // largura do calendário em pixels
         type: Number,
-        default: 350,
+        default: 280,
       validator: value => {
         return typeof value === 'number' && value >= 280
       }
@@ -712,6 +713,13 @@ const props = defineProps({
 	scrollClass: {
 		type: String,
 		default: ''
+	},
+	isoStringTimezoneFormat: {
+		type: String,
+		default: 'Z',
+		validator: value => {
+			return ['Z', '+00:00'].includes(value)
+		}
 	}
 })
 
@@ -765,6 +773,7 @@ const {
   timeDisplayLabelText,
   clearButtonTitle,
   clearButtonSymbol,
+  isoStringTimezoneFormat,
   width,
   widthFull,
   borderRadius,
@@ -1775,7 +1784,7 @@ const goToToday = (event) => {
         emit('date-selected', {
             date: today,
             dateString: today.toISOString().split('T')[0],
-            isoString: today.toISOString(),
+            isoString: formatISOString(today),
             isoStringLocal: formatISOLocal(today),
             day: null
         })
@@ -1815,7 +1824,7 @@ const goToToday = (event) => {
             minute: selectedMinute.value,
             second: props.hasSeconds ? selectedSecond.value : undefined,
             datetimeString: datetimeString,
-            isoString: now.toISOString(),
+            isoString: formatISOString(now),
             isoStringLocal: formatISOLocal(now),
             day: null
         })
@@ -1833,7 +1842,7 @@ const goToToday = (event) => {
             weekEndDate: weekEnd,
             weekNumber: getISOWeekNumber(weekStart),
             weekYear: getISOWeekYear(weekStart),
-            isoString: weekStart.toISOString(),
+            isoString: formatISOString(weekStart),
             isoStringLocal: formatISOLocal(weekStart)
         })
     } else if (props.inputType === 'month') {
@@ -1849,7 +1858,7 @@ const goToToday = (event) => {
             month: now.getMonth(),
             year: now.getFullYear(),
             monthName: currentMonthName.value,
-            isoString: monthStart.toISOString(),
+            isoString: formatISOString(monthStart),
             isoStringLocal: formatISOLocal(monthStart)
         })
     }
@@ -1904,7 +1913,7 @@ const selectMonth = (monthIndex, event) => {
             month: monthIndex,
             year: year,
             monthName: monthNames.value[monthIndex],
-            isoString: newDate.toISOString(),
+            isoString: formatISOString(newDate),
             isoStringLocal: formatISOLocal(newDate)
         })
         
@@ -2208,14 +2217,11 @@ const styleBorderRadius = computed(() => {
     Este função é usado para verificar se duas datas são iguais.
     Ele é usado para verificar se duas datas são iguais.
 */
+/*
+    Wrapper para isSameDay usando função utilitária
+*/
 const isSameDay = (date1, date2) => {
-    // Se a data1 ou data2 não forem válidas, retornar false
-    if (!date1 || !date2) return false
-
-    // Verificar se o ano, mês e dia são iguais
-    return date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate()
+    return isSameDayUtil(date1, date2)
 }
 
 /*
@@ -2464,30 +2470,24 @@ const parseTimeMinMax = (value) => {
 const timeMin = computed(() => parseTimeMinMax(props.min))
 const timeMax = computed(() => parseTimeMinMax(props.max))
 
-/*
-    Função para formatar valor de tempo com zero à esquerda
-    Esta função é usada para formatar um valor de tempo com zero à esquerda (ex: 5 -> "05").
-    Ela é usada para formatar um valor de tempo com zero à esquerda (ex: 5 -> "05").
-*/
-const formatTimeValue = (value) => {
-    // Converter para string e adicionar zero à esquerda se necessário
-    return String(value).padStart(2, '0')
-}
 
 /*
     Função para formatar data/hora ISO local (sem timezone)
     Esta função é usada para formatar uma data/hora no formato ISO local sem timezone.
     Ela é usada para formatar uma data/hora no formato ISO local sem timezone.
 */
+/*
+    Wrapper para formatISOLocal usando função utilitária
+*/
 const formatISOLocal = (date) => {
-    if (!date || !(date instanceof Date)) return null
-    const year = date.getFullYear()
-    const month = formatTimeValue(date.getMonth() + 1)
-    const day = formatTimeValue(date.getDate())
-    const hours = formatTimeValue(date.getHours())
-    const minutes = formatTimeValue(date.getMinutes())
-    const seconds = formatTimeValue(date.getSeconds())
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+    return formatISOLocalUtil(date)
+}
+
+/*
+    Wrapper para formatISOString usando função utilitária com prop
+*/
+const formatISOString = (date) => {
+    return formatISOStringUtil(date, props.isoStringTimezoneFormat)
 }
 
 /*
@@ -3165,7 +3165,7 @@ const emitTimeValue = () => {
                 minute: selectedMinute.value,
                 second: selectedSecond.value,
                 datetimeString: datetimeString,
-                isoString: date.toISOString(),
+                isoString: formatISOString(date),
                 isoStringLocal: formatISOLocal(date)
             })
         } else {
@@ -3186,7 +3186,7 @@ const emitTimeValue = () => {
                 minute: selectedMinute.value,
                 second: selectedSecond.value,
                 datetimeString: datetimeString,
-                isoString: date.toISOString(),
+                isoString: formatISOString(date),
                 isoStringLocal: formatISOLocal(date)
             })
         }
@@ -3693,7 +3693,7 @@ const goToDateFunction = (date) => {
     emit('date-selected', {
         date: normalizedDate,
         dateString: normalizedDate.toISOString().split('T')[0],
-        isoString: normalizedDate.toISOString(),
+        isoString: formatISOString(normalizedDate),
         isoStringLocal: formatISOLocal(normalizedDate),
         day: {
             date: normalizedDate.getDate(),
@@ -3798,7 +3798,7 @@ const selectDate = (day) => {
             weekEndDate: weekEnd,
             weekNumber: getISOWeekNumber(weekStart),
             weekYear: getISOWeekYear(weekStart),
-            isoString: weekStart.toISOString(),
+            isoString: formatISOString(weekStart),
             isoStringLocal: formatISOLocal(weekStart)
         })
 
@@ -3894,8 +3894,8 @@ const selectDate = (day) => {
                         endDate: end,
                         isRange: true,
                         isoString: start && end ? {
-                            start: start.toISOString(),
-                            end: end.toISOString()
+                            start: formatISOString(start),
+                            end: formatISOString(end)
                         } : null,
                         isoStringLocal: start && end ? {
                             start: formatISOLocal(start),
@@ -3915,7 +3915,7 @@ const selectDate = (day) => {
             emit('date-selected', {
                 date: clickedDate,
                 dateString: clickedDate.toISOString().split('T')[0],
-                isoString: clickedDate.toISOString(),
+                isoString: formatISOString(clickedDate),
                 isoStringLocal: formatISOLocal(clickedDate),
                 day: day
             })
@@ -4073,8 +4073,8 @@ const selectDate = (day) => {
             endDate: endDate,
             isRange: true,
             isoString: startDate && endDate ? {
-                start: startDate.toISOString(),
-                end: endDate.toISOString()
+                start: formatISOString(startDate),
+                end: formatISOString(endDate)
             } : null,
             isoStringLocal: startDate && endDate ? {
                 start: formatISOLocal(startDate),
@@ -4160,7 +4160,7 @@ const selectDate = (day) => {
             minute: selectedMinute.value,
             second: selectedSecond.value,
             datetimeString: datetimeString,
-            isoString: clickedDate.toISOString(),
+            isoString: formatISOString(clickedDate),
             isoStringLocal: formatISOLocal(clickedDate),
             day: day
         })
@@ -4311,8 +4311,8 @@ const handleDayMouseUp = () => {
             endDate: endDate,
             isRange: true,
             isoString: startDate && endDate ? {
-                start: startDate.toISOString(),
-                end: endDate.toISOString()
+                start: formatISOString(startDate),
+                end: formatISOString(endDate)
             } : null,
             isoStringLocal: startDate && endDate ? {
                 start: formatISOLocal(startDate),
@@ -4491,8 +4491,8 @@ const handleDayTouchEnd = () => {
             endDate: endDate,
             isRange: true,
             isoString: startDate && endDate ? {
-                start: startDate.toISOString(),
-                end: endDate.toISOString()
+                start: formatISOString(startDate),
+                end: formatISOString(endDate)
             } : null,
             isoStringLocal: startDate && endDate ? {
                 start: formatISOLocal(startDate),

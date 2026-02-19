@@ -3097,8 +3097,8 @@
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
     vue "^3.3.4"
 
-"@vlalg-nimbus/nb-calendar@^1.0.0", "@vlalg-nimbus/nb-calendar@^2.0.0", "@vlalg-nimbus/nb-calendar@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-calendar":
-  version "2.0.0"
+"@vlalg-nimbus/nb-calendar@^1.0.0", "@vlalg-nimbus/nb-calendar@^2.1.0", "@vlalg-nimbus/nb-calendar@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-calendar":
+  version "2.1.0"
   resolved "file:packages/vue-components/nb-calendar"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3122,7 +3122,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-inputs@^8.0.6", "@vlalg-nimbus/nb-inputs@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-inputs":
-  version "8.2.0"
+  version "9.0.1"
   resolved "file:packages/vue-components/nb-inputs"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
