@@ -1794,6 +1794,35 @@
           light-text-color="#ffffff"
           @changed="($event) => console.log('changed:', $event)"
         />
+
+        <NbDatePicker
+          nb-id="datepicker-date-simple-ptbr"
+          input-name="test-datepicker-date-simple-ptbr"
+          display="b"
+          show-label
+          label="2026-01-09 (pt-BR)"
+          input-type="date"
+          input-text="2026-01-09T21:07:50.624+00:00"
+          input-style="border"
+          light-text-color="#ffffff"
+          @changed="($event) => console.log('changed:', $event)"
+        />
+
+        <NbDatePicker
+          nb-id="datepicker-date-simple-show-buttons"
+          input-name="test-datepicker-date-simple-show-button"
+          display="b"
+          show-label
+          label="2026-01-09 (show buttons)"
+          input-type="date"
+          input-text="2026-01-09T21:07:50.624+00:00"
+          input-style="border"
+          light-text-color="#ffffff"
+          locale="pt-BR"
+          :calendar-show-today-button="true"
+          :calendar-show-clear-button="true"
+          @changed="($event) => console.log('changed:', $event)"
+        />
         
 
         <div style="color: black; margin-top: 60px;">

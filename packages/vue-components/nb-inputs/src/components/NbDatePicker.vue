@@ -342,16 +342,9 @@ const Calendar = defineAsyncComponent(() =>
         return value === null || typeof value === 'boolean'
       },
     },
-    useCustomCalendar: {
-      type: Boolean,
-      default: true, // true = usa customizado por padrão, false = força nativo
-      validator: value => {
-        return typeof value === 'boolean'
-      }
-    },
     locale: {
       type: String,
-      default: 'pt-BR',
+      default: 'en-US',
       validator: value => {
         return ['pt-BR', 'en-US'].includes(value)
       }
@@ -1011,7 +1004,6 @@ const Calendar = defineAsyncComponent(() =>
     max,
     step,
     hasSeconds,
-    useCustomCalendar,
     locale,
     theme,
     allowRange,
@@ -1672,6 +1664,7 @@ const Calendar = defineAsyncComponent(() =>
   const calendarPosition = ref({ top: 0, left: 0 }) // Posição do calendário na tela
   const inputRef = ref(null) // Referência ao elemento input
   const calendarRef = ref(null) // Referência ao elemento do calendário
+  const useCustomCalendar = ref(true) // Flag para usar calendário customizado
   
   /*
     Computed para determinar se deve usar calendário customizado
