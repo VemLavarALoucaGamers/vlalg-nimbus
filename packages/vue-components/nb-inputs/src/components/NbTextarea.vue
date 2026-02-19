@@ -242,10 +242,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
     validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    }
-  },
-    validator: value => {
 			return typeof value === 'boolean' && [true, false].includes(value)
     }
   },

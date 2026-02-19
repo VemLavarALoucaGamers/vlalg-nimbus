@@ -3090,15 +3090,15 @@
   resolved "file:packages/scss/mystery-box-css-framework"
 
 "@vlalg-nimbus/nb-buttons@^5.0.3", "@vlalg-nimbus/nb-buttons@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-buttons":
-  version "5.0.5"
+  version "6.0.0"
   resolved "file:packages/vue-components/nb-buttons"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
     vue "^3.3.4"
 
-"@vlalg-nimbus/nb-calendar@^1.0.0", "@vlalg-nimbus/nb-calendar@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-calendar":
-  version "1.0.0"
+"@vlalg-nimbus/nb-calendar@^1.0.0", "@vlalg-nimbus/nb-calendar@^2.0.0", "@vlalg-nimbus/nb-calendar@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-calendar":
+  version "2.0.0"
   resolved "file:packages/vue-components/nb-calendar"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3122,12 +3122,11 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-inputs@^8.0.6", "@vlalg-nimbus/nb-inputs@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-inputs":
-  version "8.0.6"
+  version "8.2.0"
   resolved "file:packages/vue-components/nb-inputs"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
-    "@vlalg-nimbus/nb-calendar" "^1.0.0"
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-loaders@^1.0.3":
@@ -3148,7 +3147,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-overlays@^1.0.2", "@vlalg-nimbus/nb-overlays@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-overlays":
-  version "1.0.4"
+  version "1.0.5"
   resolved "file:packages/vue-components/nb-overlays"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3181,7 +3180,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-selects@^1.0.2", "@vlalg-nimbus/nb-selects@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-selects":
-  version "1.0.3"
+  version "1.1.1"
   resolved "file:packages/vue-components/nb-selects"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -10116,6 +10115,7 @@ negotiator@0.6.3:
     "@vlalg-nimbus/nb-buttons" "^5.0.3"
     "@vlalg-nimbus/nb-calendar" "^1.0.0"
     "@vlalg-nimbus/nb-images" "^2.0.3"
+    "@vlalg-nimbus/nb-inputs" "^8.0.6"
     "@vlalg-nimbus/nb-loaders" "^1.0.3"
     "@vlalg-nimbus/nb-overlays" "^1.0.2"
     "@vlalg-nimbus/nb-pagination" "^1.0.0"

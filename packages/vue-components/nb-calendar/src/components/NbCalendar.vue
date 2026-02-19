@@ -50,13 +50,13 @@
 		</div>
                             <div v-if="viewMode === 'month' && inputType === 'datetime-local'"
                                 class="calendar__view-title">
-                                Selecione o mês
+                                {{ selectMonthText }}
                             </div>
                             <div v-if="viewMode === 'year'" class="calendar__view-title">
-                                Selecione o ano
+                                {{ selectYearText }}
                             </div>
                             <div v-if="viewMode === 'time'" class="calendar__view-title">
-                                Selecione o horário
+                                {{ selectTimeText }}
                             </div>
                         </div>
                         <button
@@ -71,8 +71,30 @@
                         <!-- Botão de limpar range -->
                         <button
                             v-if="allowRange && viewMode === 'calendar' && (inputType === 'date' || inputType === 'datetime-local') && selectedDateRange.startDate && selectedDateRange.endDate"
-                            class="calendar__clear-button" :disabled="disabled" @click="clearRange" type="button" title="Limpar seleção">
-                            ×
+                            class="calendar__clear-button" :disabled="disabled" @click="clearRange" type="button" :title="clearButtonTitle">
+                            {{ clearButtonSymbol }}
+                        </button>
+                        <!-- Botão de limpar seleção (single date, time, datetime, week, month) -->
+                        <button
+                            v-if="showClearButton && !allowRange && ((viewMode === 'calendar' && (inputType === 'date' || inputType === 'datetime-local' || inputType === 'week')) || (viewMode === 'month' && inputType === 'month')) && selectedDate"
+                            class="calendar__clear-button" :disabled="disabled" @click="clearSelection" type="button" :title="clearButtonTitle">
+                            {{ clearButtonSymbol }}
+                        </button>
+                        <button
+                            v-if="showClearButton && viewMode === 'time' && (inputType === 'time' || inputType === 'datetime-local') && (selectedHour > 0 || selectedMinute > 0 || (hasSeconds && selectedSecond > 0) || isTimeValueSet)"
+                            class="calendar__clear-button" :disabled="disabled" @click="clearSelection" type="button" :title="clearButtonTitle">
+                            {{ clearButtonSymbol }}
+                        </button>
+                        <!-- Botão de ir para HOJE/NOW -->
+                        <button
+                            v-if="showTodayButton && ((viewMode === 'calendar' && (inputType === 'date' || inputType === 'datetime-local' || inputType === 'week')) || (viewMode === 'month' && inputType === 'month'))"
+                            class="calendar__today-button calendar__today-button--today" :disabled="disabled" @click="goToToday" type="button" :title="`Go to ${todayButtonText.toLowerCase()}`">
+                            {{ todayButtonText }}
+                        </button>
+                        <button
+                            v-if="showTodayButton && viewMode === 'time' && (inputType === 'time' || inputType === 'datetime-local')"
+                            class="calendar__today-button calendar__today-button--now" :disabled="disabled" @click="goToToday" type="button" :title="`Go to ${nowButtonText.toLowerCase()}`">
+                            {{ nowButtonText }}
                         </button>
                     </div>
 
@@ -158,15 +180,21 @@
                         <div class="calendar__time-separator">:</div>
                         <div class="calendar__time-field calendar__time-field--minutes">
                             <button class="calendar__time-arrow calendar__time-arrow--up"
-                                :disabled="disabled || isMinuteIncrementDisabled" @click.stop.prevent="incrementMinute"
-                                @touchstart.stop="incrementMinute" type="button" data-field="minute"
+                                :disabled="disabled || isMinuteIncrementDisabled" 
+                                @click.stop.prevent="incrementMinute"
+                                @touchstart.stop.prevent="incrementMinute" 
+                                type="button" 
+                                data-field="minute"
                                 data-action="increment">
                                 ▲
                             </button>
                             <div class="calendar__time-value">{{ formatTimeValue(selectedMinute) }}</div>
                             <button class="calendar__time-arrow calendar__time-arrow--down"
-                                :disabled="disabled || isMinuteDecrementDisabled" @click.stop.prevent="decrementMinute"
-                                @touchstart.stop="decrementMinute" type="button" data-field="minute"
+                                :disabled="disabled || isMinuteDecrementDisabled" 
+                                @click.stop.prevent="decrementMinute"
+                                @touchstart.stop.prevent="decrementMinute" 
+                                type="button" 
+                                data-field="minute"
                                 data-action="decrement">
                                 ▼
                             </button>
@@ -192,7 +220,7 @@
                     <!-- Exibição da hora selecionada (tipo time ou datetime-local) - quando não está no modo time -->
                     <div v-if="viewMode !== 'time' && (inputType === 'time' || inputType === 'datetime-local')"
                         class="calendar__time-display" :class="[scrollClass]">
-                        <div class="calendar__time-display-label">Horário:</div>
+                        <div class="calendar__time-display-label">{{ timeDisplayLabelText }}</div>
                         <div class="calendar__time-display-value">
                             {{ formatTimeValue(selectedHour) }}:{{ formatTimeValue(selectedMinute) }}{{ hasSeconds ? ':'
                                 +
@@ -200,7 +228,7 @@
                         </div>
                         <button class="calendar__time-edit-button" :disabled="disabled"
                             @click="(event) => showTimePicker(event)" type="button">
-                            Editar
+                            {{ timeEditButtonText }}
                         </button>
                     </div>
                 </div>
@@ -220,7 +248,8 @@ defineOptions({
 const emit = defineEmits([
     'changed',
     'date-selected',
-    'month-changed'
+    'month-changed',
+    'valid'
 ])
 
 const props = defineProps({
@@ -411,7 +440,7 @@ const props = defineProps({
 	},
     locale: {
 		type: String,
-        default: 'pt-BR',
+        default: 'en-US',
 		validator: value => {
             return ['pt-BR', 'en-US'].includes(value)
         }
@@ -476,32 +505,110 @@ const props = defineProps({
             return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
         }
 	},
-    timeEditButtonBg: {
-		type: String,
+    timeEditButtonFontFamily: {
+        type: String,
+        default: `'Lato', sans-serif`
+    },
+    timeEditButtonFontSize: {
+        type: String,
+        default: '14px',
+        validator: value => {
+            return !value ? '14px' : value
+        }
+    },
+    timeEditButtonPadding: {
+        type: String,
         default: null,
-		validator: value => {
+        validator: value => {
+            return !value || (typeof value === 'string')
+        }
+    },
+    timeEditButtonBorderRadius: {
+        type: String,
+        default: null,
+        validator: value => {
+            return !value || (typeof value === 'string')
+        }
+    },
+    timeEditButtonFontWeight: {
+        type: Number,
+        default: 500,
+        validator: value => {
+            return !value ? 500 : value
+        }
+    },
+    timeEditButtonBorder: {
+        type: String,
+        default: null,
+        validator: value => {
+            return !value || (typeof value === 'string')
+        }
+    },
+    todayButtonBg: {
+        type: String,
+        default: null,
+        validator: value => {
             return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
         }
     },
-    timeEditButtonTextColor: {
+    todayButtonTextColor: {
         type: String,
         default: null,
         validator: value => {
             return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
         }
     },
-    timeEditButtonBgHover: {
+    todayButtonBgHover: {
         type: String,
         default: null,
         validator: value => {
             return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
         }
     },
-    timeEditButtonTextColorHover: {
+    todayButtonTextColorHover: {
         type: String,
         default: null,
         validator: value => {
             return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+        }
+    },
+    todayButtonFontFamily: {
+        type: String,
+        default: `'Lato', sans-serif`
+    },
+    todayButtonFontSize: {
+        type: String,
+        default: '1.1rem',
+        validator: value => {
+            return !value ? '1.1rem' : value
+        }
+    },
+    todayButtonPadding: {
+        type: String,
+        default: null,
+        validator: value => {
+            return !value || (typeof value === 'string')
+        }
+    },
+    todayButtonBorderRadius: {
+        type: String,
+        default: null,
+        validator: value => {
+            return !value || (typeof value === 'string')
+        }
+    },
+    todayButtonFontWeight: {
+        type: Number,
+        default: 400,
+        validator: value => {
+            return !value ? 400 : value
+        }
+    },
+    todayButtonBorder: {
+        type: String,
+        default: null,
+        validator: value => {
+            return !value || (typeof value === 'string')
         }
     },
     minYear: {
@@ -541,6 +648,63 @@ const props = defineProps({
         type: Boolean,
         default: false
 	},
+    showClearButton: {
+        type: Boolean,
+        default: false,
+        validator: value => {
+            return typeof value === 'boolean' && [true, false].includes(value)
+        }
+    },
+    showTodayButton: {
+        type: Boolean,
+        default: false,
+        validator: value => {
+            return typeof value === 'boolean' && [true, false].includes(value)
+        }
+    },
+    clearButtonKeepCurrentMonth: {
+        type: Boolean,
+        default: false,
+        validator: value => {
+            return typeof value === 'boolean' && [true, false].includes(value)
+        }
+    },
+    timeEditButtonText: {
+        type: String,
+        default: 'Edit'
+    },
+    todayButtonText: {
+        type: String,
+        default: 'Today'
+    },
+    nowButtonText: {
+        type: String,
+        default: 'Now'
+    },
+    selectMonthText: {
+        type: String,
+        default: 'Select month'
+    },
+    selectYearText: {
+        type: String,
+        default: 'Select year'
+    },
+    selectTimeText: {
+        type: String,
+        default: 'Select time'
+    },
+    timeDisplayLabelText: {
+        type: String,
+        default: 'Time:'
+    },
+    clearButtonTitle: {
+        type: String,
+        default: 'Clear selection'
+    },
+    clearButtonSymbol: {
+        type: String,
+        default: '×'
+    },
     borderRadius: {
         type: Number,
         default: 0
@@ -576,9 +740,37 @@ const {
   timeEditButtonTextColor,
   timeEditButtonBgHover,
   timeEditButtonTextColorHover,
+  timeEditButtonFontFamily,
+  timeEditButtonFontSize,
+  timeEditButtonPadding,
+  timeEditButtonBorderRadius,
+  timeEditButtonFontWeight,
+  timeEditButtonBorder,
+  todayButtonBg,
+  todayButtonTextColor,
+  todayButtonBgHover,
+  todayButtonTextColorHover,
+  todayButtonFontFamily,
+  todayButtonFontSize,
+  todayButtonPadding,
+  todayButtonBorderRadius,
+  todayButtonFontWeight,
+  todayButtonBorder,
+  timeEditButtonText,
+  todayButtonText,
+  nowButtonText,
+  selectMonthText,
+  selectYearText,
+  selectTimeText,
+  timeDisplayLabelText,
+  clearButtonTitle,
+  clearButtonSymbol,
   width,
   widthFull,
-  borderRadius
+  borderRadius,
+  showClearButton,
+  showTodayButton,
+  clearButtonKeepCurrentMonth
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
@@ -604,6 +796,22 @@ const formatDefaultValues = computed(() => {
 	const timeEditButtonTextColorValue = !timeEditButtonTextColor.value ? null : timeEditButtonTextColor.value
 	const timeEditButtonBgHoverValue = !timeEditButtonBgHover.value ? null : timeEditButtonBgHover.value
 	const timeEditButtonTextColorHoverValue = !timeEditButtonTextColorHover.value ? null : timeEditButtonTextColorHover.value
+	const timeEditButtonFontFamilyValue = !timeEditButtonFontFamily.value ? `'Lato', sans-serif` : timeEditButtonFontFamily.value
+	const timeEditButtonFontSizeValue = !timeEditButtonFontSize.value ? '14px' : timeEditButtonFontSize.value
+	const timeEditButtonPaddingValue = !timeEditButtonPadding.value ? null : timeEditButtonPadding.value
+	const timeEditButtonBorderRadiusValue = !timeEditButtonBorderRadius.value ? null : timeEditButtonBorderRadius.value
+	const timeEditButtonFontWeightValue = ((timeEditButtonFontWeight.value !== 0 && !timeEditButtonFontWeight.value) || timeEditButtonFontWeight.value < 0) ? 500 : timeEditButtonFontWeight.value
+	const timeEditButtonBorderValue = !timeEditButtonBorder.value ? null : timeEditButtonBorder.value
+	const todayButtonBgValue = !todayButtonBg.value ? null : todayButtonBg.value
+	const todayButtonTextColorValue = !todayButtonTextColor.value ? null : todayButtonTextColor.value
+	const todayButtonBgHoverValue = !todayButtonBgHover.value ? null : todayButtonBgHover.value
+	const todayButtonTextColorHoverValue = !todayButtonTextColorHover.value ? null : todayButtonTextColorHover.value
+	const todayButtonFontFamilyValue = !todayButtonFontFamily.value ? `'Lato', sans-serif` : todayButtonFontFamily.value
+	const todayButtonFontSizeValue = !todayButtonFontSize.value ? '1.1rem' : todayButtonFontSize.value
+	const todayButtonPaddingValue = !todayButtonPadding.value ? null : todayButtonPadding.value
+	const todayButtonBorderRadiusValue = !todayButtonBorderRadius.value ? null : todayButtonBorderRadius.value
+	const todayButtonFontWeightValue = ((todayButtonFontWeight.value !== 0 && !todayButtonFontWeight.value) || todayButtonFontWeight.value < 0) ? 400 : todayButtonFontWeight.value
+	const todayButtonBorderValue = !todayButtonBorder.value ? null : todayButtonBorder.value
     
     const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 
@@ -630,6 +838,22 @@ const formatDefaultValues = computed(() => {
 		timeEditButtonTextColor: timeEditButtonTextColorValue,
 		timeEditButtonBgHover: timeEditButtonBgHoverValue,
 		timeEditButtonTextColorHover: timeEditButtonTextColorHoverValue,
+		timeEditButtonFontFamily: timeEditButtonFontFamilyValue,
+		timeEditButtonFontSize: timeEditButtonFontSizeValue,
+		timeEditButtonPadding: timeEditButtonPaddingValue,
+		timeEditButtonBorderRadius: timeEditButtonBorderRadiusValue,
+		timeEditButtonFontWeight: timeEditButtonFontWeightValue,
+		timeEditButtonBorder: timeEditButtonBorderValue,
+		todayButtonBg: todayButtonBgValue,
+		todayButtonTextColor: todayButtonTextColorValue,
+		todayButtonBgHover: todayButtonBgHoverValue,
+		todayButtonTextColorHover: todayButtonTextColorHoverValue,
+		todayButtonFontFamily: todayButtonFontFamilyValue,
+		todayButtonFontSize: todayButtonFontSizeValue,
+		todayButtonPadding: todayButtonPaddingValue,
+		todayButtonBorderRadius: todayButtonBorderRadiusValue,
+		todayButtonFontWeight: todayButtonFontWeightValue,
+		todayButtonBorder: todayButtonBorderValue,
 		borderRadius: borderRadiusValue
 	}
 })
@@ -794,6 +1018,142 @@ const timeEditButtonBgHoverComputed = computed(() => {
 const timeEditButtonTextColorHoverComputed = computed(() => {
 	const defaultValues = formatDefaultValues.value
     return defaultValues.timeEditButtonTextColorHover || '#fff'
+})
+
+/*
+    Computed para font-family do botão de editar hora
+*/
+const timeEditButtonFontFamilyComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.timeEditButtonFontFamily
+})
+
+/*
+    Computed para font-size do botão de editar hora
+*/
+const timeEditButtonFontSizeComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.timeEditButtonFontSize
+})
+
+/*
+    Computed para padding do botão de editar hora
+*/
+const timeEditButtonPaddingComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.timeEditButtonPadding || '6px 16px'
+})
+
+/*
+    Computed para border-radius do botão de editar hora
+*/
+const timeEditButtonBorderRadiusComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.timeEditButtonBorderRadius || '4px'
+})
+
+/*
+    Computed para font-weight do botão de editar hora
+*/
+const timeEditButtonFontWeightComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.timeEditButtonFontWeight
+})
+
+/*
+    Computed para border do botão de editar hora
+*/
+const timeEditButtonBorderComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.timeEditButtonBorder || 'none'
+})
+
+/*
+    Computed para background do botão "Hoje"
+    Este computed é usado para definir o background do botão "Hoje".
+    Ele é usado para definir o background do botão "Hoje".
+*/
+const todayButtonBgComputed = computed(() => {
+    const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonBg || defaultValues.primaryColor
+})
+
+/*
+    Computed para cor do texto do botão "Hoje"
+    Este computed é usado para definir a cor do texto do botão "Hoje".
+    Ele é usado para definir a cor do texto do botão "Hoje".
+*/
+const todayButtonTextColorComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonTextColor || '#fff'
+})
+
+/*
+    Computed para background hover do botão "Hoje"
+    Este computed é usado para definir o background hover do botão "Hoje".
+    Ele é usado para definir o background hover do botão "Hoje".
+*/
+const todayButtonBgHoverComputed = computed(() => {
+    const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonBgHover || defaultValues.selectionColor
+})
+
+/*
+    Computed para cor do texto hover do botão "Hoje"
+    Este computed é usado para definir a cor do texto hover do botão "Hoje".
+    Ele é usado para definir a cor do texto hover do botão "Hoje".
+*/
+const todayButtonTextColorHoverComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonTextColorHover || defaultValues.todayButtonTextColor || '#fff'
+})
+
+/*
+    Computed para font-family do botão "Hoje"
+*/
+const todayButtonFontFamilyComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonFontFamily || defaultValues.font
+})
+
+/*
+    Computed para font-size do botão "Hoje"
+*/
+const todayButtonFontSizeComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonFontSize || '1.1rem'
+})
+
+/*
+    Computed para padding do botão "Hoje"
+*/
+const todayButtonPaddingComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonPadding || '2px 8px'
+})
+
+/*
+    Computed para border-radius do botão "Hoje"
+*/
+const todayButtonBorderRadiusComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonBorderRadius || '3px'
+})
+
+/*
+    Computed para font-weight do botão "Hoje"
+*/
+const todayButtonFontWeightComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonFontWeight
+})
+
+/*
+    Computed para border do botão "Hoje"
+*/
+const todayButtonBorderComputed = computed(() => {
+	const defaultValues = formatDefaultValues.value
+    return defaultValues.todayButtonBorder || 'none'
 })
 
 /*
@@ -1002,6 +1362,7 @@ const selectedYearButtonRef = ref(null) // Ref para o botão selecionado (para p
 const selectedHour = ref(0) // Horas selecionadas
 const selectedMinute = ref(0) // Minutos selecionados
 const selectedSecond = ref(0) // Segundos selecionados
+const isTimeValueSet = ref(false) // Flag para indicar se o tempo foi definido pelo usuário
 
 /*
     Computed para lista de anos disponíveis
@@ -1202,6 +1563,7 @@ const scrollToSelectedYear = () => {
 */
 const showCalendar = () => {
     // Mudar o modo de visualização para 'calendar'
+    // O watch no viewMode vai emitir a validação automaticamente
     viewMode.value = 'calendar'
 }
 
@@ -1221,6 +1583,7 @@ const showTimePicker = (event) => {
     }
 
     // Mudar o modo de visualização para 'time'
+    // O watch no viewMode vai emitir a validação automaticamente
     viewMode.value = 'time'
 }
 
@@ -1270,6 +1633,229 @@ const clearRange = (event) => {
         isoString: null,
         isoStringLocal: null
     })
+    
+    // Verificar e emitir validade
+    checkAndEmitValid()
+}
+
+/*
+    Função para limpar seleção (single date, time, datetime, week, month)
+    Esta função limpa a seleção atual e emite eventos apropriados.
+    Se clearButtonKeepCurrentMonth for false, navega para o mês/ano atual.
+*/
+const clearSelection = (event) => {
+    // Se o componente estiver desabilitado, retornar
+    if (props.disabled) return
+
+    if (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        event.stopImmediatePropagation()
+    }
+
+    // Limpar seleção baseado no inputType
+    if (props.allowRange) {
+        // Limpar range
+        selectedDateRange.value = { startDate: null, endDate: null }
+        editingRangeDate.value = null
+        
+        // Emitir evento com range limpo
+        emit('changed', {
+            startDate: null,
+            endDate: null
+        })
+        
+        emit('date-selected', {
+            startDate: null,
+            endDate: null,
+            isRange: true,
+            isoString: null,
+            isoStringLocal: null
+        })
+    } else {
+        // Limpar seleção single
+        selectedDate.value = null
+        
+        // Limpar time se aplicável
+        if (props.inputType === 'time' || props.inputType === 'datetime-local') {
+            selectedHour.value = 0
+            selectedMinute.value = 0
+            selectedSecond.value = 0
+            isTimeValueSet.value = false
+        }
+        
+        // Emitir evento baseado no inputType
+        if (props.inputType === 'date' || props.inputType === 'datetime-local') {
+            emit('changed', null)
+            emit('date-selected', {
+                date: null,
+                dateString: null,
+                day: null
+            })
+        } else if (props.inputType === 'time') {
+            emit('changed', '')
+            emit('date-selected', {
+                hour: 0,
+                minute: 0,
+                second: props.hasSeconds ? 0 : undefined,
+                timeString: ''
+            })
+        } else if (props.inputType === 'week') {
+            emit('changed', null)
+            emit('date-selected', {
+                weekString: null,
+                weekStartDate: null,
+                weekEndDate: null
+            })
+        } else if (props.inputType === 'month') {
+            emit('changed', null)
+            emit('date-selected', {
+                date: null,
+                dateString: null,
+                month: null,
+                year: null,
+                monthName: null
+            })
+        }
+    }
+
+    // Se clearButtonKeepCurrentMonth for false, navegar para o mês/ano atual
+    if (!props.clearButtonKeepCurrentMonth) {
+        const now = new Date()
+        const newDate = new Date(now.getFullYear(), now.getMonth(), 1)
+        currentDate.value = newDate
+        currentDateTimestamp.value = Date.now()
+        
+        // Emitir evento de mudança de mês
+        emit('month-changed', {
+            year: currentYear.value,
+            month: currentMonth.value,
+            monthName: currentMonthName.value
+        })
+    }
+
+    // Verificar e emitir validade
+    checkAndEmitValid()
+}
+
+/*
+    Função para ir para HOJE/NOW
+    Esta função seleciona a data/hora atual e emite eventos apropriados.
+*/
+const goToToday = (event) => {
+    // Se o componente estiver desabilitado, retornar
+    if (props.disabled) return
+
+    if (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        event.stopImmediatePropagation()
+    }
+
+    const now = new Date()
+    
+    // Navegar para o mês/ano atual
+    const newDate = new Date(now.getFullYear(), now.getMonth(), 1)
+    currentDate.value = newDate
+    currentDateTimestamp.value = Date.now()
+    
+    // Emitir evento de mudança de mês
+    emit('month-changed', {
+        year: currentYear.value,
+        month: currentMonth.value,
+        monthName: currentMonthName.value
+    })
+
+    // Selecionar baseado no inputType
+    if (props.inputType === 'date') {
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        selectedDate.value = today
+        
+        emit('changed', today)
+        emit('date-selected', {
+            date: today,
+            dateString: today.toISOString().split('T')[0],
+            isoString: today.toISOString(),
+            isoStringLocal: formatISOLocal(today),
+            day: null
+        })
+    } else if (props.inputType === 'time') {
+        selectedHour.value = now.getHours()
+        selectedMinute.value = now.getMinutes()
+        if (props.hasSeconds) {
+            selectedSecond.value = now.getSeconds()
+        }
+        isTimeValueSet.value = true
+        
+        const timeString = `${formatTimeValue(selectedHour.value)}:${formatTimeValue(selectedMinute.value)}${props.hasSeconds ? ':' + formatTimeValue(selectedSecond.value) : ''}`
+        
+        emit('changed', timeString)
+        emit('date-selected', {
+            hour: selectedHour.value,
+            minute: selectedMinute.value,
+            second: props.hasSeconds ? selectedSecond.value : undefined,
+            timeString: timeString
+        })
+    } else if (props.inputType === 'datetime-local') {
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        selectedDate.value = today
+        selectedHour.value = now.getHours()
+        selectedMinute.value = now.getMinutes()
+        if (props.hasSeconds) {
+            selectedSecond.value = now.getSeconds()
+        }
+        isTimeValueSet.value = true
+        
+        const datetimeString = `${today.toISOString().split('T')[0]}T${formatTimeValue(selectedHour.value)}:${formatTimeValue(selectedMinute.value)}${props.hasSeconds ? ':' + formatTimeValue(selectedSecond.value) : ''}`
+        
+        emit('changed', datetimeString)
+        emit('date-selected', {
+            date: today,
+            hour: selectedHour.value,
+            minute: selectedMinute.value,
+            second: props.hasSeconds ? selectedSecond.value : undefined,
+            datetimeString: datetimeString,
+            isoString: now.toISOString(),
+            isoStringLocal: formatISOLocal(now),
+            day: null
+        })
+    } else if (props.inputType === 'week') {
+        const weekStart = getWeekStartDate(now)
+        selectedDate.value = weekStart
+        
+        const weekString = formatWeekString(weekStart)
+        const weekEnd = getWeekEndDate(weekStart)
+        
+        emit('changed', weekString)
+        emit('date-selected', {
+            weekString: weekString,
+            weekStartDate: weekStart,
+            weekEndDate: weekEnd,
+            weekNumber: getISOWeekNumber(weekStart),
+            weekYear: getISOWeekYear(weekStart),
+            isoString: weekStart.toISOString(),
+            isoStringLocal: formatISOLocal(weekStart)
+        })
+    } else if (props.inputType === 'month') {
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+        selectedDate.value = monthStart
+        
+        const monthString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+        
+        emit('changed', monthString)
+        emit('date-selected', {
+            date: monthStart,
+            dateString: monthString,
+            month: now.getMonth(),
+            year: now.getFullYear(),
+            monthName: currentMonthName.value,
+            isoString: monthStart.toISOString(),
+            isoStringLocal: formatISOLocal(monthStart)
+        })
+    }
+
+    // Verificar e emitir validade
+    checkAndEmitValid()
 }
 
 /*
@@ -1321,6 +1907,9 @@ const selectMonth = (monthIndex, event) => {
             isoString: newDate.toISOString(),
             isoStringLocal: formatISOLocal(newDate)
         })
+        
+        // Verificar e emitir validade
+        checkAndEmitValid()
 
         return
     }
@@ -1805,8 +2394,14 @@ const timeStepMinutes = computed(() => {
         // Se tem segundos, step de minutos é sempre 1 (incremento de 1 minuto)
         return 1
     }
-    // Se não tem segundos, parseTimeStep() já retorna em minutos (já converteu segundos para minutos)
-    // Então podemos usar diretamente o resultado
+    // Se não tem segundos:
+    // - Se não há step definido: parseTimeStep() retorna 60 (segundos) = 1 minuto
+    // - Se há step definido: parseTimeStep() já retorna em minutos (stepValue / 60)
+    if (!props.step) {
+        // Quando não há step, parseTimeStep() retorna 60 (segundos), que equivale a 1 minuto
+        return 1
+    }
+    // Quando há step, parseTimeStep() já converteu para minutos
     return parseTimeStep()
 })
 
@@ -1818,6 +2413,18 @@ const timeStepMinutes = computed(() => {
 const parseTimeMinMax = (value) => {
     // Se não houver valor, retornar null
     if (!value) return null
+    
+    // Se for objeto Date, extrair hora, minuto e segundo
+    if (value instanceof Date && !isNaN(value.getTime())) {
+        const hour = value.getHours()
+        const minute = value.getMinutes()
+        const second = value.getSeconds()
+        
+        // Validar valores
+        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59) {
+            return { hour, minute, second }
+        }
+    }
     
     // Se for string, processar
     if (typeof value === 'string') {
@@ -1908,6 +2515,9 @@ const incrementHour = (event) => {
     // Atualizar hora selecionada
     selectedHour.value = newHour
     
+    // Marcar que o tempo foi definido
+    isTimeValueSet.value = true
+    
     // Emitir novo valor de tempo
     emitTimeValue()
 }
@@ -1935,6 +2545,9 @@ const decrementHour = (event) => {
     
     // Atualizar hora selecionada
     selectedHour.value = newHour
+    
+    // Marcar que o tempo foi definido
+    isTimeValueSet.value = true
     
     // Emitir novo valor de tempo
     emitTimeValue()
@@ -1987,6 +2600,9 @@ const incrementMinute = (event) => {
     // Atualizar minuto selecionado
     selectedMinute.value = newMinute
     
+    // Marcar que o tempo foi definido
+    isTimeValueSet.value = true
+    
     // Emitir novo valor de tempo
     emitTimeValue()
 }
@@ -2036,6 +2652,9 @@ const decrementMinute = (event) => {
     
     // Atualizar minuto selecionado
     selectedMinute.value = newMinute
+    
+    // Marcar que o tempo foi definido
+    isTimeValueSet.value = true
     
     // Emitir novo valor de tempo
     emitTimeValue()
@@ -2103,6 +2722,9 @@ const incrementSecond = () => {
     selectedMinute.value = newMinute
     selectedHour.value = newHour
     
+    // Marcar que o tempo foi definido
+    isTimeValueSet.value = true
+    
     // Emitir novo valor de tempo
     emitTimeValue()
 }
@@ -2168,7 +2790,10 @@ const decrementSecond = () => {
     selectedSecond.value = newSecond
     selectedMinute.value = newMinute
     selectedHour.value = newHour
-    
+
+    // Marcar que o tempo foi definido
+    isTimeValueSet.value = true
+
     // Emitir novo valor de tempo
     emitTimeValue()
 }
@@ -2207,6 +2832,88 @@ const getMaxTimeInSeconds = () => {
     
     // Converter hora, minuto e segundo para segundos totais
     return timeMax.value.hour * 3600 + timeMax.value.minute * 60 + (timeMax.value.second || 0)
+}
+
+/*
+    Função para verificar se um tempo está desabilitado (fora do range min/max)
+    Esta função é usada para verificar se um tempo (hora, minuto, segundo) está dentro do range permitido.
+    Ela é usada para verificar se um tempo está dentro do range permitido.
+*/
+const isTimeDisabled = (hour, minute, second = 0) => {
+    // Converter tempo para segundos
+    const timeInSeconds = hour * 3600 + minute * 60 + second
+    
+    // Verificar min (tempos antes do min são desabilitados)
+    const minTime = getMinTimeInSeconds()
+    if (minTime !== null && timeInSeconds < minTime) {
+        return true
+    }
+    
+    // Verificar max (tempos depois do max são desabilitados)
+    const maxTime = getMaxTimeInSeconds()
+    if (maxTime !== null && timeInSeconds > maxTime) {
+        return true
+    }
+    
+    // Se não violar nenhuma regra, não desabilitar
+    return false
+}
+
+/*
+    Função para verificar se o valor atual é válido e emitir evento valid
+    Esta função é usada para verificar se o valor atual (data, tempo ou datetime) está dentro do range permitido.
+    Ela emite o evento 'valid' com true ou false.
+*/
+const checkAndEmitValid = () => {
+    let isValid = true
+
+    // Verificar baseado no tipo de input
+    if (props.inputType === 'date' || props.inputType === 'month' || props.inputType === 'week') {
+        // Para tipos de data, verificar se a data selecionada está desabilitada
+        if (selectedDate.value) {
+            isValid = !isDateDisabled(selectedDate.value)
+        } else {
+            // Se não há data selecionada, considerar válido (valor vazio é válido)
+            isValid = true
+        }
+    } else if (props.inputType === 'time') {
+        // Para tipo time, verificar se o tempo está dentro do range
+        // Se o tempo foi definido pelo usuário, verificar se está dentro do range
+        if (isTimeValueSet.value) {
+            isValid = !isTimeDisabled(selectedHour.value || 0, selectedMinute.value || 0, selectedSecond.value || 0)
+        } else {
+            // Se não há tempo selecionado (não foi definido), verificar se o valor padrão (00:00) está dentro do range
+            // Se houver min/max definidos e o valor padrão estiver fora do range, considerar inválido
+            const minTime = getMinTimeInSeconds()
+            const maxTime = getMaxTimeInSeconds()
+            if (minTime !== null || maxTime !== null) {
+                // Verificar se o valor padrão (00:00) está dentro do range
+                isValid = !isTimeDisabled(0, 0, 0)
+            } else {
+                // Se não há min/max, considerar válido (valor vazio é válido)
+                isValid = true
+            }
+        }
+    } else if (props.inputType === 'datetime-local') {
+        // Para datetime-local, verificar tanto a data quanto o tempo
+        let dateValid = true
+        let timeValid = true
+
+        // Verificar data
+        if (selectedDate.value) {
+            dateValid = !isDateDisabled(selectedDate.value)
+        }
+
+        // Verificar tempo
+        if (selectedHour.value !== null || selectedMinute.value !== null || selectedSecond.value !== null) {
+            timeValid = !isTimeDisabled(selectedHour.value || 0, selectedMinute.value || 0, selectedSecond.value || 0)
+        }
+
+        isValid = dateValid && timeValid
+    }
+
+    // Emitir evento valid
+    emit('valid', isValid)
 }
 
 /*
@@ -2483,6 +3190,9 @@ const emitTimeValue = () => {
                 isoStringLocal: formatISOLocal(date)
             })
         }
+        
+        // Verificar e emitir validade
+        checkAndEmitValid()
         return
     }
 
@@ -2500,6 +3210,9 @@ const emitTimeValue = () => {
         second: selectedSecond.value,
         timeString: timeString
     })
+    
+    // Verificar e emitir validade
+    checkAndEmitValid()
 }
 
 /*
@@ -2991,6 +3704,9 @@ const goToDateFunction = (date) => {
             events: getEventsForDate(normalizedDate)
         }
     })
+    
+    // Verificar e emitir validade
+    checkAndEmitValid()
 }
 
 /*
@@ -3040,6 +3756,9 @@ const selectDate = (day) => {
                 weekStartDate: null,
                 weekEndDate: null
             })
+            
+            // Verificar e emitir validade
+            checkAndEmitValid()
 
             return
         }
@@ -3083,6 +3802,8 @@ const selectDate = (day) => {
             isoStringLocal: formatISOLocal(weekStart)
         })
 
+        // Verificar e emitir validade
+        checkAndEmitValid()
         return
     }
 
@@ -3154,6 +3875,9 @@ const selectDate = (day) => {
                     dateString: null,
                     day: null
                 })
+                
+                // Verificar e emitir validade
+                checkAndEmitValid()
                 return
             }
 
@@ -3195,6 +3919,9 @@ const selectDate = (day) => {
                 isoStringLocal: formatISOLocal(clickedDate),
                 day: day
             })
+            
+            // Verificar e emitir validade
+            checkAndEmitValid()
             return
         }
 
@@ -3314,9 +4041,14 @@ const selectDate = (day) => {
                         isoString: null,
                         isoStringLocal: null
                     })
+                    
+                    // Verificar e emitir validade
+                    checkAndEmitValid()
                     return
                 }
                 // Se clicou dentro do range, não fazer nada (já foi verificado acima se clicou no start ou end)
+                // Verificar e emitir validade mesmo assim
+                checkAndEmitValid()
                 return
             }
         }
@@ -3350,6 +4082,8 @@ const selectDate = (day) => {
             } : null
         })
 
+        // Verificar e emitir validade
+        checkAndEmitValid()
         return
     }
 
@@ -3368,6 +4102,9 @@ const selectDate = (day) => {
             dateString: null,
             day: null
         })
+        
+        // Verificar e emitir validade
+        checkAndEmitValid()
         return
     }
 
@@ -3438,6 +4175,9 @@ const selectDate = (day) => {
             day: day
         })
     }
+    
+    // Verificar e emitir validade
+    checkAndEmitValid()
 }
 
 /*
@@ -3990,14 +4730,30 @@ onBeforeMount(() => {
 
                     // Verificar se tem pelo menos 2 partes
                     if (timeParts.length >= 2) {
-                        // Definir a hora
-                        selectedHour.value = parseInt(timeParts[0], 10) || 0
+                        // Obter valores de hora, minuto e segundo
+                        const hour = parseInt(timeParts[0], 10) || 0
+                        const minute = parseInt(timeParts[1], 10) || 0
+                        const second = timeParts[2] ? parseInt(timeParts[2], 10) : 0
 
-                        // Definir o minuto
-                        selectedMinute.value = parseInt(timeParts[1], 10) || 0
+                        // Verificar se o tempo está dentro do range min/max
+                        // Se estiver fora do range, não definir os valores (igual ao comportamento de date)
+                        if (!isTimeDisabled(hour, minute, second)) {
+                            // Definir a hora
+                            selectedHour.value = hour
 
-                        // Definir o segundo
-                        selectedSecond.value = timeParts[2] ? parseInt(timeParts[2], 10) : 0
+                            // Definir o minuto
+                            selectedMinute.value = minute
+
+                            // Definir o segundo
+                            selectedSecond.value = second
+                            
+                            // Marcar que o tempo foi definido
+                            isTimeValueSet.value = true
+                        } else {
+                            // Se estiver fora do range, não definir e marcar como não definido
+                            isTimeValueSet.value = false
+                        }
+                        // Se estiver fora do range, não definir (selectedHour, selectedMinute, selectedSecond permanecem com valores padrão)
                     }
                 }
             } else {
@@ -4006,14 +4762,30 @@ onBeforeMount(() => {
 
                 // Verificar se tem pelo menos 2 partes
                 if (timeParts.length >= 2) {
-                    // Definir a hora
-                    selectedHour.value = parseInt(timeParts[0], 10) || 0
+                    // Obter valores de hora, minuto e segundo
+                    const hour = parseInt(timeParts[0], 10) || 0
+                    const minute = parseInt(timeParts[1], 10) || 0
+                    const second = timeParts[2] ? parseInt(timeParts[2], 10) : 0
 
-                    // Definir o minuto
-                    selectedMinute.value = parseInt(timeParts[1], 10) || 0
+                    // Verificar se o tempo está dentro do range min/max
+                    // Se estiver fora do range, não definir os valores (igual ao comportamento de date)
+                    if (!isTimeDisabled(hour, minute, second)) {
+                        // Definir a hora
+                        selectedHour.value = hour
 
-                    // Definir o segundo
-                    selectedSecond.value = timeParts[2] ? parseInt(timeParts[2], 10) : 0
+                        // Definir o minuto
+                        selectedMinute.value = minute
+
+                        // Definir o segundo
+                        selectedSecond.value = second
+                        
+                        // Marcar que o tempo foi definido
+                        isTimeValueSet.value = true
+                    } else {
+                        // Se estiver fora do range, não definir e marcar como não definido
+                        isTimeValueSet.value = false
+                    }
+                    // Se estiver fora do range, não definir (selectedHour, selectedMinute, selectedSecond permanecem com valores padrão)
                 }
             }
         }
@@ -4156,14 +4928,30 @@ watch(() => props.value, (newValue) => {
 
                     // Verificar se tem pelo menos 2 partes
                     if (timeParts.length >= 2) {
-                        // Definir a hora
-                        selectedHour.value = parseInt(timeParts[0], 10) || 0
+                        // Obter valores de hora, minuto e segundo
+                        const hour = parseInt(timeParts[0], 10) || 0
+                        const minute = parseInt(timeParts[1], 10) || 0
+                        const second = timeParts[2] ? parseInt(timeParts[2], 10) : 0
 
-                        // Definir o minuto
-                        selectedMinute.value = parseInt(timeParts[1], 10) || 0
+                        // Verificar se o tempo está dentro do range min/max
+                        // Se estiver fora do range, não definir os valores (igual ao comportamento de date)
+                        if (!isTimeDisabled(hour, minute, second)) {
+                            // Definir a hora
+                            selectedHour.value = hour
 
-                        // Definir o segundo
-                        selectedSecond.value = timeParts[2] ? parseInt(timeParts[2], 10) : 0
+                            // Definir o minuto
+                            selectedMinute.value = minute
+
+                            // Definir o segundo
+                            selectedSecond.value = second
+                            
+                            // Marcar que o tempo foi definido
+                            isTimeValueSet.value = true
+                        } else {
+                            // Se estiver fora do range, não definir e marcar como não definido
+                            isTimeValueSet.value = false
+                        }
+                        // Se estiver fora do range, não definir (selectedHour, selectedMinute, selectedSecond permanecem com valores padrão)
                     }
                 }
             } else {
@@ -4172,14 +4960,30 @@ watch(() => props.value, (newValue) => {
 
                 // Verificar se tem pelo menos 2 partes
                 if (timeParts.length >= 2) {
-                    // Definir a hora
-                    selectedHour.value = parseInt(timeParts[0], 10) || 0
+                    // Obter valores de hora, minuto e segundo
+                    const hour = parseInt(timeParts[0], 10) || 0
+                    const minute = parseInt(timeParts[1], 10) || 0
+                    const second = timeParts[2] ? parseInt(timeParts[2], 10) : 0
 
-                    // Definir o minuto
-                    selectedMinute.value = parseInt(timeParts[1], 10) || 0
+                    // Verificar se o tempo está dentro do range min/max
+                    // Se estiver fora do range, não definir os valores (igual ao comportamento de date)
+                    if (!isTimeDisabled(hour, minute, second)) {
+                        // Definir a hora
+                        selectedHour.value = hour
 
-                    // Definir o segundo
-                    selectedSecond.value = timeParts[2] ? parseInt(timeParts[2], 10) : 0
+                        // Definir o minuto
+                        selectedMinute.value = minute
+
+                        // Definir o segundo
+                        selectedSecond.value = second
+                        
+                        // Marcar que o tempo foi definido
+                        isTimeValueSet.value = true
+                    } else {
+                        // Se estiver fora do range, não definir e marcar como não definido
+                        isTimeValueSet.value = false
+                    }
+                    // Se estiver fora do range, não definir (selectedHour, selectedMinute, selectedSecond permanecem com valores padrão)
                 }
             }
         }
@@ -4246,6 +5050,21 @@ watch(() => props.value, (newValue) => {
     Este função é usado para atualizar a data atual.
     Ele é usado para atualizar a data atual.
 */
+// Watch para revalidar quando min ou max mudarem
+watch([() => props.min, () => props.max], () => {
+    // Revalidar o valor atual quando min ou max mudarem
+    checkAndEmitValid()
+})
+
+// Watch para emitir validade quando o viewMode mudar (calendário/time picker aberto)
+watch(() => viewMode.value, (newMode, oldMode) => {
+    // Só emitir se realmente mudou de modo (não na inicialização)
+    if (oldMode !== undefined && newMode !== oldMode) {
+        // Verificar e emitir validade quando o calendário ou time picker é aberto
+        checkAndEmitValid()
+    }
+})
+
 watch(() => props.goToDate, (newValue) => {
     // Processar quando goToDate mudar
     if (newValue) {
@@ -4261,6 +5080,12 @@ onMounted(() => {
 
     // Adicionar listener global para touchend
     document.addEventListener('touchend', handleDayTouchEnd, { passive: true })
+    
+    // Verificar e emitir validade quando o componente é montado pela primeira vez
+    // Usar nextTick para garantir que os valores estão inicializados
+    nextTick(() => {
+        checkAndEmitValid()
+    })
 })
 
 onUnmounted(() => {
@@ -4359,6 +5184,49 @@ onUnmounted(() => {
                         color: #ff5252;
                         background: #333;
                         transform: scale(1.1);
+                    }
+
+                    &:disabled {
+                        opacity: 0.5;
+                        cursor: not-allowed;
+                    }
+                }
+
+                .calendar__today-button {
+                    background: v-bind('todayButtonBgComputed');
+                    border: v-bind('todayButtonBorderComputed');
+                    font-family: v-bind('todayButtonFontFamilyComputed');
+                    font-size: v-bind('todayButtonFontSizeComputed');
+                    color: v-bind('todayButtonTextColorComputed');
+                    cursor: pointer;
+                    padding: v-bind('todayButtonPaddingComputed');
+                    line-height: 1.3;
+                    border-radius: v-bind('todayButtonBorderRadiusComputed');
+                    transition: all 0.2s;
+                    flex-shrink: 0;
+                    font-weight: v-bind('todayButtonFontWeightComputed');
+                    margin-left: 4px;
+                    overflow: hidden;
+                    white-space: nowrap;
+
+                    &.calendar__today-button--today {
+                        max-width: 100px;
+                    }
+
+                    &.calendar__today-button--now {
+                        max-width: 100px;
+                    }
+
+                    &:hover:not(:disabled) {
+                        background: v-bind('todayButtonBgHoverComputed');
+                        color: v-bind('todayButtonTextColorHoverComputed');
+                        transform: translateY(-1px);
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                    }
+
+                    &:active:not(:disabled) {
+                        transform: translateY(0);
+                        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
                     }
 
                     &:disabled {
@@ -4469,6 +5337,15 @@ onUnmounted(() => {
                     .calendar__time-edit-button {
                         background: v-bind('timeEditButtonBgComputed');
                         color: v-bind('timeEditButtonTextColorComputed');
+                        border: v-bind('timeEditButtonBorderComputed');
+                        border-radius: v-bind('timeEditButtonBorderRadiusComputed');
+                        padding: v-bind('timeEditButtonPaddingComputed');
+                        font-family: v-bind('timeEditButtonFontFamilyComputed');
+                        font-size: v-bind('timeEditButtonFontSizeComputed');
+                        font-weight: v-bind('timeEditButtonFontWeightComputed');
+                        max-width: 100px;
+                        overflow: hidden;
+                        white-space: nowrap;
 
                         &:hover:not(:disabled) {
                             background: v-bind('timeEditButtonBgHoverComputed');
@@ -4518,7 +5395,6 @@ onUnmounted(() => {
         background: #fff;
         border-radius: v-bind('styleBorderRadius');
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 12px;
         user-select: none;
         font-family: inherit;
         overflow: hidden;
@@ -4537,6 +5413,7 @@ onUnmounted(() => {
             border-bottom: 1px solid #e0e0e0;
             gap: 4px;
             min-width: 0;
+            padding: 12px;
 
             .calendar__nav-button {
                 background: none;
@@ -4576,6 +5453,49 @@ onUnmounted(() => {
                 &:hover:not(:disabled) {
                     color: #d32f2f;
                     transform: scale(1.1);
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+            }
+
+            .calendar__today-button {
+                background: v-bind('todayButtonBgComputed');
+                border: v-bind('todayButtonBorderComputed');
+                font-family: v-bind('todayButtonFontFamilyComputed');
+                font-size: v-bind('todayButtonFontSizeComputed');
+                color: v-bind('todayButtonTextColorComputed');
+                cursor: pointer;
+                padding: v-bind('todayButtonPaddingComputed');
+                line-height: 1.3;
+                border-radius: v-bind('todayButtonBorderRadiusComputed');
+                transition: all 0.2s;
+                flex-shrink: 0;
+                font-weight: v-bind('todayButtonFontWeightComputed');
+                margin-left: 4px;
+                overflow: hidden;
+                white-space: nowrap;
+
+                &.calendar__today-button--today {
+                    max-width: 100px;
+                }
+
+                &.calendar__today-button--now {
+                    max-width: 100px;
+                }
+
+                &:hover:not(:disabled) {
+                    background: v-bind('todayButtonBgHoverComputed');
+                    color: v-bind('todayButtonTextColorHoverComputed');
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                }
+
+                &:active:not(:disabled) {
+                    transform: translateY(0);
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
                 }
 
                 &:disabled {
@@ -4639,7 +5559,7 @@ onUnmounted(() => {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 3px;
-            padding: 12px 0;
+            padding: 12px;
             height: 280px;
             overflow-y: auto;
             overflow-x: hidden;
@@ -4692,7 +5612,7 @@ onUnmounted(() => {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
-            padding: 12px 5px;
+            padding: 12px;
             height: 280px;
             overflow-y: auto;
             overflow-x: hidden;
@@ -4748,6 +5668,7 @@ onUnmounted(() => {
             grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 1px;
             margin-bottom: 8px;
+            padding: 0 12px;
 
             .calendar__weekday {
                 text-align: center;
@@ -4768,6 +5689,7 @@ onUnmounted(() => {
             grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 2px;
             min-height: 272px;
+            padding: 0 12px;
 
             .calendar__day {
                 touch-action: none;
@@ -5082,7 +6004,7 @@ onUnmounted(() => {
             justify-content: center;
             gap: 12px;
             margin-top: 8px;
-            padding: 14px 16px 1px 16px;
+            padding: 14px 16px;
             border-top: 1px solid #e0e0e0;
             background: v-bind('timeDisplayBgComputed');
         }
@@ -5106,14 +6028,17 @@ onUnmounted(() => {
         .calendar__time-edit-button {
             background: v-bind('timeEditButtonBgComputed');
             color: v-bind('timeEditButtonTextColorComputed');
-            border: none;
-            border-radius: 4px;
-            padding: 6px 16px;
-            font-size: 14px;
-            font-weight: 500;
+            border: v-bind('timeEditButtonBorderComputed');
+            border-radius: v-bind('timeEditButtonBorderRadiusComputed');
+            padding: v-bind('timeEditButtonPaddingComputed');
+            font-family: v-bind('timeEditButtonFontFamilyComputed');
+            font-size: v-bind('timeEditButtonFontSizeComputed');
+            font-weight: v-bind('timeEditButtonFontWeightComputed');
             cursor: pointer;
             transition: background 0.2s, color 0.2s;
-            font-family: inherit;
+            max-width: 100px;
+            overflow: hidden;
+            white-space: nowrap;
 
             &:hover:not(:disabled) {
                 background: v-bind('timeEditButtonBgHoverComputed');
