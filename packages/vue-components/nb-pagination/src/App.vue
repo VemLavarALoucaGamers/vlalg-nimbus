@@ -298,6 +298,18 @@
             </select>
           </template>
         </NbPagination>
+
+        <h4 class="test-page__content-tile" style="margin-top: 700px;">NbPagination - Com Scroll On Page Change</h4>
+        <NbPagination
+          nb-id="pagination-scroll-on-page-change-1"
+          v-model="currentPage21"
+          :total-pages="10"
+          theme="light"
+          :scroll-on-page-change="true"
+          @changed="($event) => console.log('changed:', $event)"
+          @page-changed="($event) => console.log('page-changed:', $event)"
+          @scrolling="($event) => console.log('scrolling:', $event)"
+        />
       </div>
     </div>
   </div>

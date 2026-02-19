@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref, computed, toRefs } from 'vue';
+import { ref, computed, toRefs, nextTick } from 'vue';
 
 defineOptions({
 	name: 'NbPagination',
@@ -436,6 +436,35 @@ const props = defineProps({
     type: String,
     default: '#000000'
   },
+  scrollOnPageChange: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  scrollTarget: {
+    type: String,
+    default: 'top',
+    validator: (value) => {
+      return ['top', 'component', 'custom'].includes(value)
+    }
+  },
+  scrollSelector: {
+    type: String,
+    default: null
+  },
+  scrollBehavior: {
+    type: String,
+    default: 'smooth',
+    validator: (value) => {
+      return ['smooth', 'auto'].includes(value)
+    }
+  },
+  scrollOffset: {
+    type: Number,
+    default: 0
+  },
 });
 
 const goToNumber = ref(null);
@@ -447,7 +476,8 @@ const emit = defineEmits([
   'go-to-input',
   'invalid-page',
   'first-page',
-  'last-page'
+  'last-page',
+  'scrolling'
 ]);
 
 const {
@@ -735,6 +765,77 @@ function goTo (page) {
   }
   if (page === props.totalPages && previousPage !== props.totalPages) {
     emit('last-page', page);
+  }
+
+  // Scroll após mudança de página
+  if (props.scrollOnPageChange) {
+    nextTick(() => {
+      let scrollExecuted = false;
+      let scrollData = {
+        target: props.scrollTarget,
+        selector: props.scrollSelector,
+        offset: props.scrollOffset,
+        behavior: props.scrollBehavior,
+        page: page
+      };
+
+      if (props.scrollTarget === 'top') {
+        // Scroll para o topo da página
+        window.scrollTo({
+          top: props.scrollOffset,
+          behavior: props.scrollBehavior
+        });
+        scrollExecuted = true;
+        scrollData.position = props.scrollOffset;
+      } else if (props.scrollTarget === 'component') {
+        // Scroll para o componente de paginação
+        const element = document.getElementById(props.nbId);
+        if (element) {
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const scrollPosition = elementPosition - props.scrollOffset;
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: props.scrollBehavior
+          });
+          scrollExecuted = true;
+          scrollData.position = scrollPosition;
+          scrollData.elementId = props.nbId;
+        }
+      } else if (props.scrollTarget === 'custom' && props.scrollSelector) {
+        // Scroll para um elemento customizado (id, class, ou seletor CSS)
+        let element = null;
+        
+        // Tentar encontrar por ID
+        if (props.scrollSelector.startsWith('#')) {
+          element = document.getElementById(props.scrollSelector.substring(1));
+        } 
+        // Tentar encontrar por classe (primeira ocorrência)
+        else if (props.scrollSelector.startsWith('.')) {
+          element = document.querySelector(props.scrollSelector);
+        }
+        // Tentar encontrar por seletor CSS genérico
+        else {
+          element = document.querySelector(props.scrollSelector);
+        }
+        
+        if (element) {
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const scrollPosition = elementPosition - props.scrollOffset;
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: props.scrollBehavior
+          });
+          scrollExecuted = true;
+          scrollData.position = scrollPosition;
+          scrollData.selector = props.scrollSelector;
+        }
+      }
+
+      // Emitir evento de scroll se foi executado
+      if (scrollExecuted) {
+        emit('scrolling', scrollData);
+      }
+    });
   }
 }
 /**
