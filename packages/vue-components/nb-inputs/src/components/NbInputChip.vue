@@ -388,7 +388,14 @@ const props = defineProps({
 		type: Number,
 		default: 0
 	},
-	labelLeft: {
+  labelBreakOnActive: {
+    type: Boolean,
+    default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
+  labelLeft: {
 		type: Number,
 		default: 5,
 	},
@@ -523,6 +530,7 @@ const {
 	labelBackground,
 	labelPadding,
 	labelBorderRadius,
+	labelBreakOnActive,
 	labelLeft,
 	inputLabelMarginActive,
 	labelActiveTop,
@@ -637,9 +645,15 @@ const componentDisabled = computed(() => {
 })
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
+	const isActive = isLabelActive.value
 
 	return {
-		display: defaultValues.display
+		display: defaultValues.display,
+		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
+    // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+    paddingTop: '0px',
+		// Esconde o label quando não está ativo usando overflow hidden
+		overflow: isActive && showLabel.value ? 'visible' : 'hidden'
 	}
 })
 const fontSizeStyle = computed(() => {
@@ -783,6 +797,15 @@ const styleLabel = computed(() => {
     backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
     padding: isActive ? defaultValues.labelPadding : '0',
     borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
+    // Se labelBreakOnActive for true (padrão), usa ellipsis quando ativo. Se false, quebra linha
+    ...(isActive ? {
+      whiteSpace: !labelBreakOnActive.value ? 'normal' : 'nowrap',
+      wordWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+      overflowWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+      maxWidth: '100%',
+      textOverflow: labelBreakOnActive.value ? 'ellipsis' : 'clip',
+      overflow: labelBreakOnActive.value ? 'hidden' : 'visible',
+    } : {}),
   }
 })
 const fontSizeChipStyle = computed(() => {
@@ -884,8 +907,6 @@ watch(chipInputValue, (newValue) => {
 	box-sizing: border-box;
 	vertical-align: bottom;
 	position: relative;
-	// Permite que o label fique visível quando está na posição ativa
-	overflow: visible;
 }
 
 .nb-reset {
@@ -909,16 +930,12 @@ watch(chipInputValue, (newValue) => {
 
 .component__label {
     position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
     z-index: 1;
-    transition: top 0.2s ease;
     pointer-events: none;
-    // Quando ativo, o label pode sair do componente, mas o wrapper tem padding-top para acomodá-lo
 
     .component__label--required {
       color: red;
+      display: contents;
     }
   }
 

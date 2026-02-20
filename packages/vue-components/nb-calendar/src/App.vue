@@ -24,6 +24,18 @@
     <div v-if="calendarType === 'date'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
+        <h4 class="test-page__content-tile">NbCalendar - Date (Width Fulle)</h4>
+        
+        <NbCalendar
+          nb-id="calendar-date-width-full-1"
+          input-type="date"
+          theme="light"
+          :width-full="true"
+          :value="selectedDate1"
+          @changed="($event) => { selectedDate1 = $event; console.log('changed:', $event) }"
+          @date-selected="($event) => console.log('date-selected:', $event)"
+        />
+
         <h4 class="test-page__content-tile">NbCalendar - Date (Light Theme)</h4>
         
         <NbCalendar

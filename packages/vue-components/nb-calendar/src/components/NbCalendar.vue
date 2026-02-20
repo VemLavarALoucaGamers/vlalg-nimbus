@@ -5688,8 +5688,8 @@ onUnmounted(() => {
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 2px;
-            min-height: 272px;
-            padding: 0 12px;
+            min-height: auto;
+            padding: 0 12px 12px 12px;
 
             .calendar__day {
                 touch-action: none;
@@ -6003,7 +6003,7 @@ onUnmounted(() => {
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-top: 8px;
+            // margin-top: 8px;
             padding: 14px 16px;
             border-top: 1px solid #e0e0e0;
             background: v-bind('timeDisplayBgComputed');

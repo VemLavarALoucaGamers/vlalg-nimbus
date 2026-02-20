@@ -760,7 +760,7 @@ const formatDefaultValues = computed(() => {
   const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
   const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
   const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
-  const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? -10 : labelActiveLeft.value
+  const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
   const labelRightValue = (labelRight.value === null || labelRight.value === undefined) ? 0 : labelRight.value
   const labelActiveRightValue = (labelActiveRight.value === null || labelActiveRight.value === undefined) ? 0 : labelActiveRight.value
   const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
@@ -842,7 +842,10 @@ const wrapperStyle = computed(() => {
 	return {
 		display: defaultValues.display,
 		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
-		paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+		// paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+    paddingTop: '0px',
+		// Esconde o label quando não está ativo usando overflow hidden
+		overflow: isActive && showLabel.value ? 'visible' : 'hidden'
 	}
 })
 const fontSizeStyle = computed(() => {
@@ -1294,8 +1297,6 @@ watch(inputType, (newType) => {
 	box-sizing: border-box;
 	vertical-align: bottom;
 	position: relative;
-	// Permite que o label fique visível quando está na posição ativa
-	overflow: hidden;
 }
 
 .nb-reset {
@@ -1323,6 +1324,7 @@ watch(inputType, (newType) => {
 	box-sizing: border-box;
 	line-height: 1.42857143;
 	font-family: v-bind('font');
+	position: relative;
 
 	user-select: none;
 
@@ -1804,26 +1806,13 @@ watch(inputType, (newType) => {
 
     .component__label {
       position: absolute;
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%);
       z-index: 1;
-      transition: top 0.2s ease;
       pointer-events: none;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
 
       .component__label--required {
         color: red;
+        display: contents;
       }
-    }
-
-    &:has(.component__input:focus) .component__label,
-    &:has(.component__input:active) .component__label {
-      top: -10px;
-      transform: translateY(0);
     }
 
     .component__eye {
