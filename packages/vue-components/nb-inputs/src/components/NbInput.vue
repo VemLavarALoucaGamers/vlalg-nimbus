@@ -716,7 +716,7 @@ const isActive = ref(false)
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const textColorValue = !textColor ? 'ffffff' : textColor.value
+	const textColorValue = !textColor ? '#ffffff' : textColor.value
 	const caretColorValue = !caretColor.value ? '' : caretColor.value
 	const selectionBgColorValue = !selectionBgColor.value ? '' : selectionBgColor.value
 	const selectionTextColorValue = !selectionTextColor.value ? '' : selectionTextColor.value
@@ -910,6 +910,11 @@ const styleTextColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.textColor
+})
+const styleButtonColor = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.theme === 'dark' ? darkDisabledBgColor.value : lightDisabledBgColor.value
 })
 const styleTextMessageColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
@@ -1961,7 +1966,6 @@ watch(inputType, (newType) => {
 	pointer-events: none;
 	user-select: none;
 
-	background-color: #ffffff;
 	opacity: 0.8;
 
 	.component {
