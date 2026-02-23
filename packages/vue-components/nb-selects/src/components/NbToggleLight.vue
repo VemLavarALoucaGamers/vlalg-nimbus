@@ -6,8 +6,8 @@
     :tabIndex="disabled ? -1 : tabIndex"
     role="button"
     v-bind="computedAriaAttrs"
-    @keydown.enter.prevent="!disabled && hasTabIndexEnter && handleKeydown()"
-    @keydown.space.prevent="!disabled && hasTabIndexSpace && handleKeydown()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && handleKeydown($event)"
+    @keydown.space.prevent="!disabled && hasTabIndexSpace && handleKeydown($event)"
 	>
 		<div
 			:id="nbId"
@@ -20,7 +20,7 @@
         type="checkbox"
         :disabled="disabled"
         class="component-input"
-        @change="handleChange"
+        @change="handleChange($event)"
       />
       <label
         :for="`${nbId}-input`"
@@ -324,16 +324,16 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-const handleChange = () => {
+const handleChange = (event) => {
 	if (!disabled.value) {
-		emit('clicked')
+		emit('clicked', event)
 	}
 }
 
-const handleKeydown = () => {
+const handleKeydown = (event) => {
 	if (!disabled.value) {
 		currentStatus.value = !currentStatus.value
-		emit('clicked')
+		emit('clicked', event)
 	}
 }
 

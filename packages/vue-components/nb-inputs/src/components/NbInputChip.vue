@@ -5,7 +5,7 @@
     :style="[wrapperStyle]"
     role="input"
     v-bind="computedAriaAttrs"
-    @click="interacted"
+    @click="interacted($event)"
   >
     <label
       v-if="showLabel"
@@ -835,8 +835,8 @@ const inputStyleClass = computed(() => {
 			return 'component__input--background'
 	}
 })
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 
 const handleFocus = () => {

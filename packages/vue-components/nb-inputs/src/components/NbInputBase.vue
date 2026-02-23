@@ -211,8 +211,8 @@ const styleColorActiveHover = computed(() => {
 const startValue = () => {
   currentValue.value = inputValue.value
 }
-const clicked = () => {
-  emit('clicked')
+const clicked = (event) => {
+  emit('clicked', event)
 }
 
 watch(inputValue, (newValue, oldValue) => {

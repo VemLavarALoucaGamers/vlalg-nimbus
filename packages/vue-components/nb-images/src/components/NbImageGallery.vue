@@ -73,9 +73,9 @@
               :tabIndex="disabled ? -1 : tabIndex"
               role="button"
               :aria-label="`Select image ${index + 1}: ${image.alt || 'Image'}`"
-              @click="selectImage(index)"
-              @keydown.enter.prevent="!disabled && hasTabIndexEnter && selectImage(index)"
-              @keydown.space.prevent="!disabled && hasTabIndexSpace && selectImage(index)"
+              @click="selectImage(index, $event)"
+              @keydown.enter.prevent="!disabled && hasTabIndexEnter && selectImage(index, $event)"
+              @keydown.space.prevent="!disabled && hasTabIndexSpace && selectImage(index, $event)"
             >
               <div class="component__thumbnail-inner">
                 <img
@@ -930,7 +930,7 @@ const previewImage = (img) => {
 }
 
 // Função para selecionar uma imagem
-const selectImage = (index) => {
+const selectImage = (index, event) => {
   // Se o componente estiver desabilitado, retorna
 	if (disabled.value) return
 
@@ -938,7 +938,7 @@ const selectImage = (index) => {
   selectedIndex.value = index
 
   // Emite o evento clicked
-	emit('clicked', { index, image: images.value[index] })
+	emit('clicked', { index, image: images.value[index] }, event)
   // Emite o evento image-changed
 	emit('image-changed', { index, image: images.value[index] })
 	

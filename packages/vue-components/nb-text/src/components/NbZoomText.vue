@@ -3,7 +3,7 @@
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]" 
-    @click="interacted"
+    @click="interacted($event)"
   >
     <div
       :id="nbId"
@@ -162,8 +162,8 @@ const componentDisabled = computed(() => {
 
 const startValue = () => { }
 
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 </script>
 

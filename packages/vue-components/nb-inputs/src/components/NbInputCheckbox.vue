@@ -23,7 +23,7 @@
           :disabled="disabled"
           :value="item.value"
           :name="groupName"
-          @click="clicked"
+          @click="clicked($event)"
         />
         <label
           :for="`${nbId}-${item.value}`"
@@ -456,8 +456,8 @@ const computedAriaAttrs = computed(() => {
 const startValue = () => {
   currentValue.value = currentOption.value
 }
-const clicked = () => {
-  emit('clicked')
+const clicked = (event) => {
+  emit('clicked', event)
 }
 
 watch(currentOption, (newValue, oldValue) => {

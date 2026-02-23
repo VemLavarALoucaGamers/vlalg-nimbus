@@ -10,7 +10,7 @@
       :id="nbId"
       :class="['nb-reset', 'component', sizeMediaQueryStyle, themeStyle, componentReadonly, inputStyleClass]"
       :style="[componentStyle, inputWidthStyle, borderRadiusStyle]"
-      @click="interacted"
+      @click="interacted($event)"
     >
       <label
         v-if="showLabel"
@@ -1193,8 +1193,8 @@ const formatValueForEmit = (value) => {
   return value
 }
 
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 
 /*

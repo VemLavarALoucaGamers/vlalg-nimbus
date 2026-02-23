@@ -10,7 +10,7 @@
       :id="nbId"
       :class="['nb-reset', 'component', themeStyle, componentReadonly, inputStyleClass]"
       :style="[componentStyle, inputWidthStyle, borderRadiusStyle]"
-      @click="interacted"
+      @click="interacted($event)"
     >
       <label
         v-if="showLabel"
@@ -1044,8 +1044,8 @@ const startValue = () => {
   inputValue.value = inputText.value
 }
 
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 const enterConfirm = () => {
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return

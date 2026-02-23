@@ -923,6 +923,7 @@ const navigateOptionsMultiple = (direction) => {
 
 const toggleDropdown = (event) => {
 	if (!disabled.value) {
+		emit('clicked', event)
 		event.stopPropagation()
 		const wasOpen = isDropdownOpen.value
 		isDropdownOpen.value = !isDropdownOpen.value
@@ -1124,6 +1125,7 @@ const closeDropdownMultiple = () => {
 // Função para toggle do dropdown single select
 const toggleDropdownSingle = (event) => {
 	if (!disabled.value) {
+		emit('clicked', event)
 		event.stopPropagation()
 		const wasOpen = isDropdownOpenSingle.value
 		isDropdownOpenSingle.value = !isDropdownOpenSingle.value
@@ -1233,10 +1235,6 @@ const toggleOption = (value) => {
 
 const onUserChange = (value) => {
 	emit('user-changed', value)
-}
-
-const interacted = () => {
-	emit('clicked')
 }
 
 // Computed para atributos ARIA

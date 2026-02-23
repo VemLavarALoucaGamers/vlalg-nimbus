@@ -21,9 +21,9 @@
 				:aria-haspopup="!showPopupButton && menuItems.length > 0"
 				:aria-expanded="!showPopupButton ? isPopupOpen : undefined"
 				:tabindex="disabled ? -1 : 0"
-				@click.stop="handleMainButtonClick"
-				@keydown.enter.prevent="!disabled && hasTabIndexEnter && handleMainButtonClick()"
-				@keydown.space.prevent="!disabled && hasTabIndexSpace && handleMainButtonClick()"
+				@click.stop="handleMainButtonClick($event)"
+				@keydown.enter.prevent="!disabled && hasTabIndexEnter && handleMainButtonClick($event)"
+				@keydown.space.prevent="!disabled && hasTabIndexSpace && handleMainButtonClick($event)"
 			>
 				<slot name="main-content">{{ mainButtonText }}</slot>
 			</button>
@@ -73,9 +73,9 @@
 					:style="[menuItemStyle]"
 					:disabled="item.disabled || disabled"
 					:tabindex="item.disabled || disabled ? -1 : 0"
-					@click.stop="handleMenuItemClick(item, index)"
-					@keydown.enter.prevent="!item.disabled && !disabled && handleMenuItemClick(item, index)"
-					@keydown.space.prevent="!item.disabled && !disabled && handleMenuItemClick(item, index)"
+					@click.stop="handleMenuItemClick(item, index, $event)"
+					@keydown.enter.prevent="!item.disabled && !disabled && handleMenuItemClick(item, index, $event)"
+					@keydown.space.prevent="!item.disabled && !disabled && handleMenuItemClick(item, index, $event)"
 					@keydown.arrow-up.prevent="handleArrowUp(index)"
 					@keydown.arrow-down.prevent="handleArrowDown(index)"
 					@keydown.escape.prevent="handleEscape"
@@ -710,7 +710,7 @@ const togglePopup = () => {
 	}
 }
 
-const handleMainButtonClick = () => {
+const handleMainButtonClick = (event) => {
 	if (disabled.value) return
 	
 	// Se não mostrar o botão popup e houver itens no menu, abrir o dropdown
@@ -720,13 +720,13 @@ const handleMainButtonClick = () => {
 	}
 	
 	emit('main-clicked')
-	emit('clicked', { type: 'main' })
+	emit('clicked', { type: 'main' }, event)
 }
 
-const handleMenuItemClick = (item, index) => {
+const handleMenuItemClick = (item, index, event) => {
 	if (item.disabled || disabled.value) return
 	emit('menu-item-clicked', { item, index })
-	emit('clicked', { type: 'menu-item', item, index })
+	emit('clicked', { type: 'menu-item', item, index }, event)
 	isPopupOpen.value = false
 	currentFocusedIndex.value = -1
 }

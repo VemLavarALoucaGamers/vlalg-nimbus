@@ -22,7 +22,7 @@
           type="checkbox"
           :disabled="disabled"
           class="component-toggle__checkbox"
-          @change="handleChange"
+          @change="handleChange($event)"
         />
         <div
           :id="`toggle-switch-${nbId}`"
@@ -233,10 +233,10 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-const handleChange = () => {
+const handleChange = (event) => {
   emit('changed', currentStatus.value)
   emit('current-value', currentStatus.value)
-  emit('clicked')
+  emit('clicked', event)
 }
 
 watch(value, (newValue) => {

@@ -3,7 +3,7 @@
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]"
-    @click="interacted"
+    @click="interacted($event)"
   >
     <div
       :id="nbId"
@@ -478,8 +478,8 @@ const inputStyleClass = computed(() => {
 			return 'component__input--background'
 	}
 })
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 
 const handleKeyDown = (event) => {

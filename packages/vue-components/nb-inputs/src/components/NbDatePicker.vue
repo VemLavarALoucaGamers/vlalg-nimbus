@@ -10,7 +10,7 @@
         :id="nbId"
         :class="['nb-reset', 'component', sizeMediaQueryStyle, themeStyle, componentReadonly, inputStyleClass]"
         :style="[componentStyle, inputWidthStyle, borderRadiusStyle]"
-        @click="interacted"
+        @click="interacted($event)"
       >
         <label
           v-if="showLabel"
@@ -2245,8 +2245,8 @@ const Calendar = defineAsyncComponent(() =>
     Esta função é usada para processar quando o usuário interage com o componente.
     Ela emite o evento clicked.
   */
-  const interacted = () => {
-      emit('clicked')
+  const interacted = (event) => {
+      emit('clicked', event)
   }
   /*
     Handler para quando o label é clicado
