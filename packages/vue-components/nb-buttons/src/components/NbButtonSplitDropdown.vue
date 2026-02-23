@@ -17,6 +17,7 @@
 				:class="['split-button__main', { 'split-button__main--disabled': disabled }]"
 				:style="[mainButtonStyle]"
 				:disabled="disabled"
+				:title="title"
 				:aria-label="mainButtonAriaLabel"
 				:aria-haspopup="!showPopupButton && menuItems.length > 0"
 				:aria-expanded="!showPopupButton ? isPopupOpen : undefined"
@@ -158,6 +159,10 @@ const props = defineProps({
 	ariaAttrs: {
 		type: Object,
 		default: () => ({})
+	},
+	title: {
+		type: String,
+		default: ''
 	},
 	menuItemFocusOutlineColor: {
 		type: String,

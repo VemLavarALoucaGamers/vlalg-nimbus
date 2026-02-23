@@ -4,6 +4,7 @@
       :class="['nb-wrapper', componentDisabled]"
       :style="[wrapperStyle, inputWidthStyle, borderRadiusStyle]"
       role="input"
+      :title="title"
       v-bind="computedAriaAttrs"
     >
       <div
@@ -230,6 +231,10 @@ const Calendar = defineAsyncComponent(() =>
     ariaAttrs: {
       type: Object,
       default: () => ({})
+    },
+    title: {
+      type: String,
+      default: ''
     },
       caretColor: {
           type: String,

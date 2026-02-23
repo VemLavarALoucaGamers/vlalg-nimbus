@@ -4,6 +4,7 @@
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle, inputWidthStyle, borderRadiusStyle]"
     role="input"
+    :title="title"
     v-bind="computedAriaAttrs"
   >
     <div
@@ -143,6 +144,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	textColor: { // TESTAR AINDA
 		type: String,

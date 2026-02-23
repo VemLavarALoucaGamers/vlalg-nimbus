@@ -4,6 +4,7 @@
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
     role="button"
+    :title="title"
     v-bind="computedAriaAttrs"
 	>
 		<div
@@ -117,6 +118,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	borderRadius: {
 		type: Number,

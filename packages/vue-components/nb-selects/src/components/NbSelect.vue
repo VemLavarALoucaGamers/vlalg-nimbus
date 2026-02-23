@@ -4,6 +4,7 @@
     ref="wrapperRef"
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle, selectWidthStyle]"
+    :title="title"
     @focusin="handleFocusIn"
     @focusout="handleWrapperFocusOut"
   >
@@ -563,6 +564,10 @@ const props = defineProps({
 	ariaAttrs: {
 		type: Object,
 		default: () => ({})
+	},
+	title: {
+		type: String,
+		default: ''
 	}
 })
 

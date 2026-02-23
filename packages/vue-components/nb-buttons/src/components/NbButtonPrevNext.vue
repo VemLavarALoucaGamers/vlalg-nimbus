@@ -15,6 +15,7 @@
 				:style="previewStyle"
         :tabIndex="tabIndexPrev"
         role="button"
+        :title="titlePrev"
         v-bind="computedAriaAttrsPrev"
 				@click="interacted('preview', $event)"
         @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted('preview', $event)"
@@ -29,6 +30,7 @@
 				:style="nextStyle"
         :tabIndex="tabIndexNext"
         role="button"
+        :title="titleNext"
         v-bind="computedAriaAttrsNext"
         @click="interacted('next', $event)"
         @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted('next', $event)"
@@ -86,6 +88,14 @@ const props = defineProps({
   ariaAttrsNext: {
     type: Object,
     default: () => ({})
+  },
+  titlePrev: {
+    type: String,
+    default: ''
+  },
+  titleNext: {
+    type: String,
+    default: ''
   },
 	theme: {
 		type: String,

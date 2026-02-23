@@ -5,6 +5,7 @@
 		:style="[wrapperStyle]"
     :tabIndex="tabIndex"
     role="button"
+    :title="title"
     v-bind="computedAriaAttrs"
     @click="interacted($event)"
     @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted($event)"
@@ -62,6 +63,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	textColor: {
 		type: String,

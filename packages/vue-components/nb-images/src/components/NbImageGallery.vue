@@ -3,6 +3,7 @@
 		v-if="nbId"
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
+		:title="title"
     v-bind="computedAriaAttrs"
 	>
 		<div
@@ -341,6 +342,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
   imageBackground: { // transparent, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9), #ffffff, #000000
     type: String,

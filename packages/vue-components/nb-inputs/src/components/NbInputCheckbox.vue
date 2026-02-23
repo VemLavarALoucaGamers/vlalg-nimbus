@@ -3,6 +3,7 @@
 		v-if="nbId && validList"
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle, size]"
+		:title="title"
 	>
 		<div
 			:id="nbId"
@@ -94,6 +95,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
   groupName: {
     type: String,

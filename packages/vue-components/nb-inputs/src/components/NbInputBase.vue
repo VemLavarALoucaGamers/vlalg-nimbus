@@ -3,6 +3,7 @@
 		v-if="nbId"
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
+		:title="title"
 	>
 		<div
 			:id="nbId"
@@ -48,6 +49,10 @@ const props = defineProps({
     validator: value => {
       return value.toString().toLowerCase()
     },
+  },
+  title: {
+    type: String,
+    default: ''
   },
   inputValue: {
     type: [String, Number],

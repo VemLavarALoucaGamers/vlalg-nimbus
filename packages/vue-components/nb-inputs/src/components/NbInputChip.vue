@@ -4,6 +4,7 @@
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]"
     role="input"
+    :title="title"
     v-bind="computedAriaAttrs"
     @click="interacted($event)"
   >
@@ -102,6 +103,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	caretColor: {
 		type: String,
