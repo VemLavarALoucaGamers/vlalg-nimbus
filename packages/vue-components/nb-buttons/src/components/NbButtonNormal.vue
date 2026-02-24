@@ -119,6 +119,10 @@ const props = defineProps({
 			return !value ? 200 : value
 		}
 	},
+	lineHeight: {
+		type: Number,
+		default: 1.42857143
+	},
   hasAnimation: {
 		type: Boolean,
 		default: false
@@ -213,6 +217,7 @@ const {
 	fontFamily,
 	fontSize,
   fontWeight,
+	lineHeight,
 	hasAnimation,
 	animationDuration,
 	animationDurationType,
@@ -243,6 +248,7 @@ const formatDefaultValues = computed(() => {
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
   const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
+	const lineHeightValue = ((lineHeight.value !== 0 && !lineHeight.value) || lineHeight.value < 0) ? 1.42857143 : lineHeight.value
   const hasAnimationValue = hasAnimation.value ? 'component-transition' : ''
 	const animationDurationValue = ((animationDuration.value !== 0 && !animationDuration.value) || animationDuration.value < 0) ? 0.3 : animationDuration.value
 	const animationDurationTypeValue = !animationDurationType.value ? 'ms' : animationDurationType.value
@@ -258,6 +264,7 @@ const formatDefaultValues = computed(() => {
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
+		lineHeight: lineHeightValue,
 		hasAnimation: hasAnimationValue,
 		animationDuration: animationDurationValue,
 		animationDurationType: animationDurationTypeValue,
@@ -282,7 +289,7 @@ const componentStyle = computed(() => {
 	return {
 		borderRadius: `${defaultValues.borderRadius}rem`,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
-		lineHeight: '1.42857143',
+		lineHeight: defaultValues.lineHeight,
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight
 	}
@@ -349,7 +356,6 @@ const interacted = (event) => {
   box-sizing: border-box;
   display: inline-block;
 	vertical-align: bottom;
-  margin-bottom: 4px;
 }
 
 .nb-reset {
@@ -376,7 +382,6 @@ const interacted = (event) => {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	line-height: 1.42857143;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -392,9 +397,11 @@ const interacted = (event) => {
 	text-decoration-line: none;
 	white-space: nowrap;
 
-  // Add new properties below
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
   text-transform: none;
-	text-align: center;
 	box-shadow: none;
 	text-decoration: none;
 	outline: none;

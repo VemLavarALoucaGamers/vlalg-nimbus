@@ -131,6 +131,22 @@ const props = defineProps({
 			return !value ? 0.2 : value
 		}
 	},
+	marginTop: {
+		type: Number,
+		default: 0
+	},
+	marginBottom: {
+		type: Number,
+		default: 0
+	},
+	marginRight: {
+		type: Number,
+		default: 0
+	},
+	marginLeft: {
+		type: Number,
+		default: 0
+	},
 	disabled: {
 		type: Boolean,
 		default: false,
@@ -159,6 +175,10 @@ const props = defineProps({
 		validator: value => {
 			return !value ? 200 : value
 		}
+	},
+	lineHeight: {
+		type: Number,
+		default: 1.42857143
 	}
 })
 
@@ -177,11 +197,16 @@ const {
 	darkDisabledBgColor,
 	paddingX,
 	paddingY,
+	marginTop,
+	marginBottom,
+	marginRight,
+	marginLeft,
 	borderRadius,
 	disabled,
 	fontFamily,
 	fontSize,
-	fontWeight
+	fontWeight,
+	lineHeight
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
@@ -189,20 +214,30 @@ const formatDefaultValues = computed(() => {
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
 	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
-	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
+	const marginTopValue = ((marginTop.value !== 0 && !marginTop.value) || marginTop.value < 0) ? 0 : marginTop.value
+	const marginBottomValue = ((marginBottom.value !== 0 && !marginBottom.value) || marginBottom.value < 0) ? 0 : marginBottom.value
+	const marginRightValue = ((marginRight.value !== 0 && !marginRight.value) || marginRight.value < 0) ? 0 : marginRight.value
+	const marginLeftValue = ((marginLeft.value !== 0 && !marginLeft.value) || marginLeft.value < 0) ? 0 : marginLeft.value
+  const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
+	const lineHeightValue = ((lineHeight.value !== 0 && !lineHeight.value) || lineHeight.value < 0) ? 1.42857143 : lineHeight.value
 
 	return {
 		disabled: disabledValue,
 		display: displayValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
+		marginTop: marginTopValue,
+		marginBottom: marginBottomValue,
+		marginRight: marginRightValue,
+		marginLeft: marginLeftValue,
 		borderRadius: borderRadiusValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
-		fontWeight: fontWeightValue
+		fontWeight: fontWeightValue,
+		lineHeight: lineHeightValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -222,7 +257,12 @@ const componentStyle = computed(() => {
 
 	return {
 		fontSize: defaultValues.fontSize,
-		fontWeight: defaultValues.fontWeight
+		fontWeight: defaultValues.fontWeight,
+		lineHeight: defaultValues.lineHeight,
+    marginTop: `${defaultValues.marginTop}px`,
+    marginBottom: `${defaultValues.marginBottom}px`,
+    marginRight: `${defaultValues.marginRight}px`,
+    marginLeft: `${defaultValues.marginLeft}px`,
 	}
 })
 const borderStyle = computed(() => {
@@ -301,7 +341,6 @@ const interacted = (event) => {
 	font-family: 'Lato', sans-serif;
 	font-style: normal;
 	font-weight: light;
-	line-height: 1.42857143;
 
 	* {
 		margin: 0;
@@ -320,7 +359,6 @@ const interacted = (event) => {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	line-height: 1.42857143;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -336,19 +374,23 @@ const interacted = (event) => {
 	text-decoration-line: none;
 	white-space: nowrap;
 
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
 	letter-spacing: 1px;
 	outline: 0;
 	position: relative;
-
-	margin-top: 4px;
-	margin-bottom: 10px;
-	margin-right: 6px;
 
 	.component-content {
 		position: relative;
 		z-index: 4;
 		overflow: hidden;
 		background-color: transparent;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.component-shadow {

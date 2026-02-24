@@ -144,6 +144,10 @@ const props = defineProps({
 		validator: value => {
 			return !value ? 200 : value
 		}
+	},
+	lineHeight: {
+		type: Number,
+		default: 1.42857143
 	}
 })
 
@@ -164,7 +168,8 @@ const {
 	disabled,
 	fontFamily,
 	fontSize,
-  fontWeight
+  fontWeight,
+	lineHeight
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
@@ -183,6 +188,7 @@ const formatDefaultValues = computed(() => {
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
   const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
+	const lineHeightValue = ((lineHeight.value !== 0 && !lineHeight.value) || lineHeight.value < 0) ? 1.42857143 : lineHeight.value
 
 	return {
 		disabled: disabledValue,
@@ -199,7 +205,8 @@ const formatDefaultValues = computed(() => {
 		paddingY: paddingYValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
-		fontWeight: fontWeightValue
+		fontWeight: fontWeightValue,
+		lineHeight: lineHeightValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -229,7 +236,7 @@ const componentStyle = computed(() => {
 		minWidth: '33px',
 		width: newWidth,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
-		lineHeight: '1.42857143',
+		lineHeight: defaultValues.lineHeight,
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight
 	}
@@ -324,7 +331,6 @@ const interacted = (event) => {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	line-height: 1.42857143;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -340,7 +346,9 @@ const interacted = (event) => {
 	text-decoration-line: none;
 	white-space: nowrap;
 
-  // Add new properties below
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .component-disabled {

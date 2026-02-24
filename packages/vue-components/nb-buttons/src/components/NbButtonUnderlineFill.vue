@@ -158,6 +158,10 @@ const props = defineProps({
 			return !value ? 200 : value
 		}
 	},
+	lineHeight: {
+		type: Number,
+		default: 1.42857143
+	},
 	textAlign: {
 		type: String,
 		default: 'middle',
@@ -188,6 +192,7 @@ const {
 	fontFamily,
 	fontSize,
   fontWeight,
+	lineHeight,
 	textAlign
 } = toRefs(props)
 
@@ -199,6 +204,7 @@ const formatDefaultValues = computed(() => {
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
   const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
+	const lineHeightValue = ((lineHeight.value !== 0 && !lineHeight.value) || lineHeight.value < 0) ? 1.42857143 : lineHeight.value
 	const textAlignValue = !textAlign.value ? 'center' : textAlign.value
 
 	return {
@@ -209,6 +215,7 @@ const formatDefaultValues = computed(() => {
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
+		lineHeight: lineHeightValue,
 		textAlign: textAlignValue
 	}
 })
@@ -230,7 +237,7 @@ const componentStyle = computed(() => {
 
 	return {
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
-		lineHeight: '1.42857143',
+		lineHeight: defaultValues.lineHeight,
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight
 	}
@@ -328,7 +335,6 @@ const interacted = (event) => {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	line-height: 1.42857143;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -343,8 +349,10 @@ const interacted = (event) => {
 	text-decoration-line: none;
 	white-space: nowrap;
 
-  // Add new properties below
-  margin-bottom: 3px; // reset vertical align
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
   overflow: hidden;
 
   transition: background 300ms ease-in-out 0s, color 300ms ease-in-out 0s;
