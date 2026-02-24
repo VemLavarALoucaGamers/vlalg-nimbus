@@ -743,7 +743,8 @@ const wrapperStyle = computed(() => {
     // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
     paddingTop: '0px',
 		// Esconde o label quando não está ativo usando overflow hidden
-		overflow: isActive && showLabel.value ? 'visible' : 'hidden'
+		// Se não tem label ou está ativo, permite overflow visible para não cortar conteúdo
+		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden'
 	}
 })
 const fontSizeStyle = computed(() => {
