@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-pagination",
   "description": "Pagination components for Vuejs 3",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "type": "module",
   "main": "./dist/nb-pagination.umd.js",
   "module": "./dist/nb-pagination.js",
