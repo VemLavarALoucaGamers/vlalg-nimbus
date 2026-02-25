@@ -220,6 +220,119 @@
 				class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
 				style="margin-top: 50px; margin-bottom: 50px; overflow: visible;"
 			>
+
+        <h4 class="test-page__content-tile">NbSelect - hasGroups</h4>
+        <div style="width: 100%; margin-bottom: 30px;">
+					<NbSelect
+						nb-id="select-has-groups"
+						select-name="select-has-groups"
+						theme="light"
+						:options="[
+              { value: 1, text: 'Opção 1', group: 'Grupo A' },
+              { value: 2, text: 'Opção 2', group: 'Grupo A' },
+              { value: 3, text: 'Opção 3', group: 'Grupo B' }
+            ]"
+            group-key="group"
+            :has-groups="true"
+            :selected-option-only="selectedValue"
+						:has-filter="true"
+            :group-collapsible="true"
+            @changed="($event) => { selectedValue = $event; console.log('changed', $event) }"
+            @changed-complete="($event) => console.log('changed-complete', $event)"
+            @user-changed="($event) => console.log('user-changed', $event)"
+            @user-changed-complete="($event) => console.log('user-changed-complete', $event)"
+            @focused="() => console.log('focused')"
+            @blurred="() => console.log('blurred')"
+					/>
+
+          <br />
+
+          <NbSelect
+						nb-id="select-has-groups"
+						select-name="select-has-groups"
+						theme="light"
+						:options="[
+              { value: 1, text: 'Opção 1', group: 'Grupo A' },
+              { value: 2, text: 'Opção 2', group: 'Grupo A' },
+              { value: 3, text: 'Opção 3', group: 'Grupo B' }
+            ]"
+            group-key="group"
+            :has-groups="true"
+            :multiple="true"
+            :selected-option-multiple="selectedMultipleGroups"
+						:has-filter="true"
+            :group-collapsible="true"
+            @changed="($event) => { selectedMultipleGroups = $event; console.log('changed', $event) }"
+            @changed-complete="($event) => console.log('changed-complete', $event)"
+            @user-changed="($event) => console.log('user-changed', $event)"
+            @user-changed-complete="($event) => console.log('user-changed-complete', $event)"
+            @focused="() => console.log('focused')"
+            @blurred="() => console.log('blurred')"
+					/>
+				</div>
+
+        <h4 class="test-page__content-tile">NbSelect - hasFilter</h4>
+
+				<div style="width: 100%; margin-bottom: 30px;">
+					<NbSelect
+						nb-id="select-has-filter"
+						select-name="select-has-filter"
+						theme="light"
+						:options="selectOptions"
+						:has-filter="true"
+						filter-placeholder="Filtrar..."
+					/>
+          <br />
+					<NbSelect
+						nb-id="select-has-filter-dark"
+						select-name="select-has-filter-dark"
+						theme="dark"
+						:options="selectOptions"
+						:has-filter="true"
+						filter-placeholder="Filtrar..."
+					/>
+          <br />
+          <NbSelect
+						nb-id="select-light-2"
+						select-name="select-light-2"
+						theme="light"
+						:options="selectOptions"
+						:selected-option-only="selectedValue2"
+						:has-filter="true"
+						light-bg-color="#dbeafe"
+						light-bg-color-focus="#bfdbfe"
+						light-border-color="#93c5fd"
+						light-border-color-focus="#60a5fa"
+						light-text-color="#1e40af"
+						light-placeholder-color="#64748b"
+						light-option-text-color="#1e40af"
+						light-option-text-color-selected="#ffffff"
+						light-option-bg-color-selected="#3b82f6"
+						light-filter-text-color="#1e40af"
+						light-empty-text-color="#64748b"
+						light-filter-wrap-border-color="#353734"
+						light-filter-input-border-color="#353734"
+						:border-radius="0.375"
+					/>
+				</div>
+
+        <h4 class="test-page__content-tile">NbSelect - max-height</h4>
+
+				<div style="width: 100%; margin-bottom: 30px;">
+					<NbSelect
+						nb-id="select-max-height"
+						select-name="select-max-height"
+						theme="light"
+						:options="selectOptions"
+						:selected-option-only="selectedValue"
+            :max-height="200"
+						@changed="($event) => { selectedValue = $event; console.log('changed', $event) }"
+						@user-changed="($event) => console.log('user-changed', $event)"
+            @focused="() => console.log('focused')"
+            @blurred="() => console.log('blurred')"
+					/>
+				</div>
+
 				<h4 class="test-page__content-tile">NbSelect - Light Theme</h4>
 
 				<div style="width: 100%; margin-bottom: 30px;">
@@ -621,6 +734,7 @@ const selectedValue4 = ref('option4')
 const selectedValue5 = ref('option1')
 const selectedMultiple = ref(['option1', 'option2'])
 const selectedMultiple2 = ref(['option3'])
+const selectedMultipleGroups = ref([1])
 
 const toggleValue1 = ref(false)
 const toggleValue2 = ref(true)
