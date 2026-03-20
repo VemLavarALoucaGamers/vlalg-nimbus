@@ -37,6 +37,16 @@ const calendarAliasPlugin = () => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  /** Proxy para `npm run dev:upload-server` — evita CORS no demo (NbFileUpload). */
+  server: {
+    proxy: {
+      '/__nb-upload': {
+        target: 'http://127.0.0.1:8787',
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/__nb-upload/, ''),
+      },
+    },
+  },
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/install.js'),

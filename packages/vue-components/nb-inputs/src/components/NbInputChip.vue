@@ -885,19 +885,31 @@ const handleKeyDown = (event) => {
 }
 const addChip = (text) => {
   chipList.value.push(text);
-  emit('added', text);
+  emit('added', {
+    chip: text,
+    index: chipList.value.indexOf(text),
+    list: chipList.value,
+  });
 }
 const removeChip = (chip) => {
   chipList.value = chipList.value.filter(chipItem => chipItem !== chip);
-  emit('removed', chip);
+  emit('removed', {
+    chip: chip,
+    index: chipList.value.indexOf(chip),
+    list: chipList.value,
+  });
 }
 
 watch(currentList, (newList) => {
   chipList.value = newList;
-  emit('changed', newList);
+  emit('changed', {
+    list: newList,
+  });
 })
 watch(chipInputValue, (newValue) => {
-  emit('input-changed', newValue);
+  emit('input-changed', {
+    value: newValue,
+  });
 })
 </script>
 

@@ -18,6 +18,8 @@
           <option value="inputChip">inputChip</option>
           <option value="textarea">textarea</option>
           <option value="datePicker">datePicker</option>
+          <option value="clean">clean</option>
+          <option value="file">file</option>
         </select>
       </div>
     </div>
@@ -218,7 +220,10 @@
           selection-bg-color="magenta"
           selection-text-color="yellow"
           :has-icon="true"
+          icon-direction="left"
           :block-paste="true"
+          show-label
+          label="Test input"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -636,6 +641,712 @@
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
           @removed="($event) => console.log('removed', $event)"
+        />
+      </div>
+    </div>
+
+    <div v-if="btType === 'clean'" class="row" style="background-color: #d5d0fd;">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px;">
+        <h4 class="test-page__content-tile">NbInput</h4>
+        
+        <NbInputClean
+          nb-id="test1"
+          display="b"
+          input-name="test-input1"
+          input-type="text"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test input"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          :has-icon="true"
+          :block-paste="false"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+          @paste="($event) => console.log('paste', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInputClean>
+
+        <NbInputClean
+          nb-id="test2"
+          display="b"
+          input-style="border"
+          input-name="test-input2"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test input"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          :has-icon="true"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInputClean>
+        
+        <NbInputClean
+          nb-id="test3"
+          display="b"
+          input-style="line"
+          input-name="test-input3"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test input"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          :has-icon="true"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInputClean>
+
+        <h4 class="test-page__content-tile" style="margin-top: 40px;">NbInput com Label (handleLabelClick)</h4>
+        <p style="margin-top: 10px; margin-bottom: 10px;">
+          Clique no label para focar o input. O evento não será capturado pelo @click="interacted" do elemento pai.
+        </p>
+        <NbInputClean
+          nb-id="test-label-1"
+          display="b"
+          input-name="test-input-label"
+          input-type="text"
+          :show-label="true"
+          label="Nome completo"
+          :required="true"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Input com label"
+          @clicked="() => console.log('clicked - não deve aparecer ao clicar no label')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInputClean>
+
+        <p style="margin-top: 4px;">
+          Text before
+          <NbInputClean
+            nb-id="test4"
+            display="ib"
+            :show-label="true"
+            label="Este é um label gigante para ver se sai para fora do componente"
+            @current-value="($event) => console.log($event)"
+          />
+          text after
+        </p>
+
+        <br /><br />
+
+        <NbInputClean
+          nb-id="test1"
+          input-name="test-input4"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="background"
+        />
+        <NbInputClean
+          nb-id="test1"
+          input-name="test-input5"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="border"
+        />
+        <NbInputClean
+          nb-id="test1"
+          input-name="test-input6"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="line"
+        />
+
+        <br /><br />
+
+        <NbInputClean
+          nb-id="test1"
+          input-name="test-input7"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="background"
+          theme="dark"
+        />
+        <NbInputClean
+          nb-id="test1"
+          input-name="test-input8"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="border"
+          theme="dark"
+        />
+        <NbInputClean
+          nb-id="test1"
+          input-name="test-input9"
+          display="b"
+          show-label
+          label="Test label"
+          input-style="line"
+          theme="dark"
+        />
+      </div>
+    </div>
+
+    <div v-if="btType === 'file'" class="row" style="background-color: #d5d0fd;">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px;">
+        <div
+          style="background: #e8f4fc; border: 1px solid #7ec8e3; border-radius: 8px; padding: 16px; margin-bottom: 28px; color: #0d3d4d;"
+        >
+          <h4 class="test-page__content-tile" style="margin-top: 0; color: #000;">
+            NbInputFile + NbFileUpload (XHR, %, uploads paralelos)
+          </h4>
+          <p style="margin: 0 0 12px; font-size: 0.95em; line-height: 1.45;">
+            <strong>Como testar o upload:</strong> noutro terminal, nesta pasta (<code>packages/vue-components/nb-inputs</code>), execute
+            <code style="background:#fff;padding:2px 6px;border-radius:4px;">npm run dev:upload-server</code>.
+            O Vite (dev) faz proxy de
+            <code>/__nb-upload</code>
+            → <code>http://127.0.0.1:8787</code>. Ficheiros guardados em
+            <code>.uploads-dev/</code>.
+          </p>
+          <p style="margin: 0 0 12px; font-size: 0.88em; line-height: 1.45; opacity: 0.92;">
+            <strong>Explicação simples (<code>:key</code> e <code>@update:files</code>)</strong><br />
+            Imagina <strong>duas gavetas</strong>: uma é o <strong>botão de escolher ficheiros</strong> (<code>NbInputFile</code>), outra é a <strong>lista para enviar</strong> (<code>NbFileUpload</code>).
+            O que escolhes na primeira é <strong>copiado</strong> para a segunda (<code>uploadDemoFiles</code>). Se na segunda apagas tudo com «Limpar tudo», a cópia fica vazia — mas a primeira gaveta podia continuar a <strong>mostrar</strong> os nomes antigos, porque não sabe que apagaste.
+            O <code>@update:files</code> avisa o ecrã: «a lista oficial agora é esta». O <code>:key</code> que muda é como <strong>trocar a gaveta inteira</strong>: o Vue recria o botão de escolher, e a lista mostrada fica igual à lista real (vazia ou não).
+          </p>{{uploadDemoPickerKey}}
+          <NbInputFile
+            :key="uploadDemoPickerKey"
+            nb-id="file-upload-demo-picker"
+            display="b"
+            input-name="file-upload-demo-picker"
+            input-style="background"
+            :show-label="true"
+            label="Escolha ficheiros para enviar"
+            :multiple="true"
+            :max-files="8"
+            file-extension="image/*,.pdf,.txt"
+            :max-file-size-bytes="15 * 1024 * 1024"
+            :show-constraints-text="true"
+            multiple-files-selected-text="ficheiros"
+            aria-label="Demo picker + upload"
+            @changed="setUploadDemoFiles"
+            @validation-error="({ message }) => console.warn('[upload demo]', message)"
+          />
+          <p style="margin: 0 0 8px; font-size: 0.88em; opacity: 0.95;">
+            <code>min-progress-display-ms</code> anima a barra com ficheiros pequenos (o XHR muitas vezes só dispara 0→100).
+            Upload sequencial: <code>:concurrent="1"</code>.
+          </p>
+          <div style="margin-top: 16px;">
+            <!-- NbFileUpload after-upload-mode: default | clear-on-success | lock-until-clear-all -->
+            <NbFileUpload
+              nb-id="file-upload-demo-queue"
+              :files="uploadDemoFiles"
+              :upload-url="uploadDemoUploadUrl"
+              :concurrent="2"
+              :max-retries="1"
+              :min-progress-display-ms="1200"
+              after-upload-mode="lock-until-clear-all"
+              :reupload-on-start="true"
+              :show-start-button="true"
+              :show-cancel-all="true"
+              :auto-start="false"
+              @update:files="onUploadDemoQueueFiles"
+              @upload-progress="(p) => console.log('[upload demo] progress', p)"
+              @upload-complete="(p) => console.log('[upload demo] complete', p)"
+              @upload-error="(p) => console.warn('[upload demo] error', p)"
+              @upload-all-complete="(p) => console.log('[upload demo] batch', p)"
+            />
+          </div>
+        </div>
+
+        <h4 class="test-page__content-tile" style="color: #000;">NbInputFile - Single (background / border / line)</h4>
+
+        <NbInputFile
+          nb-id="file-single-bg"
+          display="b"
+          input-name="file-single-bg"
+          input-style="background"
+          :show-label="true"
+          label="Single - background"
+          file-extension=".png,.jpg,.jpeg"
+          :max-file-size-bytes="2 * 1024 * 1024"
+          :show-constraints-text="true"
+          aria-label="File single background"
+          @clicked="() => console.log('file-single-bg clicked')"
+          @current-value="($event) => console.log('file-single-bg current-value', $event)"
+          @changed="($event) => console.log('file-single-bg changed', $event)"
+          @focused="() => console.log('file-single-bg focused')"
+          @blurred="() => console.log('file-single-bg blurred')"
+        />
+
+        <NbInputFile
+          nb-id="file-single-border"
+          display="b"
+          input-name="file-single-border"
+          input-style="border"
+          :show-label="true"
+          label="Single - border"
+          file-extension=".pdf,.doc,.docx"
+          :max-file-size-bytes="5 * 1024 * 1024"
+          :show-constraints-text="true"
+          aria-label="File single border"
+          @current-value="($event) => console.log('file-single-border current-value', $event)"
+          @changed="($event) => console.log('file-single-border changed', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-single-line"
+          display="b"
+          input-name="file-single-line"
+          input-style="line"
+          :show-label="true"
+          label="Single - line"
+          file-extension="image/*"
+          :max-file-size-bytes="10 * 1024 * 1024"
+          :show-constraints-text="true"
+          aria-label="File single line"
+          @current-value="($event) => console.log('file-single-line current-value', $event)"
+          @changed="($event) => console.log('file-single-line changed', $event)"
+        />
+
+        <h4 class="test-page__content-tile" style="margin-top: 24px; color: #000;">NbInputFile - Single without label</h4>
+
+        <NbInputFile
+          nb-id="file-single-nolabel-bg"
+          display="b"
+          input-name="file-single-nolabel-bg"
+          input-style="background"
+          file-extension=".png,.jpg,.jpeg"
+          :max-file-size-bytes="2 * 1024 * 1024"
+          :show-constraints-text="true"
+          input-placeholder="Single (no label) - background"
+          aria-label="File single no label background"
+          @current-value="($event) => console.log('file-single-nolabel-bg current-value', $event)"
+          @changed="($event) => console.log('file-single-nolabel-bg changed', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-single-nolabel-border"
+          display="b"
+          input-name="file-single-nolabel-border"
+          input-style="border"
+          file-extension=".pdf,.doc,.docx"
+          :max-file-size-bytes="5 * 1024 * 1024"
+          :show-constraints-text="true"
+          input-placeholder="Single (no label) - border"
+          aria-label="File single no label border"
+          @current-value="($event) => console.log('file-single-nolabel-border current-value', $event)"
+          @changed="($event) => console.log('file-single-nolabel-border changed', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-single-nolabel-line"
+          display="b"
+          input-name="file-single-nolabel-line"
+          input-style="line"
+          file-extension="image/*"
+          :max-file-size-bytes="10 * 1024 * 1024"
+          :show-constraints-text="true"
+          input-placeholder="Single (no label) - line"
+          aria-label="File single no label line"
+          @current-value="($event) => console.log('file-single-nolabel-line current-value', $event)"
+          @changed="($event) => console.log('file-single-nolabel-line changed', $event)"
+        />
+
+        <h4 class="test-page__content-tile" style="margin-top: 40px; color: #000;">NbInputFile - Multiple (background / border / line)</h4>
+
+        <NbInputFile
+          nb-id="file-multi-bg"
+          display="b"
+          input-name="file-multi-bg"
+          input-style="background"
+          :show-label="true"
+          label="Multiple - background"
+          :multiple="true"
+          :max-files="2"
+          file-extension=".png,.jpg,.jpeg"
+          :max-file-size-bytes="3 * 1024 * 1024"
+          multiple-files-selected-text="arquivos selecionados"
+          :show-constraints-text="true"
+          aria-label="File multiple background"
+          @current-value="($event) => console.log('file-multi-bg current-value', $event)"
+          @changed="($event) => console.log('file-multi-bg changed', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-multi-border"
+          display="b"
+          input-name="file-multi-border"
+          input-style="border"
+          :show-label="true"
+          label="Multiple - border"
+          :multiple="true"
+          :max-files="5"
+          file-extension=".pdf,.zip,.rar"
+          :max-file-size-bytes="8 * 1024 * 1024"
+          multiple-files-selected-text="arquivos selecionados"
+          :show-constraints-text="true"
+          aria-label="File multiple border"
+          @current-value="($event) => console.log('file-multi-border current-value', $event)"
+          @changed="($event) => console.log('file-multi-border changed', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-multi-line"
+          display="b"
+          input-name="file-multi-line"
+          input-style="line"
+          :show-label="true"
+          label="Multiple - line"
+          :multiple="true"
+          :max-files="null"
+          file-extension="image/*"
+          :max-file-size-bytes="5 * 1024 * 1024"
+          multiple-files-selected-text="arquivos selecionados"
+          :show-constraints-text="true"
+          aria-label="File multiple line"
+          @current-value="($event) => console.log('file-multi-line current-value', $event)"
+          @changed="($event) => console.log('file-multi-line changed', $event)"
+        />
+
+        <h4 class="test-page__content-tile" style="margin-top: 24px; color: #000;">NbInputFile - Multiple without label</h4>
+
+        <NbInputFile
+          nb-id="file-multi-nolabel-bg"
+          display="b"
+          input-name="file-multi-nolabel-bg"
+          input-style="background"
+          :multiple="true"
+          :max-files="3"
+          file-extension=".png,.jpg,.jpeg"
+          :max-file-size-bytes="3 * 1024 * 1024"
+          multiple-files-selected-text="arquivos selecionados"
+          :show-constraints-text="true"
+          input-placeholder="Multiple (no label) - background"
+          aria-label="File multiple no label background"
+          @current-value="($event) => console.log('file-multi-nolabel-bg current-value', $event)"
+          @changed="($event) => console.log('file-multi-nolabel-bg changed', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-multi-nolabel-border"
+          display="b"
+          input-name="file-multi-nolabel-border"
+          input-style="border"
+          :multiple="true"
+          :max-files="5"
+          file-extension=".pdf,.zip,.rar"
+          :max-file-size-bytes="8 * 1024 * 1024"
+          multiple-files-selected-text="arquivos selecionados"
+          :show-constraints-text="true"
+          input-placeholder="Multiple (no label) - border"
+          aria-label="File multiple no label border"
+          @current-value="($event) => console.log('file-multi-nolabel-border current-value', $event)"
+          @changed="($event) => console.log('file-multi-nolabel-border changed', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-multi-nolabel-line"
+          display="b"
+          input-name="file-multi-nolabel-line"
+          input-style="line"
+          :multiple="true"
+          :max-files="null"
+          file-extension="image/*"
+          :max-file-size-bytes="5 * 1024 * 1024"
+          multiple-files-selected-text="arquivos selecionados"
+          :show-constraints-text="true"
+          input-placeholder="Multiple (no label) - line"
+          aria-label="File multiple no label line"
+          @current-value="($event) => console.log('file-multi-nolabel-line current-value', $event)"
+          @changed="($event) => console.log('file-multi-nolabel-line changed', $event)"
+        />
+
+        <h4 class="test-page__content-tile" style="margin-top: 40px; color: #000;">NbInputFile - Imagens (preview)</h4>
+
+        <NbInputFile
+          nb-id="upload-1"
+          input-name="upload-1"
+          input-style="line"
+          :multiple="true"
+          file-extension="image/*"
+          :max-files="5"
+          :max-file-size-bytes="5 * 1024 * 1024"
+          :show-label="true"
+          label="Upload images"
+          @changed="onFilesChanged"
+        />
+        <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
+          <img
+            v-for="(src, i) in imagePreviews"
+            :key="i"
+            :src="src"
+            alt="Preview"
+            style="width:120px; height:120px; object-fit:cover; border-radius:8px;"
+          />
+        </div>
+
+        <h4 class="test-page__content-tile" style="margin-top: 40px; color: #000;">NbInputFile - Icon</h4>
+
+        <p style="margin: 12px 0 8px; color: #000; font-weight: 600;">ícone à esquerda (padrão) — slot customizado</p>
+        <NbInputFile
+          nb-id="file-icon-left-slot"
+          display="b"
+          input-name="file-icon-left-slot"
+          input-style="background"
+          :has-icon="true"
+          icon-direction="left"
+          :icon-padding-input="40"
+          :show-label="true"
+          label="Anexo (ícone esquerda)"
+          file-extension=".pdf,.png"
+          :max-file-size-bytes="4 * 1024 * 1024"
+          :show-constraints-text="false"
+          aria-label="File with icon left"
+          @current-value="($event) => console.log('file-icon-left', $event)"
+          @changed="($event) => console.log('file-icon-left changed', $event)"
+        >
+          <template #icon>
+            <span style="font-size: 1.15rem;" aria-hidden="true">📎</span>
+          </template>
+        </NbInputFile>
+
+        <p style="margin: 20px 0 8px; color: #000; font-weight: 600;">ícone à direita — slot customizado</p>
+        <NbInputFile
+          nb-id="file-icon-right-slot"
+          display="b"
+          input-name="file-icon-right-slot"
+          input-style="border"
+          :has-icon="true"
+          icon-direction="right"
+          :icon-padding-input="40"
+          :show-label="true"
+          label="Upload (ícone direita)"
+          file-extension="image/*"
+          :max-file-size-bytes="3 * 1024 * 1024"
+          :show-constraints-text="false"
+          aria-label="File with icon right"
+          @current-value="($event) => console.log('file-icon-right', $event)"
+          @changed="($event) => console.log('file-icon-right changed', $event)"
+        >
+          <template #icon>
+            <span style="font-size: 1.15rem;" aria-hidden="true">🖼️</span>
+          </template>
+        </NbInputFile>
+
+        <p style="margin: 20px 0 8px; color: #000; font-weight: 600;">ícone padrão do componente (slot não preenchido — coração)</p>
+        <NbInputFile
+          nb-id="file-icon-default-slot"
+          display="b"
+          input-name="file-icon-default-slot"
+          input-style="line"
+          :has-icon="true"
+          icon-direction="left"
+          :show-label="false"
+          input-placeholder="Linha com ícone padrão"
+          file-extension=".txt,.csv"
+          :max-file-size-bytes="1024 * 1024"
+          :show-constraints-text="false"
+          aria-label="File default icon slot"
+          @current-value="($event) => console.log('file-icon-default', $event)"
+          @changed="($event) => console.log('file-icon-default changed', $event)"
+        />
+
+        <p style="margin: 20px 0 8px; color: #000; font-weight: 600;">ícone maior (<code>icon-size</code> / <code>icon-width</code>)</p>
+        <NbInputFile
+          nb-id="file-icon-large"
+          display="b"
+          input-name="file-icon-large"
+          input-style="background"
+          :has-icon="true"
+          icon-direction="left"
+          :icon-size="1.35"
+          :icon-width="40"
+          :icon-padding-input="48"
+          :show-label="true"
+          label="Ícone grande"
+          file-extension=".zip,.rar"
+          :max-file-size-bytes="20 * 1024 * 1024"
+          :show-constraints-text="false"
+          aria-label="File large icon"
+          @current-value="($event) => console.log('file-icon-large', $event)"
+          @changed="($event) => console.log('file-icon-large changed', $event)"
+        >
+          <template #icon>
+            <span style="font-size: 4rem;" aria-hidden="true">📦</span>
+          </template>
+        </NbInputFile>
+
+        <h4 class="test-page__content-tile" style="margin-top: 40px; color: #000;">
+          NbInputFile — validação (accept + allowedExtensions, duplicatas, contador, GIF, vídeo)
+        </h4>
+
+        <p style="margin: 8px 0; color: #333; font-size: 0.95em;">
+          <code>accept</code> amplo (<code>image/*</code>) mas <code>allowed-extensions</code> só PNG/JPG — JPEG/TIFF que passam no input podem falhar na lista explícita.
+        </p>
+        <NbInputFile
+          nb-id="file-allowed-ext"
+          display="b"
+          input-name="file-allowed-ext"
+          input-style="border"
+          :show-label="true"
+          label="image/* + allowedExtensions [.png, .jpg]"
+          file-extension="image/*"
+          :allowed-extensions="['.png', '.jpg']"
+          :max-file-size-bytes="6 * 1024 * 1024"
+          :multiple="true"
+          :max-files="4"
+          :show-files-counter="true"
+          :show-constraints-text="true"
+          multiple-files-selected-text="files"
+          aria-label="Allowed extensions demo"
+          @changed="($event) => console.log('file-allowed-ext', $event)"
+        />
+
+        <p style="margin: 20px 0 8px; color: #333; font-size: 0.95em;">
+          <code>allow-duplicates</code> — o mesmo arquivo (nome+tamanho) pode ser adicionado de novo.
+        </p>
+        <NbInputFile
+          nb-id="file-allow-dup"
+          display="b"
+          input-name="file-allow-dup"
+          input-style="background"
+          :show-label="true"
+          label="Permite duplicatas (nome + tamanho)"
+          file-extension=".txt,.md,.json"
+          :allow-duplicates="true"
+          :max-file-size-bytes="512 * 1024"
+          :multiple="true"
+          :max-files="6"
+          :show-files-counter="true"
+          :show-constraints-text="true"
+          multiple-files-selected-text="files"
+          aria-label="Allow duplicates demo"
+          @changed="($event) => console.log('file-allow-dup', $event)"
+        />
+
+        <p style="margin: 20px 0 8px; color: #333; font-size: 0.95em;">
+          Sem duplicatas (padrão) + contador desligado — <code>:show-files-counter="false"</code>.
+        </p>
+        <NbInputFile
+          nb-id="file-no-counter"
+          display="b"
+          input-name="file-no-counter"
+          input-style="line"
+          :show-label="true"
+          label="Máx. 3 PDFs, sem contador visível"
+          file-extension="application/pdf,.pdf"
+          :allow-duplicates="false"
+          :multiple="true"
+          :max-files="3"
+          :show-files-counter="false"
+          :max-file-size-bytes="4 * 1024 * 1024"
+          :show-constraints-text="true"
+          multiple-files-selected-text="PDFs"
+          aria-label="No file counter demo"
+          @changed="($event) => console.log('file-no-counter', $event)"
+        />
+
+        <p style="margin: 20px 0 8px; color: #333; font-size: 0.95em;">
+          GIF — só dimensões listadas (pares <code>gif-width[i]</code> × <code>gif-height[i]</code>), ex.: 800×600 ou 400×300.
+        </p>
+        <NbInputFile
+          nb-id="file-gif-dims"
+          display="b"
+          input-name="file-gif-dims"
+          input-style="border"
+          :show-label="true"
+          label="GIF estrito (800×600 ou 400×300)"
+          file-extension="image/gif,.gif"
+          :gif-width="[800, 400]"
+          :gif-height="[600, 300]"
+          :max-file-size-bytes="15 * 1024 * 1024"
+          :multiple="false"
+          :show-constraints-text="true"
+          aria-label="GIF dimensions demo"
+          @changed="($event) => console.log('file-gif-dims', $event)"
+        />
+
+        <p style="margin: 20px 0 8px; color: #333; font-size: 0.95em;">
+          Vídeo — proporção <code>16:9</code> e duração máx. 60s (tolerância de aspecto padrão 0,01).
+        </p>
+        <NbInputFile
+          nb-id="file-video-rules"
+          display="b"
+          input-name="file-video-rules"
+          input-style="background"
+          :show-label="true"
+          label="MP4/WebM 16:9, até 60s"
+          file-extension="video/mp4,video/webm,.mp4,.webm"
+          video-ratio="16:9"
+          :video-max-duration="60"
+          :video-aspect-tolerance="0.02"
+          :max-file-size-bytes="80 * 1024 * 1024"
+          :multiple="false"
+          :show-constraints-text="true"
+          aria-label="Video rules demo"
+          @changed="($event) => console.log('file-video-rules', $event)"
+        />
+
+        <p style="margin: 20px 0 8px; color: #333; font-size: 0.95em;">
+          Arquivo pequeno + muitos slots — teste de limite e mensagens (<code>max-files</code> 8, 500 KB cada).
+        </p>
+        <NbInputFile
+          nb-id="file-tiny-multi"
+          display="b"
+          input-name="file-tiny-multi"
+          input-style="line"
+          :show-label="true"
+          label="Até 8 arquivos, 500 KB cada"
+          file-extension="text/plain,.txt,.csv,.json"
+          :multiple="true"
+          :max-files="8"
+          :max-file-size-bytes="500 * 1024"
+          :show-files-counter="true"
+          :show-constraints-text="true"
+          multiple-files-selected-text="items"
+          aria-label="Tiny multi file demo"
+          @changed="($event) => console.log('file-tiny-multi', $event)"
         />
       </div>
     </div>
@@ -2299,8 +3010,11 @@ const NbInput = defineAsyncComponent(() => import('@components/NbInput.vue'))
 const NbInputChip = defineAsyncComponent(() => import('@components/NbInputChip.vue'))
 const NbTextarea = defineAsyncComponent(() => import('@components/NbTextarea.vue'))
 const NbDatePicker = defineAsyncComponent(() => import('@components/NbDatePicker.vue'))
+const NbInputClean = defineAsyncComponent(() => import('@components/NbInputClean.vue'))
+const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.vue'))
+const NbFileUpload = defineAsyncComponent(() => import('@components/NbFileUpload.vue'))
 
-const btType = ref('datePicker')
+const btType = ref('file')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
@@ -2330,6 +3044,26 @@ const testValidationIsValid = ref(true)
 const testValidationInputType = ref('date')
 const testValidationMin = ref('')
 const testValidationMax = ref('')
+
+const selectedFiles = ref([])
+const imagePreviews = ref([])
+
+/** Demo NbInputFile → NbFileUpload — mesmo origin via proxy Vite (`vite.config.js`). */
+const uploadDemoFiles = ref([])
+const uploadDemoUploadUrl = '/__nb-upload/upload'
+const uploadDemoPickerKey = ref(0)
+
+const setUploadDemoFiles = (files) => {
+  uploadDemoFiles.value = Array.isArray(files) ? files : []
+}
+
+/** Sincroniza a fila com o pai; “limpar tudo” reinicia o picker (`:key`). */
+const onUploadDemoQueueFiles = (files) => {
+  uploadDemoFiles.value = Array.isArray(files) ? files : []
+  if (uploadDemoFiles.value.length === 0) {
+    uploadDemoPickerKey.value += 1
+  }
+}
 
 // Handler para evento @valid
 const handleValidationTest = (isValid) => {
@@ -2400,6 +3134,16 @@ const changeRadioItem = (event) => {
 }
 const changeChackboxItem = (event) => {
   currentCheckboxItem.value = event
+}
+
+const onFilesChanged = (files) => {
+  selectedFiles.value = files
+  // revoga previews antigos
+  imagePreviews.value.forEach(url => URL.revokeObjectURL(url))
+  // cria preview externo apenas para imagens
+  imagePreviews.value = files
+    .filter(f => f.type?.startsWith('image/'))
+    .map(f => URL.createObjectURL(f))
 }
 </script>
 

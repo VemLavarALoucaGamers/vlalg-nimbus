@@ -21,51 +21,52 @@
         @click="handleLabelClick"
       >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
 
-      <div
-        v-if="validShowInputEye"
-        :class="['component__eye', activeInput]"
-        :style="[borderRadiusStyle]"
-        @click="changeShowValue"
-      >
-        <label
-          :for="computedInputName"
-          :class="['component__eye-icon', 'fas']"
-        >
-          <span v-if="!inputEyeCustomIcon">{{ inputIcon }}</span>
-          <span v-else>
-            <slot v-if="showValue" name="eye-icon-show">show</slot>
-            <slot v-else name="eye-icon-hidden">hidden</slot>
-          </span>
-        </label>
-      </div>
       <input
         ref="inputRef"
-        v-model="inputValue"
         :id="computedInputName"
         :name="computedInputName"
-        :type="currentType"
-        class="component__input"
+        type="file"
+        :multiple="multiple"
+        :accept="acceptedFileExtensions"
+        class="component__file-native"
         :class="[
           uppercaseStyle,
-          hiddenDefaultEye,
           activeStyle
         ]"
-        :placeholder="computedPlaceholder"
         :disabled="disabled || inputReadonly"
         :required="required"
-        :readonly="inputReadonly"
-        :autocomplete="inputAutocomplete"
-        :tabindex="disabled || inputReadonly ? -1 : tabindex"
-        :min="supportsMinMaxStep ? min : undefined"
-        :max="supportsMinMaxStep ? max : undefined"
-        :step="supportsMinMaxStep ? step : undefined"
+        :tabindex="-1"
         role="input"
-        :style="[borderRadiusStyle, inputIconStyle]"
+        :style="[borderRadiusStyle]"
         @focus="isActive = true"
-        @blur="isActive = false"
-        @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
-        @paste="handlePaste"
+        @blur="handleFileInputBlur"
+        @cancel="onNativeFilePickerCancel"
+        @change="onChangeFile"
       />
+      <div
+        class="component__input component__input--file-display"
+        :class="[
+          uppercaseStyle,
+          activeStyle
+        ]"
+        role="button"
+        :tabindex="disabled || inputReadonly ? -1 : tabindex"
+        :aria-label="fileControlAriaLabel"
+        :aria-disabled="disabled || inputReadonly"
+        :style="[borderRadiusStyle, inputIconStyle]"
+        @focus="handleFileDisplayFocus"
+        @blur="handleFileDisplayBlur"
+        @keydown="onFileDisplayKeydown"
+      >
+        <div class="component__file-info">
+          <span v-if="files.length">
+            {{ multiple ? `${files.length} ${multipleFilesSelectedText}` : files[0]?.name }}
+          </span>
+          <span v-else>{{ computedPlaceholder }}</span>
+        </div>
+
+        <span v-if="files.length > 0" class="component__file-clear" @click.stop="removeAllFiles">clear</span>
+      </div>
 
       <label :for="computedInputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
         <slot name="icon">
@@ -73,36 +74,48 @@
         </slot>
       </label>
     </div>
+    <div v-if="files.length > 0" style="display:flex; flex-direction:column; gap:12px; color:#000;">
+      <ul>
+        <li v-for="(file, fileIndex) in files" :key="duplicateKey(file)">
+          {{ file.name }} <span @click="removeFile(fileIndex)">X</span>
+        </li>
+      </ul>
+    </div>
     <div
       v-if="validShowMsg"
       :class="['component__message', hasCustomMsg ? 'component__message--custom' : 'component__message--default']"
     >
       <slot name="message">{{ message }}</slot>
     </div>
+    <p v-if="showConstraintsText" class="component__file-constraints">
+      {{ constraintsText }}
+    </p>
+    <p
+      v-if="showFilesCounter && maxFiles != null && multiple"
+      class="component__file-counter"
+    >
+      {{ filesCounterText }}
+    </p>
+    <div v-if="errors.length" class="component__file-errors">
+      <div v-for="(error, index) in errors" :key="index" class="component__file-error">
+        {{ error }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch } from 'vue'
+import { defineProps, ref, toRefs, computed, watch } from 'vue'
+import {
+  validateIncomingFile,
+  duplicateKey,
+  formatLocaleMessage,
+  resolveFileValidationLocale,
+} from '@helpers/nbFileValidation.js'
 
 defineOptions({
 	name: 'NbInput',
 	inheritAttrs: false
-})
-
-onMounted(() => {
-  if (inputText.value != null) {
-    if (inputType.value === 'number' && typeof inputText.value === 'number') {
-      inputValue.value = inputText.value
-    } else {
-      inputValue.value = String(inputText.value)
-    }
-  } else {
-    inputValue.value = ''
-  }
-})
-onUnmounted(() => {
-  startValue()
 })
 
 const emit = defineEmits([
@@ -110,10 +123,8 @@ const emit = defineEmits([
   'changed',
   'focused',
   'blurred',
-  'show-input-eye',
   'clicked',
-  'entered',
-  'paste'
+  'validation-error',
 ])
 
 const props = defineProps({
@@ -243,36 +254,6 @@ const props = defineProps({
       return ['center', 'left', 'right'].indexOf(value) !== -1
     },
   },
-  inputText: {
-    type: [String, Number],
-    default: null,
-  },
-  inputType: {
-    type: String,
-    default: 'text',
-    validator: value => { // TESTAR AINDA: 'tel', 'url'
-      return ['text', 'number', 'email', 'password'].indexOf(value) !== -1
-    },
-  },
-  min: {
-    type: String,
-    default: '',
-  },
-  max: {
-    type: String,
-    default: '',
-  },
-  step: {
-    type: [String, Number],
-    default: '',
-  },
-  hasTrim: {
-    type: Boolean,
-    default: false,
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    },
-  },
   inputName: {
     type: String,
     required: true,
@@ -281,27 +262,83 @@ const props = defineProps({
       type: String,
       default: '',
   },
-  showInputEye: {
+  multiple: {
     type: Boolean,
     default: false,
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    },
+    validator: value => typeof value === 'boolean' && [true, false].includes(value),
   },
-  inputEyeIcon: {
+  fileExtension: {
     type: String,
-    default: '🫣',
+    default: '',
   },
-  inputEyeIconHidden: {
+  // compatibilidade com implementação antiga
+  fileExtensions: {
     type: String,
-    default: '😎',
+    default: '',
   },
-  inputEyeCustomIcon: {
+  maxFileSizeBytes: {
+    type: Number,
+    default: 5 * 1024 * 1024,
+  },
+  maxFiles: {
+    type: [Number, null],
+    default: null,
+    validator: value => value === null || (typeof value === 'number' && value > 0),
+  },
+  /** Extensões explícitas além do `accept` (ex: ['.png', '.jpg']). Ambos se aplicam quando preenchidos. */
+  allowedExtensions: {
+    type: Array,
+    default: () => [],
+    validator: value => Array.isArray(value) && value.every(v => typeof v === 'string'),
+  },
+  /** Se false, não permite o mesmo nome+tamanho na lista nem duplicar no mesmo lote do picker. */
+  allowDuplicates: {
     type: Boolean,
     default: false,
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    },
+  },
+  /** Larguras permitidas para GIF (pares com gifHeight). */
+  gifWidth: {
+    type: Array,
+    default: () => [],
+  },
+  gifHeight: {
+    type: Array,
+    default: () => [],
+  },
+  /** Duração máxima de vídeo em segundos (null = sem validação). */
+  videoMaxDuration: {
+    type: Number,
+    default: null,
+  },
+  /** Proporção esperada, ex: '4:3' (vazio = sem validação de aspect). */
+  videoRatio: {
+    type: String,
+    default: '',
+  },
+  videoAspectTolerance: {
+    type: Number,
+    default: 0.01,
+  },
+  /** Mostra `atual/máx` quando `multiple` e `maxFiles` estão definidos. */
+  showFilesCounter: {
+    type: Boolean,
+    default: true,
+  },
+  /**
+   * Textos de validação e contador. Chaves em `nbFileValidation.DEFAULT_FILE_VALIDATION_LOCALE`;
+   * apenas as informadas substituem o inglês padrão (ex.: `filesCounter: '{current} de {max}'`).
+   */
+  locale: {
+    type: Object,
+    default: () => ({}),
+  },
+  showConstraintsText: {
+    type: Boolean,
+    default: true,
+  },
+  multipleFilesSelectedText: {
+    type: String,
+    default: 'files selected',
   },
   activeTextStyle: {
     type: String,
@@ -330,20 +367,6 @@ const props = defineProps({
     validator: value => {
 			return typeof value === 'boolean' && [true, false].includes(value)
     }
-  },
-  blockPaste: {
-    type: Boolean,
-    default: false,
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    }
-  },
-  inputAutocomplete: {
-    type: String,
-    default: 'on',
-    validator: value => {
-      return ['on', 'off'].indexOf(value) !== -1
-    },
   },
   inputUppercase: {
     type: Boolean,
@@ -645,18 +668,27 @@ const {
 	activeTextStyle,
 	sizeMediaQuery,
 	inputReadonly,
-	blockPaste,
-	showInputEye,
-	inputType,
-  hasTrim,
 	inputUppercase,
   inputName,
   inputPlaceholder,
-  inputText,
+  multiple,
+  fileExtension,
+  fileExtensions,
+  maxFileSizeBytes,
+  maxFiles,
+  allowedExtensions,
+  allowDuplicates,
+  gifWidth,
+  gifHeight,
+  videoMaxDuration,
+  videoRatio,
+  videoAspectTolerance,
+  showFilesCounter,
+  locale,
+  showConstraintsText,
+  multipleFilesSelectedText,
   theme,
-  inputEyeIcon,
   tabindex,
-  inputEyeIconHidden,
 	lightBgColor,
 	lightBgColorFocus,
 	lightEyeBgColor,
@@ -712,11 +744,49 @@ const {
   darkTextColorLabelActive
 } = toRefs(props)
 
-const inputValue = ref('')
 const inputRef = ref(null)
-const currentType = ref('')
-const showValue = ref(false)
 const isActive = ref(false)
+const files = ref([])
+const errors = ref([])
+const fileDialogToken = ref(0)
+const isFileDialogOpen = ref(false)
+
+const acceptedFileExtensions = computed(() => fileExtension.value || fileExtensions.value || '')
+
+const resolvedFileLocale = computed(() => resolveFileValidationLocale(locale.value))
+
+const filesCounterText = computed(() => {
+  if (!showFilesCounter.value || maxFiles.value == null || !multiple.value) return ''
+  const L = resolvedFileLocale.value
+  return formatLocaleMessage(L.filesCounter, {
+    current: files.value.length,
+    max: maxFiles.value,
+  })
+})
+
+const maxFilesAllowed = computed(() => {
+  if (!multiple.value) return 1
+  return maxFiles.value
+})
+
+const formatBytes = (bytes) => {
+  if (!bytes || bytes <= 0) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
+  const value = bytes / Math.pow(1024, i)
+  return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[i]}`
+}
+
+const constraintsText = computed(() => {
+  const maxFilesText = (() => {
+    const max = maxFilesAllowed.value
+    if (!multiple.value) return '1 file'
+    if (max == null) return 'Multiple files'
+    return `Up to ${max} files`
+  })()
+
+  return `${maxFilesText} • Max size per file: ${formatBytes(maxFileSizeBytes.value)}`
+})
 
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
@@ -738,8 +808,6 @@ const formatDefaultValues = computed(() => {
   const activeTextStyleValue = !activeTextStyle.value ? 'normal' : activeTextStyle.value
   const sizeMediaQueryValue = !sizeMediaQuery.value ? 'xs' : sizeMediaQuery.value
   const inputReadonlyValue = !inputReadonly.value ? false : inputReadonly.value
-  const showInputEyeValue = !showInputEye.value ? false : showInputEye.value
-  const inputTypeValue = !inputType.value ? 'text' : inputType.value
   const inputUppercaseValue = !inputUppercase.value ? false : inputUppercase.value
   const themeValue = !theme.value ? 'normal' : theme.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
@@ -798,8 +866,6 @@ const formatDefaultValues = computed(() => {
     activeTextStyle: activeTextStyleValue,
     sizeMediaQuery: sizeMediaQueryValue,
     inputReadonly: inputReadonlyValue,
-    showInputEye: showInputEyeValue,
-    inputType: inputTypeValue,
     inputUppercase: inputUppercaseValue,
     theme: themeValue,
     inputStyle: inputStyleValue,
@@ -1010,17 +1076,6 @@ const uppercaseStyle = computed(() => {
 
   return defaultValues.inputUppercase ? 'component__input--uppercase' : ''
 })
-const validShowInputEye = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return !!(defaultValues.showInputEye && defaultValues.inputType === 'password')
-})
-
-const inputIcon = computed(() => {
-  if (showValue.value) return inputEyeIcon.value
-
-  return inputEyeIconHidden.value
-})
 const computedInputName = computed(() => {
   return inputName.value ? inputName.value : `${nbId.value}-name-label`
 })
@@ -1033,22 +1088,11 @@ const computedPlaceholder = computed(() => {
   return isActive.value ? inputPlaceholder.value : ''
 })
 const isLabelActive = computed(() => {
-  // Label está ativo se o input estiver focado OU se tiver conteúdo
-  const value = inputValue.value
-  return isActive.value || (value != null && String(value).trim().length > 0)
-})
-const hiddenDefaultEye = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return defaultValues.inputType === 'password' ? 'component__input__eye-default--hidden' : ''
-})
-const activeInput = computed(() => {
-  return isActive.value ? 'component__input--active' : 'component__input--no-active'
+  // Label ativo quando há foco/interação ou quando já existe arquivo selecionado
+  return isActive.value || files.value.length > 0
 })
 const inputPadding = computed(() => {
-  if (!validShowInputEye.value) return '6px 10px'
-
-  return '6px 50px 6px 10px'
+  return '6px 10px'
 })
 const validShowMsg = computed(() => {
   return !!(showMsg.value && hasMsg.value)
@@ -1072,6 +1116,14 @@ const computedAriaAttrs = computed(() => {
   return Object.fromEntries(
     Object.entries(attrs).filter(([_, value]) => value !== undefined && value !== null)
   )
+})
+
+/** Nome do controle que recebe Tab (área visível); label / placeholder / ariaLabel como fallback. */
+const fileControlAriaLabel = computed(() => {
+  if (ariaLabel.value) return ariaLabel.value
+  if (showLabel.value && label.value) return label.value
+  if (inputPlaceholder.value) return inputPlaceholder.value
+  return 'Choose file'
 })
 
 const styleIconSize = computed(() => {
@@ -1122,8 +1174,6 @@ const styleLabel = computed(() => {
   const lightTextColorLabel = isActive ? defaultValues.lightTextColorLabelActive : defaultValues.lightTextColorLabel
   const darkTextColorLabel = isActive ? defaultValues.darkTextColorLabelActive : defaultValues.darkTextColorLabel
 
-  // Só no estado inativo o label fica na linha do texto — aí precisa do offset do ícone.
-  // Quando ativo (recolhido em cima), mantém labelActiveLeft / labelActiveRight.
   let leftPx = isActive ? defaultValues.labelActiveLeft : defaultValues.labelLeft
   if (!isActive && hasIcon.value && iconDirection.value === 'left') {
     leftPx += defaultValues.iconPaddingInput - defaultValues.labelLeft
@@ -1162,56 +1212,139 @@ const styleLabelActive = computed(() => {
 
   return defaultValues.theme === 'dark' ? defaultValues.darkTextColorLabelActive : defaultValues.lightTextColorLabelActive
 })
-const startValue = () => {
-  if (inputText.value != null) {
-    if (inputType.value === 'number' && typeof inputText.value === 'number') {
-      inputValue.value = inputText.value
-    } else {
-      inputValue.value = String(inputText.value)
-    }
-  } else {
-    inputValue.value = ''
-  }
-
-  currentType.value = inputType.value
-}
-const changeShowValue = () => {
-  const defaultValues = formatDefaultValues.value
-
-  if (defaultValues.inputReadonly || defaultValues.disabled) return
-
-  const newShow = !showValue.value
-
-  if (newShow) {
-    currentType.value = 'text'
-  } else {
-    currentType.value = inputType.value
-  }
-
-  showValue.value = newShow
-}
-
-const supportsMinMaxStep = computed(() => {
-  // Apenas 'number' suporta min, max e step no validator atual
-  // Se no futuro adicionar date, datetime-local, etc., adicionar aqui
-  return currentType.value === 'number'
-})
-
-const formatValueForEmit = (value) => {
-  // Converte para número se inputType for 'number'
-  if (inputType.value === 'number') {
-    if (value === '' || value === null || value === undefined) {
-      return ''
-    } else {
-      const numValue = typeof value === 'number' ? value : Number(value)
-      return isNaN(numValue) ? value : numValue
-    }
-  }
-  return value
-}
 
 const interacted = (event) => {
 	emit('clicked', event)
+  triggerFileInput()
+}
+
+/**
+ * Fecha o fluxo do file picker nativo: invalida listeners pendentes e alinha label com arquivos reais.
+ * Usado após cancel (evento cancel), foco na janela (fallback) e após change com sucesso (via incremento de token em onChangeFile).
+ */
+const closeNativeFilePickerFlow = () => {
+  fileDialogToken.value++
+  isFileDialogOpen.value = false
+  const nativeFilesCount = inputRef.value?.files?.length || 0
+  isActive.value = files.value.length > 0 || nativeFilesCount > 0
+}
+
+const onNativeFilePickerCancel = () => {
+  // Evento padrão ao dispensar o seletor sem escolher (Chrome 113+, Firefox, Safari 16.4+).
+  // Em Windows o `window` `focus` nem sempre dispara de forma confiável ao fechar o modal.
+  if (!isFileDialogOpen.value) return
+  closeNativeFilePickerFlow()
+}
+
+const triggerFileInput = () => {
+  if (disabled.value || formatDefaultValues.value.inputReadonly) return
+  isActive.value = true
+  isFileDialogOpen.value = true
+  const thisDialogToken = ++fileDialogToken.value
+  const syncActiveStateAfterDialog = () => {
+    if (thisDialogToken !== fileDialogToken.value) return
+    isFileDialogOpen.value = false
+    const nativeFilesCount = inputRef.value?.files?.length || 0
+    if (files.value.length === 0 && nativeFilesCount === 0) {
+      isActive.value = false
+    }
+  }
+  const handleWindowFocusAfterFileDialog = () => {
+    // Em alguns browsers, cancelar o dialog de arquivo não dispara `change`.
+    // Sincronizamos o estado ativo apenas quando a janela realmente voltar ao foco.
+    setTimeout(() => syncActiveStateAfterDialog(), 0)
+  }
+  // capture: true — em alguns ambientes o foco não chega ao alvo sem captura
+  window.addEventListener('focus', handleWindowFocusAfterFileDialog, { once: true, capture: true })
+  if (inputRef.value) {
+    inputRef.value.value = null
+    inputRef.value.click()
+  }
+}
+
+const onChangeFile = async (event) => {
+  // Fecha o fluxo do picker e invalida o listener de `focus` pendente (mesmo token que cancel).
+  fileDialogToken.value++
+  isFileDialogOpen.value = false
+  errors.value = []
+  const selected = Array.from(event.target.files || [])
+
+  const batchKeys = new Set()
+  const validFiles = []
+
+  for (const file of selected) {
+    const result = await validateIncomingFile(file, {
+      accept: acceptedFileExtensions.value,
+      allowedExtensions: allowedExtensions.value,
+      maxFileSizeBytes: maxFileSizeBytes.value,
+      allowDuplicates: allowDuplicates.value,
+      existingFiles: files.value,
+      batchKeySet: batchKeys,
+      gifWidth: gifWidth.value,
+      gifHeight: gifHeight.value,
+      videoRatio: videoRatio.value,
+      videoMaxDuration: videoMaxDuration.value,
+      videoAspectTolerance: videoAspectTolerance.value,
+      locale: resolvedFileLocale.value,
+    })
+
+    if (!result.ok) {
+      errors.value.push(result.error)
+      emit('validation-error', { file, message: result.error })
+      continue
+    }
+
+    batchKeys.add(duplicateKey(file))
+    validFiles.push(file)
+  }
+
+  if (multiple.value) {
+    if (maxFiles.value != null) {
+      const remaining = maxFiles.value - files.value.length
+      if (remaining <= 0) {
+        const msg = formatLocaleMessage(resolvedFileLocale.value.maxFilesReached, {
+          max: maxFiles.value,
+        })
+        errors.value.push(msg)
+        emit('validation-error', { file: null, message: msg })
+        validFiles.length = 0
+      } else if (validFiles.length > remaining) {
+        validFiles.splice(remaining)
+      }
+    }
+    files.value = [...files.value, ...validFiles]
+  } else {
+    files.value = validFiles.length ? [validFiles[0]] : []
+  }
+
+  // Se o usuário cancelar a seleção e não houver arquivos, desativa o estado visual
+  isActive.value = files.value.length > 0
+
+  emit('changed', files.value)
+  emit('current-value', files.value)
+}
+
+const handleFileInputBlur = () => {
+  // Enquanto o diálogo nativo estiver aberto, não desativar o label
+  if (isFileDialogOpen.value) return
+  isActive.value = files.value.length > 0
+}
+
+const handleFileDisplayFocus = () => {
+  isActive.value = true
+}
+
+const handleFileDisplayBlur = () => {
+  handleFileInputBlur()
+}
+
+/** Tab foca a área visível; Enter/Espaço abrem o picker (não abrir só com foco — evita surpresa na navegação). */
+const onFileDisplayKeydown = (e) => {
+  if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    triggerFileInput()
+  }
 }
 
 /*
@@ -1228,81 +1361,34 @@ const handleLabelClick = (event) => {
     return
   }
   
-  // Focar o input explicitamente
+  triggerFileInput()
+}
+
+const removeFile = (index) => {
+  if (index < 0 || index >= files.value.length) return
+  files.value = files.value.filter((_, i) => i !== index)
+  isActive.value = files.value.length > 0
+  if (files.value.length === 0 && inputRef.value) {
+    inputRef.value.value = ''
+  }
+  emit('changed', files.value)
+  emit('current-value', files.value)
+}
+const removeAllFiles = () => {
+  files.value = []
+  isActive.value = false
   if (inputRef.value) {
-    inputRef.value.focus()
+    inputRef.value.value = ''
   }
+  emit('changed', [])
+  emit('current-value', [])
 }
 
-const enterConfirm = () => {
-  if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
-
-  emit('entered', formatValueForEmit(inputValue.value))
-}
-
-const handlePaste = async (event) => {
-  // Capturar o valor do clipboard
-  const pastedValue = event.clipboardData?.getData('text') || ''
-  
-  // Sempre emitir o evento
-  emit('paste', pastedValue)
-  
-  // Bloquear o paste se blockPaste for true
-  if (blockPaste.value) {
-    event.preventDefault()
-  }
-}
-
-watch(inputType, value => {
-  currentType.value = value
-}, { immediate: true })
-watch(inputText, value => {
-  if (value != null) {
-    if (inputType.value === 'number' && typeof value === 'number') {
-      if (value !== inputValue.value) inputValue.value = value
-    } else {
-      const stringValue = String(value)
-      if (stringValue !== inputValue.value) inputValue.value = stringValue
-    }
-  } else {
-    if (inputValue.value !== '') inputValue.value = ''
-  }
-}, { immediate: true })
-watch(inputValue, value => {
-  if (hasTrim.value && typeof value === 'string') {
-    value = value.trim()
-  }
-
-  emit('changed', formatValueForEmit(value))
-})
 watch(isActive, value => {
   if (value) {
     emit('focused')
   } else {
     emit('blurred')
-  }
-})
-watch(showValue, value => {
-  emit('show-input-eye', value)
-}, { immediate: true })
-watch(inputValue, value => {
-  if (hasTrim.value && typeof value === 'string') {
-    value = value.trim()
-  }
-
-  emit('current-value', formatValueForEmit(value))
-})
-watch(inputType, (newType) => {
-  if (newType === 'password') {
-    // Força o tipo password e remove qualquer botão padrão
-    nextTick(() => {
-      const input = document.getElementById(inputName.value)
-      if (input) {
-        input.type = 'password'
-        // Remove qualquer atributo que possa mostrar o botão
-        input.removeAttribute('autocomplete')
-      }
-    })
   }
 })
 </script>
@@ -1376,10 +1462,6 @@ watch(inputType, (newType) => {
       height: 32.39px;
       max-height: 32.39px;
 
-      .component__eye {
-        padding: 5px 10px;
-      }
-
       .component__input {
         font-size: v-bind('fontSizeStyle');
       }
@@ -1391,10 +1473,6 @@ watch(inputType, (newType) => {
     &.component__md {
       height: 48px;
       max-height: 48px;
-
-      .component__eye {
-        padding: 10px 10px;
-      }
 
       .component__input {
         font-size: v-bind('fontSizeStyle');
@@ -1408,19 +1486,11 @@ watch(inputType, (newType) => {
       height: 58px;
       max-height: 58px;
 
-      .component__eye {
-        padding: 17px 10px;
-      }
-
       .component__input {
         font-size: v-bind('fontSizeStyle');
       }
     }
     // fim sizeMediaQuery
-
-    .component__eye {
-      color: v-bind('lightTextColor');
-    }
 
     .component__icon {
       color: v-bind('lightTextColor');
@@ -1443,10 +1513,6 @@ watch(inputType, (newType) => {
 
     // inicio propTheme
     &.component__theme--dark {
-      .component__eye {
-        color: v-bind('darkTextColor');
-      }
-
       .component__icon {
         color: v-bind('iconDarkTextColor');
       }
@@ -1458,14 +1524,6 @@ watch(inputType, (newType) => {
       &.component__input--disabled,
       &.component__input--read-only {
         &.component__input--background {
-          .component__eye {
-            background-color: v-bind('darkDisabledEyeBgColor');
-
-            &:hover {
-              cursor: not-allowed;
-            }
-          }
-
           .component__icon {
             background-color: v-bind('iconDarkDisabledBgColor');
 
@@ -1496,10 +1554,6 @@ watch(inputType, (newType) => {
         }
 
         &.component__input--line {
-          .component__eye {
-            opacity: 0.2;
-          }
-
           .component__icon {
             opacity: 0.2;
           }
@@ -1515,10 +1569,6 @@ watch(inputType, (newType) => {
         }
 
         &.component__input--border {
-          .component__eye {
-            opacity: 0.2;
-          }
-
           .component__icon {
             opacity: 0.2;
           }
@@ -1535,18 +1585,6 @@ watch(inputType, (newType) => {
       }
 
       &.component__input--background {
-        .component__eye {
-          background-color: v-bind('darkEyeBgColor');
-
-          &.component__input--active {
-            background-color: v-bind('darkEyeBgColorActive');
-          }
-
-          &.component__input--no-active {
-            background-color: v-bind('darkEyeBgColor');
-          }
-        }
-
         .component__icon {
           background-color: v-bind('styleIconBgColor');
 
@@ -1578,11 +1616,6 @@ watch(inputType, (newType) => {
       }
 
       &.component__input--line {
-        .component__eye {
-          background-color: transparent;
-          opacity: 1;
-        }
-
         .component__icon {
           background-color: transparent;
           opacity: 1;
@@ -1603,11 +1636,6 @@ watch(inputType, (newType) => {
       }
 
       &.component__input--border {
-        .component__eye {
-          background-color: transparent;
-          opacity: 1;
-        }
-
         .component__icon {
           background-color: transparent;
           opacity: 1;
@@ -1626,10 +1654,6 @@ watch(inputType, (newType) => {
       }
     }
     &.component__theme--light {
-      .component__eye {
-        color: v-bind('lightTextColor');
-      }
-
       .component__icon {
         color: v-bind('iconLightTextColor');
       }
@@ -1641,14 +1665,6 @@ watch(inputType, (newType) => {
       &.component__input--disabled,
       &.component__input--read-only {
         &.component__input--background {
-          .component__eye {
-            background-color: v-bind('lightDisabledEyeBgColor');
-
-            &:hover {
-              cursor: not-allowed;
-            }
-          }
-
           .component__icon {
             background-color: v-bind('iconLightDisabledBgColor');
 
@@ -1679,10 +1695,6 @@ watch(inputType, (newType) => {
         }
 
         &.component__input--line {
-          .component__eye {
-            opacity: 0.2;
-          }
-
           .component__icon {
             opacity: 0.2;
           }
@@ -1698,10 +1710,6 @@ watch(inputType, (newType) => {
         }
 
         &.component__input--border {
-          .component__eye {
-            opacity: 0.2;
-          }
-
           .component__icon {
             opacity: 0.2;
           }
@@ -1718,18 +1726,6 @@ watch(inputType, (newType) => {
       }
 
       &.component__input--background {
-        .component__eye {
-          background-color: v-bind('lightEyeBgColor');
-
-          &.component__input--active {
-            background-color: v-bind('lightEyeBgColorActive');
-          }
-
-          &.component__input--no-active {
-            background-color: v-bind('lightEyeBgColor');
-          }
-        }
-
         .component__icon {
           background-color: v-bind('styleIconBgColor');
 
@@ -1761,11 +1757,6 @@ watch(inputType, (newType) => {
       }
 
       &.component__input--line {
-        .component__eye {
-          background-color: transparent;
-          opacity: 1;
-        }
-
         .component__icon {
           background-color: transparent;
           opacity: 1;
@@ -1786,11 +1777,6 @@ watch(inputType, (newType) => {
       }
 
       &.component__input--border {
-        .component__eye {
-          background-color: transparent;
-          opacity: 1;
-        }
-
         .component__icon {
           background-color: transparent;
           opacity: 1;
@@ -1834,20 +1820,6 @@ watch(inputType, (newType) => {
       .component__label--required {
         color: red;
         display: contents;
-      }
-    }
-
-    .component__eye {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      padding: 1px 10px;
-      margin: 2px 2px 2px 0;
-      z-index: 1;
-
-      &:hover {
-        cursor: pointer;
       }
     }
 
@@ -1978,6 +1950,77 @@ watch(inputType, (newType) => {
   }
 }
 
+.component__file-info {
+  width: 100%;
+  font-size: 1.3em;
+  text-align: left;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.component__file-constraints {
+  margin-top: 6px;
+  font-size: 1.2em;
+  color: #6b7280;
+}
+
+.component__file-counter {
+  margin-top: 4px;
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #374151;
+}
+
+.component__file-errors {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ffc6c6;
+  background: #ffe7e7;
+  color: #b42318;
+}
+
+.component__file-error {
+  font-size: 1.2em;
+}
+
+.component__file-native {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.component__input--file-display {
+  display: flex;
+  align-items: center;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+.component__file-clear {
+  cursor: pointer;
+  // position: absolute;
+  // right: 0;
+  // top: 0;
+  // bottom: 0;
+  background: aqua;
+  align-content: center;
+  padding: 0 6px;
+
+  &:hover {
+    background: #000;
+    color: #fff;
+  }
+}
+
 .component-disabled {
 	cursor: not-allowed;
 	pointer-events: none;
@@ -1991,14 +2034,6 @@ watch(inputType, (newType) => {
 		background-color: var(--disabled-button-color) !important;
 		color: var(--disabled-color) !important;
 		border-radius: inherit;
-
-    .component__eye {
-      background-color: rgba(#f15574, 0.3);
-
-      &:hover {
-        cursor: not-allowed;
-      }
-    }
 
     .component__input {
       &:focus,

@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-inputs",
   "description": "Input components for Vuejs 3",
-  "version": "9.6.0",
+  "version": "9.9.0",
   "type": "module",
   "main": "./dist/nb-inputs.umd.js",
   "module": "./dist/nb-inputs.js",
@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "dev": "vite",
+    "dev:upload-server": "node ./scripts/dev-upload-server.mjs",
     "build": "vite build",
     "preview": "vite preview --port 4173",
     "test:unit": "vitest --environment jsdom",
@@ -46,6 +47,7 @@
     "@vue/test-utils": "^2.4.1",
     "eslint": "^8.51.0",
     "eslint-plugin-vue": "^9.17.0",
+    "formidable": "^3.5.4",
     "jsdom": "^22.1.0",
     "prettier": "^3.0.3",
     "sass": "^1.69.0",

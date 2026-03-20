@@ -21,23 +21,6 @@
         @click="handleLabelClick"
       >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
 
-      <div
-        v-if="validShowInputEye"
-        :class="['component__eye', activeInput]"
-        :style="[borderRadiusStyle]"
-        @click="changeShowValue"
-      >
-        <label
-          :for="computedInputName"
-          :class="['component__eye-icon', 'fas']"
-        >
-          <span v-if="!inputEyeCustomIcon">{{ inputIcon }}</span>
-          <span v-else>
-            <slot v-if="showValue" name="eye-icon-show">show</slot>
-            <slot v-else name="eye-icon-hidden">hidden</slot>
-          </span>
-        </label>
-      </div>
       <input
         ref="inputRef"
         v-model="inputValue"
@@ -47,7 +30,6 @@
         class="component__input"
         :class="[
           uppercaseStyle,
-          hiddenDefaultEye,
           activeStyle
         ]"
         :placeholder="computedPlaceholder"
@@ -92,11 +74,7 @@ defineOptions({
 
 onMounted(() => {
   if (inputText.value != null) {
-    if (inputType.value === 'number' && typeof inputText.value === 'number') {
-      inputValue.value = inputText.value
-    } else {
-      inputValue.value = String(inputText.value)
-    }
+    inputValue.value = String(inputText.value)
   } else {
     inputValue.value = ''
   }
@@ -110,7 +88,6 @@ const emit = defineEmits([
   'changed',
   'focused',
   'blurred',
-  'show-input-eye',
   'clicked',
   'entered',
   'paste'
@@ -247,13 +224,6 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
-  inputType: {
-    type: String,
-    default: 'text',
-    validator: value => { // TESTAR AINDA: 'tel', 'url'
-      return ['text', 'number', 'email', 'password'].indexOf(value) !== -1
-    },
-  },
   min: {
     type: String,
     default: '',
@@ -280,28 +250,6 @@ const props = defineProps({
   inputPlaceholder: {
       type: String,
       default: '',
-  },
-  showInputEye: {
-    type: Boolean,
-    default: false,
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    },
-  },
-  inputEyeIcon: {
-    type: String,
-    default: '🫣',
-  },
-  inputEyeIconHidden: {
-    type: String,
-    default: '😎',
-  },
-  inputEyeCustomIcon: {
-    type: Boolean,
-    default: false,
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    },
   },
   activeTextStyle: {
     type: String,
@@ -646,17 +594,13 @@ const {
 	sizeMediaQuery,
 	inputReadonly,
 	blockPaste,
-	showInputEye,
-	inputType,
   hasTrim,
 	inputUppercase,
   inputName,
   inputPlaceholder,
   inputText,
   theme,
-  inputEyeIcon,
   tabindex,
-  inputEyeIconHidden,
 	lightBgColor,
 	lightBgColorFocus,
 	lightEyeBgColor,
@@ -715,7 +659,6 @@ const {
 const inputValue = ref('')
 const inputRef = ref(null)
 const currentType = ref('')
-const showValue = ref(false)
 const isActive = ref(false)
 
 const formatDefaultValues = computed(() => {
@@ -738,8 +681,7 @@ const formatDefaultValues = computed(() => {
   const activeTextStyleValue = !activeTextStyle.value ? 'normal' : activeTextStyle.value
   const sizeMediaQueryValue = !sizeMediaQuery.value ? 'xs' : sizeMediaQuery.value
   const inputReadonlyValue = !inputReadonly.value ? false : inputReadonly.value
-  const showInputEyeValue = !showInputEye.value ? false : showInputEye.value
-  const inputTypeValue = !inputType.value ? 'text' : inputType.value
+  const inputTypeValue = 'text'
   const inputUppercaseValue = !inputUppercase.value ? false : inputUppercase.value
   const themeValue = !theme.value ? 'normal' : theme.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
@@ -798,7 +740,6 @@ const formatDefaultValues = computed(() => {
     activeTextStyle: activeTextStyleValue,
     sizeMediaQuery: sizeMediaQueryValue,
     inputReadonly: inputReadonlyValue,
-    showInputEye: showInputEyeValue,
     inputType: inputTypeValue,
     inputUppercase: inputUppercaseValue,
     theme: themeValue,
@@ -1010,17 +951,6 @@ const uppercaseStyle = computed(() => {
 
   return defaultValues.inputUppercase ? 'component__input--uppercase' : ''
 })
-const validShowInputEye = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return !!(defaultValues.showInputEye && defaultValues.inputType === 'password')
-})
-
-const inputIcon = computed(() => {
-  if (showValue.value) return inputEyeIcon.value
-
-  return inputEyeIconHidden.value
-})
 const computedInputName = computed(() => {
   return inputName.value ? inputName.value : `${nbId.value}-name-label`
 })
@@ -1037,18 +967,8 @@ const isLabelActive = computed(() => {
   const value = inputValue.value
   return isActive.value || (value != null && String(value).trim().length > 0)
 })
-const hiddenDefaultEye = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  return defaultValues.inputType === 'password' ? 'component__input__eye-default--hidden' : ''
-})
-const activeInput = computed(() => {
-  return isActive.value ? 'component__input--active' : 'component__input--no-active'
-})
 const inputPadding = computed(() => {
-  if (!validShowInputEye.value) return '6px 10px'
-
-  return '6px 50px 6px 10px'
+  return '6px 10px'
 })
 const validShowMsg = computed(() => {
   return !!(showMsg.value && hasMsg.value)
@@ -1122,8 +1042,6 @@ const styleLabel = computed(() => {
   const lightTextColorLabel = isActive ? defaultValues.lightTextColorLabelActive : defaultValues.lightTextColorLabel
   const darkTextColorLabel = isActive ? defaultValues.darkTextColorLabelActive : defaultValues.darkTextColorLabel
 
-  // Só no estado inativo o label fica na linha do texto — aí precisa do offset do ícone.
-  // Quando ativo (recolhido em cima), mantém labelActiveLeft / labelActiveRight.
   let leftPx = isActive ? defaultValues.labelActiveLeft : defaultValues.labelLeft
   if (!isActive && hasIcon.value && iconDirection.value === 'left') {
     leftPx += defaultValues.iconPaddingInput - defaultValues.labelLeft
@@ -1164,49 +1082,20 @@ const styleLabelActive = computed(() => {
 })
 const startValue = () => {
   if (inputText.value != null) {
-    if (inputType.value === 'number' && typeof inputText.value === 'number') {
-      inputValue.value = inputText.value
-    } else {
-      inputValue.value = String(inputText.value)
-    }
+    inputValue.value = String(inputText.value)
   } else {
     inputValue.value = ''
   }
 
-  currentType.value = inputType.value
-}
-const changeShowValue = () => {
-  const defaultValues = formatDefaultValues.value
-
-  if (defaultValues.inputReadonly || defaultValues.disabled) return
-
-  const newShow = !showValue.value
-
-  if (newShow) {
-    currentType.value = 'text'
-  } else {
-    currentType.value = inputType.value
-  }
-
-  showValue.value = newShow
+  currentType.value = 'text'
 }
 
 const supportsMinMaxStep = computed(() => {
-  // Apenas 'number' suporta min, max e step no validator atual
-  // Se no futuro adicionar date, datetime-local, etc., adicionar aqui
-  return currentType.value === 'number'
+  // NbInputClean opera apenas como texto
+  return false
 })
 
 const formatValueForEmit = (value) => {
-  // Converte para número se inputType for 'number'
-  if (inputType.value === 'number') {
-    if (value === '' || value === null || value === undefined) {
-      return ''
-    } else {
-      const numValue = typeof value === 'number' ? value : Number(value)
-      return isNaN(numValue) ? value : numValue
-    }
-  }
   return value
 }
 
@@ -1253,17 +1142,10 @@ const handlePaste = async (event) => {
   }
 }
 
-watch(inputType, value => {
-  currentType.value = value
-}, { immediate: true })
 watch(inputText, value => {
   if (value != null) {
-    if (inputType.value === 'number' && typeof value === 'number') {
-      if (value !== inputValue.value) inputValue.value = value
-    } else {
-      const stringValue = String(value)
-      if (stringValue !== inputValue.value) inputValue.value = stringValue
-    }
+    const stringValue = String(value)
+    if (stringValue !== inputValue.value) inputValue.value = stringValue
   } else {
     if (inputValue.value !== '') inputValue.value = ''
   }
@@ -1282,28 +1164,12 @@ watch(isActive, value => {
     emit('blurred')
   }
 })
-watch(showValue, value => {
-  emit('show-input-eye', value)
-}, { immediate: true })
 watch(inputValue, value => {
   if (hasTrim.value && typeof value === 'string') {
     value = value.trim()
   }
 
   emit('current-value', formatValueForEmit(value))
-})
-watch(inputType, (newType) => {
-  if (newType === 'password') {
-    // Força o tipo password e remove qualquer botão padrão
-    nextTick(() => {
-      const input = document.getElementById(inputName.value)
-      if (input) {
-        input.type = 'password'
-        // Remove qualquer atributo que possa mostrar o botão
-        input.removeAttribute('autocomplete')
-      }
-    })
-  }
 })
 </script>
 
