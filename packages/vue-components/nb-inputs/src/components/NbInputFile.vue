@@ -28,6 +28,7 @@
         type="file"
         :multiple="multiple"
         :accept="acceptedFileExtensions"
+        :capture="inputCapture"
         class="component__file-native"
         :class="[
           uppercaseStyle,
@@ -44,6 +45,7 @@
         @change="onChangeFile"
       />
       <div
+        ref="fileDisplayRef"
         class="component__input component__input--file-display"
         :class="[
           uppercaseStyle,
@@ -65,7 +67,9 @@
           <span v-else>{{ computedPlaceholder }}</span>
         </div>
 
-        <span v-if="files.length > 0" class="component__file-clear" @click.stop="removeAllFiles">clear</span>
+        <span v-if="files.length > 0" class="component__file-clear" :style="[styleClearButton]" @click.stop="removeAllFiles">
+          {{ resolvedFileUiLocale.clearAction }}
+        </span>
       </div>
 
       <label :for="computedInputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
@@ -74,12 +78,14 @@
         </slot>
       </label>
     </div>
-    <div v-if="files.length > 0" style="display:flex; flex-direction:column; gap:12px; color:#000;">
-      <ul>
-        <li v-for="(file, fileIndex) in files" :key="duplicateKey(file)">
-          {{ file.name }} <span @click="removeFile(fileIndex)">X</span>
-        </li>
-      </ul>
+    <div v-if="files.length > 0" class="component__file-list" :style="[styleFileList]">
+      <slot name="file-list" :files="files" :removeFile="removeFile">
+        <ul>
+          <li v-for="(file, fileIndex) in files" :key="duplicateKey(file)">
+            {{ file.name }} <span @click="removeFile(fileIndex)">X</span>
+          </li>
+        </ul>
+      </slot>
     </div>
     <div
       v-if="validShowMsg"
@@ -87,20 +93,27 @@
     >
       <slot name="message">{{ message }}</slot>
     </div>
-    <p v-if="showConstraintsText" class="component__file-constraints">
-      {{ constraintsText }}
-    </p>
-    <p
-      v-if="showFilesCounter && maxFiles != null && multiple"
-      class="component__file-counter"
-    >
-      {{ filesCounterText }}
-    </p>
     <div v-if="errors.length" class="component__file-errors">
-      <div v-for="(error, index) in errors" :key="index" class="component__file-error">
-        {{ error }}
-      </div>
+      <slot v-if="errors.length" name="file-errors" :errors="errors">
+        <div class="component__file-errors--inline">
+          <div v-for="(error, index) in errors" :key="index" class="component__file-error">
+            {{ error }}
+          </div>
+        </div>
+      </slot>
     </div>
+    
+    <div class="component__file-constraints-counter">
+      <p v-if="showConstraintsText" class="component__file-constraints" :style="[styleConstraints]">
+        {{ constraintsText }}
+      </p>
+      <p
+        v-if="showFilesCounter && maxFiles != null && multiple"
+        class="component__file-counter" :style="[styleCounter]"
+      >
+        {{ filesCounterText }}
+      </p>
+    </div>    
   </div>
 </template>
 
@@ -125,6 +138,7 @@ const emit = defineEmits([
   'blurred',
   'clicked',
   'validation-error',
+  'file-dialog-closed',
 ])
 
 const props = defineProps({
@@ -247,6 +261,146 @@ const props = defineProps({
 		type: String,
 		default: '#f15574'
 	},
+	fontFamilyFileList: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	fontSizeFileList: {
+		type: String,
+		default: '1em',
+		validator: value => {
+			return !value ? '1em' : value
+		}
+	},
+	fontWeightFileList: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 400 : value
+		}
+	},
+	textFileListColor: {
+		type: String,
+		default: '#000000'
+	},
+	textFileListPadding: {
+		type: String,
+		default: '2px'
+	},
+	textFileListMargin: {
+		type: String,
+		default: '2px'
+	},
+	fontFamilyConstraints: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	fontSizeConstraints: {
+		type: String,
+		default: '1.2em',
+		validator: value => {
+			return !value ? '1.2em' : value
+		}
+	},
+	fontWeightConstraints: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 400 : value
+		}
+	},
+	textConstraintsColor: {
+		type: String,
+		default: '#6b7280'
+	},
+	textConstraintsPadding: {
+		type: String,
+		default: '0px'
+	},
+	textConstraintsMargin: {
+		type: String,
+		default: '6px 0 0 0'
+	},
+
+  
+	fontFamilyClearButton: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	fontSizeClearButton: {
+		type: String,
+		default: '1.2em',
+		validator: value => {
+			return !value ? '1.2em' : value
+		}
+	},
+	fontWeightClearButton: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 400 : value
+		}
+	},
+	textClearButtonColor: {
+		type: String,
+		default: '#6b7280'
+	},
+	textClearButtonColorHover: {
+		type: String,
+		default: '#000000'
+	},
+	textClearButtonPadding: {
+		type: String,
+		default: '0px 6px'
+	},
+	textClearButtonPaddingHover: {
+		type: String,
+		default: '0px 6px'
+	},
+	textClearButtonBackground: {
+		type: String,
+		default: 'transparent'
+	},
+	textClearButtonBackgroundHover: {
+		type: String,
+		default: 'transparent'
+	},
+
+
+  
+	fontFamilyCounter: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	fontSizeCounter: {
+		type: String,
+		default: '1.2em',
+		validator: value => {
+			return !value ? '1.2em' : value
+		}
+	},
+	fontWeightCounter: {
+		type: Number,
+		default: 600,
+		validator: value => {
+			return !value ? 600 : value
+		}
+	},
+	textCounterColor: {
+		type: String,
+		default: '#374151'
+	},
+	textCounterPadding: {
+		type: String,
+		default: '0px'
+	},
+	textCounterMargin: {
+		type: String,
+		default: '4px 0px 0 0'
+	},
+  
+
+
   textAlign: {
     type: String,
     default: 'left',
@@ -275,6 +429,21 @@ const props = defineProps({
   fileExtensions: {
     type: String,
     default: '',
+  },
+  /**
+   * Sugestão para dispositivos móveis abrirem câmera/mic:
+   * - '' (padrão): no capture force
+   * - 'user': front camera
+   * - 'environment': back camera
+   * - 'auto': usa 'environment'
+   *
+   * Obs.: só é aplicado quando o `accept` indica mídia (image/* ou video/*).
+   * Para tipos como PDF, é ignorado automaticamente.
+   */
+  captureMode: {
+    type: String,
+    default: '',
+    validator: value => ['', 'auto', 'user', 'environment'].includes(value),
   },
   maxFileSizeBytes: {
     type: Number,
@@ -333,6 +502,11 @@ const props = defineProps({
     default: () => ({}),
   },
   showConstraintsText: {
+    type: Boolean,
+    default: true,
+  },
+  /** Remove foco do controle visível ao cancelar/fechar o seletor sem escolher arquivo. */
+  blurOnDialogCancel: {
     type: Boolean,
     default: true,
   },
@@ -395,11 +569,11 @@ const props = defineProps({
 		type: String,
 		default: '#eaeaea'
 	},
-	lightEyeBgColor: {
+	lightControlBorderColor: {
 		type: String,
 		default: '#353734'
 	},
-	lightEyeBgColorActive: {
+	lightControlBorderColorActive: {
 		type: String,
 		default: '#272936'
 	},
@@ -420,11 +594,11 @@ const props = defineProps({
 		type: String,
 		default: '#272936'
 	},
-	darkEyeBgColor: {
+	darkControlBorderColor: {
 		type: String,
 		default: '#353734'
 	},
-	darkEyeBgColorActive: {
+	darkControlBorderColorActive: {
 		type: String,
 		default: '#272936'
 	},
@@ -436,11 +610,11 @@ const props = defineProps({
 		type: String,
 		default: '#000000'
 	},
-	darkDisabledEyeBgColor: {
+	darkDisabledControlBorderColor: {
 		type: String,
 		default: 'rgba(68, 71, 90, 0.3)'
 	},
-	lightDisabledEyeBgColor: {
+	lightDisabledControlBorderColor: {
 		type: String,
 		default: 'rgba(53, 55, 52, 0.3)'
 	},
@@ -663,6 +837,12 @@ const {
 	fontSizeMsg,
 	fontWeightMsg,
 	textMessageColor,
+	fontFamilyFileList,
+	fontSizeFileList,
+	fontWeightFileList,
+	textFileListColor,
+	textFileListPadding,
+	textFileListMargin,
 	inputWidth,
 	inputStyle,
 	activeTextStyle,
@@ -674,6 +854,7 @@ const {
   multiple,
   fileExtension,
   fileExtensions,
+  captureMode,
   maxFileSizeBytes,
   maxFiles,
   allowedExtensions,
@@ -686,23 +867,24 @@ const {
   showFilesCounter,
   locale,
   showConstraintsText,
+  blurOnDialogCancel,
   multipleFilesSelectedText,
   theme,
   tabindex,
 	lightBgColor,
 	lightBgColorFocus,
-	lightEyeBgColor,
-	lightEyeBgColorActive,
+	lightControlBorderColor,
+	lightControlBorderColorActive,
 	lightDisabledBgColor,
 	lightTextColor,
 	darkBgColor,
 	darkBgColorFocus,
-	darkEyeBgColor,
-	darkEyeBgColorActive,
+	darkControlBorderColor,
+	darkControlBorderColorActive,
 	darkDisabledBgColor,
 	darkTextColor,
-	darkDisabledEyeBgColor,
-	lightDisabledEyeBgColor,
+	darkDisabledControlBorderColor,
+	lightDisabledControlBorderColor,
   textAlign,
   showMsg,
   hasMsg,
@@ -741,10 +923,32 @@ const {
   lightTextColorLabel,
   lightTextColorLabelActive,
   darkTextColorLabel,
-  darkTextColorLabelActive
+  darkTextColorLabelActive,
+  fontFamilyConstraints,
+  fontSizeConstraints,
+  fontWeightConstraints,
+  textConstraintsColor,
+  textConstraintsPadding,
+  textConstraintsMargin,
+  fontFamilyClearButton,
+  fontSizeClearButton,
+  fontWeightClearButton,
+  textClearButtonColor,
+  textClearButtonColorHover,
+  textClearButtonPadding,
+  textClearButtonPaddingHover,
+  textClearButtonBackground,
+  textClearButtonBackgroundHover,
+  fontFamilyCounter,
+  fontSizeCounter,
+  fontWeightCounter,
+  textCounterColor,
+  textCounterPadding,
+  textCounterMargin,
 } = toRefs(props)
 
 const inputRef = ref(null)
+const fileDisplayRef = ref(null)
 const isActive = ref(false)
 const files = ref([])
 const errors = ref([])
@@ -753,7 +957,41 @@ const isFileDialogOpen = ref(false)
 
 const acceptedFileExtensions = computed(() => fileExtension.value || fileExtensions.value || '')
 
+const inputCapture = computed(() => {
+  const mode = String(captureMode.value || '').toLowerCase()
+  if (!mode) return null
+
+  const acceptTokens = acceptedFileExtensions.value
+    .split(',')
+    .map(t => t.trim().toLowerCase())
+    .filter(Boolean)
+
+  const hasMediaAccept = acceptTokens.some(token =>
+    token.startsWith('image/')
+    || token.startsWith('video/')
+    || token === 'image/*'
+    || token === 'video/*',
+  )
+
+  // Evita casos sem sentido (ex.: accept PDF + capture camera).
+  if (!hasMediaAccept) return null
+  if (mode === 'auto') return 'environment'
+  return mode
+})
+
 const resolvedFileLocale = computed(() => resolveFileValidationLocale(locale.value))
+const DEFAULT_FILE_UI_LOCALE = {
+  clearAction: 'Clear',
+  chooseFileAriaLabel: 'Choose file',
+  singleFileLimit: '1 file',
+  multipleFilesLimit: 'Multiple files',
+  upToFilesLimit: 'Up to {max} files',
+  maxSizePerFile: 'Max size per file: {size}',
+}
+const resolvedFileUiLocale = computed(() => ({
+  ...DEFAULT_FILE_UI_LOCALE,
+  ...(locale.value || {}),
+}))
 
 const filesCounterText = computed(() => {
   if (!showFilesCounter.value || maxFiles.value == null || !multiple.value) return ''
@@ -780,12 +1018,15 @@ const formatBytes = (bytes) => {
 const constraintsText = computed(() => {
   const maxFilesText = (() => {
     const max = maxFilesAllowed.value
-    if (!multiple.value) return '1 file'
-    if (max == null) return 'Multiple files'
-    return `Up to ${max} files`
+    if (!multiple.value) return resolvedFileUiLocale.value.singleFileLimit
+    if (max == null) return resolvedFileUiLocale.value.multipleFilesLimit
+    return formatLocaleMessage(resolvedFileUiLocale.value.upToFilesLimit, { max })
   })()
 
-  return `${maxFilesText} • Max size per file: ${formatBytes(maxFileSizeBytes.value)}`
+  const maxPerFile = formatLocaleMessage(resolvedFileUiLocale.value.maxSizePerFile, {
+    size: formatBytes(maxFileSizeBytes.value),
+  })
+  return `${maxFilesText} • ${maxPerFile}`
 })
 
 const formatDefaultValues = computed(() => {
@@ -845,7 +1086,38 @@ const formatDefaultValues = computed(() => {
   const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#ffffff' : lightTextColorLabelActive.value
   const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#000000' : darkTextColorLabelActive.value
 
-	return {
+  const fontFamilyFileListValue = !fontFamilyFileList.value ? `'Lato', sans-serif` : fontFamilyFileList.value
+  const fontSizeFileListValue = !fontSizeFileList.value ? '1em' : fontSizeFileList.value
+  const fontWeightFileListValue = !fontWeightFileList.value ? 400 : fontWeightFileList.value
+  const textFileListColorValue = !textFileListColor.value ? '#000000' : textFileListColor.value
+  const textFileListPaddingValue = !textFileListPadding.value ? '2px' : textFileListPadding.value
+  const textFileListMarginValue = !textFileListMargin.value ? '2px' : textFileListMargin.value
+
+  const fontFamilyConstraintsValue = !fontFamilyConstraints.value ? `'Lato', sans-serif` : fontFamilyConstraints.value
+  const fontSizeConstraintsValue = !fontSizeConstraints.value ? '1.2em' : fontSizeConstraints.value
+  const fontWeightConstraintsValue = !fontWeightConstraints.value ? 400 : fontWeightConstraints.value
+  const textConstraintsColorValue = !textConstraintsColor.value ? '#6b7280' : textConstraintsColor.value
+  const textConstraintsPaddingValue = !textConstraintsPadding.value ? '2px' : textConstraintsPadding.value
+  const textConstraintsMarginValue = !textConstraintsMargin.value ? '6px 0 0 0' : textConstraintsMargin.value
+
+  const fontFamilyClearButtonValue = !fontFamilyClearButton.value ? `'Lato', sans-serif` : fontFamilyClearButton.value
+  const fontSizeClearButtonValue = !fontSizeClearButton.value ? '1.2em' : fontSizeClearButton.value
+  const fontWeightClearButtonValue = !fontWeightClearButton.value ? 400 : fontWeightClearButton.value
+  const textClearButtonColorValue = !textClearButtonColor.value ? '#6b7280' : textClearButtonColor.value
+  const textClearButtonColorHoverValue = !textClearButtonColorHover.value ? '#000000' : textClearButtonColorHover.value
+  const textClearButtonPaddingValue = !textClearButtonPadding.value ? '0px 6px' : textClearButtonPadding.value
+  const textClearButtonPaddingHoverValue = !textClearButtonPaddingHover.value ? '0px 6px' : textClearButtonPaddingHover.value
+  const textClearButtonBackgroundValue = !textClearButtonBackground.value ? 'transparent' : textClearButtonBackground.value
+  const textClearButtonBackgroundHoverValue = !textClearButtonBackgroundHover.value ? 'transparent' : textClearButtonBackgroundHover.value
+  
+  const fontFamilyCounterValue = !fontFamilyCounter.value ? `'Lato', sans-serif` : fontFamilyCounter.value
+  const fontSizeCounterValue = !fontSizeCounter.value ? '1.2em' : fontSizeCounter.value
+  const fontWeightCounterValue = !fontWeightCounter.value ? 600 : fontWeightCounter.value
+  const textCounterColorValue = !textCounterColor.value ? '#374151' : textCounterColor.value
+  const textCounterPaddingValue = !textCounterPadding.value ? '0px' : textCounterPadding.value
+  const textCounterMarginValue = !textCounterMargin.value ? '4px 0 0 0' : textCounterMargin.value
+  
+  return {
 		disabled: disabledValue,
 		display: displayValue,
 		font: fontValue,
@@ -899,6 +1171,33 @@ const formatDefaultValues = computed(() => {
     darkTextColorLabel: darkTextColorLabelValue,
     lightTextColorLabelActive: lightTextColorLabelActiveValue,
     darkTextColorLabelActive: darkTextColorLabelActiveValue,
+    fontFamilyFileList: fontFamilyFileListValue,
+    fontSizeFileList: fontSizeFileListValue,
+    fontWeightFileList: fontWeightFileListValue,
+    textFileListColor: textFileListColorValue,
+    textFileListPadding: textFileListPaddingValue,
+    textFileListMargin: textFileListMarginValue,
+    fontFamilyConstraints: fontFamilyConstraintsValue,
+    fontSizeConstraints: fontSizeConstraintsValue,
+    fontWeightConstraints: fontWeightConstraintsValue,
+    textConstraintsColor: textConstraintsColorValue,
+    textConstraintsPadding: textConstraintsPaddingValue,
+    textConstraintsMargin: textConstraintsMarginValue,
+    fontFamilyClearButton: fontFamilyClearButtonValue,
+    fontSizeClearButton: fontSizeClearButtonValue,
+    fontWeightClearButton: fontWeightClearButtonValue,
+    textClearButtonColor: textClearButtonColorValue,
+    textClearButtonColorHover: textClearButtonColorHoverValue,
+    textClearButtonPadding: textClearButtonPaddingValue,
+    textClearButtonPaddingHover: textClearButtonPaddingHoverValue,
+    textClearButtonBackground: textClearButtonBackgroundValue,
+    textClearButtonBackgroundHover: textClearButtonBackgroundHoverValue,
+    fontFamilyCounter: fontFamilyCounterValue,
+    fontSizeCounter: fontSizeCounterValue,
+    fontWeightCounter: fontWeightCounterValue,
+    textCounterColor: textCounterColorValue,
+    textCounterPadding: textCounterPaddingValue,
+    textCounterMargin: textCounterMarginValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -1123,7 +1422,7 @@ const fileControlAriaLabel = computed(() => {
   if (ariaLabel.value) return ariaLabel.value
   if (showLabel.value && label.value) return label.value
   if (inputPlaceholder.value) return inputPlaceholder.value
-  return 'Choose file'
+  return resolvedFileUiLocale.value.chooseFileAriaLabel
 })
 
 const styleIconSize = computed(() => {
@@ -1213,6 +1512,73 @@ const styleLabelActive = computed(() => {
   return defaultValues.theme === 'dark' ? defaultValues.darkTextColorLabelActive : defaultValues.lightTextColorLabelActive
 })
 
+const styleFileList = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return {
+    fontFamily: defaultValues.fontFamilyFileList,
+    fontSize: defaultValues.fontSizeFileList,
+    fontWeight: defaultValues.fontWeightFileList,
+    color: defaultValues.textFileListColor,
+    padding: defaultValues.textFileListPadding,
+    margin: defaultValues.textFileListMargin,
+  }
+})
+
+const styleConstraints = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return {
+    fontFamily: defaultValues.fontFamilyConstraints,
+    fontSize: defaultValues.fontSizeConstraints,
+    fontWeight: defaultValues.fontWeightConstraints,
+    color: defaultValues.textConstraintsColor,
+    padding: defaultValues.textConstraintsPadding,
+    margin: defaultValues.textConstraintsMargin,
+  }
+})
+
+const styleCounter = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return {
+    fontFamily: defaultValues.fontFamilyCounter,
+    fontSize: defaultValues.fontSizeCounter,
+    fontWeight: defaultValues.fontWeightCounter,
+    color: defaultValues.textCounterColor,
+    padding: defaultValues.textCounterPadding,
+    margin: defaultValues.textCounterMargin,
+  }
+})
+
+const styleClearButton = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return {
+    fontFamily: defaultValues.fontFamilyClearButton,
+    fontSize: defaultValues.fontSizeClearButton,
+    fontWeight: defaultValues.fontWeightClearButton,
+    color: defaultValues.textClearButtonColor,
+    padding: defaultValues.textClearButtonPadding,
+    background: defaultValues.textClearButtonBackground
+  }
+})
+const styleClearButtonPaddingHover = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.textClearButtonPaddingHover
+})
+const styleClearButtonColorHover = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.textClearButtonColorHover
+})
+const styleClearButtonBackgroundHover = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.textClearButtonBackgroundHover
+})
+
 const interacted = (event) => {
 	emit('clicked', event)
   triggerFileInput()
@@ -1227,6 +1593,14 @@ const closeNativeFilePickerFlow = () => {
   isFileDialogOpen.value = false
   const nativeFilesCount = inputRef.value?.files?.length || 0
   isActive.value = files.value.length > 0 || nativeFilesCount > 0
+  if (blurOnDialogCancel.value && files.value.length === 0 && nativeFilesCount === 0) {
+    inputRef.value?.blur?.()
+    fileDisplayRef.value?.blur?.()
+  }
+}
+
+const emitFileDialogClosed = (reason = 'cancelled', selectedCount = 0) => {
+  emit('file-dialog-closed', { reason, selectedCount })
 }
 
 const onNativeFilePickerCancel = () => {
@@ -1234,10 +1608,13 @@ const onNativeFilePickerCancel = () => {
   // Em Windows o `window` `focus` nem sempre dispara de forma confiável ao fechar o modal.
   if (!isFileDialogOpen.value) return
   closeNativeFilePickerFlow()
+  emitFileDialogClosed('cancelled', 0)
 }
 
 const triggerFileInput = () => {
   if (disabled.value || formatDefaultValues.value.inputReadonly) return
+  // Evita tentativas duplicadas de abrir o diálogo nativo no mesmo gesto de clique.
+  if (isFileDialogOpen.value) return
   isActive.value = true
   isFileDialogOpen.value = true
   const thisDialogToken = ++fileDialogToken.value
@@ -1247,6 +1624,7 @@ const triggerFileInput = () => {
     const nativeFilesCount = inputRef.value?.files?.length || 0
     if (files.value.length === 0 && nativeFilesCount === 0) {
       isActive.value = false
+      emitFileDialogClosed('cancelled', 0)
     }
   }
   const handleWindowFocusAfterFileDialog = () => {
@@ -1268,6 +1646,7 @@ const onChangeFile = async (event) => {
   isFileDialogOpen.value = false
   errors.value = []
   const selected = Array.from(event.target.files || [])
+  const selectedCount = selected.length
 
   const batchKeys = new Set()
   const validFiles = []
@@ -1322,6 +1701,7 @@ const onChangeFile = async (event) => {
 
   emit('changed', files.value)
   emit('current-value', files.value)
+  emitFileDialogClosed(selectedCount > 0 ? 'selected' : 'cancelled', selectedCount)
 }
 
 const handleFileInputBlur = () => {
@@ -1354,6 +1734,7 @@ const onFileDisplayKeydown = (e) => {
 */
 const handleLabelClick = (event) => {
   // Prevenir que o evento seja capturado pelo @click="interacted" do elemento pai
+  event.preventDefault()
   event.stopPropagation()
   
   // Verificar se o componente está desabilitado ou readonly
@@ -1559,11 +1940,11 @@ watch(isActive, value => {
           }
 
           .component__input {
-            border-bottom: 1px solid v-bind('darkDisabledEyeBgColor');
+            border-bottom: 1px solid v-bind('darkDisabledControlBorderColor');
 
             &:focus,
             &:active {
-              border-bottom: 1px solid v-bind('darkDisabledEyeBgColor');
+              border-bottom: 1px solid v-bind('darkDisabledControlBorderColor');
             }
           }
         }
@@ -1574,11 +1955,11 @@ watch(isActive, value => {
           }
 
           .component__input {
-            border: 1px solid v-bind('darkDisabledEyeBgColor');
+            border: 1px solid v-bind('darkDisabledControlBorderColor');
 
             &:focus,
             &:active {
-              border: 1px solid v-bind('darkDisabledEyeBgColor');
+              border: 1px solid v-bind('darkDisabledControlBorderColor');
             }
           }
         }
@@ -1624,13 +2005,13 @@ watch(isActive, value => {
         .component__input {
           background-color: transparent;
           border: 0;
-          border-bottom: 1px solid v-bind('darkEyeBgColor');
+          border-bottom: 1px solid v-bind('darkControlBorderColor');
 
           &:focus,
           &:active {
             background-color: transparent;
             border: 0;
-            border-bottom: 1px solid v-bind('darkEyeBgColorActive');
+            border-bottom: 1px solid v-bind('darkControlBorderColorActive');
           }
         }
       }
@@ -1643,12 +2024,12 @@ watch(isActive, value => {
 
         .component__input {
           background-color: transparent;
-          border: 1px solid v-bind('darkEyeBgColor');
+          border: 1px solid v-bind('darkControlBorderColor');
 
           &:focus,
           &:active {
             background-color: transparent;
-            border: 1px solid v-bind('darkEyeBgColorActive');
+            border: 1px solid v-bind('darkControlBorderColorActive');
           }
         }
       }
@@ -1700,11 +2081,11 @@ watch(isActive, value => {
           }
 
           .component__input {
-            border-bottom: 1px solid v-bind('lightDisabledEyeBgColor');
+            border-bottom: 1px solid v-bind('lightDisabledControlBorderColor');
 
             &:focus,
             &:active {
-              border-bottom: 1px solid v-bind('lightDisabledEyeBgColor');
+              border-bottom: 1px solid v-bind('lightDisabledControlBorderColor');
             }
           }
         }
@@ -1715,11 +2096,11 @@ watch(isActive, value => {
           }
 
           .component__input {
-            border: 1px solid v-bind('lightDisabledEyeBgColor');
+            border: 1px solid v-bind('lightDisabledControlBorderColor');
 
             &:focus,
             &:active {
-              border: 1px solid v-bind('lightDisabledEyeBgColor');
+              border: 1px solid v-bind('lightDisabledControlBorderColor');
             }
           }
         }
@@ -1765,13 +2146,13 @@ watch(isActive, value => {
         .component__input {
           background-color: transparent;
           border: 0;
-          border-bottom: 1px solid v-bind('lightEyeBgColor');
+          border-bottom: 1px solid v-bind('lightControlBorderColor');
 
           &:focus,
           &:active {
             background-color: transparent;
             border: 0;
-            border-bottom: 1px solid v-bind('lightEyeBgColorActive');
+            border-bottom: 1px solid v-bind('lightControlBorderColorActive');
           }
         }
       }
@@ -1784,12 +2165,12 @@ watch(isActive, value => {
 
         .component__input {
           background-color: transparent;
-          border: 1px solid v-bind('lightEyeBgColor');
+          border: 1px solid v-bind('lightControlBorderColor');
 
           &:focus,
           &:active {
             background-color: transparent;
-            border: 1px solid v-bind('lightEyeBgColorActive');
+            border: 1px solid v-bind('lightControlBorderColorActive');
           }
         }
       }
@@ -1879,38 +2260,6 @@ watch(isActive, value => {
         border: 0;
       }
 
-      &.component__input__eye-default--hidden {
-        // Internet Explorer / Edge antigo
-        &::-ms-reveal,
-        &::-ms-clear {
-          display: none;
-          width: 0;
-          height: 0;
-        }
-        
-        // Remove aparência padrão do navegador
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        
-        // Chrome / Edge moderno - força esconder qualquer elemento decorativo
-        &::-webkit-credentials-auto-fill-button {
-          display: none !important;
-          visibility: hidden !important;
-          opacity: 0 !important;
-          pointer-events: none !important;
-          position: absolute !important;
-          right: -9999px !important;
-          width: 0 !important;
-          height: 0 !important;
-        }
-        
-        // Firefox
-        &::-moz-textfield-decoration-container {
-          display: none !important;
-        }
-      }
-
       // inicio propActiveStyle
       &.component__input--active--italic:focus,
       &.component__input--active--italic:active {
@@ -1950,6 +2299,12 @@ watch(isActive, value => {
   }
 }
 
+.component__file-list {
+  display:flex;
+  flex-direction:column;
+  gap:12px; 
+}
+
 .component__file-info {
   width: 100%;
   font-size: 1.3em;
@@ -1960,17 +2315,10 @@ watch(isActive, value => {
   text-overflow: ellipsis;
 }
 
-.component__file-constraints {
-  margin-top: 6px;
-  font-size: 1.2em;
-  color: #6b7280;
-}
-
-.component__file-counter {
-  margin-top: 4px;
-  font-size: 1.2em;
-  font-weight: 600;
-  color: #374151;
+.component__file-constraints-counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .component__file-errors {
@@ -2007,17 +2355,12 @@ watch(isActive, value => {
 
 .component__file-clear {
   cursor: pointer;
-  // position: absolute;
-  // right: 0;
-  // top: 0;
-  // bottom: 0;
-  background: aqua;
   align-content: center;
-  padding: 0 6px;
 
   &:hover {
-    background: #000;
-    color: #fff;
+    background: v-bind('styleClearButtonBackgroundHover') !important;
+    color: v-bind('styleClearButtonColorHover') !important;
+    padding: v-bind('styleClearButtonPaddingHover') !important;
   }
 }
 

@@ -834,71 +834,6 @@
     <div v-if="btType === 'file'" class="row" style="background-color: #d5d0fd;">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
-        <div
-          style="background: #e8f4fc; border: 1px solid #7ec8e3; border-radius: 8px; padding: 16px; margin-bottom: 28px; color: #0d3d4d;"
-        >
-          <h4 class="test-page__content-tile" style="margin-top: 0; color: #000;">
-            NbInputFile + NbFileUpload (XHR, %, uploads paralelos)
-          </h4>
-          <p style="margin: 0 0 12px; font-size: 0.95em; line-height: 1.45;">
-            <strong>Como testar o upload:</strong> noutro terminal, nesta pasta (<code>packages/vue-components/nb-inputs</code>), execute
-            <code style="background:#fff;padding:2px 6px;border-radius:4px;">npm run dev:upload-server</code>.
-            O Vite (dev) faz proxy de
-            <code>/__nb-upload</code>
-            → <code>http://127.0.0.1:8787</code>. Ficheiros guardados em
-            <code>.uploads-dev/</code>.
-          </p>
-          <p style="margin: 0 0 12px; font-size: 0.88em; line-height: 1.45; opacity: 0.92;">
-            <strong>Explicação simples (<code>:key</code> e <code>@update:files</code>)</strong><br />
-            Imagina <strong>duas gavetas</strong>: uma é o <strong>botão de escolher ficheiros</strong> (<code>NbInputFile</code>), outra é a <strong>lista para enviar</strong> (<code>NbFileUpload</code>).
-            O que escolhes na primeira é <strong>copiado</strong> para a segunda (<code>uploadDemoFiles</code>). Se na segunda apagas tudo com «Limpar tudo», a cópia fica vazia — mas a primeira gaveta podia continuar a <strong>mostrar</strong> os nomes antigos, porque não sabe que apagaste.
-            O <code>@update:files</code> avisa o ecrã: «a lista oficial agora é esta». O <code>:key</code> que muda é como <strong>trocar a gaveta inteira</strong>: o Vue recria o botão de escolher, e a lista mostrada fica igual à lista real (vazia ou não).
-          </p>{{uploadDemoPickerKey}}
-          <NbInputFile
-            :key="uploadDemoPickerKey"
-            nb-id="file-upload-demo-picker"
-            display="b"
-            input-name="file-upload-demo-picker"
-            input-style="background"
-            :show-label="true"
-            label="Escolha ficheiros para enviar"
-            :multiple="true"
-            :max-files="8"
-            file-extension="image/*,.pdf,.txt"
-            :max-file-size-bytes="15 * 1024 * 1024"
-            :show-constraints-text="true"
-            multiple-files-selected-text="ficheiros"
-            aria-label="Demo picker + upload"
-            @changed="setUploadDemoFiles"
-            @validation-error="({ message }) => console.warn('[upload demo]', message)"
-          />
-          <p style="margin: 0 0 8px; font-size: 0.88em; opacity: 0.95;">
-            <code>min-progress-display-ms</code> anima a barra com ficheiros pequenos (o XHR muitas vezes só dispara 0→100).
-            Upload sequencial: <code>:concurrent="1"</code>.
-          </p>
-          <div style="margin-top: 16px;">
-            <!-- NbFileUpload after-upload-mode: default | clear-on-success | lock-until-clear-all -->
-            <NbFileUpload
-              nb-id="file-upload-demo-queue"
-              :files="uploadDemoFiles"
-              :upload-url="uploadDemoUploadUrl"
-              :concurrent="2"
-              :max-retries="1"
-              :min-progress-display-ms="1200"
-              after-upload-mode="lock-until-clear-all"
-              :reupload-on-start="true"
-              :show-start-button="true"
-              :show-cancel-all="true"
-              :auto-start="false"
-              @update:files="onUploadDemoQueueFiles"
-              @upload-progress="(p) => console.log('[upload demo] progress', p)"
-              @upload-complete="(p) => console.log('[upload demo] complete', p)"
-              @upload-error="(p) => console.warn('[upload demo] error', p)"
-              @upload-all-complete="(p) => console.log('[upload demo] batch', p)"
-            />
-          </div>
-        </div>
-
         <h4 class="test-page__content-tile" style="color: #000;">NbInputFile - Single (background / border / line)</h4>
 
         <NbInputFile
@@ -1348,6 +1283,174 @@
           aria-label="Tiny multi file demo"
           @changed="($event) => console.log('file-tiny-multi', $event)"
         />
+
+        <p style="margin: 24px 0 8px; color: #333; font-size: 0.95em;">
+          <strong>Capture (mobile):</strong> quando <code>accept</code> é mídia, <code>capture-mode</code> pode sugerir câmera.
+          Para tipos sem mídia (ex.: PDF), o capture é ignorado automaticamente.
+        </p>
+
+        <NbInputFile
+          nb-id="file-capture-camera-back"
+          display="b"
+          input-name="file-capture-camera-back"
+          input-style="background"
+          :show-label="true"
+          label="Imagem (capture traseira)"
+          file-extension="image/*"
+          capture-mode="environment"
+          :multiple="false"
+          :max-file-size-bytes="10 * 1024 * 1024"
+          :show-constraints-text="true"
+          aria-label="Capture camera back demo"
+          @changed="($event) => console.log('file-capture-camera-back', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-capture-camera-front"
+          display="b"
+          input-name="file-capture-camera-front"
+          input-style="border"
+          :show-label="true"
+          label="Vídeo (capture frontal)"
+          file-extension="video/*"
+          capture-mode="user"
+          :multiple="false"
+          :max-file-size-bytes="40 * 1024 * 1024"
+          :show-constraints-text="true"
+          aria-label="Capture camera front demo"
+          @changed="($event) => console.log('file-capture-camera-front', $event)"
+        />
+
+        <NbInputFile
+          nb-id="file-capture-pdf-ignored"
+          display="b"
+          input-name="file-capture-pdf-ignored"
+          input-style="line"
+          :show-label="true"
+          label="PDF (capture ignorado)"
+          file-extension="application/pdf,.pdf"
+          capture-mode="environment"
+          :multiple="false"
+          :max-file-size-bytes="8 * 1024 * 1024"
+          :show-constraints-text="true"
+          aria-label="Capture ignored for pdf demo"
+          @changed="($event) => console.log('file-capture-pdf-ignored', $event)"
+        />
+
+        <p style="margin: 20px 0 8px; color: #333; font-size: 0.95em;">
+          Slot <code>file-list</code> customizado + props de estilo da lista (<code>font-family-file-list</code>,
+          <code>font-size-file-list</code>, <code>font-weight-file-list</code>, <code>text-file-list-*</code>).
+        </p>
+        <NbInputFile
+          nb-id="file-slot-list-custom"
+          display="b"
+          input-name="file-slot-list-custom"
+          input-style="border"
+          :show-label="true"
+          label="Lista customizada (slot file-list)"
+          file-extension="image/*,.pdf,.txt"
+          :multiple="true"
+          :max-files="6"
+          :show-files-counter="true"
+          :show-constraints-text="true"
+          :max-file-size-bytes="12 * 1024 * 1024"
+          font-family-file-list="'Lato', sans-serif"
+          font-size-file-list="0.95em"
+          :font-weight-file-list="600"
+          text-file-list-color="#1f2937"
+          text-file-list-padding="6px"
+          text-file-list-margin="4px 0"
+          aria-label="Custom file-list slot demo"
+          @changed="($event) => console.log('file-slot-list-custom', $event)"
+        >
+          <template #file-list="{ files, removeFile }">
+            <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;">
+              <li
+                v-for="(file, fileIndex) in files"
+                :key="`${file.name}-${file.size}-${fileIndex}`"
+                style="display:flex; align-items:center; justify-content:space-between; gap:12px; background:#f3f4f6; border:1px solid #d1d5db; border-radius:6px; padding:8px 10px;"
+              >
+                <span style="color:#111827;">
+                  {{ file.name }}
+                  <small style="opacity:.7;">({{ Math.round(file.size / 1024) }} KB)</small>
+                </span>
+                <button
+                  type="button"
+                  style="border:none; border-radius:4px; background:#fee2e2; color:#991b1b; padding:4px 8px; cursor:pointer;"
+                  @click="removeFile(fileIndex)"
+                >
+                  Excluir
+                </button>
+              </li>
+            </ul>
+          </template>
+        </NbInputFile>
+
+        <p style="margin: 20px 0 8px; color: #333; font-size: 0.95em;">
+          Locale em português (validação + textos de UI).
+        </p>
+        <NbInputFile
+          nb-id="file-locale-ptbr"
+          display="b"
+          input-name="file-locale-ptbr"
+          input-style="background"
+          :show-label="true"
+          label="Arquivo com locale PT-BR"
+          file-extension=".pdf,image/*"
+          :multiple="true"
+          :max-files="3"
+          :max-file-size-bytes="2 * 1024 * 1024"
+          :show-files-counter="true"
+          :show-constraints-text="true"
+          :locale="{
+            clearAction: 'Limpar',
+            chooseFileAriaLabel: 'Escolher arquivo',
+            singleFileLimit: '1 arquivo',
+            multipleFilesLimit: 'Múltiplos arquivos',
+            upToFilesLimit: 'Até {max} arquivos',
+            maxSizePerFile: 'Tamanho máx. por arquivo: {size}',
+            filesCounter: '{current} de {max} arquivos',
+            maxFilesReached: 'Máximo de {max} arquivo(s).',
+            sizeExceeded: 'O arquivo {fileName} excede o tamanho máximo.',
+          }"
+          aria-label="Exemplo locale português"
+          @changed="($event) => console.log('file-locale-ptbr', $event)"
+          @validation-error="({ file, message }) => console.warn('file-locale-ptbr', message, file)"
+        />
+
+        <p style="margin-top: 4px; color: #000;">
+          Text before
+
+          <NbInputFile
+            nb-id="file-capture-pdf-ignored"
+            display="ib"
+            input-name="file-capture-pdf-ignored"
+            input-style="line"
+            :show-label="true"
+            label="PDF (capture ignorado)"
+            file-extension="application/pdf,.pdf"
+            capture-mode="environment"
+            :multiple="false"
+            :max-file-size-bytes="8 * 1024 * 1024"
+            :show-constraints-text="true"
+            aria-label="Capture ignored for pdf demo"
+            :showMsg="false"
+            :hasMsg="true"
+            message="Erro teste"
+            @changed="($event) => console.log('file-capture-pdf-ignored', $event)"
+          />
+          <NbInput
+            nb-id="test4"
+            display="ib"
+            :show-label="false"
+            :showMsg="true"
+            :hasMsg="true"
+            message="Erro teste"
+            label="Este é um label gigante para ver se sai para fora do componente"
+            @current-value="($event) => console.log($event)"
+          />
+          text after
+        </p>
       </div>
     </div>
 
@@ -3012,7 +3115,6 @@ const NbTextarea = defineAsyncComponent(() => import('@components/NbTextarea.vue
 const NbDatePicker = defineAsyncComponent(() => import('@components/NbDatePicker.vue'))
 const NbInputClean = defineAsyncComponent(() => import('@components/NbInputClean.vue'))
 const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.vue'))
-const NbFileUpload = defineAsyncComponent(() => import('@components/NbFileUpload.vue'))
 
 const btType = ref('file')
 const currentRadioItem = ref('')
@@ -3047,23 +3149,6 @@ const testValidationMax = ref('')
 
 const selectedFiles = ref([])
 const imagePreviews = ref([])
-
-/** Demo NbInputFile → NbFileUpload — mesmo origin via proxy Vite (`vite.config.js`). */
-const uploadDemoFiles = ref([])
-const uploadDemoUploadUrl = '/__nb-upload/upload'
-const uploadDemoPickerKey = ref(0)
-
-const setUploadDemoFiles = (files) => {
-  uploadDemoFiles.value = Array.isArray(files) ? files : []
-}
-
-/** Sincroniza a fila com o pai; “limpar tudo” reinicia o picker (`:key`). */
-const onUploadDemoQueueFiles = (files) => {
-  uploadDemoFiles.value = Array.isArray(files) ? files : []
-  if (uploadDemoFiles.value.length === 0) {
-    uploadDemoPickerKey.value += 1
-  }
-}
 
 // Handler para evento @valid
 const handleValidationTest = (isValid) => {
