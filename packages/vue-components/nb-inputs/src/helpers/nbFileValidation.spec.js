@@ -7,6 +7,7 @@ import {
   isDuplicateInBatchKeySet,
   formatLocaleMessage,
   validateIncomingFile,
+  FileValidationErrorType,
 } from './nbFileValidation.js'
 
 function file(name, type, size = 100) {
@@ -62,5 +63,6 @@ describe('nbFileValidation', () => {
     expect(r.ok).toBe(false)
     expect(r.error).toContain('PT:')
     expect(r.error).toContain('application/octet-stream')
+    expect(r.errorType).toBe(FileValidationErrorType.TYPE_NOT_ALLOWED)
   })
 })

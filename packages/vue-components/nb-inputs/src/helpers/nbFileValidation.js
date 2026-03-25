@@ -17,6 +17,53 @@
  * gifDimensionsInvalid, gifLoadError, videoAspectInvalid, videoDurationInvalid, videoLoadError,
  * maxFilesReached, filesCounter.
  */
+/**
+ * Tipos estáveis para erros de validação de ficheiro (uso em UI, analytics, i18n condicional).
+ * Valores em SCREAMING_SNAKE_CASE; compara com `payload.errorType` nos eventos do componente.
+ */
+export const FileValidationErrorType = Object.freeze({
+  TYPE_NOT_ALLOWED: 'TYPE_NOT_ALLOWED',
+  EXTENSION_NOT_ALLOWED: 'EXTENSION_NOT_ALLOWED',
+  SIZE_EXCEEDED: 'SIZE_EXCEEDED',
+  DUPLICATE_IN_LIST: 'DUPLICATE_IN_LIST',
+  DUPLICATE_IN_BATCH: 'DUPLICATE_IN_BATCH',
+  GIF_DIMENSIONS_INVALID: 'GIF_DIMENSIONS_INVALID',
+  GIF_LOAD_ERROR: 'GIF_LOAD_ERROR',
+  VIDEO_ASPECT_INVALID: 'VIDEO_ASPECT_INVALID',
+  VIDEO_DURATION_INVALID: 'VIDEO_DURATION_INVALID',
+  VIDEO_LOAD_ERROR: 'VIDEO_LOAD_ERROR',
+  MAX_FILES_REACHED: 'MAX_FILES_REACHED',
+  UNKNOWN: 'UNKNOWN',
+})
+
+/**
+ * Objeto normalizado para `errors` internos e eventos `validation-error` / `validation-errors`.
+ *
+ * @param {File | null} file
+ * @param {string} msg
+ * @param {string} errorType - Um valor de {@link FileValidationErrorType}.
+ * @returns {{ file: File | null, fileName: string, msg: string, errorType: string }}
+ */
+export function buildFileValidationErrorPayload(file, msg, errorType) {
+  return {
+    file: file ?? null,
+    fileName: file?.name ?? '',
+    msg,
+    errorType,
+  }
+}
+
+/**
+ * @param {string} message
+ * @param {string} errorType
+ * @returns {Error & { code: string }}
+ */
+export function createFileValidationError(message, errorType) {
+  const err = new Error(message)
+  err.code = errorType
+  return err
+}
+
 export const DEFAULT_FILE_VALIDATION_LOCALE = {
   typeNotAllowed: 'File type not allowed ({fileType}). Accept: {accept}',
   extensionNotAllowed: 'Extension not allowed for \'{fileName}\'. Allowed: {list}',
@@ -224,16 +271,16 @@ export function validateGifDimensions(file, gifWidth, gifHeight, locale = {}) {
       if (ok) resolve()
       else {
         const pairs = widths.map((gw, i) => `${gw}x${heights[i]}`).join(' or ')
-        reject(new Error(formatLocaleMessage(L.gifDimensionsInvalid, {
+        reject(createFileValidationError(formatLocaleMessage(L.gifDimensionsInvalid, {
           width: w,
           height: h,
           allowedPairs: pairs,
-        })))
+        }), FileValidationErrorType.GIF_DIMENSIONS_INVALID))
       }
     }
     img.onerror = () => {
       URL.revokeObjectURL(url)
-      reject(new Error(L.gifLoadError))
+      reject(createFileValidationError(L.gifLoadError, FileValidationErrorType.GIF_LOAD_ERROR))
     }
     img.src = url
   })
@@ -292,12 +339,12 @@ export function validateVideoMetadata(file, options = {}) {
           if (vh > 0) {
             const videoAspect = vw / vh
             if (Math.abs(videoAspect - targetAspect) > aspectTolerance) {
-              reject(new Error(formatLocaleMessage(L.videoAspectInvalid, {
+              reject(createFileValidationError(formatLocaleMessage(L.videoAspectInvalid, {
                 width: vw,
                 height: vh,
                 aspect: videoAspect.toFixed(2),
                 ratio: videoRatio,
-              })))
+              }), FileValidationErrorType.VIDEO_ASPECT_INVALID))
               return
             }
           }
@@ -305,10 +352,10 @@ export function validateVideoMetadata(file, options = {}) {
       }
 
       if (needDuration && Number.isFinite(video.duration) && video.duration > videoMaxDuration) {
-        reject(new Error(formatLocaleMessage(L.videoDurationInvalid, {
+        reject(createFileValidationError(formatLocaleMessage(L.videoDurationInvalid, {
           duration: video.duration.toFixed(2),
           maxDuration: videoMaxDuration,
-        })))
+        }), FileValidationErrorType.VIDEO_DURATION_INVALID))
         return
       }
 
@@ -317,7 +364,7 @@ export function validateVideoMetadata(file, options = {}) {
 
     video.onerror = () => {
       URL.revokeObjectURL(url)
-      reject(new Error(L.videoLoadError))
+      reject(createFileValidationError(L.videoLoadError, FileValidationErrorType.VIDEO_LOAD_ERROR))
     }
 
     video.src = url
@@ -327,7 +374,7 @@ export function validateVideoMetadata(file, options = {}) {
 /**
  * Runs all validation steps in order: accept, extensions, size, list duplicate,
  * batch duplicate, GIF dimensions, video metadata.
- * Returns a discriminated result instead of throwing for synchronous rules; async failures are caught and mapped to `{ ok: false, error }`.
+ * Returns a discriminated result instead of throwing for synchronous rules; async failures are caught and mapped to `{ ok: false, error, errorType }`.
  *
  * @param {File} file
  * @param {object} options
@@ -343,7 +390,7 @@ export function validateVideoMetadata(file, options = {}) {
  * @param {number | null} [options.videoMaxDuration] - Seconds.
  * @param {number} [options.videoAspectTolerance=0.01]
  * @param {Record<string, string>} [options.locale] - Partial override of `DEFAULT_FILE_VALIDATION_LOCALE`.
- * @returns {Promise<{ ok: true } | { ok: false, error: string }>}
+ * @returns {Promise<{ ok: true } | { ok: false, error: string, errorType: string }>}
  */
 export async function validateIncomingFile(file, {
   accept,
@@ -369,6 +416,7 @@ export async function validateIncomingFile(file, {
           fileType: file.type || 'unknown',
           accept: accept || 'any',
         }),
+        errorType: FileValidationErrorType.TYPE_NOT_ALLOWED,
       }
     }
     if (!fileMatchesAllowedExtensions(file.name, allowedExtensions)) {
@@ -379,24 +427,28 @@ export async function validateIncomingFile(file, {
           fileName: file.name,
           list,
         }),
+        errorType: FileValidationErrorType.EXTENSION_NOT_ALLOWED,
       }
     }
     if (fileExceedsMaxSize(file, maxFileSizeBytes)) {
       return {
         ok: false,
         error: formatLocaleMessage(L.sizeExceeded, { fileName: file.name }),
+        errorType: FileValidationErrorType.SIZE_EXCEEDED,
       }
     }
     if (isDuplicateOfList(file, existingFiles, allowDuplicates)) {
       return {
         ok: false,
         error: formatLocaleMessage(L.duplicateInList, { fileName: file.name }),
+        errorType: FileValidationErrorType.DUPLICATE_IN_LIST,
       }
     }
     if (isDuplicateInBatchKeySet(file, batchKeySet, allowDuplicates)) {
       return {
         ok: false,
         error: formatLocaleMessage(L.duplicateInBatch, { fileName: file.name }),
+        errorType: FileValidationErrorType.DUPLICATE_IN_BATCH,
       }
     }
 
@@ -411,6 +463,7 @@ export async function validateIncomingFile(file, {
     return { ok: true }
   } catch (e) {
     const msg = e && typeof e.message === 'string' ? e.message : String(e)
-    return { ok: false, error: msg }
+    const errorType = e && typeof e.code === 'string' && e.code ? e.code : FileValidationErrorType.UNKNOWN
+    return { ok: false, error: msg, errorType }
   }
 }

@@ -20,6 +20,7 @@
           <option value="datePicker">datePicker</option>
           <option value="clean">clean</option>
           <option value="file">file</option>
+          <option value="search">search</option>
         </select>
       </div>
     </div>
@@ -862,11 +863,15 @@
           :show-label="true"
           label="Single - border"
           file-extension=".pdf,.doc,.docx"
-          :max-file-size-bytes="5 * 1024 * 1024"
+          :max-file-size-bytes="1 * 1024 * 1024"
           :show-constraints-text="true"
           aria-label="File single border"
+          @clicked="() => console.log('file-single-bg clicked')"
           @current-value="($event) => console.log('file-single-border current-value', $event)"
           @changed="($event) => console.log('file-single-border changed', $event)"
+          @focused="() => console.log('file-single-bg focused')"
+          @blurred="() => console.log('file-single-bg blurred')"
+          @validation-error="($event) => console.log('file-single-border validation-error', $event)"
         />
 
         <NbInputFile
@@ -1415,8 +1420,37 @@
           }"
           aria-label="Exemplo locale português"
           @changed="($event) => console.log('file-locale-ptbr', $event)"
-          @validation-error="({ file, message }) => console.warn('file-locale-ptbr', message, file)"
+          @validation-error="(p) => console.warn('file-locale-ptbr', p.msg, p.fileName, p.errorType)"
         />
+
+        <h4 class="test-page__content-tile" style="margin-top: 24px; color: #000;">NbInputFile - Error validation events</h4>
+
+        <NbInputFile
+          nb-id="file-multiple-border"
+          display="b"
+          input-name="file-multiple-border"
+          input-style="border"
+          :show-label="true"
+          label="Multiple - border"
+          file-extension=".pdf,.doc,.docx"
+          :multiple="true"
+          :max-files="2"
+          :max-file-size-bytes="2 * 1024 * 1024"
+          :show-constraints-text="true"
+          aria-label="File multiple border"
+          @validation-errors="onMultipleBorderValidationErrors"
+          @validation-error="onMultipleBorderValidationItem"
+        />
+
+        <p style="margin-top: 15px; color: #000;">inputFileErrors below if has errors:</p>
+        <ul v-if="inputFileErrors.length > 0" style="color: #000;">
+          <li v-for="(err, idx) in inputFileErrors" :key="`${idx}-${err.msg}`">
+            {{ err.errorType }}: {{ err.msg }}
+            <span v-if="err.fileName"> ({{ err.fileName }})</span>
+          </li>
+        </ul>
+
+        <h4 class="test-page__content-tile" style="margin-top: 24px; color: #000;">NbInputFile - display inline-block</h4>
 
         <p style="margin-top: 4px; color: #000;">
           Text before
@@ -1437,16 +1471,20 @@
             :showMsg="false"
             :hasMsg="true"
             message="Erro teste"
+            :showFileList="false"
+            :showConstraintsText="true"
+            :extraContendAbsolute="true"
             @changed="($event) => console.log('file-capture-pdf-ignored', $event)"
           />
           <NbInput
             nb-id="test4"
             display="ib"
-            :show-label="false"
+            :show-label="true"
             :showMsg="true"
             :hasMsg="true"
             message="Erro teste"
             label="Este é um label gigante para ver se sai para fora do componente"
+            :extraContendAbsolute="true"
             @current-value="($event) => console.log($event)"
           />
           text after
@@ -1900,7 +1938,7 @@
               <div>Erro teste</div>
             </template>
           </NbDatePicker>
-          ASDASDAS1
+          ASDASDAS
 
           <p>ASDASDAS2</p>
           <p>ASDASDAS3</p>
@@ -3100,6 +3138,26 @@
         </div>
       </div>
     </div>
+
+    <div v-if="btType === 'search'" class="row"  style="background-color: #d5d0fd;">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px;">
+        <h4 class="test-page__content-tile">NbSearch</h4>
+        
+        <NbInputSearch
+          nb-id="search-1"
+          display="b"
+          label="Search"
+          input-name="search-1"
+          input-type="search"
+          input-style="border"
+          light-text-color="#ffffff"
+          @changed="($event) => console.log('changed:', $event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -3115,8 +3173,9 @@ const NbTextarea = defineAsyncComponent(() => import('@components/NbTextarea.vue
 const NbDatePicker = defineAsyncComponent(() => import('@components/NbDatePicker.vue'))
 const NbInputClean = defineAsyncComponent(() => import('@components/NbInputClean.vue'))
 const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.vue'))
+const NbInputSearch = defineAsyncComponent(() => import('@components/NbInputSearch.vue'))
 
-const btType = ref('file')
+const btType = ref('search')
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {
@@ -3149,6 +3208,8 @@ const testValidationMax = ref('')
 
 const selectedFiles = ref([])
 const imagePreviews = ref([])
+
+const inputFileErrors = ref([])
 
 // Handler para evento @valid
 const handleValidationTest = (isValid) => {
@@ -3229,6 +3290,16 @@ const onFilesChanged = (files) => {
   imagePreviews.value = files
     .filter(f => f.type?.startsWith('image/'))
     .map(f => URL.createObjectURL(f))
+}
+
+/** Lista completa após cada seleção (inclui vários erros no mesmo lote). */
+const onMultipleBorderValidationErrors = (messages) => {
+  inputFileErrors.value = Array.isArray(messages) ? [...messages] : []
+}
+
+/** Um evento por item: { file, fileName, msg, errorType }. */
+const onMultipleBorderValidationItem = (payload) => {
+  console.warn('File multiple border — validation-error:', payload)
 }
 </script>
 

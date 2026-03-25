@@ -39,7 +39,8 @@
         :tabindex="-1"
         role="input"
         :style="[borderRadiusStyle]"
-        @focus="isActive = true"
+        @click="handleNativeInputClick"
+        @focus="handleNativeInputFocus"
         @blur="handleFileInputBlur"
         @cancel="onNativeFilePickerCancel"
         @change="onChangeFile"
@@ -56,6 +57,7 @@
         :aria-label="fileControlAriaLabel"
         :aria-disabled="disabled || inputReadonly"
         :style="[borderRadiusStyle, inputIconStyle]"
+        @click="onFileDisplayClick"
         @focus="handleFileDisplayFocus"
         @blur="handleFileDisplayBlur"
         @keydown="onFileDisplayKeydown"
@@ -78,42 +80,53 @@
         </slot>
       </label>
     </div>
-    <div v-if="files.length > 0" class="component__file-list" :style="[styleFileList]">
-      <slot name="file-list" :files="files" :removeFile="removeFile">
-        <ul>
-          <li v-for="(file, fileIndex) in files" :key="duplicateKey(file)">
-            {{ file.name }} <span @click="removeFile(fileIndex)">X</span>
-          </li>
-        </ul>
-      </slot>
-    </div>
-    <div
-      v-if="validShowMsg"
-      :class="['component__message', hasCustomMsg ? 'component__message--custom' : 'component__message--default']"
-    >
-      <slot name="message">{{ message }}</slot>
-    </div>
-    <div v-if="errors.length" class="component__file-errors">
-      <slot v-if="errors.length" name="file-errors" :errors="errors">
-        <div class="component__file-errors--inline">
-          <div v-for="(error, index) in errors" :key="index" class="component__file-error">
-            {{ error }}
-          </div>
-        </div>
-      </slot>
-    </div>
-    
-    <div class="component__file-constraints-counter">
-      <p v-if="showConstraintsText" class="component__file-constraints" :style="[styleConstraints]">
-        {{ constraintsText }}
-      </p>
-      <p
-        v-if="showFilesCounter && maxFiles != null && multiple"
-        class="component__file-counter" :style="[styleCounter]"
+
+    <div class="component__extra-content" :class="{ 'component__extra-content--absolute': extraContendAbsolute }">
+      <!-- slot constraints -->
+      <div class="component__file-constraints-counter">
+        <p v-if="showConstraintsText" class="component__file-constraints" :style="[styleConstraints]">
+          {{ constraintsText }}
+        </p>
+        <p
+          v-if="showFilesCounter && maxFiles != null && multiple"
+          class="component__file-counter" :style="[styleCounter]"
+        >
+          {{ filesCounterText }}
+        </p>
+      </div>    
+      <!-- fim slot constraints -->
+
+      <!-- slot message -->
+      <div
+        v-if="validShowMsg"
+        :class="['component__message', hasCustomMsg ? 'component__message--custom' : 'component__message--default']"
       >
-        {{ filesCounterText }}
-      </p>
-    </div>    
+        <slot name="message">{{ message }}</slot>
+      </div>
+      <div v-if="validShowError" class="component__file-errors" style="display: none !important;">
+        <slot v-if="errors.length" name="file-errors" :errors="errors">
+          <div class="component__file-errors--inline">
+            <div v-for="(error, index) in errors" :key="index" class="component__file-error">
+              {{ error.msg }}
+            </div>
+          </div>
+        </slot>
+      </div>
+      <!-- fim slot message -->
+
+      <!-- slot file-list -->
+      <div v-if="validShowFileList" class="component__file-list" :style="[styleFileList]">
+        <slot name="file-list" :files="files" :removeFile="removeFile">
+          <ul class="component__file-list-items">
+            <li v-for="(file, fileIndex) in files" :key="duplicateKey(file)" class="component__file-list-item">
+              <span class="component__file-list-item-name">{{ file.name }}</span>
+              <span @click="removeFile(fileIndex)" class="component__file-list-item-remove">x</span>
+            </li>
+          </ul>
+        </slot>
+      </div>
+      <!-- fim slot file-list -->
+    </div>
   </div>
 </template>
 
@@ -124,10 +137,12 @@ import {
   duplicateKey,
   formatLocaleMessage,
   resolveFileValidationLocale,
+  FileValidationErrorType,
+  buildFileValidationErrorPayload,
 } from '@helpers/nbFileValidation.js'
 
 defineOptions({
-	name: 'NbInput',
+	name: 'NbInputFile',
 	inheritAttrs: false
 })
 
@@ -138,6 +153,7 @@ const emit = defineEmits([
   'blurred',
   'clicked',
   'validation-error',
+  'validation-errors',
   'file-dialog-closed',
 ])
 
@@ -160,7 +176,10 @@ const props = defineProps({
   },
   hasTabIndexEnter: {
     type: Boolean,
-    default: true
+    default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
   },
   ariaLabel: {
     type: String,
@@ -267,9 +286,9 @@ const props = defineProps({
 	},
 	fontSizeFileList: {
 		type: String,
-		default: '1em',
+		default: '1.6em',
 		validator: value => {
-			return !value ? '1em' : value
+			return !value ? '1.6em' : value
 		}
 	},
 	fontWeightFileList: {
@@ -398,9 +417,13 @@ const props = defineProps({
 		type: String,
 		default: '4px 0px 0 0'
 	},
-  
-
-
+  extraContendAbsolute: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
   textAlign: {
     type: String,
     default: 'left',
@@ -464,6 +487,9 @@ const props = defineProps({
   allowDuplicates: {
     type: Boolean,
     default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
   },
   /** Larguras permitidas para GIF (pares com gifHeight). */
   gifWidth: {
@@ -492,6 +518,9 @@ const props = defineProps({
   showFilesCounter: {
     type: Boolean,
     default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
   },
   /**
    * Textos de validação e contador. Chaves em `nbFileValidation.DEFAULT_FILE_VALIDATION_LOCALE`;
@@ -501,14 +530,27 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  showFileList: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
   showConstraintsText: {
     type: Boolean,
     default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
   },
   /** Remove foco do controle visível ao cancelar/fechar o seletor sem escolher arquivo. */
   blurOnDialogCancel: {
     type: Boolean,
     default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
   },
   multipleFilesSelectedText: {
     type: String,
@@ -647,6 +689,13 @@ const props = defineProps({
       return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
+  /*showError: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },*/
   hasIcon: {
     type: Boolean,
     default: false,
@@ -814,7 +863,7 @@ const props = defineProps({
 	darkTextColorLabelActive: {
 		type: String,
 		default: '#ffffff'
-	}
+	},
 })
 
 const {
@@ -888,6 +937,7 @@ const {
   textAlign,
   showMsg,
   hasMsg,
+  showError,
   hasIcon,
   iconDirection,
   iconPadding,
@@ -945,41 +995,19 @@ const {
   textCounterColor,
   textCounterPadding,
   textCounterMargin,
+  showFileList,
+  extraContendAbsolute,
 } = toRefs(props)
 
-const inputRef = ref(null)
-const fileDisplayRef = ref(null)
-const isActive = ref(false)
-const files = ref([])
-const errors = ref([])
-const fileDialogToken = ref(0)
-const isFileDialogOpen = ref(false)
+const inputRef = ref(null) // input element reference
+const fileDisplayRef = ref(null) // file display reference
+const isActive = ref(false) // is active state
+const files = ref([]) // selected files
+const errors = ref([]) // validation errors
+const fileDialogToken = ref(0) // file dialog token
+const isFileDialogOpen = ref(false) // is file dialog open state
 
-const acceptedFileExtensions = computed(() => fileExtension.value || fileExtensions.value || '')
-
-const inputCapture = computed(() => {
-  const mode = String(captureMode.value || '').toLowerCase()
-  if (!mode) return null
-
-  const acceptTokens = acceptedFileExtensions.value
-    .split(',')
-    .map(t => t.trim().toLowerCase())
-    .filter(Boolean)
-
-  const hasMediaAccept = acceptTokens.some(token =>
-    token.startsWith('image/')
-    || token.startsWith('video/')
-    || token === 'image/*'
-    || token === 'video/*',
-  )
-
-  // Evita casos sem sentido (ex.: accept PDF + capture camera).
-  if (!hasMediaAccept) return null
-  if (mode === 'auto') return 'environment'
-  return mode
-})
-
-const resolvedFileLocale = computed(() => resolveFileValidationLocale(locale.value))
+/* Default file UI locale */
 const DEFAULT_FILE_UI_LOCALE = {
   clearAction: 'Clear',
   chooseFileAriaLabel: 'Choose file',
@@ -988,47 +1016,106 @@ const DEFAULT_FILE_UI_LOCALE = {
   upToFilesLimit: 'Up to {max} files',
   maxSizePerFile: 'Max size per file: {size}',
 }
+
+/* Accepted file extensions */
+const acceptedFileExtensions = computed(() => {
+  // Return accepted file extensions
+  return fileExtension.value || fileExtensions.value || ''
+})
+
+/* Input capture */
+const inputCapture = computed(() => {
+  // Get capture mode
+  const mode = String(captureMode.value || '').toLowerCase()
+  if (!mode) return null
+
+  // Get accept tokens
+  const acceptTokens = acceptedFileExtensions.value
+    .split(',')
+    .map(t => t.trim().toLowerCase())
+    .filter(Boolean)
+
+  // Check if has media accept
+  const hasMediaAccept = acceptTokens.some(token =>
+    token.startsWith('image/')
+    || token.startsWith('video/')
+    || token === 'image/*'
+    || token === 'video/*',
+  )
+
+  // Avoid cases without sense (e.g. accept PDF + capture camera).
+  if (!hasMediaAccept) return null
+
+  // Return capture mode
+  if (mode === 'auto') return 'environment'
+
+  // Return capture mode
+  return mode
+})
+
+/* Resolved file locale */
+const resolvedFileLocale = computed(() => {
+  // Resolve file locale
+  return resolveFileValidationLocale(locale.value)
+})
+
+/* Resolved file UI locale */
 const resolvedFileUiLocale = computed(() => ({
-  ...DEFAULT_FILE_UI_LOCALE,
-  ...(locale.value || {}),
+  ...DEFAULT_FILE_UI_LOCALE, // default file UI locale
+  ...(locale.value || {}), // resolved file locale
 }))
 
+/* Files counter text */
 const filesCounterText = computed(() => {
+  // Check if show files counter
   if (!showFilesCounter.value || maxFiles.value == null || !multiple.value) return ''
+
+  // Get resolved file locale
   const L = resolvedFileLocale.value
+
+  // Format locale message
   return formatLocaleMessage(L.filesCounter, {
     current: files.value.length,
     max: maxFiles.value,
   })
 })
 
+/* Max files allowed */
 const maxFilesAllowed = computed(() => {
+  // Check if multiple
   if (!multiple.value) return 1
+
+  // Return max files
   return maxFiles.value
 })
 
-const formatBytes = (bytes) => {
-  if (!bytes || bytes <= 0) return '0 B'
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
-  const value = bytes / Math.pow(1024, i)
-  return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[i]}`
-}
-
+/* Constraints text */
 const constraintsText = computed(() => {
+  // Get max files text
   const maxFilesText = (() => {
+    // Get max files text
     const max = maxFilesAllowed.value
+
+    // Check if single file limit
     if (!multiple.value) return resolvedFileUiLocale.value.singleFileLimit
+
+    // Check if multiple files limit
     if (max == null) return resolvedFileUiLocale.value.multipleFilesLimit
+
+    // Format locale message
     return formatLocaleMessage(resolvedFileUiLocale.value.upToFilesLimit, { max })
   })()
 
+  // Get max per file
   const maxPerFile = formatLocaleMessage(resolvedFileUiLocale.value.maxSizePerFile, {
     size: formatBytes(maxFileSizeBytes.value),
   })
+
+  // Return constraints text
   return `${maxFilesText} • ${maxPerFile}`
 })
 
+/* Format default values */
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
@@ -1087,7 +1174,7 @@ const formatDefaultValues = computed(() => {
   const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#000000' : darkTextColorLabelActive.value
 
   const fontFamilyFileListValue = !fontFamilyFileList.value ? `'Lato', sans-serif` : fontFamilyFileList.value
-  const fontSizeFileListValue = !fontSizeFileList.value ? '1em' : fontSizeFileList.value
+  const fontSizeFileListValue = !fontSizeFileList.value ? '1.6em' : fontSizeFileList.value
   const fontWeightFileListValue = !fontWeightFileList.value ? 400 : fontWeightFileList.value
   const textFileListColorValue = !textFileListColor.value ? '#000000' : textFileListColor.value
   const textFileListPaddingValue = !textFileListPadding.value ? '2px' : textFileListPadding.value
@@ -1200,31 +1287,38 @@ const formatDefaultValues = computed(() => {
     textCounterMargin: textCounterMarginValue,
 	}
 })
+
+/* Component disabled */
 const componentDisabled = computed(() => {
+  // Get default values
 	const defaultValues = formatDefaultValues.value
 
+  // Return disabled
 	return defaultValues.disabled
 })
+
+/* Wrapper style */
 const wrapperStyle = computed(() => {
-	const defaultValues = formatDefaultValues.value
-	const isActive = isLabelActive.value
+	const defaultValues = formatDefaultValues.value // Get default values
 
 	return {
 		display: defaultValues.display,
-		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
-		// paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+		// Add padding-top when label is active to avoid being cut
     paddingTop: '0px',
-		// Esconde o label quando não está ativo usando overflow hidden
-		// Se não tem label ou está ativo, permite overflow visible para não cortar conteúdo
-		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden'
+		overflow: 'visible',
 	}
 })
 const fontSizeStyle = computed(() => {
+  // Get default values
   const defaultValues = formatDefaultValues.value
-
+  
+  // Check if font size
   if (defaultValues.fontSize) return defaultValues.fontSize
 
+  // Get new font size
   let newFontSize = ''
+
+  // Switch size media query
   switch (defaultValues.sizeMediaQuery) {
     case 'sm':
       return '1.2em'
@@ -1236,80 +1330,111 @@ const fontSizeStyle = computed(() => {
       newFontSize = '1.2em'
   }
 
+  // Return new font size
   return newFontSize
 })
+
+/* Component style */
 const componentStyle = computed(() => {
+  // Get default values
   const defaultValues = formatDefaultValues.value
 
+  // Get is active
   const isActive = isLabelActive.value
 
 	return {
 		fontWeight: defaultValues.fontWeight,
 		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
+		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden',
 	}
 })
-const borderRadiusStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
 
+/* Border radius style */
+const borderRadiusStyle = computed(() => {
+  // Get default values
+  const defaultValues = formatDefaultValues.value
+  
+  // Check if input style is not line and has border radius
   if (defaultValues.inputStyle !== 'line' && defaultValues.hasBorderRadius) {
+    // Return border radius style
     return { borderRadius: `${defaultValues.borderRadius}rem` }
   }
 
+  // Return empty style
   return {}
 })
+
+/* Font */
 const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.font
 })
+
+/* Font message */
 const fontMessage = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.fontFamilyMsg
 })
+
+/* Font size message */
 const fontSizeMessage = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.fontSizeMsg
 })
+
+/* Font weight message */
 const fontWeightMessage = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.fontWeightMsg
 })
+
+/* Text color */
 const styleTextColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.textColor
 })
+
+/* Button color */
 const styleButtonColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.theme === 'dark' ? darkDisabledBgColor.value : lightDisabledBgColor.value
 })
+
+/* Text message color */
 const styleTextMessageColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.textMessageColor
 })
+
+/* Caret color */
 const styleCaretColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.caretColor || (defaultValues.theme === 'dark' ? '#00d4ff' : '#007bff')
 })
 
+/* Selection background color */
 const styleSelectionBgColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.selectionBgColor || (defaultValues.theme === 'dark' ? '#00d4ff' : '#007bff')
 })
 
+/* Selection text color */
 const styleSelectionTextColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.selectionTextColor || (defaultValues.theme === 'dark' ? '#000000' : '#ffffff')
 })
 
+/* Input width style */
 const inputWidthStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1319,6 +1444,8 @@ const inputWidthStyle = computed(() => {
     width: `${defaultValues.inputWidth}px`
   }
 })
+
+/* Input style class */
 const inputStyleClass = computed(() => {
 	switch (inputStyle.value) {
 		case 'line':
@@ -1329,6 +1456,8 @@ const inputStyleClass = computed(() => {
 			return 'component__input--background'
 	}
 })
+
+/* Active style */
 const activeStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1341,6 +1470,8 @@ const activeStyle = computed(() => {
       return 'component__input--active--normal'
   }
 })
+
+/* Size media query style */
 const sizeMediaQueryStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1355,6 +1486,8 @@ const sizeMediaQueryStyle = computed(() => {
       return ''
   }
 })
+
+/* Theme style */
 const themeStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1365,19 +1498,27 @@ const themeStyle = computed(() => {
       return 'component__theme--light'
   }
 })
+
+/* Component readonly */
 const componentReadonly = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.inputReadonly ? 'component__input--read-only' : ''
 })
+
+/* Uppercase style */
 const uppercaseStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return defaultValues.inputUppercase ? 'component__input--uppercase' : ''
 })
+
+/* Computed input name */
 const computedInputName = computed(() => {
   return inputName.value ? inputName.value : `${nbId.value}-name-label`
 })
+
+/* Computed placeholder */
 const computedPlaceholder = computed(() => {
   // Se não houver label, sempre mostra o placeholder
   if (!showLabel.value) {
@@ -1390,12 +1531,29 @@ const isLabelActive = computed(() => {
   // Label ativo quando há foco/interação ou quando já existe arquivo selecionado
   return isActive.value || files.value.length > 0
 })
+
+/* Input padding */
 const inputPadding = computed(() => {
   return '6px 10px'
 })
+
+/* Valid show message */
 const validShowMsg = computed(() => {
   return !!(showMsg.value && hasMsg.value)
 })
+
+/* Valid show error */
+const validShowError = computed(() => {
+  return false
+  // return !!(showError.value && errors.value.length > 0)
+})
+
+/* Valid show file list */
+const validShowFileList = computed(() => {
+  return !!(showFileList.value && files.value.length > 0)
+})
+
+/* Computed aria attributes */
 const computedAriaAttrs = computed(() => {
   const newAttrs = {}
 
@@ -1417,33 +1575,51 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-/** Nome do controle que recebe Tab (área visível); label / placeholder / ariaLabel como fallback. */
+/* File control aria label */
 const fileControlAriaLabel = computed(() => {
+  // Check if aria label
   if (ariaLabel.value) return ariaLabel.value
+
+  // Check if show label and label
   if (showLabel.value && label.value) return label.value
+
+  // Check if input placeholder
   if (inputPlaceholder.value) return inputPlaceholder.value
+
+  // Return choose file aria label
   return resolvedFileUiLocale.value.chooseFileAriaLabel
 })
 
+/* Style icon size */
 const styleIconSize = computed(() => {
   return hasIcon.value ? `${iconSize.value}rem` : '0'
 })
+
+/* Style icon width */
 const styleIconWidth = computed(() => {
   return hasIcon.value ? `${iconWidth.value}px` : '0'
 })
+
+/* Style icon direction */
 const styleIconDirection = computed(() => {
   return hasIcon.value ? `component__icon--${iconDirection.value}` : ''
 })
+
+/* Style icon padding */
 const styleIconPadding = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return hasIcon.value ? defaultValues.iconPadding : '0'
 })
+
+/* Style icon margin */
 const styleIconMargin = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return hasIcon.value ? defaultValues.iconMargin : '0'
 })
+
+/* Style icon background color */
 const styleIconBgColor = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1453,11 +1629,15 @@ const styleIconBgColor = computed(() => {
 
   return 'transparent'
 })
+
+/* Style icon border radius */
 const styleIconBorderRadius = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return hasIcon.value ? `${defaultValues.iconBorderRadius}rem` : '0'
 })
+
+/* Input icon style */
 const inputIconStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1466,6 +1646,7 @@ const inputIconStyle = computed(() => {
   return iconDirection.value === 'left' ? { paddingLeft: `${defaultValues.iconPaddingInput}px` } : { paddingRight: `${defaultValues.iconPaddingInput}px` }
 })
 
+/* Style label */
 const styleLabel = computed(() => {
   const defaultValues = formatDefaultValues.value
   const isActive = isLabelActive.value
@@ -1506,12 +1687,15 @@ const styleLabel = computed(() => {
     } : {}),
   }
 })
+
+/* Style label active */
 const styleLabelActive = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return defaultValues.theme === 'dark' ? defaultValues.darkTextColorLabelActive : defaultValues.lightTextColorLabelActive
 })
 
+/* Style file list */
 const styleFileList = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1525,6 +1709,7 @@ const styleFileList = computed(() => {
   }
 })
 
+/* Style constraints */
 const styleConstraints = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1538,6 +1723,7 @@ const styleConstraints = computed(() => {
   }
 })
 
+/* Style counter */
 const styleCounter = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1551,6 +1737,7 @@ const styleCounter = computed(() => {
   }
 })
 
+/* Style clear button */
 const styleClearButton = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1563,213 +1750,422 @@ const styleClearButton = computed(() => {
     background: defaultValues.textClearButtonBackground
   }
 })
+
+/* Style clear button padding hover */
 const styleClearButtonPaddingHover = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return defaultValues.textClearButtonPaddingHover
 })
+
+/* Style clear button color hover */
 const styleClearButtonColorHover = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return defaultValues.textClearButtonColorHover
 })
+
+/* Style clear button background hover */
 const styleClearButtonBackgroundHover = computed(() => {
   const defaultValues = formatDefaultValues.value
 
   return defaultValues.textClearButtonBackgroundHover
 })
 
+/* Interacted */
 const interacted = (event) => {
+  // Emit clicked event
 	emit('clicked', event)
+
+  // Trigger file input
   triggerFileInput()
 }
 
+/* Clear validation errors */
+const clearValidationErrors = ({ emitEvent = true } = {}) => {
+  // Clear errors
+  errors.value = []
+
+  // Check if emit event
+  if (emitEvent) {
+    emit('validation-errors', [])
+  }
+}
+
+/* Format bytes */
+const formatBytes = (bytes) => {
+  // Check if bytes is not valid
+  if (!bytes || bytes <= 0) return '0 B'
+
+  // Get units
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+
+  // Get index of units
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
+
+  // Get value of bytes
+  const value = bytes / Math.pow(1024, i)
+
+  // Return formatted bytes with value and units
+  return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[i]}`
+}
+
+/* Handle native input click */
+const handleNativeInputClick = (event) => {
+  // Stop event propagation
+  event.stopPropagation()
+
+  // Check if disabled or readonly
+  if (disabled.value || formatDefaultValues.value.inputReadonly) return
+
+  // Interact with event
+  interacted(event)
+}
+
+/* Handle native input focus */
+const handleNativeInputFocus = () => {
+  // Check if is file dialog open and files is empty
+  if (!isFileDialogOpen.value && files.value.length === 0) return
+
+  // Set active state
+  isActive.value = true
+}
+
+/* Close native file picker flow */
 /**
- * Fecha o fluxo do file picker nativo: invalida listeners pendentes e alinha label com arquivos reais.
- * Usado após cancel (evento cancel), foco na janela (fallback) e após change com sucesso (via incremento de token em onChangeFile).
+ * Close native file picker flow: invalidate pending listeners and align label with actual files.
+ * Used after cancel (cancel event), window focus (fallback) and after successful change (via increment of token in onChangeFile).
  */
 const closeNativeFilePickerFlow = () => {
+  // Increment file dialog token
   fileDialogToken.value++
+  
+  // Set file dialog open to false
   isFileDialogOpen.value = false
+
+  // Get native files count
   const nativeFilesCount = inputRef.value?.files?.length || 0
+
+  // Set active state
   isActive.value = files.value.length > 0 || nativeFilesCount > 0
+
+  // Check if blur on dialog cancel and files is empty and native files count is empty
   if (blurOnDialogCancel.value && files.value.length === 0 && nativeFilesCount === 0) {
+    // Blur input and file display
     inputRef.value?.blur?.()
+
+    // Blur file display
     fileDisplayRef.value?.blur?.()
   }
 }
 
+/* Emit file dialog closed */
 const emitFileDialogClosed = (reason = 'cancelled', selectedCount = 0) => {
+  // Emit file dialog closed event
   emit('file-dialog-closed', { reason, selectedCount })
 }
 
+/* On native file picker cancel */
 const onNativeFilePickerCancel = () => {
-  // Evento padrão ao dispensar o seletor sem escolher (Chrome 113+, Firefox, Safari 16.4+).
-  // Em Windows o `window` `focus` nem sempre dispara de forma confiável ao fechar o modal.
+  // Default event when canceling the picker without choosing (Chrome 113+, Firefox, Safari 16.4+).
+  // On Windows the `window` `focus` does not always trigger reliably when closing the modal.
   if (!isFileDialogOpen.value) return
+
+  // Close native file picker flow
   closeNativeFilePickerFlow()
+
+  // Emit file dialog closed event
   emitFileDialogClosed('cancelled', 0)
 }
 
+/* Trigger file input */
 const triggerFileInput = () => {
+  // Check if disabled or readonly
   if (disabled.value || formatDefaultValues.value.inputReadonly) return
-  // Evita tentativas duplicadas de abrir o diálogo nativo no mesmo gesto de clique.
+
+  // Check if file dialog is open
+  // Avoid duplicate attempts to open the native dialog on the same click gesture.
   if (isFileDialogOpen.value) return
+  
+  // Set active state
   isActive.value = true
+
+  // Set file dialog open to true
   isFileDialogOpen.value = true
+  
+  // Get this dialog token
   const thisDialogToken = ++fileDialogToken.value
+
+  // Sync active state after dialog
   const syncActiveStateAfterDialog = () => {
+    // Check if this dialog token is not the same as the current file dialog token
     if (thisDialogToken !== fileDialogToken.value) return
+
+    // Set file dialog open to false
     isFileDialogOpen.value = false
+
+    // Get native files count
     const nativeFilesCount = inputRef.value?.files?.length || 0
+
+    // Check if files is empty and native files count is empty
     if (files.value.length === 0 && nativeFilesCount === 0) {
+      // Set active state to false
       isActive.value = false
+
+      // Emit file dialog closed event
       emitFileDialogClosed('cancelled', 0)
     }
   }
+
+  // Handle window focus after file dialog
   const handleWindowFocusAfterFileDialog = () => {
-    // Em alguns browsers, cancelar o dialog de arquivo não dispara `change`.
-    // Sincronizamos o estado ativo apenas quando a janela realmente voltar ao foco.
+    // In some browsers, canceling the file dialog does not trigger `change`.
+    // We synchronize the active state only when the window really returns focus.
     setTimeout(() => syncActiveStateAfterDialog(), 0)
   }
-  // capture: true — em alguns ambientes o foco não chega ao alvo sem captura
+
+  // capture: true — in some environments the focus does not reach the target without capture
   window.addEventListener('focus', handleWindowFocusAfterFileDialog, { once: true, capture: true })
+
+  // Check if input ref is valid
   if (inputRef.value) {
+    // Set input value to null
     inputRef.value.value = null
+
+    // Click input
     inputRef.value.click()
   }
 }
 
+/* On change file */
 const onChangeFile = async (event) => {
-  // Fecha o fluxo do picker e invalida o listener de `focus` pendente (mesmo token que cancel).
+  // Close the picker flow and invalidate the pending `focus` listener (same token as cancel).
   fileDialogToken.value++
-  isFileDialogOpen.value = false
-  errors.value = []
-  const selected = Array.from(event.target.files || [])
-  const selectedCount = selected.length
+  
+  isFileDialogOpen.value = false // Set file dialog open to false
+  
+  clearValidationErrors({ emitEvent: false }) // Clear validation errors
+  
+  const selected = Array.from(event.target.files || []) // Get selected files
+  const selectedCount = selected.length // Get selected count
 
-  const batchKeys = new Set()
-  const validFiles = []
+  const batchKeys = new Set() // Set of batch keys
+  const validFiles = [] // Array of valid files
 
+  // Loop through selected files
   for (const file of selected) {
+    // Validate incoming file
     const result = await validateIncomingFile(file, {
-      accept: acceptedFileExtensions.value,
-      allowedExtensions: allowedExtensions.value,
-      maxFileSizeBytes: maxFileSizeBytes.value,
-      allowDuplicates: allowDuplicates.value,
-      existingFiles: files.value,
-      batchKeySet: batchKeys,
-      gifWidth: gifWidth.value,
-      gifHeight: gifHeight.value,
-      videoRatio: videoRatio.value,
-      videoMaxDuration: videoMaxDuration.value,
-      videoAspectTolerance: videoAspectTolerance.value,
-      locale: resolvedFileLocale.value,
+      accept: acceptedFileExtensions.value, // Accepted file extensions
+      allowedExtensions: allowedExtensions.value, // Allowed extensions list
+      maxFileSizeBytes: maxFileSizeBytes.value, // Max file size in bytes
+      allowDuplicates: allowDuplicates.value, // Allow duplicates
+      existingFiles: files.value, // Existing files
+      batchKeySet: batchKeys, // Batch key set  
+      gifWidth: gifWidth.value, // GIF width
+      gifHeight: gifHeight.value, // GIF height
+      videoRatio: videoRatio.value, // Video ratio
+      videoMaxDuration: videoMaxDuration.value, // Video max duration
+      videoAspectTolerance: videoAspectTolerance.value, // Video aspect tolerance
+      locale: resolvedFileLocale.value, // Resolved file locale
     })
 
+    // Check if result is not ok
     if (!result.ok) {
-      errors.value.push(result.error)
-      emit('validation-error', { file, message: result.error })
+      // Build file validation error payload
+      const payload = buildFileValidationErrorPayload(file, result.error, result.errorType)
+
+      // Add error to errors array
+      errors.value.push(payload)
+
+      // Emit validation error event
+      emit('validation-error', payload)
+
+      // Continue to next file
       continue
     }
 
+    // Add duplicate key to batch keys
     batchKeys.add(duplicateKey(file))
+
+    // Add valid file to valid files array
     validFiles.push(file)
   }
 
+  // Check if multiple
   if (multiple.value) {
+    // Check if max files is not null
     if (maxFiles.value != null) {
+      // Get remaining files
       const remaining = maxFiles.value - files.value.length
+
+      // Check if remaining is less than or equal to 0
       if (remaining <= 0) {
+        // Build file validation error payload
         const msg = formatLocaleMessage(resolvedFileLocale.value.maxFilesReached, {
           max: maxFiles.value,
         })
-        errors.value.push(msg)
-        emit('validation-error', { file: null, message: msg })
+
+        // Build file validation error payload
+        const payload = buildFileValidationErrorPayload(null, msg, FileValidationErrorType.MAX_FILES_REACHED)
+
+        // Add error to errors array
+        errors.value.push(payload)
+
+        // Emit validation error event
+        emit('validation-error', payload)
+
+        // Clear valid files array
         validFiles.length = 0
       } else if (validFiles.length > remaining) {
+        // Remove files from valid files array
         validFiles.splice(remaining)
       }
     }
+
+    // Set files value to valid files array
     files.value = [...files.value, ...validFiles]
   } else {
+    // Set files value to valid files array
     files.value = validFiles.length ? [validFiles[0]] : []
   }
 
-  // Se o usuário cancelar a seleção e não houver arquivos, desativa o estado visual
+  // Check if user canceled selection and there are no files, deactivate visual state
   isActive.value = files.value.length > 0
 
-  emit('changed', files.value)
-  emit('current-value', files.value)
+  emit('validation-errors', [...errors.value]) // Emit validation errors event
+  emit('changed', files.value) // Emit changed event
+  emit('current-value', files.value) // Emit current value event
+
+  // Emit file dialog closed event
   emitFileDialogClosed(selectedCount > 0 ? 'selected' : 'cancelled', selectedCount)
 }
 
+/* Handle file input blur */
 const handleFileInputBlur = () => {
-  // Enquanto o diálogo nativo estiver aberto, não desativar o label
+  // While the native dialog is open, do not deactivate the label
   if (isFileDialogOpen.value) return
+
+  // Set active state
   isActive.value = files.value.length > 0
 }
 
-const handleFileDisplayFocus = () => {
-  isActive.value = true
+/* Handle file display focus */
+const handleFileDisplayFocus = (event) => {
+  // Only animate the label on keyboard focus. Focus on mouse click usually triggers before the click
+  // and breaks the opening of the picker in some browsers (active state without modal).
+  // Get target element
+  const el = event?.target
+
+  // Check if element is valid and matches focus visible
+  if (el && typeof el.matches === 'function' && el.matches(':focus-visible')) {
+    // Set active state
+    isActive.value = true
+  }
 }
 
+/* Handle file display blur */
 const handleFileDisplayBlur = () => {
+  // Handle file input blur
   handleFileInputBlur()
 }
 
-/** Tab foca a área visível; Enter/Espaço abrem o picker (não abrir só com foco — evita surpresa na navegação). */
+/* On file display click */
+const onFileDisplayClick = (event) => {
+  // Stop event propagation
+  event.stopPropagation()
+
+  // Check if disabled or readonly
+  if (disabled.value || formatDefaultValues.value.inputReadonly) return
+
+  // Interact with event
+  interacted(event)
+}
+
+/* On file display keydown */
 const onFileDisplayKeydown = (e) => {
+  // Check if disabled or readonly or has tab index enter
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
+
+  // Check if key is enter or space
   if (e.key === 'Enter' || e.key === ' ') {
+    // Prevent default
     e.preventDefault()
+
+    // Trigger file input
     triggerFileInput()
   }
 }
 
 /*
-  Handler para quando o label é clicado
-  Esta função previne que o evento seja capturado pelo @click="interacted" do elemento pai
-  e foca o input explicitamente.
+  Handle label click
+  This function prevents the event from being captured by the parent @click="interacted" and focuses the input explicitly.
 */
 const handleLabelClick = (event) => {
-  // Prevenir que o evento seja capturado pelo @click="interacted" do elemento pai
+  // Prevent event from being captured by the parent @click="interacted" and focus the input explicitly.
   event.preventDefault()
   event.stopPropagation()
   
-  // Verificar se o componente está desabilitado ou readonly
+  // Check if component is disabled or readonly
   if (disabled.value || formatDefaultValues.value.inputReadonly) {
     return
   }
   
+  // Trigger file input
   triggerFileInput()
 }
 
+/* Remove file */
 const removeFile = (index) => {
+  // Check if index is less than 0 or greater than or equal to files length
   if (index < 0 || index >= files.value.length) return
+  
+  // Clear validation errors
+  clearValidationErrors()
+  
+  // Filter files array
   files.value = files.value.filter((_, i) => i !== index)
+  
+  // Set active state
   isActive.value = files.value.length > 0
+
+  // Check if files is empty and input ref is valid
   if (files.value.length === 0 && inputRef.value) {
+    // Set input value to empty string
     inputRef.value.value = ''
   }
-  emit('changed', files.value)
-  emit('current-value', files.value)
+
+  emit('changed', files.value) // Emit changed event
+  emit('current-value', files.value) // Emit current value event
 }
+
+/* Remove all files */
 const removeAllFiles = () => {
+  // Clear validation errors
+  clearValidationErrors()
+  
+  // Set files value to empty array
   files.value = []
+  
+  // Set active state
   isActive.value = false
+  
+  // Check if input ref is valid
   if (inputRef.value) {
+    // Set input value to empty string
     inputRef.value.value = ''
   }
-  emit('changed', [])
+  
+  emit('changed', []) // Emit changed event
   emit('current-value', [])
 }
 
+/* Watch is active */
 watch(isActive, value => {
   if (value) {
-    emit('focused')
+    emit('focused') // Emit focused event
   } else {
-    emit('blurred')
+    emit('blurred') // Emit blurred event
   }
 })
 </script>
@@ -2300,9 +2696,51 @@ watch(isActive, value => {
 }
 
 .component__file-list {
-  display:flex;
-  flex-direction:column;
-  gap:12px; 
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+  text-align: left;
+
+  /* UA default `ul` adds large padding-left for markers outside the box */
+  .component__file-list-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-left: 10px;
+
+    .component__file-list-item {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      line-height: 1.35;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      text-align: left;
+
+      &::before {
+        content: '•';
+        flex-shrink: 0;
+      }
+
+      .component__file-list-item-name {
+        min-width: 0;
+      }
+
+      .component__file-list-item-remove {
+        flex-shrink: 0;
+        cursor: pointer;
+        margin-left: 2px;
+        color: #b42318;
+
+        &:hover {
+          color: #991b1b;
+        }
+      }
+    }
+  }
 }
 
 .component__file-info {
@@ -2313,6 +2751,19 @@ watch(isActive, value => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.component__extra-content {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.component__extra-content--absolute {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 1;
 }
 
 .component__file-constraints-counter {

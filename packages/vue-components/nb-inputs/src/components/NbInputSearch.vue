@@ -73,7 +73,7 @@
 import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch } from 'vue'
 
 defineOptions({
-	name: 'NbInputClean',
+	name: 'NbInputSearch',
 	inheritAttrs: false
 })
 

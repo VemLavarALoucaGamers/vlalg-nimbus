@@ -47,7 +47,12 @@
     </div>
     <div
       v-if="validShowMsg"
-      :class="['component__message', hasCustomMsg ? 'component__message--custom' : 'component__message--default']"
+      :class="[
+        'component__message',
+        'component__extra-content',
+        hasCustomMsg ? 'component__message--custom' : 'component__message--default',
+        { 'component__extra-content--absolute': extraContendAbsolute },
+      ]"
     >
       <slot name="message">{{ message }}</slot>
     </div>
@@ -338,6 +343,13 @@ const props = defineProps({
       return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
+  extraContendAbsolute: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
   showLabel: {
     type: Boolean,
     default: false,
@@ -572,6 +584,7 @@ const {
   textAlign,
     showMsg,
     hasMsg,
+    extraContendAbsolute,
     showLabel,
   labelBackground,
   labelPadding,
@@ -735,16 +748,15 @@ const componentDisabled = computed(() => {
 })
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
-	const isActive = isLabelActive.value
 
 	return {
 		display: defaultValues.display,
 		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
     // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
     paddingTop: '0px',
-		// Esconde o label quando não está ativo usando overflow hidden
-		// Se não tem label ou está ativo, permite overflow visible para não cortar conteúdo
-		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden'
+		// overflow do label fica no .component (componentStyle): se hidden for aqui, corta
+		// .component__message com position fora do fluxo (irmão do .component dentro do wrapper)
+		overflow: 'visible',
 	}
 })
 const fontSizeStyle = computed(() => {
@@ -767,6 +779,8 @@ const componentStyle = computed(() => {
 		minHeight: isActive && showLabel.value ? '28px' : '28px',
 		height: isActive && showLabel.value ? 'auto' : '28px',
 		maxHeight: isActive && showLabel.value ? undefined : '28px',
+		// Mesma regra que antes estava no wrapper: esconde label inativo; não afeta .component__message
+		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden',
 	}
 })
 const borderRadiusStyle = computed(() => {
@@ -1481,6 +1495,19 @@ watch(inputValue, () => {
       // fim propUppercase
     }
     // fim INPUT
+}
+
+.component__extra-content {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.component__extra-content--absolute {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 1;
 }
 
 .component__message {
