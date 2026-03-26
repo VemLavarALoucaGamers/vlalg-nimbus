@@ -5,6 +5,7 @@ import NbInputChip from '@components/NbInputChip.vue';
 import NbInputFile from '@components/NbInputFile.vue';
 import NbTextarea from '@components/NbTextarea.vue';
 import NbDatePicker from '@components/NbDatePicker.vue';
+import NbInputSearch from '@components/NbInputSearch.vue';
 
 export default {
   NbInputRadio,
@@ -13,5 +14,6 @@ export default {
   NbInputChip,
   NbInputFile,
   NbTextarea,
-  NbDatePicker
+  NbDatePicker,
+  NbInputSearch
 };

@@ -3139,23 +3139,161 @@
       </div>
     </div>
 
-    <div v-if="btType === 'search'" class="row"  style="background-color: #d5d0fd;">
-      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
-        style="margin-top: 50px; margin-bottom: 50px;">
-        <h4 class="test-page__content-tile">NbSearch</h4>
-        
-        <NbInputSearch
-          nb-id="search-1"
-          display="b"
-          label="Search"
-          input-name="search-1"
-          input-type="search"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-        />
+    <div v-if="btType === 'search'" class="row" style="background-color: #d5d0fd;">
+      <div
+        class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px; color: black;"
+      >
+        <h4 class="test-page__content-tile">NbInputSearch</h4>
+        <p style="max-width: 58rem; line-height: 1.5; margin-bottom: 1.25rem;">
+          O botão “pesquisar” aparece em <strong><code>submit</code></strong> ou em <strong><code>debounce</code></strong>
+          com <code>interaction-debounce-wait="0"</code>. Com <code>debounce</code> e <code>wait &gt; 0</code> ele some
+          (só pausa na digitação + <strong>Enter</strong>).
+          <strong>Debounce</strong> com <code>wait &gt; 0</code>: <code>interactionFunction</code> após pausa;
+          Enter cancela o timer e dispara na hora.
+          <strong>Submit</strong>: não dispara pela digitação; Enter ou botão.
+          Eventos de ciclo da <code>interactionFunction</code>: <code>@interaction-start</code>,
+          <code>@interaction-end</code>, <code>@interaction-error</code>, <code>@interaction-cancel</code>
+          (veja o log no primeiro campo).
+          Abaixo há um exemplo com <strong>lista em memória</strong> e atraso fake — o mesmo padrão serve para chamar uma API real dentro de <code>interactionFunction</code>.
+        </p>
+
+        <div style="display: grid; gap: 1.75rem; max-width: 42rem">
+          <div>
+            <h5 style="margin: 0 0 0.5rem">Debounce na digitação (500 ms) + trim</h5>
+            <NbInputSearch
+              nb-id="search-demo-debounce"
+              display="b"
+              label="Buscar (debounce)"
+              input-name="search-demo-debounce"
+              input-style="border"
+              light-text-color="#ffffff"
+              input-text=""
+              :has-trim="true"
+              interaction-trigger="debounce"
+              :interaction-debounce-wait="500"
+              :interaction-function="searchDemoInteractionDebounced"
+              @entered="searchDemoOnEnteredDebounced"
+              @changed="searchDemoLastChanged = $event"
+              @interaction-start="searchDemoOnInteractionStart"
+              @interaction-end="searchDemoOnInteractionEnd"
+              @interaction-cancel="searchDemoOnInteractionCancel"
+              @interaction-error="searchDemoOnInteractionError"
+            />
+            <p style="margin: 0.5rem 0 0; font-size: 0.9em; opacity: 0.85">
+              Valor atual (<code>@changed</code>): <code>{{ searchDemoLastChanged || '(vazio)' }}</code>
+            </p>
+          </div>
+
+          <div>
+            <h5 style="margin: 0 0 0.5rem">Submit + <code>interaction-debounce-wait="0"</code> (padrão típico)</h5>
+            <NbInputSearch
+              nb-id="search-demo-submit-zero"
+              display="b"
+              label="Buscar (Enter / botão, wait 0)"
+              input-name="search-demo-submit-zero"
+              input-style="border"
+              light-text-color="#ffffff"
+              input-text=""
+              interaction-trigger="submit"
+              :interaction-debounce-wait="0"
+              :interaction-function="searchDemoInteractionSubmitZero"
+              @entered="searchDemoOnEnteredSubmitZero"
+            />
+          </div>
+
+          <div>
+            <h5 style="margin: 0 0 0.5rem">
+              Submit + <code>wait="500"</code> — debounce na digitação continua desligado
+            </h5>
+            <NbInputSearch
+              nb-id="search-demo-submit-wait500"
+              display="b"
+              label="Buscar (submit; wait ignorado no type)"
+              input-name="search-demo-submit-wait500"
+              input-style="border"
+              light-text-color="#ffffff"
+              input-text=""
+              interaction-trigger="submit"
+              :interaction-debounce-wait="500"
+              :interaction-function="searchDemoInteractionSubmitWait500"
+              @entered="searchDemoOnEnteredSubmitWait500"
+            />
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem; max-width: 46rem">
+          <h5 style="margin: 0 0 0.5rem">
+            Debounce + consulta fake (filtra array pelo campo <code>text</code>)
+          </h5>
+          <p style="margin: 0 0 0.75rem; font-size: 0.92em; line-height: 1.45; opacity: 0.9">
+            Após a pausa no teclado, um <code>await</code> simula latência; em seguida filtramos objetos
+            <code>{ id, text, category }</code> com <code>text.includes(query)</code>. Em produção, troque por
+            <code>fetch</code> e preencha a lista com a resposta.
+          </p>
+          <NbInputSearch
+            nb-id="search-demo-fake-catalog"
+            display="b"
+            label="Buscar produto (fake API)"
+            input-name="search-demo-fake-catalog"
+            input-style="border"
+            light-text-color="#ffffff"
+            input-text=""
+            :has-trim="true"
+            interaction-trigger="debounce"
+            :interaction-debounce-wait="400"
+            :interaction-function="searchFakeCatalogInteraction"
+            @changed="searchFakeCatalogOnChanged"
+          />
+          <div
+            v-if="searchFakeCatalogResults.length"
+            style="margin-top: 0.75rem; padding: 0.65rem 0.85rem; background: rgba(255, 255, 255, 0.65); border-radius: 6px"
+          >
+            <strong style="font-size: 0.9em">Resultados ({{ searchFakeCatalogResults.length }})</strong>
+            <ul style="margin: 0.4rem 0 0; padding-left: 1.2rem; line-height: 1.55">
+              <li v-for="item in searchFakeCatalogResults" :key="item.id">
+                <strong>{{ item.text }}</strong>
+                <span style="opacity: 0.75"> — {{ item.category }}</span>
+              </li>
+            </ul>
+          </div>
+          <p
+            v-else-if="searchFakeCatalogLastQuery !== ''"
+            style="margin: 0.75rem 0 0; font-size: 0.9em; opacity: 0.85"
+          >
+            Nenhum resultado para <code>{{ searchFakeCatalogLastQuery }}</code>.
+          </p>
+        </div>
+
+        <div
+          style="
+            margin-top: 1.5rem;
+            max-width: 52rem;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.55);
+            border-radius: 8px;
+            font-family: ui-monospace, monospace;
+            font-size: 13px;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem">
+            <strong>Log do teste</strong>
+            <span style="opacity: 0.8">(mais recente primeiro)</span>
+            <button type="button" style="cursor: pointer; padding: 0.25rem 0.6rem" @click="searchDemoClearLogs">
+              Limpar
+            </button>
+          </div>
+          <ul v-if="searchDemoLogs.length" style="margin: 0; padding-left: 1.25rem; line-height: 1.6">
+            <li v-for="row in searchDemoLogs" :key="row.id">
+              <span style="opacity: 0.75">{{ row.at }}</span>
+              — <strong>{{ row.source }}</strong> · {{ row.kind }} →
+              <code>{{ row.detail }}</code>
+            </li>
+          </ul>
+          <p v-else style="margin: 0; opacity: 0.75">
+            Nenhum evento ainda — digite (modo debounce), pressione Enter ou clique em pesquisar.
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -3176,6 +3314,120 @@ const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.v
 const NbInputSearch = defineAsyncComponent(() => import('@components/NbInputSearch.vue'))
 
 const btType = ref('search')
+
+/** Demo NbInputSearch: log em tela para debounce, Enter e interactionFunction */
+const searchDemoLogs = ref([])
+const searchDemoLastChanged = ref('')
+
+const searchDemoPushLog = (source, kind, detail) => {
+  const at = new Date().toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })
+  searchDemoLogs.value = [
+    {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      at,
+      source,
+      kind,
+      detail: detail === '' || detail == null ? '(vazio)' : String(detail)
+    },
+    ...searchDemoLogs.value
+  ].slice(0, 30)
+}
+
+const searchDemoClearLogs = () => {
+  searchDemoLogs.value = []
+  searchDemoLastChanged.value = ''
+}
+
+const searchDemoInteractionDebounced = async (query) => {
+  searchDemoPushLog('Campo com debounce', 'interactionFunction', query)
+  console.log('[NbInputSearch demo] interactionFunction (debounce):', query)
+}
+
+const searchDemoInteractionSubmitZero = async (query) => {
+  searchDemoPushLog('Submit + wait 0', 'interactionFunction', query)
+  console.log('[NbInputSearch demo] interactionFunction (submit, wait 0):', query)
+}
+
+const searchDemoInteractionSubmitWait500 = async (query) => {
+  searchDemoPushLog('Submit + wait 500', 'interactionFunction', query)
+  console.log('[NbInputSearch demo] interactionFunction (submit, wait 500):', query)
+}
+
+const searchDemoOnEnteredDebounced = (value) => {
+  searchDemoPushLog('Campo com debounce', '@entered', value)
+}
+
+const searchDemoOnInteractionStart = (p) => {
+  searchDemoPushLog('Campo com debounce', '@interaction-start', `${p.source} → ${p.value}`)
+}
+
+const searchDemoOnInteractionEnd = (p) => {
+  searchDemoPushLog('Campo com debounce', '@interaction-end', `${p.source} → ${p.value}`)
+}
+
+const searchDemoOnInteractionCancel = (p) => {
+  searchDemoPushLog('Campo com debounce', '@interaction-cancel', p.reason)
+}
+
+const searchDemoOnInteractionError = (p) => {
+  const msg = p.error instanceof Error ? p.error.message : String(p.error)
+  searchDemoPushLog('Campo com debounce', '@interaction-error', `${p.source} → ${msg}`)
+}
+
+const searchDemoOnEnteredSubmitZero = (value) => {
+  searchDemoPushLog('Submit + wait 0', '@entered', value)
+}
+
+const searchDemoOnEnteredSubmitWait500 = (value) => {
+  searchDemoPushLog('Submit + wait 500', '@entered', value)
+}
+
+/** Catálogo estático para demo “API fake”: filtro por `text` após debounce + latência simulada */
+const FAKE_SEARCH_CATALOG = [
+  { id: '1', text: 'Notebook Pro 14', category: 'Informática' },
+  { id: '2', text: 'Notebook Pro 15', category: 'Informática' },
+  { id: '3', text: 'Notebook Pro 16 2025', category: 'Informática' },
+  { id: '4', text: 'Notebook Pro 16 2026', category: 'Informática' },
+  { id: '5', text: 'Notebook Pro 16 2027', category: 'Informática' },
+  { id: '6', text: 'Notebook Pro 17 2026', category: 'Informática' },
+  { id: '7', text: 'Mouse sem fio', category: 'Periféricos' },
+  { id: '8', text: 'Teclado mecânico', category: 'Periféricos' },
+  { id: '9', text: 'Monitor 27 polegadas', category: 'Informática' },
+  { id: '10', text: 'Webcam HD', category: 'Periféricos' },
+  { id: '11', text: 'Headset com microfone', category: 'Áudio' },
+  { id: '12', text: 'Caixa de som Bluetooth', category: 'Áudio' },
+  { id: '13', text: 'SSD 1TB', category: 'Armazenamento' },
+  { id: '14', text: 'Hub USB-C', category: 'Acessórios' },
+  { id: '15', text: 'Base notebook alumínio', category: 'Acessórios' }
+]
+
+const searchFakeCatalogResults = ref([])
+const searchFakeCatalogLastQuery = ref('')
+
+const searchFakeCatalogInteraction = async (query) => {
+  await new Promise((resolve) => setTimeout(resolve, 450))
+  const q = String(query).trim().toLowerCase()
+  searchFakeCatalogLastQuery.value = String(query).trim()
+  if (!q) {
+    searchFakeCatalogResults.value = []
+    return
+  }
+  searchFakeCatalogResults.value = FAKE_SEARCH_CATALOG.filter((item) =>
+    item.text.toLowerCase().includes(q)
+  )
+}
+
+const searchFakeCatalogOnChanged = (v) => {
+  if (!String(v ?? '').trim()) {
+    searchFakeCatalogResults.value = []
+    searchFakeCatalogLastQuery.value = ''
+  }
+}
+
 const currentRadioItem = ref('')
 const currentCheckboxItem = ref([''])
 const inputOptions = computed(() => {

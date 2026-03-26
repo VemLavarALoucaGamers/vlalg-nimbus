@@ -49,6 +49,26 @@
         @paste="handlePaste"
       />
 
+      <div
+        v-if="showSubmitSearchButton"
+        role="button"
+        @click.stop="submitInteractionFromControl"
+        style="
+        background-color: #353734;
+        color: #f8f8f2;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        align-content: center;
+        "
+      >
+        pesquisar
+      </div>
+
       <label :for="computedInputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
         <slot name="icon">
           <span>&#9829;</span>
@@ -66,11 +86,16 @@
     >
       <slot name="message">{{ message }}</slot>
     </div>
+    <div v-if="showResults" class="component__results">
+      Lista de resultados
+    </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch } from 'vue'
+import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, shallowRef } from 'vue'
+
+import debounceFactory from '@vlalg-nimbus/magic-debounce'
 
 defineOptions({
 	name: 'NbInputSearch',
@@ -84,10 +109,6 @@ onMounted(() => {
     inputValue.value = ''
   }
 })
-onUnmounted(() => {
-  startValue()
-})
-
 const emit = defineEmits([
   'current-value',
   'changed',
@@ -95,7 +116,15 @@ const emit = defineEmits([
   'blurred',
   'clicked',
   'entered',
-  'paste'
+  'paste',
+  // interaction-start: { source: 'debounce'|'submit', value }
+  'interaction-start',
+  // interaction-end: { source, value }
+  'interaction-end',
+  // interaction-error: { source, value, error }
+  'interaction-error',
+  // interaction-cancel: { reason: 'submit'|'clear-value'|'unmount'|'reconfigure' }
+  'interaction-cancel'
 ])
 
 const props = defineProps({
@@ -577,7 +606,36 @@ const props = defineProps({
 	darkTextColorLabelActive: {
 		type: String,
 		default: '#ffffff'
-	}
+	},
+  showResults: {
+    type: Boolean,
+    default: false, // mudar para false depois que finalizar tudo
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
+  interactionFunction: {
+    type: Function,
+    default: async () => {},
+    validator: value => {
+      return typeof value === 'function'
+    },
+  },
+  /** Milissegundos de debounce ao digitar (`interactionFunction`). Só tem efeito com `interaction-trigger="debounce"`. */
+  interactionDebounceWait: {
+    type: Number,
+    default: 0,
+    validator: value => typeof value === 'number' && value >= 0
+  },
+  /**
+   * `debounce` — dispara `interactionFunction` após pausa na digitação (ver `interaction-debounce-wait`); Enter e o botão disparam na hora.
+   * `submit` — não dispara pela digitação; só Enter (se `has-tab-index-enter`) e clique no botão.
+   */
+  interactionTrigger: {
+    type: String,
+    default: 'submit',
+    validator: value => ['debounce', 'submit'].includes(value)
+  },
 })
 
 const {
@@ -666,13 +724,26 @@ const {
   lightTextColorLabel,
   lightTextColorLabelActive,
   darkTextColorLabel,
-  darkTextColorLabelActive
+  darkTextColorLabelActive,
+  interactionFunction,
+  interactionDebounceWait,
+  interactionTrigger,
 } = toRefs(props)
 
 const inputValue = ref('')
 const inputRef = ref(null)
 const currentType = ref('')
 const isActive = ref(false)
+
+/** Debounce ao digitar; Enter cancela o timer pendente e chama `inputAction` na hora. */
+const interactionDebounceRef = shallowRef(null)
+
+/** Botão em `submit` ou em `debounce` com `interaction-debounce-wait === 0`. Com debounce + wait > 0 some (busca pela pausa na digitação + Enter). */
+const showSubmitSearchButton = computed(() => {
+  if (interactionTrigger.value === 'submit') return true
+  if (interactionTrigger.value === 'debounce' && interactionDebounceWait.value <= 0) return true
+  return false
+})
 
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
@@ -732,7 +803,10 @@ const formatDefaultValues = computed(() => {
   const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#ffffff' : lightTextColorLabelActive.value
   const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#000000' : darkTextColorLabelActive.value
 
-	return {
+  const interactionFunctionValue = !interactionFunction.value ? async () => {} : interactionFunction.value
+  const interactionDebounceWaitValue = !interactionDebounceWait.value ? 0 : interactionDebounceWait.value
+
+  return {
 		disabled: disabledValue,
 		display: displayValue,
 		font: fontValue,
@@ -787,6 +861,8 @@ const formatDefaultValues = computed(() => {
     darkTextColorLabel: darkTextColorLabelValue,
     lightTextColorLabelActive: lightTextColorLabelActiveValue,
     darkTextColorLabelActive: darkTextColorLabelActiveValue,
+    interactionFunction: interactionFunctionValue,
+    interactionDebounceWait: interactionDebounceWaitValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -1094,6 +1170,25 @@ const styleLabelActive = computed(() => {
 
   return defaultValues.theme === 'dark' ? defaultValues.darkTextColorLabelActive : defaultValues.lightTextColorLabelActive
 })
+
+/**
+ * Cancela o debounce
+ * @param {string} reason - Motivo da cancelação
+ */
+ function cancelInteractionDebounce(reason) {
+  // Pega o debounce
+  const deb = interactionDebounceRef.value
+
+  // Se o debounce não existir, retorna
+  if (!deb) return
+
+  // Cancela o debounce
+  deb.cancel()
+
+  // Emite o evento de cancelação
+  emit('interaction-cancel', { reason })
+}
+
 const startValue = () => {
   if (inputText.value != null) {
     inputValue.value = String(inputText.value)
@@ -1137,10 +1232,33 @@ const handleLabelClick = (event) => {
   }
 }
 
-const enterConfirm = () => {
+/** Enter ou botão “pesquisar”: emite `entered` e executa `interactionFunction` (respeita disabled/readonly). */
+const submitInteractionFromControl = async (event) => {
+  // Se o evento for passado, previne que o evento seja propagado
+  if (event) {
+    // Prevenir que o evento seja propagado
+    event.stopPropagation()
+  }
+
+  // Se o componente está desabilitado ou readonly, retorna
+  if (disabled.value || formatDefaultValues.value.inputReadonly) return
+
+  // Cancela o debounce
+  cancelInteractionDebounce('submit')
+
+  // Emite o evento de entrada
+  emit('entered', formatValueForEmit(inputValue.value))
+
+  // Executa a função de interação
+  await inputAction()
+}
+
+const enterConfirm = async () => {
+  // Se o componente está desabilitado ou readonly, retorna
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
 
-  emit('entered', formatValueForEmit(inputValue.value))
+  // Executa a função de interação
+  await submitInteractionFromControl()
 }
 
 const handlePaste = async (event) => {
@@ -1154,6 +1272,120 @@ const handlePaste = async (event) => {
   if (blockPaste.value) {
     event.preventDefault()
   }
+}
+
+/**
+ * Resolve o valor do input para a função de interação
+ * Remove os espaços em branco e retorna o valor
+ */
+const resolveInteractionValue = () => {
+  // Pega o valor do input
+  let currentValue = inputValue.value
+  
+  // Se o valor for null ou vazio, retorna null
+  if (currentValue == null || currentValue === '') return null
+
+  // Se o valor for uma string, remove os espaços em branco
+  if (hasTrim.value && typeof currentValue === 'string') {
+    currentValue = currentValue.trim()
+  }
+
+  // Se o valor for vazio, retorna null
+  if (currentValue === '') return null
+
+  // Retorna o valor
+  return currentValue
+}
+
+// Executa a função de interação
+async function runInteractionFunction(currentValue, source) {
+  // Emite o evento de início
+  emit('interaction-start', { source, value: currentValue })
+
+  // Tenta executar a função de interação
+  try {
+    // Executa a função de interação
+    await formatDefaultValues.value.interactionFunction(currentValue)
+
+    // Emite o evento de fim
+    emit('interaction-end', { source, value: currentValue })
+  } catch (error) {
+    // Emite o evento de erro
+    emit('interaction-error', { source, value: currentValue, error })
+  }
+}
+
+/**
+ * Watch para o debounce wait
+ * Cancela o debounce anterior e cria um novo debounce com o novo wait
+ */
+watch([interactionDebounceWait, interactionTrigger], () => {
+  // Cancela o debounce
+  cancelInteractionDebounce('reconfigure')
+
+  // Pega o novo wait
+  const w = interactionDebounceWait.value
+
+  // Se o trigger for debounce, usa o debounce
+  const useDebounceOnType = interactionTrigger.value === 'debounce'
+
+  // Se o wait for maior que 0 e o trigger for debounce, usa o debounce
+  if (w > 0 && useDebounceOnType) {
+    // Cria um novo debounce
+    interactionDebounceRef.value = debounceFactory({
+      wait: w, // Wait para o debounce
+      callback: async (currentValue) => { // Função de interação
+        // Se o componente está desabilitado ou readonly, retorna
+        if (disabled.value || formatDefaultValues.value.inputReadonly) return
+
+        // Executa a função de interação
+        await runInteractionFunction(currentValue, 'debounce')
+      }
+    })
+  } else {
+    // Se o trigger não for debounce, define o debounce como null
+    interactionDebounceRef.value = null
+  }
+}, {
+  immediate: true // Inicia imediatamente
+})
+
+watch(inputValue, () => {
+  // Se o trigger não for debounce, retorna
+  if (interactionTrigger.value !== 'debounce') return
+
+  // Se o wait for menor ou igual a 0, retorna
+  if (interactionDebounceWait.value <= 0) return
+  
+  // Se o componente está desabilitado ou readonly, retorna
+  if (disabled.value || formatDefaultValues.value.inputReadonly) return
+  
+  // Pega o valor do input
+  const v = resolveInteractionValue()
+  
+  // Se o valor for null, cancela o debounce e retorna
+  if (v == null) {
+    // Cancela o debounce
+    cancelInteractionDebounce('clear-value')
+
+    // Retorna
+    return
+  }
+  
+  // Executa a função de interação
+  interactionDebounceRef.value?.debouncedFunction(v)
+})
+
+// Executa a função de interação
+const inputAction = async () => {
+  // Pega o valor do input
+  const currentValue = resolveInteractionValue()
+
+  // Se o valor for null, cancela o debounce e retorna
+  if (currentValue == null) return
+
+  // Executa a função de interação
+  await runInteractionFunction(currentValue, 'submit')
 }
 
 watch(inputText, value => {
@@ -1184,6 +1416,16 @@ watch(inputValue, value => {
   }
 
   emit('current-value', formatValueForEmit(value))
+})
+
+// OnUnmounted para cancelar o debounce e iniciar o valor inicial
+// esta no final do componente para garantir que o debounce seja cancelado antes de desmontar o componente
+onUnmounted(() => {
+  // Cancelar o debounce
+  cancelInteractionDebounce('unmount')
+
+  // Iniciar o valor inicial
+  startValue()
 })
 </script>
 
@@ -1723,6 +1965,22 @@ watch(inputValue, value => {
     padding-left: 2px;
     margin-top: 2px;
   }
+}
+
+.component__results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background-color: #fff;
+  color: #000;
+  height: 300px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
 }
 
 .component-disabled {

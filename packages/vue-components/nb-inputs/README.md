@@ -45,6 +45,8 @@ The components that are part of this lib are:
 - <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input-chip" target="_blank">nb-input-chip</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-textarea" target="_blank">nb-textarea</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-date-picker" target="_blank">nb-date-picker</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input-file" target="_blank">nb-input-file</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input-search" target="_blank">nb-input-search</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

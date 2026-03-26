@@ -46,12 +46,13 @@ export default defineConfig({
     },
     rollupOptions: {
       // Make sure to externalize deps that shouldn't into your library
-      external: ['vue', '@vlalg-nimbus/nb-calendar'],
+      external: ['vue', '@vlalg-nimbus/nb-calendar', '@vlalg-nimbus/magic-debounce'],
       output: {
         // Provide global variables to use in the UMD for externalized deps
         globals: {
           vue: 'Vue',
           '@vlalg-nimbus/nb-calendar': 'NbCalendar',
+          '@vlalg-nimbus/magic-debounce': 'MagicDebounce',
         },
       },
     },
@@ -103,6 +104,11 @@ export default defineConfig({
       {
         find: '@vlalg-nimbus/nb-calendar',
         replacement: path.resolve(__dirname, '../nb-calendar/src/install.js'),
+      },
+      // Fonte TS quando dist do pacote não foi gerado (evita depender de build prévio)
+      {
+        find: '@vlalg-nimbus/magic-debounce',
+        replacement: path.resolve(__dirname, '../../libs/magic-debounce/modules/index.ts'),
       },
     ],
   },

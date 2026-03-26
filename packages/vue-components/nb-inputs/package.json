@@ -32,6 +32,7 @@
     "npm:publish": "vite build && npm login && npm publish --access=public"
   },
   "dependencies": {
+    "@vlalg-nimbus/magic-debounce": "^3.0.2",
     "@vlalg-nimbus/bee-css-reset": "^2.0.2",
     "@vlalg-nimbus/chameleon-grid-layout": "^1.0.2",
     "@vlalg-nimbus/nb-calendar": "^2.1.1",
