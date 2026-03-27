@@ -3168,7 +3168,7 @@
               input-name="search-demo-debounce"
               input-style="border"
               light-text-color="#ffffff"
-              input-text=""
+              :input-text="searchFakeCatalogInputText"
               :has-trim="true"
               interaction-trigger="debounce"
               :interaction-debounce-wait="500"
@@ -3194,7 +3194,7 @@
               input-name="search-demo-submit-zero"
               input-style="border"
               light-text-color="#ffffff"
-              input-text=""
+              :input-text="searchFakeCatalogInputText"
               interaction-trigger="submit"
               :interaction-debounce-wait="0"
               :interaction-function="searchDemoInteractionSubmitZero"
@@ -3220,49 +3220,6 @@
               @entered="searchDemoOnEnteredSubmitWait500"
             />
           </div>
-        </div>
-
-        <div style="margin-top: 2rem; max-width: 46rem">
-          <h5 style="margin: 0 0 0.5rem">
-            Debounce + consulta fake (filtra array pelo campo <code>text</code>)
-          </h5>
-          <p style="margin: 0 0 0.75rem; font-size: 0.92em; line-height: 1.45; opacity: 0.9">
-            Após a pausa no teclado, um <code>await</code> simula latência; em seguida filtramos objetos
-            <code>{ id, text, category }</code> com <code>text.includes(query)</code>. Em produção, troque por
-            <code>fetch</code> e preencha a lista com a resposta.
-          </p>
-          <NbInputSearch
-            nb-id="search-demo-fake-catalog"
-            display="b"
-            label="Buscar produto (fake API)"
-            input-name="search-demo-fake-catalog"
-            input-style="border"
-            light-text-color="#ffffff"
-            input-text=""
-            :has-trim="true"
-            interaction-trigger="debounce"
-            :interaction-debounce-wait="400"
-            :interaction-function="searchFakeCatalogInteraction"
-            @changed="searchFakeCatalogOnChanged"
-          />
-          <div
-            v-if="searchFakeCatalogResults.length"
-            style="margin-top: 0.75rem; padding: 0.65rem 0.85rem; background: rgba(255, 255, 255, 0.65); border-radius: 6px"
-          >
-            <strong style="font-size: 0.9em">Resultados ({{ searchFakeCatalogResults.length }})</strong>
-            <ul style="margin: 0.4rem 0 0; padding-left: 1.2rem; line-height: 1.55">
-              <li v-for="item in searchFakeCatalogResults" :key="item.id">
-                <strong>{{ item.text }}</strong>
-                <span style="opacity: 0.75"> — {{ item.category }}</span>
-              </li>
-            </ul>
-          </div>
-          <p
-            v-else-if="searchFakeCatalogLastQuery !== ''"
-            style="margin: 0.75rem 0 0; font-size: 0.9em; opacity: 0.85"
-          >
-            Nenhum resultado para <code>{{ searchFakeCatalogLastQuery }}</code>.
-          </p>
         </div>
 
         <div
@@ -3294,13 +3251,101 @@
             Nenhum evento ainda — digite (modo debounce), pressione Enter ou clique em pesquisar.
           </p>
         </div>
+
+        <div style="margin-top: 2rem; max-width: 46rem">
+          <h5 style="margin: 0 0 0.5rem">
+            Debounce + consulta fake (filtra array pelo campo <code>text</code>)
+          </h5>
+          <p style="margin: 0 0 0.75rem; font-size: 0.92em; line-height: 1.45; opacity: 0.9">
+            Após a pausa no teclado, um <code>await</code> simula latência; em seguida filtramos objetos
+            <code>{ id, text, category }</code> com <code>text.includes(query)</code>. Em produção, troque por
+            <code>fetch</code> e preencha a lista com a resposta.
+          </p>
+          searchFakeCatalogInputText: {{ searchFakeCatalogInputText }}<br>
+          searchFakeCatalogLastQuery: {{ searchFakeCatalogLastQuery }}<br>
+          fetchingFakeCatalog: {{ fetchingFakeCatalog }}<br>
+          showResults: {{ showResults }}<br>
+          lastInteractionSource: {{ searchFakeCatalogLastInteractionSource || '(nenhum)' }}<br>
+          sourceCounters: debounce={{ searchFakeCatalogSourceCounters.debounce }} / submit={{ searchFakeCatalogSourceCounters.submit }}<br>
+          
+          <div
+            class="wrapper-field-search"
+            ref="searchFakeCatalogWrapperRef"
+            @mouseleave="searchFakeCatalogOnWrapperMouseLeave"
+            @focusout="searchFakeCatalogOnWrapperFocusOut"
+          >
+            <NbInputSearch
+              nb-id="search-demo-fake-catalog"
+              display="b"
+              label="Buscar produto (fake API)"
+              input-name="search-demo-fake-catalog"
+              :input-text="searchFakeCatalogInputText"
+              input-style="border"
+              light-text-color="#ffffff"
+              input-text=""
+              :has-trim="true"
+              interaction-trigger="debounce"
+              :interaction-debounce-wait="400"
+              :interaction-debounce-enforce-min-length="false"
+              :interaction-debounce-min-length="3"
+              :interaction-function="searchFakeCatalogInteraction"
+              :show-results="showResults"
+              @changed="searchFakeCatalogOnChanged"
+              @cleared="searchFakeCatalogOnCleared"
+              @interaction-start="searchFakeCatalogOnInteractionStart"
+              @blurred="searchFakeCatalogOnBlurred"
+              @focused="searchFakeCatalogOnFocused"
+            />
+
+            <div
+              v-if="showResults"
+              class="wrapper-field-search__results"
+              @click="closeResults"
+              @contextmenu.prevent="closeResults"
+              @auxclick="closeResultsOnAuxClick"
+            >
+              <div class="wrapper-field-search__results-content">
+                <div v-if="fetchingFakeCatalog">
+                  <p>Carregando...</p>
+                </div>
+                <div v-else>
+                  <div v-if="searchFakeCatalogResults.length">
+                    <strong>Resultados ({{ searchFakeCatalogResults.length }})</strong>
+                    <ul>
+                      <li v-for="item in searchFakeCatalogResults" :key="item.id" @click.stop="fakeSelectResult(item)">
+                        <strong>{{ item.text }}</strong>
+                        <span style="opacity: 0.75"> — {{ item.category }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <p
+                    v-else
+                    style="margin: 0.75rem 0 0; font-size: 0.9em; opacity: 0.85"
+                  >
+                    Nenhum resultado para <code>{{ searchFakeCatalogLastQuery }}</code>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 1rem 1.25rem; background: rgba(255, 255, 255, 0.55); border-radius: 8px; font-family: ui-monospace, monospace; font-size: 13px;">
+            <p>List to filter:</p>
+            <ul>
+              <li v-for="item in FAKE_SEARCH_CATALOG" :key="item.id">
+                <strong>{{ item.text }}</strong>
+                <span style="opacity: 0.75"> — {{ item.category }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineAsyncComponent, ref, computed } from 'vue'
+import { defineAsyncComponent, ref, computed, onMounted, onUnmounted } from 'vue'
 
 const NbInputTest = defineAsyncComponent(() => import('@components/NbInputTest.vue'))
 const NbInputRadio = defineAsyncComponent(() => import('@components/NbInputRadio.vue'))
@@ -3386,6 +3431,53 @@ const searchDemoOnEnteredSubmitWait500 = (value) => {
   searchDemoPushLog('Submit + wait 500', '@entered', value)
 }
 
+const fetchingFakeCatalog = ref(false)
+const showResults = ref(false)
+
+const searchFakeCatalogWrapperRef = ref(null)
+
+const hideSearchFakeCatalogResults = () => {
+  fetchingFakeCatalog.value = false
+  showResults.value = false
+}
+
+const hasBlurFocus = ref(false)
+const searchFakeCatalogOnWrapperMouseLeave = () => {
+  if (!hasBlurFocus.value) return
+
+  hideSearchFakeCatalogResults()
+}
+
+const searchFakeCatalogOnWrapperFocusOut = (event) => {
+  if (!hasBlurFocus.value) return
+
+  const wrapper = searchFakeCatalogWrapperRef.value
+  const next = event?.relatedTarget || null
+
+  // Se o foco ainda está dentro do wrapper, não esconde
+  if (wrapper && next && wrapper.contains(next)) return
+
+  hideSearchFakeCatalogResults()
+}
+
+const searchFakeCatalogOnDocumentPointerDown = (event) => {
+  const wrapper = searchFakeCatalogWrapperRef.value
+  if (!wrapper) return
+
+  const target = event?.target
+  if (target && wrapper.contains(target)) return
+
+  hideSearchFakeCatalogResults()
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', searchFakeCatalogOnDocumentPointerDown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('pointerdown', searchFakeCatalogOnDocumentPointerDown)
+})
+
 /** Catálogo estático para demo “API fake”: filtro por `text` após debounce + latência simulada */
 const FAKE_SEARCH_CATALOG = [
   { id: '1', text: 'Notebook Pro 14', category: 'Informática' },
@@ -3407,8 +3499,40 @@ const FAKE_SEARCH_CATALOG = [
 
 const searchFakeCatalogResults = ref([])
 const searchFakeCatalogLastQuery = ref('')
+const searchFakeCatalogInputText = ref('notebook')
+const searchFakeCatalogLastInteractionSource = ref('')
+const searchFakeCatalogSourceCounters = ref({
+  debounce: 0,
+  submit: 0
+})
+
+const searchFakeCatalogOnInteractionStart = (payload) => {
+  const source = payload?.source === 'submit' ? 'submit' : 'debounce'
+  searchFakeCatalogLastInteractionSource.value = source
+  searchFakeCatalogSourceCounters.value[source] += 1
+}
+
+/** Simula latência de rede / backend no filtro fake (ms). Aumente para ver o “Carregando...”. */
+const SEARCH_FAKE_CATALOG_FILTER_DELAY_MS = 1500
 
 const searchFakeCatalogInteraction = async (query) => {
+  console.log('interaction => ', query && searchFakeCatalogLastQuery.value === query)
+  // Reaproveita apenas quando a mesma query ainda tem resultados em memória.
+  // Se a lista foi limpa ao fechar, refaz a busca para reconstruir os itens.
+  if (
+    query &&
+    searchFakeCatalogLastQuery.value === query &&
+    searchFakeCatalogResults.value.length > 0
+  ) {
+    showResults.value = true
+    return
+  }
+
+  if (searchFakeCatalogLastQuery.value === '') showResults.value = true
+
+  fetchingFakeCatalog.value = true
+
+  /*
   await new Promise((resolve) => setTimeout(resolve, 450))
   const q = String(query).trim().toLowerCase()
   searchFakeCatalogLastQuery.value = String(query).trim()
@@ -3419,12 +3543,74 @@ const searchFakeCatalogInteraction = async (query) => {
   searchFakeCatalogResults.value = FAKE_SEARCH_CATALOG.filter((item) =>
     item.text.toLowerCase().includes(q)
   )
+  showResults.value = true
+  fetchingFakeCatalog.value = false
+  */
+  try {
+    await new Promise((resolve) => setTimeout(resolve, SEARCH_FAKE_CATALOG_FILTER_DELAY_MS))
+    const q = String(query).trim().toLowerCase()
+    searchFakeCatalogLastQuery.value = String(query).trim()
+    if (!q) {
+      searchFakeCatalogResults.value = []
+      return
+    }
+    searchFakeCatalogResults.value = FAKE_SEARCH_CATALOG.filter((item) =>
+      item.text.toLowerCase().includes(q)
+    )
+    showResults.value = true
+  } finally {
+    fetchingFakeCatalog.value = false
+  }
 }
 
 const searchFakeCatalogOnChanged = (v) => {
+  searchFakeCatalogInputText.value = String(v ?? '')
+
   if (!String(v ?? '').trim()) {
     searchFakeCatalogResults.value = []
     searchFakeCatalogLastQuery.value = ''
+    showResults.value = false
+  }
+}
+const searchFakeCatalogOnCleared = () => {
+  console.log('clean')
+  searchFakeCatalogInputText.value = ''
+  searchFakeCatalogLastQuery.value = ''
+  searchFakeCatalogResults.value = []
+  showResults.value = false
+  searchFakeCatalogLastInteractionSource.value = ''
+  searchFakeCatalogSourceCounters.value = { debounce: 0, submit: 0 }
+}
+const hasBlurInput = ref(false)
+const searchFakeCatalogOnBlurred = () => {
+  console.log('blurred input')
+  if (!hasBlurInput.value) return
+
+  console.log('blurred => ', searchFakeCatalogLastQuery.value === '')
+
+  fetchingFakeCatalog.value = false
+  showResults.value = false
+}
+const searchFakeCatalogOnFocused = () => {
+  console.log('focused => ', searchFakeCatalogLastQuery.value === '')
+  if (searchFakeCatalogLastQuery.value !== '') {
+    searchFakeCatalogInteraction(searchFakeCatalogLastQuery.value)
+  }
+}
+const fakeSelectResult = (item) => {
+  console.log('select result => ', item)
+  searchFakeCatalogInputText.value = ''
+  searchFakeCatalogLastQuery.value = ''
+  showResults.value = false
+  searchFakeCatalogResults.value = []
+}
+const closeResults = () => {
+  console.log('close results')
+  showResults.value = false
+}
+const closeResultsOnAuxClick = (event) => {
+  if (event?.button === 1) {
+    closeResults()
   }
 }
 
@@ -3624,5 +3810,50 @@ const onMultipleBorderValidationItem = (payload) => {
     height: 272px;
 
     color: #000;
+}
+
+.wrapper-field-search {
+  position: relative;
+
+  .wrapper-field-search__results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    background-color: #fff;
+    color: #000;
+    overflow-y: none;
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+    font-size: 14px;
+
+    .wrapper-field-search__results-content {
+      max-height: 240px;
+      overflow-y: auto;
+      background-color: #fff;
+      color: #000;
+      padding: 12px;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      row-gap: 13px;
+      margin-top: 18px;
+
+      li {
+        cursor: pointer;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: #007bff;
+        }
+      }
+    }
+  }
 }
 </style>

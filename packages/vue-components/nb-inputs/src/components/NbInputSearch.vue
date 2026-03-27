@@ -9,7 +9,16 @@
   >
     <div
       :id="nbId"
-      :class="['nb-reset', 'component', sizeMediaQueryStyle, themeStyle, componentReadonly, inputStyleClass]"
+      :class="[
+        'nb-reset',
+        'component',
+        sizeMediaQueryStyle,
+        themeStyle,
+        componentReadonly,
+        inputStyleClass,
+        { 'component--focus-border-enabled': hasBorderFocus },
+        { 'component--focus-border-active': hasBorderFocus && isActive }
+      ]"
       :style="[componentStyle, inputWidthStyle, borderRadiusStyle]"
       @click="interacted($event)"
     >
@@ -37,6 +46,8 @@
         :required="required"
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
+        enterkeyhint="search"
+        inputmode="search"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
         :min="supportsMinMaxStep ? min : undefined"
         :max="supportsMinMaxStep ? max : undefined"
@@ -45,6 +56,11 @@
         :style="[borderRadiusStyle, inputIconStyle]"
         @focus="isActive = true"
         @blur="isActive = false"
+        @beforeinput="scheduleDebouncedInteraction($event)"
+        @input="scheduleDebouncedInteraction($event)"
+        @keyup="scheduleDebouncedInteraction($event)"
+        @compositionupdate="scheduleDebouncedInteraction($event)"
+        @compositionend="scheduleDebouncedInteraction($event)"
         @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
         @paste="handlePaste"
       />
@@ -86,9 +102,6 @@
     >
       <slot name="message">{{ message }}</slot>
     </div>
-    <div v-if="showResults" class="component__results">
-      Lista de resultados
-    </div>
   </div>
 </template>
 
@@ -117,6 +130,8 @@ const emit = defineEmits([
   'clicked',
   'entered',
   'paste',
+  // cleared: previous value before field becomes empty
+  'cleared',
   // interaction-start: { source: 'debounce'|'submit', value }
   'interaction-start',
   // interaction-end: { source, value }
@@ -199,6 +214,11 @@ const props = defineProps({
       return typeof value === 'boolean' && [true, false].includes(value)
     },
 	},
+  /** Exibe borda de foco azul quando o campo está ativo/focado. */
+  hasBorderFocus: {
+    type: Boolean,
+    default: true
+  },
 	borderRadius: {
 		type: Number,
 		default: .5 // 0.375
@@ -607,13 +627,6 @@ const props = defineProps({
 		type: String,
 		default: '#ffffff'
 	},
-  showResults: {
-    type: Boolean,
-    default: false, // mudar para false depois que finalizar tudo
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    },
-  },
   interactionFunction: {
     type: Function,
     default: async () => {},
@@ -636,6 +649,23 @@ const props = defineProps({
     default: 'submit',
     validator: value => ['debounce', 'submit'].includes(value)
   },
+  /**
+   * Com `interaction-trigger="debounce"` e `interaction-debounce-enforce-min-length`,
+   * quantidade mínima de caracteres do valor resolvido (após `has-trim`, se ativo) para disparar `interactionFunction`.
+   */
+  interactionDebounceMinLength: {
+    type: Number,
+    default: 2,
+    validator: value => typeof value === 'number' && Number.isFinite(value) && value >= 0
+  },
+  /**
+   * Se true e `interaction-trigger="debounce"`, não chama `interactionFunction` enquanto o texto tiver menos que
+   * `interaction-debounce-min-length` caracteres (digitação com debounce, Enter e botão).
+   */
+  interactionDebounceEnforceMinLength: {
+    type: Boolean,
+    default: false
+  },
 })
 
 const {
@@ -649,6 +679,7 @@ const {
 	selectionBgColor,
 	selectionTextColor,
   hasBorderRadius,
+  hasBorderFocus,
 	borderRadius,
 	disabled,
 	fontFamily,
@@ -728,6 +759,8 @@ const {
   interactionFunction,
   interactionDebounceWait,
   interactionTrigger,
+  interactionDebounceMinLength,
+  interactionDebounceEnforceMinLength,
 } = toRefs(props)
 
 const inputValue = ref('')
@@ -1196,7 +1229,8 @@ const startValue = () => {
     inputValue.value = ''
   }
 
-  currentType.value = 'text'
+  // Define o tipo de input como search para permitir o uso do teclado virtual
+  currentType.value = 'search'
 }
 
 const supportsMinMaxStep = computed(() => {
@@ -1246,6 +1280,19 @@ const submitInteractionFromControl = async (event) => {
   // Cancela o debounce
   cancelInteractionDebounce('submit')
 
+  // Resolve o valor para a validação de tamanho mínimo
+  const resolvedForMin = resolveInteractionValue()
+
+  // Se o valor for diferente de null, o trigger for debounce e a validação de tamanho mínimo for true e o valor não satisfaz a validação de tamanho mínimo, retorna
+  if (
+    resolvedForMin != null &&
+    interactionTrigger.value === 'debounce' &&
+    interactionDebounceEnforceMinLength.value &&
+    !satisfiesDebounceMinLength(resolvedForMin)
+  ) {
+    return
+  }
+
   // Emite o evento de entrada
   emit('entered', formatValueForEmit(inputValue.value))
 
@@ -1278,9 +1325,9 @@ const handlePaste = async (event) => {
  * Resolve o valor do input para a função de interação
  * Remove os espaços em branco e retorna o valor
  */
-const resolveInteractionValue = () => {
+const resolveInteractionValue = (rawValue = inputValue.value) => {
   // Pega o valor do input
-  let currentValue = inputValue.value
+  let currentValue = rawValue
   
   // Se o valor for null ou vazio, retorna null
   if (currentValue == null || currentValue === '') return null
@@ -1295,6 +1342,62 @@ const resolveInteractionValue = () => {
 
   // Retorna o valor
   return currentValue
+}
+
+/** Regra de tamanho mínimo só em modo debounce, quando `interaction-debounce-enforce-min-length` está ativo. */
+const satisfiesDebounceMinLength = (resolvedValue) => {
+  // Se o enforce min length for false ou o trigger não for debounce, retorna true
+  if (!interactionDebounceEnforceMinLength.value || interactionTrigger.value !== 'debounce') {
+    return true
+  }
+
+  // Se o valor for null, retorna false
+  if (resolvedValue == null) return false
+
+  // Se o valor for maior ou igual ao tamanho mínimo, retorna true
+  return String(resolvedValue).length >= interactionDebounceMinLength.value
+}
+
+/**
+ * Agenda a busca no modo debounce.
+ * Fallback para alguns teclados mobile/IME que podem não disparar o fluxo esperado apenas com watch.
+ */
+const scheduleDebouncedInteraction = (event) => {
+  // Se o trigger não for debounce, retorna
+  if (interactionTrigger.value !== 'debounce') return
+
+  // Se o wait for menor ou igual a 0, retorna
+  if (interactionDebounceWait.value <= 0) return
+
+  // Se o componente está desabilitado ou readonly, retorna
+  if (disabled.value || formatDefaultValues.value.inputReadonly) return
+
+  // Pega o valor do evento
+  const eventValue = event?.target?.value
+
+  // Se o valor do evento for diferente do valor do input, atualiza o valor do input
+  if (eventValue !== undefined && eventValue !== inputValue.value) {
+    inputValue.value = eventValue // Atualiza o valor do input
+  }
+
+  // Pega o valor do input
+  const v = resolveInteractionValue(eventValue !== undefined ? eventValue : inputValue.value)
+
+  // Se o valor for null, cancela o debounce e retorna
+  if (v == null) {
+    cancelInteractionDebounce('clear-value') // Cancela o debounce
+    return
+  }
+
+  // Debounce + validação de tamanho mínimo: não agenda busca até atingir N caracteres
+  if (!satisfiesDebounceMinLength(v)) {
+    // Cancela o debounce
+    cancelInteractionDebounce('below-min-length')
+    return
+  }
+
+  // Executa a função de interação
+  interactionDebounceRef.value?.debouncedFunction(v) // Executa a função de interação
 }
 
 // Executa a função de interação
@@ -1338,6 +1441,9 @@ watch([interactionDebounceWait, interactionTrigger], () => {
         // Se o componente está desabilitado ou readonly, retorna
         if (disabled.value || formatDefaultValues.value.inputReadonly) return
 
+        // Se o valor não satisfaz a validação de tamanho mínimo, retorna
+        if (!satisfiesDebounceMinLength(currentValue)) return
+
         // Executa a função de interação
         await runInteractionFunction(currentValue, 'debounce')
       }
@@ -1351,29 +1457,8 @@ watch([interactionDebounceWait, interactionTrigger], () => {
 })
 
 watch(inputValue, () => {
-  // Se o trigger não for debounce, retorna
-  if (interactionTrigger.value !== 'debounce') return
-
-  // Se o wait for menor ou igual a 0, retorna
-  if (interactionDebounceWait.value <= 0) return
-  
-  // Se o componente está desabilitado ou readonly, retorna
-  if (disabled.value || formatDefaultValues.value.inputReadonly) return
-  
-  // Pega o valor do input
-  const v = resolveInteractionValue()
-  
-  // Se o valor for null, cancela o debounce e retorna
-  if (v == null) {
-    // Cancela o debounce
-    cancelInteractionDebounce('clear-value')
-
-    // Retorna
-    return
-  }
-  
-  // Executa a função de interação
-  interactionDebounceRef.value?.debouncedFunction(v)
+  // Agenda a busca no modo debounce
+  scheduleDebouncedInteraction() // Agenda a busca no modo debounce
 })
 
 // Executa a função de interação
@@ -1383,6 +1468,15 @@ const inputAction = async () => {
 
   // Se o valor for null, cancela o debounce e retorna
   if (currentValue == null) return
+
+  // Se o trigger for debounce e a validação de tamanho mínimo for true e o valor não satisfaz a validação de tamanho mínimo, retorna
+  if (
+    interactionTrigger.value === 'debounce' &&
+    interactionDebounceEnforceMinLength.value &&
+    !satisfiesDebounceMinLength(currentValue)
+  ) {
+    return
+  }
 
   // Executa a função de interação
   await runInteractionFunction(currentValue, 'submit')
@@ -1402,6 +1496,31 @@ watch(inputValue, value => {
   }
 
   emit('changed', formatValueForEmit(value))
+})
+watch(inputValue, (newValue, oldValue) => {
+  // Se o valor antigo for undefined, retorna
+  if (oldValue === undefined) return
+
+  const normalize = (v) => {
+    // Se o valor for uma string e o hasTrim for true, remove os espaços em branco
+    if (hasTrim.value && typeof v === 'string') return v.trim()
+    return v
+  }
+
+  // Normaliza o valor antigo
+  const prev = normalize(oldValue)
+
+  // Normaliza o valor novo
+  const next = normalize(newValue)
+  
+  // Se o valor for null ou vazio, retorna
+  const isEmpty = (v) => v == null || v === ''
+
+  // Se o valor antigo não for vazio e o valor novo for vazio, emite o evento cleared
+  if (!isEmpty(prev) && isEmpty(next)) {
+    // Emite o evento cleared
+    emit('cleared')
+  }
 })
 watch(isActive, value => {
   if (value) {
@@ -1544,6 +1663,14 @@ onUnmounted(() => {
       &::-moz-selection {
         background-color: v-bind('styleSelectionBgColor');
         color: v-bind('styleSelectionTextColor');
+      }
+    }
+
+    &.component--focus-border-active {
+      .component__input {
+        border-style: solid !important;
+        border-color: #3483fa !important;
+        border-width: 1.5px !important;
       }
     }
 
@@ -1967,21 +2094,6 @@ onUnmounted(() => {
   }
 }
 
-.component__results {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  background-color: #fff;
-  color: #000;
-  height: 300px;
-  overflow-y: auto;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 14px;
-}
 
 .component-disabled {
 	cursor: not-allowed;
