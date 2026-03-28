@@ -39,6 +39,37 @@
         </label>
       </div>
       <input
+        v-if="hasInputMask"
+        ref="inputRef"
+        v-model="inputValue"
+        v-mask="inputMaskForDirective"
+        :id="computedInputName"
+        :name="computedInputName"
+        :type="currentType"
+        class="component__input"
+        :class="[
+          uppercaseStyle,
+          hiddenDefaultEye,
+          activeStyle
+        ]"
+        :placeholder="computedPlaceholder"
+        :disabled="disabled || inputReadonly"
+        :required="required"
+        :readonly="inputReadonly"
+        :autocomplete="inputAutocomplete"
+        :tabindex="disabled || inputReadonly ? -1 : tabindex"
+        :min="supportsMinMaxStep ? min : undefined"
+        :max="supportsMinMaxStep ? max : undefined"
+        :step="supportsMinMaxStep ? step : undefined"
+        role="input"
+        :style="[borderRadiusStyle, inputIconStyle]"
+        @focus="isActive = true"
+        @blur="isActive = false"
+        @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+        @paste="handlePaste"
+      />
+      <input
+        v-else
         ref="inputRef"
         v-model="inputValue"
         :id="computedInputName"
@@ -88,7 +119,11 @@
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch } from 'vue'
+import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import * as vueTheMask from 'vue-the-mask'
+
+// O default do pacote é só o `Vue.use` installer; a diretiva está na exportação nomeada `mask`.
+const vMask = vueTheMask.mask
 
 defineOptions({
 	name: 'NbInput',
@@ -270,6 +305,19 @@ const props = defineProps({
   step: {
     type: [String, Number],
     default: '',
+  },
+  /**
+   * Máscara [`vue-the-mask`](https://www.npmjs.com/package/vue-the-mask) (mesma lib que `NbCreditCard` em `@vlalg-nimbus/nb-payments`).
+   * Só aplica com **`input-type="text"`**. Ex.: `'###.###.###-##'`, `'(##) ####-####'`. Array = máscaras dinâmicas por comprimento.
+   */
+  inputMask: {
+    type: [String, Array],
+    default: null,
+    validator: value => {
+      if (value == null) return true
+      if (typeof value === 'string') return true
+      return Array.isArray(value) && value.every(s => typeof s === 'string')
+    },
   },
   hasTrim: {
     type: Boolean,
@@ -660,6 +708,7 @@ const {
 	blockPaste,
 	showInputEye,
 	inputType,
+	inputMask,
   hasTrim,
 	inputUppercase,
   inputName,
@@ -731,6 +780,20 @@ const currentType = ref('')
 const showValue = ref(false)
 const isActive = ref(false)
 
+const hasInputMask = computed(() => {
+  if (inputType.value !== 'text') return false
+  const m = inputMask.value
+  if (m == null || m === '') return false
+  return !(Array.isArray(m) && m.length === 0)
+})
+
+/** A diretiva do vue-the-mask ordena o array in-place; em Vue 3 props são readonly — repassa cópia. */
+const inputMaskForDirective = computed(() => {
+  const m = inputMask.value
+  if (Array.isArray(m)) return m.slice()
+  return m
+})
+
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
@@ -754,7 +817,7 @@ const formatDefaultValues = computed(() => {
   const showInputEyeValue = !showInputEye.value ? false : showInputEye.value
   const inputTypeValue = !inputType.value ? 'text' : inputType.value
   const inputUppercaseValue = !inputUppercase.value ? false : inputUppercase.value
-  const themeValue = !theme.value ? 'normal' : theme.value
+  const themeValue = !theme.value ? 'light' : theme.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
   const inputStyleValue = !inputStyle.value ? 'background' : inputStyle.value
 

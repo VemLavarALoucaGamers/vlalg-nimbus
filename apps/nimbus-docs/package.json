@@ -28,6 +28,7 @@
     "@vlalg-nimbus/nb-calendar": "^1.0.0",
     "@vlalg-nimbus/nb-images": "^2.0.3",
     "@vlalg-nimbus/nb-inputs": "^8.0.6",
+    "vue-the-mask": "0.11.1",
     "@vlalg-nimbus/nb-loaders": "^1.0.3",
     "@vlalg-nimbus/nb-overlays": "^1.0.2",
     "@vlalg-nimbus/nb-pagination": "^1.0.0",

@@ -40,6 +40,27 @@
       </div>
 
       <input
+        v-if="hasInputMask"
+        ref="chipInput"
+        type="text"
+        v-model="chipInputValue"
+        v-mask="inputMaskForDirective"
+        :id="computedInputName"
+        :name="computedInputName"
+        :placeholder="computedPlaceholder"
+        :readonly="inputReadonly"
+        :autocomplete="inputAutocomplete"
+        :required="required"
+        :tabindex="disabled || inputReadonly ? -1 : tabIndex"
+        :class="['chips-input', activeTextStyleClass]"
+        :style="[caretColorStyle, selectionStyle]"
+        @keydown.enter="!disabled && hasTabIndexEnter && handleKeyDown($event)"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        @paste="handlePaste"
+      />
+      <input
+        v-else
         ref="chipInput"
         type="text"
         v-model="chipInputValue"
@@ -63,6 +84,9 @@
 
 <script setup>
 import { defineProps, ref, toRefs, computed, onMounted, watch } from 'vue'
+import * as vueTheMask from 'vue-the-mask'
+
+const vMask = vueTheMask.mask
 
 defineOptions({
   name: 'NbInputChip',
@@ -251,6 +275,19 @@ const props = defineProps({
 		validator: value => {
 			return ['on', 'off'].indexOf(value) !== -1
 		}
+	},
+	/**
+	 * Máscara [`vue-the-mask@0.11.1`](https://www.npmjs.com/package/vue-the-mask) — mesma API que `NbInput` (`input-mask`).
+	 * O campo de digitação do chip é sempre `type="text"`. String ou array de padrões.
+	 */
+	inputMask: {
+		type: [String, Array],
+		default: null,
+		validator: value => {
+			if (value == null) return true
+			if (typeof value === 'string') return true
+			return Array.isArray(value) && value.every(s => typeof s === 'string')
+		},
 	},
 	required: {
 		type: Boolean,
@@ -497,6 +534,7 @@ const {
 	inputReadonly,
 	blockPaste,
 	inputAutocomplete,
+	inputMask,
 	required,
 	textAlign,
 	hasBorderRadius,
@@ -841,6 +879,19 @@ const inputStyleClass = computed(() => {
 			return 'component__input--background'
 	}
 })
+
+const hasInputMask = computed(() => {
+	const m = inputMask.value
+	if (m == null || m === '') return false
+	return !(Array.isArray(m) && m.length === 0)
+})
+
+const inputMaskForDirective = computed(() => {
+	const m = inputMask.value
+	if (Array.isArray(m)) return m.slice()
+	return m
+})
+
 const interacted = (event) => {
 	emit('clicked', event)
 }

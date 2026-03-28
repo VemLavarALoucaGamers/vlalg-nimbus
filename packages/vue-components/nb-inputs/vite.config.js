@@ -46,13 +46,14 @@ export default defineConfig({
     },
     rollupOptions: {
       // Make sure to externalize deps that shouldn't into your library
-      external: ['vue', '@vlalg-nimbus/nb-calendar', '@vlalg-nimbus/magic-debounce'],
+      external: ['vue', '@vlalg-nimbus/nb-calendar', '@vlalg-nimbus/magic-debounce', 'vue-the-mask'],
       output: {
         // Provide global variables to use in the UMD for externalized deps
         globals: {
           vue: 'Vue',
           '@vlalg-nimbus/nb-calendar': 'NbCalendar',
           '@vlalg-nimbus/magic-debounce': 'MagicDebounce',
+          'vue-the-mask': 'VueTheMask',
         },
       },
     },

@@ -49,9 +49,6 @@
         enterkeyhint="search"
         inputmode="search"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
-        :min="supportsMinMaxStep ? min : undefined"
-        :max="supportsMinMaxStep ? max : undefined"
-        :step="supportsMinMaxStep ? step : undefined"
         role="input"
         :style="[borderRadiusStyle, inputIconStyle]"
         @focus="isActive = true"
@@ -68,24 +65,19 @@
       <div
         v-if="showSubmitSearchButton"
         role="button"
+        class="component__submit-search-button"
+        :style="submitSearchButtonStyle"
         @click.stop="submitInteractionFromControl"
-        style="
-        background-color: #353734;
-        color: #f8f8f2;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        align-content: center;
-        "
       >
-        pesquisar
+        {{ submitButtonLabel }}
       </div>
 
-      <label :for="computedInputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
+      <label
+        :for="computedInputName"
+        v-if="hasIcon"
+        :class="['component__icon', styleIconDirection]"
+        @click="handleLabelClick"
+      >
         <slot name="icon">
           <span>&#9829;</span>
         </slot>
@@ -219,6 +211,14 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  lightFocusActiveBorderColor: {
+    type: String,
+    default: '#2563eb'
+  },
+  darkFocusActiveBorderColor: {
+    type: String,
+    default: '#7dd3fc'
+  },
 	borderRadius: {
 		type: Number,
 		default: .5 // 0.375
@@ -278,18 +278,6 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
-  min: {
-    type: String,
-    default: '',
-  },
-  max: {
-    type: String,
-    default: '',
-  },
-  step: {
-    type: [String, Number],
-    default: '',
-  },
   hasTrim: {
     type: Boolean,
     default: false,
@@ -300,6 +288,10 @@ const props = defineProps({
   inputName: {
     type: String,
     required: true,
+  },
+  inputPadding: {
+    type: String,
+    default: '6px 10px'
   },
   inputPlaceholder: {
       type: String,
@@ -376,11 +368,11 @@ const props = defineProps({
 	},
 	lightControlBorderColor: {
 		type: String,
-		default: '#353734'
+		default: '#334155'
 	},
 	lightControlBorderColorActive: {
 		type: String,
-		default: '#272936'
+		default: '#2563eb'
 	},
 	lightDisabledBgColor: {
 		type: String,
@@ -388,24 +380,24 @@ const props = defineProps({
 	},
 	lightTextColor: {
 		type: String,
-		default: '#000000'
+		default: '#0f172a'
 	},
 	// Cores do tema dark
 	darkBgColor: {
 		type: String,
-		default: '#353734'
+		default: '#1e293b'
 	},
 	darkBgColorFocus: {
 		type: String,
-		default: '#272936'
+		default: '#334155'
 	},
 	darkControlBorderColor: {
 		type: String,
-		default: '#353734'
+		default: '#94a3b8'
 	},
 	darkControlBorderColorActive: {
 		type: String,
-		default: '#272936'
+		default: '#38bdf8'
 	},
 	darkDisabledBgColor: {
 		type: String,
@@ -413,7 +405,7 @@ const props = defineProps({
 	},
 	darkTextColor: {
 		type: String,
-		default: '#000000'
+		default: '#f1f5f9'
 	},
 	darkDisabledControlBorderColor: {
 		type: String,
@@ -470,6 +462,10 @@ const props = defineProps({
     type: Number,
     default: 32
   },
+  /**
+   * `right` só vale quando o botão de busca **não** está no layout (`debounce` com `interactionDebounceWait > 0`).
+   * Com ícone + botão visível (`submit` ou `debounce` com wait ≤ 0), força `left` para não colidir com o botão.
+   */
   iconDirection: {
     type: String,
     default: 'left',
@@ -494,27 +490,27 @@ const props = defineProps({
   },
 	iconLightTextColor: {
     type: String,
-    default: '#f8f8f2'
+    default: '#f8fafc'
   },
   iconDarkTextColor: {
     type: String,
-    default: '#f8f8f2'
+    default: '#f1f5f9'
   },
   iconLightBgColor: {
     type: String,
-    default: '#353734'
+    default: '#334155'
   },
   iconLightBgColorActive: {
     type: String,
-    default: '#272936'
+    default: '#475569'
   },
   iconDarkBgColor: {
     type: String,
-    default: '#353734'
+    default: '#334155'
   },
   iconDarkBgColorActive: {
     type: String,
-    default: '#272936'
+    default: '#475569'
   },
   iconDarkDisabledBgColor: {
     type: String,
@@ -666,6 +662,89 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  submitButtonLabel: {
+    type: String,
+    default: 'search'
+  },
+  /** Fundo do botão no tema claro (acento azul, contraste com campo claro). */
+  lightSubmitButtonBgColor: {
+    type: String,
+    default: '#1d4ed8'
+  },
+  /** Fundo do botão no tema escuro (acento ciano, contraste com campo escuro). */
+  darkSubmitButtonBgColor: {
+    type: String,
+    default: '#38bdf8'
+  },
+  lightSubmitButtonBgColorHover: {
+    type: String,
+    default: '#1e40af'
+  },
+  darkSubmitButtonBgColorHover: {
+    type: String,
+    default: '#0ea5e9'
+  },
+  lightSubmitButtonTextColor: {
+    type: String,
+    default: '#f8fafc'
+  },
+  darkSubmitButtonTextColor: {
+    type: String,
+    default: '#0f172a'
+  },
+  lightSubmitButtonTextColorHover: {
+    type: String,
+    default: '#ffffff'
+  },
+  darkSubmitButtonTextColorHover: {
+    type: String,
+    default: '#020617'
+  },
+  submitButtonPadding: {
+    type: String,
+    default: '5px 10px'
+  },
+  submitButtonBorderRadius: {
+    type: String,
+    default: '0px'
+  },
+  submitButtonTop: {
+    type: String,
+    default: '0'
+  },
+  submitButtonRight: {
+    type: String,
+    default: '0'
+  },
+  submitButtonBottom: {
+    type: String,
+    default: '0'
+  },
+	submitButtonFontFamily: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	submitButtonFontSize: {
+		type: String,
+		default: '1.1em',
+		validator: value => {
+			return !value ? '1.1em' : value
+		}
+	},
+	submitButtonFontWeight: {
+		type: Number,
+		default: 700,
+		validator: value => {
+			return !value ? 700 : value
+		}
+	},
+  submitButtonIsUppercase: {
+    type: Boolean,
+    default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  }
 })
 
 const {
@@ -680,6 +759,8 @@ const {
 	selectionTextColor,
   hasBorderRadius,
   hasBorderFocus,
+  lightFocusActiveBorderColor,
+  darkFocusActiveBorderColor,
 	borderRadius,
 	disabled,
 	fontFamily,
@@ -698,6 +779,7 @@ const {
   hasTrim,
 	inputUppercase,
   inputName,
+  inputPadding,
   inputPlaceholder,
   inputText,
   theme,
@@ -761,6 +843,24 @@ const {
   interactionTrigger,
   interactionDebounceMinLength,
   interactionDebounceEnforceMinLength,
+  submitButtonLabel,
+  lightSubmitButtonBgColor,
+  darkSubmitButtonBgColor,
+  lightSubmitButtonBgColorHover,
+  darkSubmitButtonBgColorHover,
+  lightSubmitButtonTextColor,
+  darkSubmitButtonTextColor,
+  lightSubmitButtonTextColorHover,
+  darkSubmitButtonTextColorHover,
+  submitButtonPadding,
+  submitButtonBorderRadius,
+  submitButtonTop,
+  submitButtonRight,
+  submitButtonBottom,
+  submitButtonFontFamily,
+  submitButtonFontSize,
+  submitButtonFontWeight,
+  submitButtonIsUppercase,
 } = toRefs(props)
 
 const inputValue = ref('')
@@ -770,13 +870,6 @@ const isActive = ref(false)
 
 /** Debounce ao digitar; Enter cancela o timer pendente e chama `inputAction` na hora. */
 const interactionDebounceRef = shallowRef(null)
-
-/** Botão em `submit` ou em `debounce` com `interaction-debounce-wait === 0`. Com debounce + wait > 0 some (busca pela pausa na digitação + Enter). */
-const showSubmitSearchButton = computed(() => {
-  if (interactionTrigger.value === 'submit') return true
-  if (interactionTrigger.value === 'debounce' && interactionDebounceWait.value <= 0) return true
-  return false
-})
 
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
@@ -800,15 +893,16 @@ const formatDefaultValues = computed(() => {
   const inputReadonlyValue = !inputReadonly.value ? false : inputReadonly.value
   const inputTypeValue = 'text'
   const inputUppercaseValue = !inputUppercase.value ? false : inputUppercase.value
-  const themeValue = !theme.value ? 'normal' : theme.value
+  const themeValue = !theme.value ? 'light' : theme.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
   const inputStyleValue = !inputStyle.value ? 'background' : inputStyle.value
+  const inputPaddingValue = !inputPadding.value ? '6px 10px' : inputPadding.value
 
   const iconPaddingValue = !iconPadding.value ? '5px 10px' : iconPadding.value
   const iconMarginValue = !iconMargin.value ? '0' : iconMargin.value
   const iconPaddingInputValue = !iconPaddingInput.value ? 10 : iconPaddingInput.value
-  const iconLightTextColorValue = !iconLightTextColor.value ? '#000000' : iconLightTextColor.value
-  const iconDarkTextColorValue = !iconDarkTextColor.value ? '#000000' : iconDarkTextColor.value
+  const iconLightTextColorValue = !iconLightTextColor.value ? '#f8fafc' : iconLightTextColor.value
+  const iconDarkTextColorValue = !iconDarkTextColor.value ? '#f1f5f9' : iconDarkTextColor.value
   const iconLightBgColorValue = !iconLightBgColor.value ? 'transparent' : iconLightBgColor.value
   const iconDarkBgColorValue = !iconDarkBgColor.value ? 'transparent' : iconDarkBgColor.value
   const iconBorderRadiusValue = ((iconBorderRadius.value !== 0 && !iconBorderRadius.value) || iconBorderRadius.value < 0) ? 0 : iconBorderRadius.value
@@ -831,13 +925,34 @@ const formatDefaultValues = computed(() => {
   const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
   const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
   const fontWeightLabelValue = !fontWeightLabel.value ? 400 : fontWeightLabel.value
-  const lightTextColorLabelValue = !lightTextColorLabel.value ? '#ffffff' : lightTextColorLabel.value
-  const darkTextColorLabelValue = !darkTextColorLabel.value ? '#000000' : darkTextColorLabel.value
-  const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#ffffff' : lightTextColorLabelActive.value
-  const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#000000' : darkTextColorLabelActive.value
+  const lightTextColorLabelValue = !lightTextColorLabel.value ? '#333333' : lightTextColorLabel.value
+  const darkTextColorLabelValue = !darkTextColorLabel.value ? '#ffffff' : darkTextColorLabel.value
+  const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#333333' : lightTextColorLabelActive.value
+  const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#ffffff' : darkTextColorLabelActive.value
 
   const interactionFunctionValue = !interactionFunction.value ? async () => {} : interactionFunction.value
   const interactionDebounceWaitValue = !interactionDebounceWait.value ? 0 : interactionDebounceWait.value
+
+  const lightSubmitButtonBgColorValue = !lightSubmitButtonBgColor.value ? '#1d4ed8' : lightSubmitButtonBgColor.value
+  const darkSubmitButtonBgColorValue = !darkSubmitButtonBgColor.value ? '#38bdf8' : darkSubmitButtonBgColor.value
+  const lightSubmitButtonTextColorValue = !lightSubmitButtonTextColor.value ? '#f8fafc' : lightSubmitButtonTextColor.value
+  const darkSubmitButtonTextColorValue = !darkSubmitButtonTextColor.value ? '#0f172a' : darkSubmitButtonTextColor.value
+  const lightSubmitButtonBgColorHoverValue = !lightSubmitButtonBgColorHover.value ? '#1e40af' : lightSubmitButtonBgColorHover.value
+  const darkSubmitButtonBgColorHoverValue = !darkSubmitButtonBgColorHover.value ? '#0ea5e9' : darkSubmitButtonBgColorHover.value
+  const lightSubmitButtonTextColorHoverValue = !lightSubmitButtonTextColorHover.value ? '#ffffff' : lightSubmitButtonTextColorHover.value
+  const darkSubmitButtonTextColorHoverValue = !darkSubmitButtonTextColorHover.value ? '#020617' : darkSubmitButtonTextColorHover.value
+  const lightFocusActiveBorderColorValue = !lightFocusActiveBorderColor.value ? '#2563eb' : lightFocusActiveBorderColor.value
+  const darkFocusActiveBorderColorValue = !darkFocusActiveBorderColor.value ? '#7dd3fc' : darkFocusActiveBorderColor.value
+
+  const submitButtonPaddingValue = !submitButtonPadding.value ? '5px 10px' : submitButtonPadding.value
+  const submitButtonBorderRadiusValue = !submitButtonBorderRadius.value ? '0px' : submitButtonBorderRadius.value
+  const submitButtonTopValue = !submitButtonTop.value ? '0' : submitButtonTop.value
+  const submitButtonRightValue = !submitButtonRight.value ? '0' : submitButtonRight.value
+  const submitButtonBottomValue = !submitButtonBottom.value ? '0' : submitButtonBottom.value
+  const submitButtonFontFamilyValue = !submitButtonFontFamily.value ? `'Lato', sans-serif` : submitButtonFontFamily.value
+  const submitButtonFontSizeValue = !submitButtonFontSize.value ? '1.1em' : submitButtonFontSize.value
+  const submitButtonFontWeightValue = !submitButtonFontWeight.value ? 700 : submitButtonFontWeight.value
+  const submitButtonIsUppercaseValue = !submitButtonIsUppercase.value ? true : submitButtonIsUppercase.value
 
   return {
 		disabled: disabledValue,
@@ -862,6 +977,7 @@ const formatDefaultValues = computed(() => {
     inputReadonly: inputReadonlyValue,
     inputType: inputTypeValue,
     inputUppercase: inputUppercaseValue,
+    inputPadding: inputPaddingValue,
     theme: themeValue,
     inputStyle: inputStyleValue,
     iconPadding: iconPaddingValue,
@@ -896,6 +1012,25 @@ const formatDefaultValues = computed(() => {
     darkTextColorLabelActive: darkTextColorLabelActiveValue,
     interactionFunction: interactionFunctionValue,
     interactionDebounceWait: interactionDebounceWaitValue,
+    lightSubmitButtonBgColor: lightSubmitButtonBgColorValue,
+    darkSubmitButtonBgColor: darkSubmitButtonBgColorValue,
+    lightSubmitButtonTextColor: lightSubmitButtonTextColorValue,
+    darkSubmitButtonTextColor: darkSubmitButtonTextColorValue,
+    lightSubmitButtonBgColorHover: lightSubmitButtonBgColorHoverValue,
+    darkSubmitButtonBgColorHover: darkSubmitButtonBgColorHoverValue,
+    lightSubmitButtonTextColorHover: lightSubmitButtonTextColorHoverValue,
+    darkSubmitButtonTextColorHover: darkSubmitButtonTextColorHoverValue,
+    lightFocusActiveBorderColor: lightFocusActiveBorderColorValue,
+    darkFocusActiveBorderColor: darkFocusActiveBorderColorValue,
+    submitButtonPadding: submitButtonPaddingValue,
+    submitButtonBorderRadius: submitButtonBorderRadiusValue,
+    submitButtonTop: submitButtonTopValue,
+    submitButtonRight: submitButtonRightValue,
+    submitButtonBottom: submitButtonBottomValue,
+    submitButtonFontFamily: submitButtonFontFamilyValue,
+    submitButtonFontSize: submitButtonFontSizeValue,
+    submitButtonFontWeight: submitButtonFontWeightValue,
+    submitButtonIsUppercase: submitButtonIsUppercaseValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -1009,6 +1144,12 @@ const styleSelectionTextColor = computed(() => {
 	return defaultValues.selectionTextColor || (defaultValues.theme === 'dark' ? '#000000' : '#ffffff')
 })
 
+const styleFocusActiveBorderColor = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkFocusActiveBorderColor : defaultValues.lightFocusActiveBorderColor
+})
+
 const inputWidthStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -1090,8 +1231,10 @@ const isLabelActive = computed(() => {
   const value = inputValue.value
   return isActive.value || (value != null && String(value).trim().length > 0)
 })
-const inputPadding = computed(() => {
-  return '6px 10px'
+const inputPaddingStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.inputPadding
 })
 const validShowMsg = computed(() => {
   return !!(showMsg.value && hasMsg.value)
@@ -1124,7 +1267,7 @@ const styleIconWidth = computed(() => {
   return hasIcon.value ? `${iconWidth.value}px` : '0'
 })
 const styleIconDirection = computed(() => {
-  return hasIcon.value ? `component__icon--${iconDirection.value}` : ''
+  return hasIcon.value ? `component__icon--${effectiveIconDirection.value}` : ''
 })
 const styleIconPadding = computed(() => {
   const defaultValues = formatDefaultValues.value
@@ -1155,7 +1298,7 @@ const inputIconStyle = computed(() => {
 
   if (!hasIcon.value) return {}
 
-  return iconDirection.value === 'left' ? { paddingLeft: `${defaultValues.iconPaddingInput}px` } : { paddingRight: `${defaultValues.iconPaddingInput}px` }
+  return effectiveIconDirection.value === 'left' ? { paddingLeft: `${defaultValues.iconPaddingInput}px` } : { paddingRight: `${defaultValues.iconPaddingInput}px` }
 })
 
 const styleLabel = computed(() => {
@@ -1166,11 +1309,11 @@ const styleLabel = computed(() => {
   const darkTextColorLabel = isActive ? defaultValues.darkTextColorLabelActive : defaultValues.darkTextColorLabel
 
   let leftPx = isActive ? defaultValues.labelActiveLeft : defaultValues.labelLeft
-  if (!isActive && hasIcon.value && iconDirection.value === 'left') {
+  if (!isActive && hasIcon.value && effectiveIconDirection.value === 'left') {
     leftPx += defaultValues.iconPaddingInput - defaultValues.labelLeft
   }
   let rightPx = isActive ? defaultValues.labelActiveRight : defaultValues.labelRight
-  if (!isActive && hasIcon.value && iconDirection.value === 'right') {
+  if (!isActive && hasIcon.value && effectiveIconDirection.value === 'right') {
     rightPx += defaultValues.iconPaddingInput - defaultValues.labelRight
   }
 
@@ -1204,6 +1347,58 @@ const styleLabelActive = computed(() => {
   return defaultValues.theme === 'dark' ? defaultValues.darkTextColorLabelActive : defaultValues.lightTextColorLabelActive
 })
 
+/** Botão em `submit` ou em `debounce` com `interaction-debounce-wait === 0`. Com debounce + wait > 0 some (busca pela pausa na digitação + Enter). */
+const showSubmitSearchButton = computed(() => {
+  if (interactionTrigger.value === 'submit') return true
+  if (interactionTrigger.value === 'debounce' && interactionDebounceWait.value <= 0) return true
+  return false
+})
+
+/** Com ícone + botão de busca visível, o ícone fica sempre à esquerda (à direita conflitaria com o botão). */
+const effectiveIconDirection = computed(() => {
+  if (hasIcon.value && showSubmitSearchButton.value) return 'left'
+  return iconDirection.value
+})
+
+/** Cores do botão de busca efetivas conforme `theme` em `formatDefaultValues`. */
+const resolvedSubmitButtonBgColor = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return defaultValues.theme === 'dark' ? defaultValues.darkSubmitButtonBgColor : defaultValues.lightSubmitButtonBgColor
+})
+const resolvedSubmitButtonTextColor = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return defaultValues.theme === 'dark' ? defaultValues.darkSubmitButtonTextColor : defaultValues.lightSubmitButtonTextColor
+})
+const resolvedSubmitButtonBgColorHover = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return defaultValues.theme === 'dark' ? defaultValues.darkSubmitButtonBgColorHover : defaultValues.lightSubmitButtonBgColorHover
+})
+const resolvedSubmitButtonTextColorHover = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return defaultValues.theme === 'dark' ? defaultValues.darkSubmitButtonTextColorHover : defaultValues.lightSubmitButtonTextColorHover
+})
+
+/** Estilo do botão de busca (cores, padding, cantos e inset vêm das props; defaults no `defineProps`). */
+const submitSearchButtonStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return {
+    backgroundColor: resolvedSubmitButtonBgColor.value,
+    color: resolvedSubmitButtonTextColor.value,
+    padding: defaultValues.submitButtonPadding,
+    borderRadius: defaultValues.submitButtonBorderRadius,
+    top: defaultValues.submitButtonTop,
+    right: defaultValues.submitButtonRight,
+    bottom: defaultValues.submitButtonBottom,
+    fontFamily: defaultValues.submitButtonFontFamily,
+    fontSize: defaultValues.submitButtonFontSize,
+    fontWeight: defaultValues.submitButtonFontWeight,
+    textTransform: defaultValues.submitButtonIsUppercase ? 'uppercase' : 'none',
+  }
+})
+const submitSearchButtonBgColorHoverStyle = computed(() => resolvedSubmitButtonBgColorHover.value)
+const submitSearchButtonTextColorHoverStyle = computed(() => resolvedSubmitButtonTextColorHover.value)
+
 /**
  * Cancela o debounce
  * @param {string} reason - Motivo da cancelação
@@ -1232,11 +1427,6 @@ const startValue = () => {
   // Define o tipo de input como search para permitir o uso do teclado virtual
   currentType.value = 'search'
 }
-
-const supportsMinMaxStep = computed(() => {
-  // NbInputClean opera apenas como texto
-  return false
-})
 
 const formatValueForEmit = (value) => {
   return value
@@ -1647,6 +1837,21 @@ onUnmounted(() => {
     }
     // fim sizeMediaQuery
 
+    .component__submit-search-button {
+      cursor: pointer;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      text-align: center;
+
+      &:hover {
+        background-color: v-bind('submitSearchButtonBgColorHoverStyle') !important;
+        color: v-bind('submitSearchButtonTextColorHoverStyle') !important;
+      }
+    }
+
     .component__icon {
       color: v-bind('lightTextColor');
     }
@@ -1669,7 +1874,7 @@ onUnmounted(() => {
     &.component--focus-border-active {
       .component__input {
         border-style: solid !important;
-        border-color: #3483fa !important;
+        border-color: v-bind('styleFocusActiveBorderColor') !important;
         border-width: 1.5px !important;
       }
     }
@@ -2035,7 +2240,7 @@ onUnmounted(() => {
       -moz-box-shadow: none;
       box-shadow: none;
       text-align: v-bind('textAlign');
-      padding: v-bind('inputPadding');
+      padding: v-bind('inputPaddingStyle');
 
       &:focus,
       &:active {
@@ -2114,6 +2319,10 @@ onUnmounted(() => {
       &:active {
         background-color: #f15574;
       }
+    }
+
+    .component__submit-search-button {
+      opacity: 0.6 !important;
     }
 	}
 }

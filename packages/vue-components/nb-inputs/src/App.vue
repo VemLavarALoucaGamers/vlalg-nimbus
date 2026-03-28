@@ -273,6 +273,69 @@
           </template>
         </NbInput>
 
+        <h4 class="test-page__content-tile" style="color: #000;">NbInput — máscaras (vue-the-mask)</h4>
+        <p style="max-width: 52rem; margin: 0 0 1rem; line-height: 1.5; color: #1e293b">
+          Padrão com <code>#</code> (dígito) e strings no <code>input-mask</code>; moeda usa <strong>array</strong> de máscaras
+          para ir de <code>R$ 0,00</code> até valores grandes. O <code>@changed</code> envia o texto já formatado (string).
+        </p>
+        <div style="display: grid; gap: 1.25rem; max-width: 42rem">
+          <NbInput
+            nb-id="test-input-mask-cpf"
+            display="b"
+            input-style="border"
+            input-name="test-input-mask-cpf"
+            input-mask="###.###.###-##"
+            label="CPF"
+            :show-label="true"
+            input-placeholder="000.000.000-00"
+            @changed="($event) => console.log('mask cpf', $event)"
+          />
+          <NbInput
+            nb-id="test-input-mask-cep"
+            display="b"
+            input-style="border"
+            input-name="test-input-mask-cep"
+            input-mask="#####-###"
+            label="CEP"
+            :show-label="true"
+            input-placeholder="00000-000"
+            @changed="($event) => console.log('mask cep', $event)"
+          />
+          <NbInput
+            nb-id="test-input-mask-fone"
+            display="b"
+            input-style="border"
+            input-name="test-input-mask-fone"
+            :input-mask="demoMaskTelefoneBr"
+            label="Telefone (fixo / celular)"
+            :show-label="true"
+            input-placeholder="(00) 00000-0000"
+            @changed="($event) => console.log('mask fone', $event)"
+          />
+          <NbInput
+            nb-id="test-input-mask-real"
+            display="b"
+            input-style="border"
+            input-name="test-input-mask-real"
+            :input-mask="demoMaskMoedaReal"
+            label="Moeda (R$ 1,00 …)"
+            :show-label="true"
+            input-placeholder="R$ 0,00"
+            @changed="($event) => console.log('mask real', $event)"
+          />
+          <NbInput
+            nb-id="test-input-mask-prefix-s"
+            display="b"
+            input-style="border"
+            input-name="test-input-mask-prefix-s"
+            :input-mask="demoMaskMoedaPrefixoS"
+            label="Mesmo formato com prefixo S (ex.: S 1.000,00)"
+            :show-label="true"
+            input-placeholder="S 0,00"
+            @changed="($event) => console.log('mask prefix S', $event)"
+          />
+        </div>
+
         <NbInput
           nb-id="test2"
           display="b"
@@ -455,6 +518,20 @@
             <span class="chip-remove" @click="removeChip(chip)">×</span>
           </template>
         </NbInputChip>
+
+        <br><br>
+
+        <h4 class="test-page__content-tile" style="color: #000;">NbInputChip — input-mask (CPF)</h4>
+        <NbInputChip
+          nb-id="chip-mask-cpf"
+          input-name="chip-input-mask-cpf"
+          theme="dark"
+          input-mask="###.###.###-##"
+          input-placeholder="CPF e Enter"
+          :current-list="[]"
+          aria-label="Chips com máscara CPF"
+          @added="($event) => console.log('added', $event)"
+        />
 
         <br><br>
 
@@ -3167,7 +3244,6 @@
               label="Buscar (debounce)"
               input-name="search-demo-debounce"
               input-style="border"
-              light-text-color="#ffffff"
               :input-text="searchFakeCatalogInputText"
               :has-trim="true"
               interaction-trigger="debounce"
@@ -3186,20 +3262,106 @@
           </div>
 
           <div>
-            <h5 style="margin: 0 0 0.5rem">Submit + <code>interaction-debounce-wait="0"</code> (padrão típico)</h5>
+            <h5 style="margin: 0 0 0.5rem">
+              Submit + <code>interaction-debounce-wait="0"</code> — contraste por <code>theme</code>
+            </h5>
+            <p style="margin: 0 0 0.75rem; font-size: 0.9em; opacity: 0.9">
+              Cores de texto, borda, foco e botão vêm dos <strong>defaults</strong> do componente para cada
+              <code>theme</code> (sem passar props de cor aqui).
+            </p>
             <NbInputSearch
-              nb-id="search-demo-submit-zero"
+              nb-id="search-demo-submit-zero-dark"
               display="b"
-              label="Buscar (Enter / botão, wait 0)"
-              input-name="search-demo-submit-zero"
+              theme="dark"
+              label="Buscar — tema escuro"
+              input-name="search-demo-submit-zero-dark"
+              input-text="asdasdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
               input-style="border"
-              light-text-color="#ffffff"
+              input-padding="10px 67px 10px 15px"
               :input-text="searchFakeCatalogInputText"
+              submit-button-label="Buscar"
+              submit-button-padding="8px 14px"
+              submit-button-border-radius="0px"
+              submit-button-top="4px"
+              submit-button-right="4px"
+              submit-button-bottom="4px"
               interaction-trigger="submit"
               :interaction-debounce-wait="0"
               :interaction-function="searchDemoInteractionSubmitZero"
               @entered="searchDemoOnEnteredSubmitZero"
             />
+            <div style="margin-top: 1rem" />
+            <NbInputSearch
+              nb-id="search-demo-submit-zero-light"
+              display="b"
+              theme="light"
+              label="Buscar — tema claro"
+              input-name="search-demo-submit-zero-light"
+              input-text="asdasdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              input-style="border"
+              input-padding="10px 67px 10px 15px"
+              :input-text="searchFakeCatalogInputText"
+              submit-button-label="Buscar"
+              submit-button-padding="8px 14px"
+              submit-button-border-radius="0px"
+              submit-button-top="4px"
+              submit-button-right="4px"
+              submit-button-bottom="4px"
+              interaction-trigger="submit"
+              :interaction-debounce-wait="0"
+              :interaction-function="searchDemoInteractionSubmitZero"
+              @entered="searchDemoOnEnteredSubmitZero"
+            />
+          </div>
+
+          <div>
+            <h5 style="margin: 0 0 0.5rem">
+              Submit com texto do botão via prop + ícone customizado
+            </h5>
+            <NbInputSearch
+              nb-id="search-demo-submit-custom-button-icon"
+              display="b"
+              label="Buscar com ícone"
+              input-name="search-demo-submit-custom-button-icon"
+              input-style="border"
+              input-text="asdasdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              interaction-trigger="submit"
+              :interaction-debounce-wait="0"
+              submit-button-label="ir"
+              :has-icon="true"
+              icon-direction="left"
+              :icon-padding-input="35"
+              input-padding="10px 35px 10px 15px"
+              :interaction-function="searchDemoInteractionSubmitZero"
+              @entered="searchDemoOnEnteredSubmitZero"
+            >
+              <template #icon>
+                <span style="font-size: 1.1rem" aria-hidden="true">🔎</span>
+              </template>
+            </NbInputSearch>
+
+            <br>
+
+            <NbInputSearch
+              nb-id="search-demo-submit-custom-button-icon2"
+              display="b"
+              label="Buscar com ícone"
+              input-name="search-demo-submit-custom-button-icon2"
+              input-style="border"
+              input-text="asdasdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              interaction-trigger="submit"
+              :interaction-debounce-wait="0"
+              submit-button-label="ir"
+              :has-icon="true"
+              icon-direction="right"
+              :icon-padding-input="35"
+              :interaction-function="searchDemoInteractionSubmitZero"
+              @entered="searchDemoOnEnteredSubmitZero"
+            >
+              <template #icon>
+                <span style="font-size: 1.1rem" aria-hidden="true">🔎</span>
+              </template>
+            </NbInputSearch>
           </div>
 
           <div>
@@ -3212,7 +3374,6 @@
               label="Buscar (submit; wait ignorado no type)"
               input-name="search-demo-submit-wait500"
               input-style="border"
-              light-text-color="#ffffff"
               input-text=""
               interaction-trigger="submit"
               :interaction-debounce-wait="500"
@@ -3281,7 +3442,6 @@
               input-name="search-demo-fake-catalog"
               :input-text="searchFakeCatalogInputText"
               input-style="border"
-              light-text-color="#ffffff"
               input-text=""
               :has-trim="true"
               interaction-trigger="debounce"
@@ -3289,7 +3449,6 @@
               :interaction-debounce-enforce-min-length="false"
               :interaction-debounce-min-length="3"
               :interaction-function="searchFakeCatalogInteraction"
-              :show-results="showResults"
               @changed="searchFakeCatalogOnChanged"
               @cleared="searchFakeCatalogOnCleared"
               @interaction-start="searchFakeCatalogOnInteractionStart"
@@ -3358,7 +3517,36 @@ const NbInputClean = defineAsyncComponent(() => import('@components/NbInputClean
 const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.vue'))
 const NbInputSearch = defineAsyncComponent(() => import('@components/NbInputSearch.vue'))
 
-const btType = ref('search')
+const btType = ref('input')
+
+/** vue-the-mask: padrão BR (milhar `.`, centavos `,`) com prefixo `R$ ` — vários tamanhos até bilhões. */
+const demoMaskMoedaReal = [
+  'R$ #,##',
+  'R$ ##,##',
+  'R$ ###,##',
+  'R$ #.###,##',
+  'R$ ##.###,##',
+  'R$ ###.###,##',
+  'R$ #.###.###,##',
+  'R$ ##.###.###,##',
+  'R$ ###.###.###,##',
+]
+
+/** Mesmo padrão numérico BR com prefixo literal `S ` (ex.: valor simbólico). */
+const demoMaskMoedaPrefixoS = [
+  'S #,##',
+  'S ##,##',
+  'S ###,##',
+  'S #.###,##',
+  'S ##.###,##',
+  'S ###.###,##',
+  'S #.###.###,##',
+  'S ##.###.###,##',
+  'S ###.###.###,##',
+]
+
+/** Celular / fixo BR: máscara dinâmica por quantidade de dígitos. */
+const demoMaskTelefoneBr = ['(##) ####-####', '(##) #####-####']
 
 /** Demo NbInputSearch: log em tela para debounce, Enter e interactionFunction */
 const searchDemoLogs = ref([])

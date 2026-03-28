@@ -644,7 +644,7 @@ const formatDefaultValues = computed(() => {
   const activeTextStyleValue = !activeTextStyle.value ? 'normal' : activeTextStyle.value
   const inputReadonlyValue = !inputReadonly.value ? false : inputReadonly.value
   const inputUppercaseValue = !inputUppercase.value ? false : inputUppercase.value
-  const themeValue = !theme.value ? 'normal' : theme.value
+  const themeValue = !theme.value ? 'light' : theme.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
   const inputStyleValue = !inputStyle.value ? 'background' : inputStyle.value
 
