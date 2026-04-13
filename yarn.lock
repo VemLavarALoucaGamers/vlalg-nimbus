@@ -3087,14 +3087,14 @@
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
     vue "^3.3.4"
 
-"@vlalg-nimbus/nb-inputs@^8.0.6":
-  version "8.1.0"
-  resolved "https://registry.npmjs.org/@vlalg-nimbus/nb-inputs/-/nb-inputs-8.1.0.tgz"
-  integrity sha512-1uE+QIaL4+JwpWv/VbUWuADo7pkaZc4lHGyYNQySffNTZY7QGS5baNjUWDKGCSlMZAEW7F/NwuQaOrl10MgCxA==
+"@vlalg-nimbus/nb-inputs@^10.0.0", "@vlalg-nimbus/nb-inputs@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-inputs":
+  version "10.0.0"
+  resolved "file:packages/vue-components/nb-inputs"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
-    "@vlalg-nimbus/nb-calendar" "^1.0.0"
+    "@vlalg-nimbus/magic-debounce" "^3.0.2"
+    "@vlalg-nimbus/nb-calendar" "^2.1.1"
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-inputs@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-inputs":
@@ -3158,7 +3158,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-payments@^5.0.1", "@vlalg-nimbus/nb-payments@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-payments":
-  version "5.0.1"
+  version "5.0.2"
   resolved "file:packages/vue-components/nb-payments"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -10119,7 +10119,7 @@ negotiator@0.6.3:
     add "^2.0.6"
     sass "^1.81.0"
     vue-loader "^17.4.2"
-    vue-the-mask "^0.11.1"
+    vue-the-mask "0.11.1"
     yarn "^1.22.22"
 
 "nimbus-playground@file:G:\\projetos\\vlalg-nimbus\\apps\\nimbus-playground":
