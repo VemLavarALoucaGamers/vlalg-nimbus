@@ -1,5 +1,5 @@
 <template>
-	<div class="container-fluid test-page">
+	<div class="container-fluid test-page" style="background-color: rgb(222 154 118);">
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1 test-page__title">
 				<h2>Test page</h2>

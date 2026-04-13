@@ -3,6 +3,7 @@
 		v-if="nbId"
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
+		:title="title"
 	>
 		<div
 			:id="nbId"
@@ -48,6 +49,10 @@ const props = defineProps({
     validator: value => {
       return value.toString().toLowerCase()
     },
+  },
+  title: {
+    type: String,
+    default: ''
   },
   inputValue: {
     type: [String, Number],
@@ -211,8 +216,8 @@ const styleColorActiveHover = computed(() => {
 const startValue = () => {
   currentValue.value = inputValue.value
 }
-const clicked = () => {
-  emit('clicked')
+const clicked = (event) => {
+  emit('clicked', event)
 }
 
 watch(inputValue, (newValue, oldValue) => {

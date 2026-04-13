@@ -5,10 +5,11 @@
 		:style="[wrapperStyle]"
     :tabIndex="tabIndex"
     role="button"
+    :title="title"
     v-bind="computedAriaAttrs"
-    @click="interacted"
-    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
-    @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
+    @click="interacted($event)"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted($event)"
+    @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted($event)"
 	>
 		<div
 			:id="nbId"
@@ -63,6 +64,10 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  title: {
+    type: String,
+    default: ''
+  },
 	textColor: {
 		type: String,
 		default: '#ffffff'
@@ -93,13 +98,6 @@ const props = defineProps({
 	borderRadius: {
 		type: Number,
 		default: 0.375
-	},
-	width: {
-		type: Number,
-		default: 86,
-		validator: value => {
-			return !value ? 86 : value
-		}
 	},
 	paddingX: {
 		type: Number,
@@ -139,6 +137,10 @@ const props = defineProps({
 		validator: value => {
 			return !value ? 200 : value
 		}
+	},
+	lineHeight: {
+		type: Number,
+		default: 1.42857143
 	}
 })
 
@@ -153,13 +155,13 @@ const {
 	borderRadius,
 	textColor,
 	textHoverColor,
-	width,
 	paddingX,
 	paddingY,
 	disabled,
 	fontFamily,
 	fontSize,
-  fontWeight
+  fontWeight,
+	lineHeight
 } = toRefs(props)
 
 const formatDefaultValues = computed(() => {
@@ -172,12 +174,12 @@ const formatDefaultValues = computed(() => {
 	const showBorderValue = ![false, true].includes(showBorder.value) ? true : showBorder.value
 	const textColorValue = !textColor.value ? '#ffffff' : textColor.value
 	const textHoverColorValue = !textHoverColor.value ? '#000000' : textHoverColor.value
-	const widthValue = !width.value || width.value < 86 ? 86 : width.value
 	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
   const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 200 : fontWeight.value
+	const lineHeightValue = ((lineHeight.value !== 0 && !lineHeight.value) || lineHeight.value < 0) ? 1.42857143 : lineHeight.value
 
 	return {
 		disabled: disabledValue,
@@ -189,12 +191,12 @@ const formatDefaultValues = computed(() => {
 		borderRadius: borderRadiusValue,
 		textColor: textColorValue,
 		textHoverColor: textHoverColorValue,
-		width: widthValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
-		fontWeight: fontWeightValue
+		fontWeight: fontWeightValue,
+		lineHeight: lineHeightValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -212,12 +214,8 @@ const wrapperStyle = computed(() => {
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
-	const newWidth = defaultValues.display === 'block' ? 'auto' : `${defaultValues.width}px`
-
 	return {
-		minWidth: '33px',
-		width: newWidth,
-		lineHeight: '1.42857143',
+		lineHeight: defaultValues.lineHeight,
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight
 	}
@@ -279,8 +277,8 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 </script>
 
@@ -322,7 +320,6 @@ const interacted = () => {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	line-height: 1.42857143;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -338,7 +335,10 @@ const interacted = () => {
 	text-decoration-line: none;
 	white-space: nowrap;
 
-  // Add new properties below
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
   overflow: hidden;
   background: v-bind('styleButtonColor');
   background-clip: padding-box;

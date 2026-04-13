@@ -3,6 +3,7 @@
 		v-if="nbId && validList"
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle, size]"
+		:title="title"
 	>
 		<div
 			:id="nbId"
@@ -12,28 +13,28 @@
 		>
       <div
         v-for="(item, index) in options"
-        :key="index"
+        :key="item[valueKey]"
         class="component-radio__item"
       >
         <input
-          :id="`${nbId}-${item.value}`"
+          :id="`${nbId}-${item[valueKey]}`"
           v-model="currentValue"
           type="radio"
           class="component-radio__item--input"
           :disabled="disabled"
-          :value="item.value"
+          :value="item[valueKey]"
           :name="groupName"
-          @click="clicked"
+          @click="clicked($event)"
         />
         <label
-          :for="`${nbId}-${item.value}`"
+          :for="`${nbId}-${item[valueKey]}`"
           :tabindex="disabled ? -1 : (Array.isArray(tabIndex) ? tabIndex[index] : tabIndex >= 0 ? tabIndex : index + 1)"
           class="component-radio__item--label"
           @keydown.enter.prevent="!disabled && hasTabIndexEnter && $event.target.click()"
           @keydown.space.prevent="!disabled && hasTabIndexSpace && $event.target.click()"
         >
           <div></div>
-          <span :style="[componentStyle]">{{ item.text }}</span>
+          <span :style="[componentStyle]">{{ item[textKey] }}</span>
         </label>
       </div>
 		</div>
@@ -94,6 +95,10 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  title: {
+    type: String,
+    default: ''
+  },
   groupName: {
     type: String,
     default: '',
@@ -105,30 +110,15 @@ const props = defineProps({
   options: {
     type: Array,
     required: true,
-    default: () => {
-      return []
-    },
-    validator: item => {
-      if (!item.length) return false
-
-      let hasError = false
-
-      for (const obj of item) {
-        const objkeys = Object.keys(obj)
-
-        if (objkeys.length !== 2) hasError = true
-
-        const result = objkeys.every(key => {
-          const keys = ['value', 'text']
-
-          return keys.includes(key)
-        })
-
-        if (!result) hasError = true
-      }
-
-      if (!hasError) return item
-    },
+    default: () => []
+  },
+  valueKey: {
+    type: String,
+    default: 'value',
+  },
+  textKey: {
+    type: String,
+    default: 'text',
   },
   currentOption: {
     type: [String, Number, Boolean],
@@ -236,6 +226,8 @@ const {
   valueType,
   display,
   options,
+  valueKey,
+  textKey,
   theme,
   lightTextColor,
   lightColor,
@@ -401,8 +393,8 @@ const startValue = () => {
     currentValue.value = initialValue
   }
 }
-const clicked = () => {
-  emit('clicked')
+const clicked = (event) => {
+  emit('clicked', event)
 }
 
 watch(currentOption, (newValue, oldValue) => {
@@ -455,7 +447,6 @@ watch(currentValue, (newValue, oldValue) => {
 	font-family: 'Lato', sans-serif;
 	font-family: v-bind('font');
 
-	user-select: none;
 
 	touch-action: manipulation;
 
@@ -544,6 +535,10 @@ watch(currentValue, (newValue, oldValue) => {
         -moz-box-shadow: none;
         box-shadow: none;
         font-family: 'Lato', sans-serif !important;
+      }
+
+      span {
+        user-select: auto !important;
       }
     }
   }

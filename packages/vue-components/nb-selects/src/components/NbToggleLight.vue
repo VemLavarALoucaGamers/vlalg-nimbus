@@ -5,9 +5,10 @@
 		:style="[wrapperStyle]"
     :tabIndex="disabled ? -1 : tabIndex"
     role="button"
+    :title="title"
     v-bind="computedAriaAttrs"
-    @keydown.enter.prevent="!disabled && hasTabIndexEnter && handleKeydown()"
-    @keydown.space.prevent="!disabled && hasTabIndexSpace && handleKeydown()"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && handleKeydown($event)"
+    @keydown.space.prevent="!disabled && hasTabIndexSpace && handleKeydown($event)"
 	>
 		<div
 			:id="nbId"
@@ -20,7 +21,7 @@
         type="checkbox"
         :disabled="disabled"
         class="component-input"
-        @change="handleChange"
+        @change="handleChange($event)"
       />
       <label
         :for="`${nbId}-input`"
@@ -90,6 +91,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	theme: {
 		type: String,
@@ -170,9 +175,9 @@ const props = defineProps({
 	},
 	fontWeight: {
 		type: Number,
-		default: 200,
+		default: 400,
 		validator: value => {
-			return !value ? 200 : value
+			return !value ? 400 : value
 		}
 	},
 	hasAnimation: {
@@ -324,16 +329,16 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-const handleChange = () => {
+const handleChange = (event) => {
 	if (!disabled.value) {
-		emit('clicked')
+		emit('clicked', event)
 	}
 }
 
-const handleKeydown = () => {
+const handleKeydown = (event) => {
 	if (!disabled.value) {
 		currentStatus.value = !currentStatus.value
-		emit('clicked')
+		emit('clicked', event)
 	}
 }
 
@@ -400,7 +405,7 @@ watch(value, () => {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 
-	cursor: pointer;
+	cursor: pointer !important;
 	text-align: center;
 	-webkit-text-decoration-line: none;
 	text-decoration-line: none;
@@ -425,6 +430,10 @@ watch(value, () => {
     padding-top: 4px;
     height: 100%;
 
+    &:hover {
+      cursor: pointer !important;
+    }
+
     // inicio propAnimation
     &.component-label-text-animation {
       .component-label-text {
@@ -447,9 +456,9 @@ watch(value, () => {
       width: 100%;
       top: 0;
       bottom: 0;
-      padding: 4px 0px;
       user-select: none;
       border-radius: v-bind('borderRadiusValue');
+      align-content: center;
     }
 
     &.component-button--left {

@@ -5,7 +5,7 @@
 		:style="[wrapperStyle]"
     role="status"
     v-bind="computedAriaAttrs"
-    @click.prevent="interacted"
+    @click.prevent="interacted($event)"
 	>
 		<div
 			:id="nbId"
@@ -136,8 +136,8 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 
 watch(show, (value) => {

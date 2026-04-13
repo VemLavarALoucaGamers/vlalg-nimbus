@@ -2,8 +2,9 @@
   <div
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
-    :style="[wrapperStyle]" 
-    @click="interacted"
+    :style="[wrapperStyle]"
+    :title="title"
+    @click="interacted($event)"
   >
     <div
       :id="nbId"
@@ -33,6 +34,10 @@ const props = defineProps({
   nbId: {
     type: String,
     required: true
+  },
+  title: {
+    type: String,
+    default: ''
   },
   background: {
     type: Boolean,
@@ -162,8 +167,8 @@ const componentDisabled = computed(() => {
 
 const startValue = () => { }
 
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 </script>
 

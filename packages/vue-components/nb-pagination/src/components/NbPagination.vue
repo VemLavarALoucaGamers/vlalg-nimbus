@@ -3,13 +3,15 @@
     <div :id="nbId" :class="['nb-reset', 'component', themeStyle]" :style="[componentStyle]">
       <nav :class="['pagination', themeStyle]" aria-label="Paginação">
         <!-- Botão anterior -->
-        <button v-if="showButtonFirst" class="nav" :disabled="currentPage === 1 || disabled" @click="goTo(1)">
-          ‹‹
-        </button>
-        <button v-if="showButtonPreview" class="nav" :disabled="currentPage === 1 || disabled"
-          @click="goTo(currentPage - 1)">
-          ‹
-        </button>
+        <div class="pagination-buttons">
+          <button v-if="showButtonFirst" class="nav" :disabled="currentPage === 1 || disabled" @click="goTo(1)">
+            ‹‹
+          </button>
+          <button v-if="showButtonPreview" class="nav" :disabled="currentPage === 1 || disabled"
+            @click="goTo(currentPage - 1)">
+            ‹
+          </button>
+        </div>
 
         <div v-if="showNumberButtons">
           <!-- Container dos números (com animação opcional) -->
@@ -40,14 +42,16 @@
         </div>
 
         <!-- Botão próximo -->
-        <button v-if="showButtonNext" class="nav" :disabled="currentPage === totalPages || disabled"
-          @click="goTo(currentPage + 1)">
-          ›
-        </button>
-        <button v-if="showButtonLast" class="nav" :disabled="currentPage === totalPages || disabled"
-          @click="goTo(totalPages)">
-          ››
-        </button>
+        <div class="pagination-buttons">
+          <button v-if="showButtonNext" class="nav" :disabled="currentPage === totalPages || disabled"
+            @click="goTo(currentPage + 1)">
+            ›
+          </button>
+          <button v-if="showButtonLast" class="nav" :disabled="currentPage === totalPages || disabled"
+            @click="goTo(totalPages)">
+            ››
+          </button>
+        </div>
       </nav>
 
       <div v-if="showGoTo" class="go-to">
@@ -78,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, computed, toRefs } from 'vue';
+import { ref, computed, toRefs, nextTick } from 'vue';
 
 defineOptions({
 	name: 'NbPagination',
@@ -436,6 +440,35 @@ const props = defineProps({
     type: String,
     default: '#000000'
   },
+  scrollOnPageChange: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  scrollTarget: {
+    type: String,
+    default: 'top',
+    validator: (value) => {
+      return ['top', 'component', 'custom'].includes(value)
+    }
+  },
+  scrollSelector: {
+    type: String,
+    default: null
+  },
+  scrollBehavior: {
+    type: String,
+    default: 'smooth',
+    validator: (value) => {
+      return ['smooth', 'auto'].includes(value)
+    }
+  },
+  scrollOffset: {
+    type: Number,
+    default: 0
+  },
 });
 
 const goToNumber = ref(null);
@@ -447,7 +480,8 @@ const emit = defineEmits([
   'go-to-input',
   'invalid-page',
   'first-page',
-  'last-page'
+  'last-page',
+  'scrolling'
 ]);
 
 const {
@@ -736,6 +770,77 @@ function goTo (page) {
   if (page === props.totalPages && previousPage !== props.totalPages) {
     emit('last-page', page);
   }
+
+  // Scroll após mudança de página
+  if (props.scrollOnPageChange) {
+    nextTick(() => {
+      let scrollExecuted = false;
+      let scrollData = {
+        target: props.scrollTarget,
+        selector: props.scrollSelector,
+        offset: props.scrollOffset,
+        behavior: props.scrollBehavior,
+        page: page
+      };
+
+      if (props.scrollTarget === 'top') {
+        // Scroll para o topo da página
+        window.scrollTo({
+          top: props.scrollOffset,
+          behavior: props.scrollBehavior
+        });
+        scrollExecuted = true;
+        scrollData.position = props.scrollOffset;
+      } else if (props.scrollTarget === 'component') {
+        // Scroll para o componente de paginação
+        const element = document.getElementById(props.nbId);
+        if (element) {
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const scrollPosition = elementPosition - props.scrollOffset;
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: props.scrollBehavior
+          });
+          scrollExecuted = true;
+          scrollData.position = scrollPosition;
+          scrollData.elementId = props.nbId;
+        }
+      } else if (props.scrollTarget === 'custom' && props.scrollSelector) {
+        // Scroll para um elemento customizado (id, class, ou seletor CSS)
+        let element = null;
+        
+        // Tentar encontrar por ID
+        if (props.scrollSelector.startsWith('#')) {
+          element = document.getElementById(props.scrollSelector.substring(1));
+        } 
+        // Tentar encontrar por classe (primeira ocorrência)
+        else if (props.scrollSelector.startsWith('.')) {
+          element = document.querySelector(props.scrollSelector);
+        }
+        // Tentar encontrar por seletor CSS genérico
+        else {
+          element = document.querySelector(props.scrollSelector);
+        }
+        
+        if (element) {
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const scrollPosition = elementPosition - props.scrollOffset;
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: props.scrollBehavior
+          });
+          scrollExecuted = true;
+          scrollData.position = scrollPosition;
+          scrollData.selector = props.scrollSelector;
+        }
+      }
+
+      // Emitir evento de scroll se foi executado
+      if (scrollExecuted) {
+        emit('scrolling', scrollData);
+      }
+    });
+  }
 }
 /**
  * Valida o input durante a digitação
@@ -824,20 +929,16 @@ const visiblePages = computed(() => {
   // maxVisible define quantas páginas numéricas mostrar na região central
   const half = Math.floor(safeMaxVisible.value / 2);
 
-  // Calcular início baseado na página atual (tentando centralizar)
+  // Calcular início tentando centralizar a página atual
   let start = Math.max(1, currentPage.value - half);
   // Calcular fim garantindo exatamente maxVisible páginas
   let end = Math.min(props.totalPages, start + safeMaxVisible.value - 1);
 
-  // Se não temos páginas suficientes, ajustar o início
+  // Se não temos páginas suficientes do início, ajustar o início
   const actualCount = end - start + 1;
-  if (actualCount < safeMaxVisible.value) {
+  if (actualCount < safeMaxVisible.value && start > 1) {
     start = Math.max(1, end - safeMaxVisible.value + 1);
   }
-
-  // Garantir que não excedemos maxVisible páginas no centro
-  // Recalcular end baseado no start ajustado
-  end = Math.min(props.totalPages, start + safeMaxVisible.value - 1);
 
   // Garantir que a página atual sempre está incluída (importante quando showFirstLast=false)
   if (currentPage.value < start) {
@@ -846,6 +947,18 @@ const visiblePages = computed(() => {
   } else if (currentPage.value > end) {
     end = currentPage.value;
     start = Math.max(1, end - safeMaxVisible.value + 1);
+  }
+
+  // Garantir que o range final não excede maxVisible páginas
+  const finalCount = end - start + 1;
+  if (finalCount > safeMaxVisible.value) {
+    // Se excedeu, recalcular centralizando na página atual
+    start = Math.max(1, currentPage.value - half);
+    end = Math.min(props.totalPages, start + safeMaxVisible.value - 1);
+    // Se ainda exceder, ajustar para garantir exatamente maxVisible
+    if (end - start + 1 > safeMaxVisible.value) {
+      end = start + safeMaxVisible.value - 1;
+    }
   }
 
   // Verificar se precisa de ellipsis inicial (se não começamos em 1 ou 2)
@@ -857,13 +970,52 @@ const visiblePages = computed(() => {
   // Verificar se precisa de ellipsis final
   // Com showFirstLast=true: mostrar ellipsis se end < totalPages - 1, última página sempre se end < totalPages
   // Com showFirstLast=false: mostrar apenas ellipsis se end < totalPages
-  const hasMorePagesAfter = end < props.totalPages;
-  const needsEndEllipsis = props.useEllipsis && (
+  let hasMorePagesAfter = end < props.totalPages;
+  let needsEndEllipsis = props.useEllipsis && (
     props.showFirstLast ? end < props.totalPages - 1 : hasMorePagesAfter
   );
 
   // Quando showFirstLast=true, mostrar última página se não está incluída nas centrais (end < totalPages)
-  const shouldShowLastPage = props.showFirstLast && props.useEllipsis && hasMorePagesAfter && !needsEndEllipsis;
+  let shouldShowLastPage = props.showFirstLast && props.useEllipsis && hasMorePagesAfter && !needsEndEllipsis;
+  
+  // Verificar quantas páginas numéricas serão mostradas no total
+  const willShowFirstPage = needsStartEllipsis && props.showFirstLast;
+  const willShowLastPageViaEllipsis = needsEndEllipsis && props.showFirstLast;
+  const willShowLastPageDirect = shouldShowLastPage;
+  const centralPageCount = end - start + 1;
+  const totalNumericPages = centralPageCount + (willShowFirstPage ? 1 : 0) + (willShowLastPageViaEllipsis ? 1 : 0) + (willShowLastPageDirect ? 1 : 0);
+  
+  // Se o total exceder maxVisible, ajustar o range central
+  if (totalNumericPages > safeMaxVisible.value) {
+    const excess = totalNumericPages - safeMaxVisible.value;
+    // Reduzir do range central para manter maxVisible páginas numéricas no total
+    if (willShowFirstPage && (willShowLastPageViaEllipsis || willShowLastPageDirect)) {
+      // Se vamos mostrar primeira e última, reduzir igualmente dos dois lados
+      const reduceFromEachSide = Math.floor(excess / 2);
+      start = start + reduceFromEachSide;
+      end = end - (excess - reduceFromEachSide);
+    } else if (willShowFirstPage) {
+      // Se só vamos mostrar primeira, reduzir do fim
+      end = end - excess;
+    } else if (willShowLastPageViaEllipsis || willShowLastPageDirect) {
+      // Se só vamos mostrar última, reduzir do início
+      start = start + excess;
+    }
+    // Garantir que a página atual ainda está incluída após ajuste
+    if (currentPage.value < start) {
+      start = currentPage.value;
+      end = Math.min(props.totalPages, start + safeMaxVisible.value - (willShowFirstPage ? 1 : 0) - ((willShowLastPageViaEllipsis || willShowLastPageDirect) ? 1 : 0));
+    } else if (currentPage.value > end) {
+      end = currentPage.value;
+      start = Math.max(1, end - safeMaxVisible.value + (willShowFirstPage ? 1 : 0) + ((willShowLastPageViaEllipsis || willShowLastPageDirect) ? 1 : 0));
+    }
+    // Recalcular condições após ajuste
+    hasMorePagesAfter = end < props.totalPages;
+    needsEndEllipsis = props.useEllipsis && (
+      props.showFirstLast ? end < props.totalPages - 1 : hasMorePagesAfter
+    );
+    shouldShowLastPage = props.showFirstLast && props.useEllipsis && hasMorePagesAfter && !needsEndEllipsis;
+  }
 
   // Adicionar página 1 e ellipsis inicial se necessário e showFirstLast estiver ativo
   if (needsStartEllipsis && props.showFirstLast) {
@@ -887,7 +1039,7 @@ const visiblePages = computed(() => {
     });
   }
 
-  // Páginas centrais (exatamente maxVisible páginas numéricas)
+  // Páginas centrais (exatamente maxVisible páginas numéricas, ou menos se ajustado)
   for (let i = start; i <= end; i++) {
     pages.push({
       key: i,
@@ -920,11 +1072,15 @@ const visiblePages = computed(() => {
     }
   } else if (shouldShowLastPage) {
     // Quando end === totalPages - 1 e showFirstLast=true, mostrar apenas a última página (sem ellipsis)
-    pages.push({
-      key: 'end',
-      label: props.totalPages,
-      number: props.totalPages,
-    });
+    // Verificar se isso não excederá maxVisible
+    const finalNumericCount = (end - start + 1) + (needsStartEllipsis && props.showFirstLast ? 1 : 0) + 1;
+    if (finalNumericCount <= safeMaxVisible.value) {
+      pages.push({
+        key: 'end',
+        label: props.totalPages,
+        number: props.totalPages,
+      });
+    }
   }
 
   return pages;
@@ -987,6 +1143,7 @@ const visiblePages = computed(() => {
     gap: v-bind('gapButton');
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
 
     button {
       width: 36px;
@@ -999,6 +1156,13 @@ const visiblePages = computed(() => {
       transition: all 0.2s ease;
       justify-content: center;
       align-items: center;
+    }
+
+    .pagination-buttons {
+      display: inline-flex;
+      gap: v-bind('gapButton');
+      align-items: center;
+      justify-content: center;
     }
 
     button.nav {
@@ -1239,6 +1403,9 @@ const visiblePages = computed(() => {
     gap: v-bind('gapNumber');
     margin: v-bind('spacingNumbersComputed');
     overflow: hidden;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Animação estilo Instagram/Reels */

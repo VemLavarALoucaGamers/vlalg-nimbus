@@ -8,12 +8,14 @@ This lib contains input components.
 ## Installation
 
 ```bash
-npm install @vlalg-nimbus/nb-inputs
+npm install @vlalg-nimbus/nb-inputs vue-the-mask@0.11.1
 
 # or
 
-yarn add @vlalg-nimbus/nb-inputs
+yarn add @vlalg-nimbus/nb-inputs vue-the-mask@0.11.1
 ```
+
+`vue-the-mask` **0.11.1** is a **peer dependency** (used by `NbInput` when `input-mask` is set; pin avoids unexpected upgrades of an unmaintained package). `@vlalg-nimbus/magic-debounce` is a normal dependency of this package (installs with `nb-inputs`; not inlined in the library build, same pattern as `nb-calendar`).
 
 ## Usage
 
@@ -45,6 +47,8 @@ The components that are part of this lib are:
 - <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input-chip" target="_blank">nb-input-chip</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-textarea" target="_blank">nb-textarea</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-date-picker" target="_blank">nb-date-picker</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input-file" target="_blank">nb-input-file</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-inputs/nb-input-search" target="_blank">nb-input-search</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

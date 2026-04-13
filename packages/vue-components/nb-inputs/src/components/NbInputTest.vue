@@ -3,7 +3,7 @@
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]"
-    @click="interacted"
+    @click="interacted($event)"
   >
     <div
       :id="nbId"
@@ -372,7 +372,7 @@ const formatDefaultValues = computed(() => {
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.6rem' : fontSize.value
+	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 	const minChipsValue = ((minChips.value !== 0 && !minChips.value) || minChips.value < 0) ? 0 : minChips.value
 	const maxChipsValue = ((maxChips.value !== 0 && !maxChips.value) || maxChips.value < 0) ? 10 : maxChips.value
@@ -478,8 +478,8 @@ const inputStyleClass = computed(() => {
 			return 'component__input--background'
 	}
 })
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 
 const handleKeyDown = (event) => {

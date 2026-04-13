@@ -15,10 +15,11 @@
 				:style="previewStyle"
         :tabIndex="tabIndexPrev"
         role="button"
+        :title="titlePrev"
         v-bind="computedAriaAttrsPrev"
-				@click="interacted('preview')"
-        @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted('preview')"
-        @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('preview')"
+				@click="interacted('preview', $event)"
+        @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted('preview', $event)"
+        @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('preview', $event)"
 			>
 				<slot name="prev">← Preview</slot>
 			</div>
@@ -29,10 +30,11 @@
 				:style="nextStyle"
         :tabIndex="tabIndexNext"
         role="button"
+        :title="titleNext"
         v-bind="computedAriaAttrsNext"
-        @click="interacted('next')"
-        @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted('next')"
-        @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('next')"
+        @click="interacted('next', $event)"
+        @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted('next', $event)"
+        @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted('next', $event)"
 			>
 				<slot name="next">Next →</slot>
 			</div>
@@ -86,6 +88,14 @@ const props = defineProps({
   ariaAttrsNext: {
     type: Object,
     default: () => ({})
+  },
+  titlePrev: {
+    type: String,
+    default: ''
+  },
+  titleNext: {
+    type: String,
+    default: ''
   },
 	theme: {
 		type: String,
@@ -379,8 +389,8 @@ const computedAriaAttrsNext = computed(() => {
   )
 })
 
-const interacted = clickType => {
-	emit('clicked', clickType)
+const interacted = (clickType, event) => {
+	emit('clicked', clickType, event)
 }
 </script>
 

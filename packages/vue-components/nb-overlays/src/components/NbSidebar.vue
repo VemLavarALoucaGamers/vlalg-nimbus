@@ -674,7 +674,6 @@ provide('showSidebar', sideBarIsVisible)
 .nb-wrapper {
   margin: 0;
   padding: 0;
-  font-size: 62.5%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -744,6 +743,7 @@ provide('showSidebar', sideBarIsVisible)
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    font-size: inherit;
 
     &.component__menu--left {
       left: -100%;
@@ -769,7 +769,7 @@ provide('showSidebar', sideBarIsVisible)
     }
 
     .component__menu-close-button {
-      font-size: 1.5rem;
+      font-size: 16px;
       cursor: pointer;
       position: absolute;
       color: v-bind('styleCloseButtonColor');
@@ -782,6 +782,8 @@ provide('showSidebar', sideBarIsVisible)
       overflow-y: auto;
       overflow-x: hidden;
       color: v-bind('styleContentColor');
+      text-align: left;
+      white-space: normal;
     }
 
     .component__menu-bottom-section {

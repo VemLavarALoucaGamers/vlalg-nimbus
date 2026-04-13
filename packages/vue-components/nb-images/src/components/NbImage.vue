@@ -4,6 +4,7 @@
 		:class="['nb-wrapper', componentDisabled]"
 		:style="[wrapperStyle]"
     role="button"
+    :title="title"
     v-bind="computedAriaAttrs"
 	>
 		<div
@@ -35,7 +36,7 @@
         :fetchpriority="fetchpriority"
         :style="imageStyle"
         :class="['component__image', { 'component__image--show-preview': hasPreview, 'component__image--has-magnifier': hagnifierGlass }]"
-        @click="openModal"
+        @click="openModal($event)"
         @mouseenter="showMagnifier"
         @mouseleave="hideMagnifier"
       />
@@ -117,6 +118,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	borderRadius: {
 		type: Number,
@@ -505,13 +510,13 @@ const imageStyle = computed(() => {
 })
 
 // Função para abrir o modal
-const openModal = () => {
+const openModal = (event) => {
   // Se o modal deve ser exibido e a imagem existe e a imagem tem uma URL, abre o modal
 	if (hasPreview.value && image.value && image.value.url) {
     // Atualiza o estado da imagem selecionada
 		selectedImg.value = true
     // Emite o evento clicked
-    emit('clicked')
+    emit('clicked', event)
 	}
 }
 

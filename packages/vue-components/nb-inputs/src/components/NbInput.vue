@@ -4,20 +4,22 @@
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle, inputWidthStyle, borderRadiusStyle]"
     role="input"
+    :title="title"
     v-bind="computedAriaAttrs"
   >
     <div
       :id="nbId"
       :class="['nb-reset', 'component', sizeMediaQueryStyle, themeStyle, componentReadonly, inputStyleClass]"
       :style="[componentStyle, inputWidthStyle, borderRadiusStyle]"
-      @click="interacted"
+      @click="interacted($event)"
     >
       <label
         v-if="showLabel"
         :for="computedInputName"
         class="component__label"
         :style="[styleLabel]"
-      >{{ label }}</label>
+        @click="handleLabelClick"
+      >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
 
       <div
         v-if="validShowInputEye"
@@ -37,6 +39,38 @@
         </label>
       </div>
       <input
+        v-if="hasInputMask"
+        ref="inputRef"
+        v-model="inputValue"
+        v-mask="inputMaskForDirective"
+        :id="computedInputName"
+        :name="computedInputName"
+        :type="currentType"
+        class="component__input"
+        :class="[
+          uppercaseStyle,
+          hiddenDefaultEye,
+          activeStyle
+        ]"
+        :placeholder="computedPlaceholder"
+        :disabled="disabled || inputReadonly"
+        :required="required"
+        :readonly="inputReadonly"
+        :autocomplete="inputAutocomplete"
+        :tabindex="disabled || inputReadonly ? -1 : tabindex"
+        :min="supportsMinMaxStep ? min : undefined"
+        :max="supportsMinMaxStep ? max : undefined"
+        :step="supportsMinMaxStep ? step : undefined"
+        role="input"
+        :style="[borderRadiusStyle, inputIconStyle]"
+        @focus="isActive = true"
+        @blur="isActive = false"
+        @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+        @paste="handlePaste"
+      />
+      <input
+        v-else
+        ref="inputRef"
         v-model="inputValue"
         :id="computedInputName"
         :name="computedInputName"
@@ -53,11 +87,15 @@
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
+        :min="supportsMinMaxStep ? min : undefined"
+        :max="supportsMinMaxStep ? max : undefined"
+        :step="supportsMinMaxStep ? step : undefined"
         role="input"
         :style="[borderRadiusStyle, inputIconStyle]"
         @focus="isActive = true"
         @blur="isActive = false"
         @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+        @paste="handlePaste"
       />
 
       <label :for="computedInputName" v-if="hasIcon" :class="['component__icon', styleIconDirection]">
@@ -68,7 +106,12 @@
     </div>
     <div
       v-if="validShowMsg"
-      :class="['component__message', hasCustomMsg ? 'component__message--custom' : 'component__message--default']"
+      :class="[
+        'component__message',
+        'component__extra-content',
+        hasCustomMsg ? 'component__message--custom' : 'component__message--default',
+        { 'component__extra-content--absolute': extraContendAbsolute },
+      ]"
     >
       <slot name="message">{{ message }}</slot>
     </div>
@@ -76,7 +119,11 @@
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch } from 'vue'
+import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import * as vueTheMask from 'vue-the-mask'
+
+// O default do pacote é só o `Vue.use` installer; a diretiva está na exportação nomeada `mask`.
+const vMask = vueTheMask.mask
 
 defineOptions({
 	name: 'NbInput',
@@ -84,7 +131,15 @@ defineOptions({
 })
 
 onMounted(() => {
-  inputValue.value = inputText.value
+  if (inputText.value != null) {
+    if (inputType.value === 'number' && typeof inputText.value === 'number') {
+      inputValue.value = inputText.value
+    } else {
+      inputValue.value = String(inputText.value)
+    }
+  } else {
+    inputValue.value = ''
+  }
 })
 onUnmounted(() => {
   startValue()
@@ -97,7 +152,8 @@ const emit = defineEmits([
   'blurred',
   'show-input-eye',
   'clicked',
-  'entered'
+  'entered',
+  'paste'
 ])
 
 const props = defineProps({
@@ -128,6 +184,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	textColor: { // TESTAR AINDA
 		type: String,
@@ -224,14 +284,39 @@ const props = defineProps({
     },
   },
   inputText: {
-    type: String,
-    default: '',
+    type: [String, Number],
+    default: null,
   },
   inputType: {
     type: String,
     default: 'text',
     validator: value => { // TESTAR AINDA: 'tel', 'url'
       return ['text', 'number', 'email', 'password'].indexOf(value) !== -1
+    },
+  },
+  min: {
+    type: String,
+    default: '',
+  },
+  max: {
+    type: String,
+    default: '',
+  },
+  step: {
+    type: [String, Number],
+    default: '',
+  },
+  /**
+   * Máscara [`vue-the-mask`](https://www.npmjs.com/package/vue-the-mask) (mesma lib que `NbCreditCard` em `@vlalg-nimbus/nb-payments`).
+   * Só aplica com **`input-type="text"`**. Ex.: `'###.###.###-##'`, `'(##) ####-####'`. Array = máscaras dinâmicas por comprimento.
+   */
+  inputMask: {
+    type: [String, Array],
+    default: null,
+    validator: value => {
+      if (value == null) return true
+      if (typeof value === 'string') return true
+      return Array.isArray(value) && value.every(s => typeof s === 'string')
     },
   },
   hasTrim: {
@@ -297,6 +382,13 @@ const props = defineProps({
     default: false,
     validator: value => {
 			return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  blockPaste: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
     }
   },
   inputAutocomplete: {
@@ -411,6 +503,13 @@ const props = defineProps({
       return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
+  extraContendAbsolute: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
   hasIcon: {
     type: Boolean,
     default: false,
@@ -495,6 +594,13 @@ const props = defineProps({
     type: String,
     default: 'Label text',
   },
+  labelBreakOnActive: {
+    type: Boolean,
+    default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
   labelBackground: {
     type: String,
     default: 'transparent',
@@ -522,6 +628,14 @@ const props = defineProps({
   labelActiveLeft: {
     type: Number,
     default: 5,
+  },
+  labelRight: {
+    type: Number,
+    default: 0,
+  },
+  labelActiveRight: {
+    type: Number,
+    default: 0,
   },
   fontFamilyLabel: {
 		type: String,
@@ -591,8 +705,10 @@ const {
 	activeTextStyle,
 	sizeMediaQuery,
 	inputReadonly,
+	blockPaste,
 	showInputEye,
 	inputType,
+	inputMask,
   hasTrim,
 	inputUppercase,
   inputName,
@@ -619,6 +735,7 @@ const {
   textAlign,
   showMsg,
   hasMsg,
+  extraContendAbsolute,
   hasIcon,
   iconDirection,
   iconPadding,
@@ -636,6 +753,8 @@ const {
   iconWidth,
   iconSize,
   showLabel,
+  label,
+  labelBreakOnActive,
   labelBackground,
   labelPadding,
   labelBorderRadius,
@@ -643,6 +762,8 @@ const {
   inputLabelMarginActive,
   labelActiveTop,
   labelActiveLeft,
+  labelRight,
+  labelActiveRight,
   fontFamilyLabel,
   fontSizeLabel,
   fontSizeLabelActive,
@@ -654,14 +775,29 @@ const {
 } = toRefs(props)
 
 const inputValue = ref('')
+const inputRef = ref(null)
 const currentType = ref('')
 const showValue = ref(false)
 const isActive = ref(false)
 
+const hasInputMask = computed(() => {
+  if (inputType.value !== 'text') return false
+  const m = inputMask.value
+  if (m == null || m === '') return false
+  return !(Array.isArray(m) && m.length === 0)
+})
+
+/** A diretiva do vue-the-mask ordena o array in-place; em Vue 3 props são readonly — repassa cópia. */
+const inputMaskForDirective = computed(() => {
+  const m = inputMask.value
+  if (Array.isArray(m)) return m.slice()
+  return m
+})
+
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const textColorValue = !textColor ? 'ffffff' : textColor.value
+	const textColorValue = !textColor ? '#ffffff' : textColor.value
 	const caretColorValue = !caretColor.value ? '' : caretColor.value
 	const selectionBgColorValue = !selectionBgColor.value ? '' : selectionBgColor.value
 	const selectionTextColorValue = !selectionTextColor.value ? '' : selectionTextColor.value
@@ -681,7 +817,7 @@ const formatDefaultValues = computed(() => {
   const showInputEyeValue = !showInputEye.value ? false : showInputEye.value
   const inputTypeValue = !inputType.value ? 'text' : inputType.value
   const inputUppercaseValue = !inputUppercase.value ? false : inputUppercase.value
-  const themeValue = !theme.value ? 'normal' : theme.value
+  const themeValue = !theme.value ? 'light' : theme.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
   const inputStyleValue = !inputStyle.value ? 'background' : inputStyle.value
 
@@ -705,7 +841,9 @@ const formatDefaultValues = computed(() => {
   const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
   const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
   const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
-  const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? -10 : labelActiveLeft.value
+  const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
+  const labelRightValue = (labelRight.value === null || labelRight.value === undefined) ? 0 : labelRight.value
+  const labelActiveRightValue = (labelActiveRight.value === null || labelActiveRight.value === undefined) ? 0 : labelActiveRight.value
   const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
   const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
   const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
@@ -761,6 +899,8 @@ const formatDefaultValues = computed(() => {
     inputLabelMarginActive: inputLabelMarginActiveValue,
     labelActiveTop: labelActiveTopValue,
     labelActiveLeft: labelActiveLeftValue,
+    labelRight: labelRightValue,
+    labelActiveRight: labelActiveRightValue,
     fontFamilyLabel: fontFamilyLabelValue,
     fontSizeLabel: fontSizeLabelValue,
     fontSizeLabelActive: fontSizeLabelActiveValue,
@@ -778,9 +918,16 @@ const componentDisabled = computed(() => {
 })
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
+	const isActive = isLabelActive.value
 
 	return {
-		display: defaultValues.display
+		display: defaultValues.display,
+		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
+		// paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+    paddingTop: '0px',
+		// overflow do label fica no .component (componentStyle): se hidden for aqui, corta
+		// .component__message com position fora do fluxo (irmão do .component dentro do wrapper)
+		overflow: 'visible',
 	}
 })
 const fontSizeStyle = computed(() => {
@@ -810,6 +957,8 @@ const componentStyle = computed(() => {
 	return {
 		fontWeight: defaultValues.fontWeight,
 		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
+		// Mesma regra que antes estava no wrapper: esconde label inativo; não afeta .component__message
+		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden',
 	}
 })
 const borderRadiusStyle = computed(() => {
@@ -845,6 +994,11 @@ const styleTextColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.textColor
+})
+const styleButtonColor = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.theme === 'dark' ? darkDisabledBgColor.value : lightDisabledBgColor.value
 })
 const styleTextMessageColor = computed(() => {
 	const defaultValues = formatDefaultValues.value
@@ -958,7 +1112,8 @@ const computedPlaceholder = computed(() => {
 })
 const isLabelActive = computed(() => {
   // Label está ativo se o input estiver focado OU se tiver conteúdo
-  return isActive.value || (inputValue.value && inputValue.value.trim().length > 0)
+  const value = inputValue.value
+  return isActive.value || (value != null && String(value).trim().length > 0)
 })
 const hiddenDefaultEye = computed(() => {
   const defaultValues = formatDefaultValues.value
@@ -1045,18 +1200,39 @@ const styleLabel = computed(() => {
   const lightTextColorLabel = isActive ? defaultValues.lightTextColorLabelActive : defaultValues.lightTextColorLabel
   const darkTextColorLabel = isActive ? defaultValues.darkTextColorLabelActive : defaultValues.darkTextColorLabel
 
+  // Só no estado inativo o label fica na linha do texto — aí precisa do offset do ícone.
+  // Quando ativo (recolhido em cima), mantém labelActiveLeft / labelActiveRight.
+  let leftPx = isActive ? defaultValues.labelActiveLeft : defaultValues.labelLeft
+  if (!isActive && hasIcon.value && iconDirection.value === 'left') {
+    leftPx += defaultValues.iconPaddingInput - defaultValues.labelLeft
+  }
+  let rightPx = isActive ? defaultValues.labelActiveRight : defaultValues.labelRight
+  if (!isActive && hasIcon.value && iconDirection.value === 'right') {
+    rightPx += defaultValues.iconPaddingInput - defaultValues.labelRight
+  }
+
   return {
     fontFamily: defaultValues.fontFamilyLabel,
     fontSize: isActive ? defaultValues.fontSizeLabelActive : defaultValues.fontSizeLabel,
     fontWeight: defaultValues.fontWeightLabel,
     color: defaultValues.theme === 'dark' ? darkTextColorLabel : lightTextColorLabel,
     top: isActive ? `${defaultValues.labelActiveTop}px` : '50%',
-    left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
+    left: `${leftPx}px`,
+    right: `${rightPx}px`,
     transform: isActive ? 'translateY(0)' : 'translateY(-50%)',
     transition: 'all 0.2s ease',
     backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
     padding: isActive ? defaultValues.labelPadding : '0',
     borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
+    // Se labelBreakOnActive for true (padrão), usa ellipsis quando ativo. Se false, quebra linha
+    ...(isActive ? {
+      whiteSpace: !labelBreakOnActive.value ? 'normal' : 'nowrap',
+      wordWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+      overflowWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+      maxWidth: '100%',
+      textOverflow: labelBreakOnActive.value ? 'ellipsis' : 'clip',
+      overflow: labelBreakOnActive.value ? 'hidden' : 'visible',
+    } : {}),
   }
 })
 const styleLabelActive = computed(() => {
@@ -1065,7 +1241,15 @@ const styleLabelActive = computed(() => {
   return defaultValues.theme === 'dark' ? defaultValues.darkTextColorLabelActive : defaultValues.lightTextColorLabelActive
 })
 const startValue = () => {
-  inputValue.value = inputText.value
+  if (inputText.value != null) {
+    if (inputType.value === 'number' && typeof inputText.value === 'number') {
+      inputValue.value = inputText.value
+    } else {
+      inputValue.value = String(inputText.value)
+    }
+  } else {
+    inputValue.value = ''
+  }
 
   currentType.value = inputType.value
 }
@@ -1085,25 +1269,89 @@ const changeShowValue = () => {
   showValue.value = newShow
 }
 
-const interacted = () => {
-	emit('clicked')
+const supportsMinMaxStep = computed(() => {
+  // Apenas 'number' suporta min, max e step no validator atual
+  // Se no futuro adicionar date, datetime-local, etc., adicionar aqui
+  return currentType.value === 'number'
+})
+
+const formatValueForEmit = (value) => {
+  // Converte para número se inputType for 'number'
+  if (inputType.value === 'number') {
+    if (value === '' || value === null || value === undefined) {
+      return ''
+    } else {
+      const numValue = typeof value === 'number' ? value : Number(value)
+      return isNaN(numValue) ? value : numValue
+    }
+  }
+  return value
 }
+
+const interacted = (event) => {
+	emit('clicked', event)
+}
+
+/*
+  Handler para quando o label é clicado
+  Esta função previne que o evento seja capturado pelo @click="interacted" do elemento pai
+  e foca o input explicitamente.
+*/
+const handleLabelClick = (event) => {
+  // Prevenir que o evento seja capturado pelo @click="interacted" do elemento pai
+  event.stopPropagation()
+  
+  // Verificar se o componente está desabilitado ou readonly
+  if (disabled.value || formatDefaultValues.value.inputReadonly) {
+    return
+  }
+  
+  // Focar o input explicitamente
+  if (inputRef.value) {
+    inputRef.value.focus()
+  }
+}
+
 const enterConfirm = () => {
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
 
-  emit('entered', inputValue.value)
+  emit('entered', formatValueForEmit(inputValue.value))
+}
+
+const handlePaste = async (event) => {
+  // Capturar o valor do clipboard
+  const pastedValue = event.clipboardData?.getData('text') || ''
+  
+  // Sempre emitir o evento
+  emit('paste', pastedValue)
+  
+  // Bloquear o paste se blockPaste for true
+  if (blockPaste.value) {
+    event.preventDefault()
+  }
 }
 
 watch(inputType, value => {
   currentType.value = value
 }, { immediate: true })
 watch(inputText, value => {
-  if (value !== inputValue.value) inputValue.value = value
+  if (value != null) {
+    if (inputType.value === 'number' && typeof value === 'number') {
+      if (value !== inputValue.value) inputValue.value = value
+    } else {
+      const stringValue = String(value)
+      if (stringValue !== inputValue.value) inputValue.value = stringValue
+    }
+  } else {
+    if (inputValue.value !== '') inputValue.value = ''
+  }
 }, { immediate: true })
 watch(inputValue, value => {
-  if (hasTrim.value) value = value.trim()
+  if (hasTrim.value && typeof value === 'string') {
+    value = value.trim()
+  }
 
-  emit('changed', value)
+  emit('changed', formatValueForEmit(value))
 })
 watch(isActive, value => {
   if (value) {
@@ -1116,9 +1364,11 @@ watch(showValue, value => {
   emit('show-input-eye', value)
 }, { immediate: true })
 watch(inputValue, value => {
-  if (hasTrim.value) value = value.trim()
+  if (hasTrim.value && typeof value === 'string') {
+    value = value.trim()
+  }
 
-  emit('current-value', value)
+  emit('current-value', formatValueForEmit(value))
 })
 watch(inputType, (newType) => {
   if (newType === 'password') {
@@ -1146,6 +1396,7 @@ watch(inputType, (newType) => {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	vertical-align: bottom;
+	position: relative;
 }
 
 .nb-reset {
@@ -1173,6 +1424,7 @@ watch(inputType, (newType) => {
 	box-sizing: border-box;
 	line-height: 1.42857143;
 	font-family: v-bind('font');
+	position: relative;
 
 	user-select: none;
 
@@ -1654,17 +1906,13 @@ watch(inputType, (newType) => {
 
     .component__label {
       position: absolute;
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%);
       z-index: 1;
-      transition: top 0.2s ease;
-    }
+      pointer-events: none;
 
-    &:has(.component__input:focus) .component__label,
-    &:has(.component__input:active) .component__label {
-      top: -10px;
-      transform: translateY(0);
+      .component__label--required {
+        color: red;
+        display: contents;
+      }
     }
 
     .component__eye {
@@ -1797,6 +2045,19 @@ watch(inputType, (newType) => {
     // fim INPUT
 }
 
+.component__extra-content {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.component__extra-content--absolute {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 1;
+}
+
 .component__message {
   &.component__message--default {
     font-family: v-bind('fontMessage');
@@ -1813,7 +2074,6 @@ watch(inputType, (newType) => {
 	pointer-events: none;
 	user-select: none;
 
-	background-color: #ffffff;
 	opacity: 0.8;
 
 	.component {

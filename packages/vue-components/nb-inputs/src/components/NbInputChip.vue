@@ -4,15 +4,16 @@
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]"
     role="input"
+    :title="title"
     v-bind="computedAriaAttrs"
-    @click="interacted"
+    @click="interacted($event)"
   >
     <label
       v-if="showLabel"
       :for="computedInputName"
       class="component__label"
       :style="[styleLabel]"
-    >{{ label }}</label>
+    >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
     
     <div
       :id="nbId"
@@ -28,16 +29,38 @@
             :chip="chip"
             :removeChip="removeChip"
           >
-            <span class="chip-text">{{ chip }}</span>
+            <span class="chip-text" :style="[fontSizeChipStyle]">{{ chip }}</span>
             <span 
               v-if="!disabled && !inputReadonly"
-              class="chip-remove" 
+              class="chip-remove"
+              :style="[fontSizeChipStyle]"
               @click="removeChip(chip)">×</span>
           </slot>
         </div>
       </div>
 
       <input
+        v-if="hasInputMask"
+        ref="chipInput"
+        type="text"
+        v-model="chipInputValue"
+        v-mask="inputMaskForDirective"
+        :id="computedInputName"
+        :name="computedInputName"
+        :placeholder="computedPlaceholder"
+        :readonly="inputReadonly"
+        :autocomplete="inputAutocomplete"
+        :required="required"
+        :tabindex="disabled || inputReadonly ? -1 : tabIndex"
+        :class="['chips-input', activeTextStyleClass]"
+        :style="[caretColorStyle, selectionStyle]"
+        @keydown.enter="!disabled && hasTabIndexEnter && handleKeyDown($event)"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        @paste="handlePaste"
+      />
+      <input
+        v-else
         ref="chipInput"
         type="text"
         v-model="chipInputValue"
@@ -53,6 +76,7 @@
         @keydown.enter="!disabled && hasTabIndexEnter && handleKeyDown($event)"
         @focus="handleFocus"
         @blur="handleBlur"
+        @paste="handlePaste"
       />
     </div>
   </div>
@@ -60,6 +84,9 @@
 
 <script setup>
 import { defineProps, ref, toRefs, computed, onMounted, watch } from 'vue'
+import * as vueTheMask from 'vue-the-mask'
+
+const vMask = vueTheMask.mask
 
 defineOptions({
   name: 'NbInputChip',
@@ -70,7 +97,7 @@ onMounted(() => {
   if (currentList.value.length > 0) chipList.value = currentList.value;
 })
 
-const emit = defineEmits(['clicked', 'changed', 'removed', 'added', 'input-changed', 'focused', 'blurred'])
+const emit = defineEmits(['clicked', 'changed', 'removed', 'added', 'input-changed', 'focused', 'blurred', 'paste'])
 
 const props = defineProps({
 	nbId: {
@@ -100,6 +127,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	caretColor: {
 		type: String,
@@ -231,12 +262,32 @@ const props = defineProps({
 			return typeof value === 'boolean' && [true, false].includes(value)
 		}
 	},
+	blockPaste: {
+		type: Boolean,
+		default: false,
+		validator: value => {
+			return typeof value === 'boolean' && [true, false].includes(value)
+		}
+	},
 	inputAutocomplete: {
 		type: String,
 		default: 'on',
 		validator: value => {
 			return ['on', 'off'].indexOf(value) !== -1
 		}
+	},
+	/**
+	 * Máscara [`vue-the-mask@0.11.1`](https://www.npmjs.com/package/vue-the-mask) — mesma API que `NbInput` (`input-mask`).
+	 * O campo de digitação do chip é sempre `type="text"`. String ou array de padrões.
+	 */
+	inputMask: {
+		type: [String, Array],
+		default: null,
+		validator: value => {
+			if (value == null) return true
+			if (typeof value === 'string') return true
+			return Array.isArray(value) && value.every(s => typeof s === 'string')
+		},
 	},
 	required: {
 		type: Boolean,
@@ -379,7 +430,14 @@ const props = defineProps({
 		type: Number,
 		default: 0
 	},
-	labelLeft: {
+  labelBreakOnActive: {
+    type: Boolean,
+    default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
+  labelLeft: {
 		type: Number,
 		default: 5,
 	},
@@ -389,7 +447,7 @@ const props = defineProps({
 	},
 	labelActiveTop: {
 		type: Number,
-		default: 13,
+		default: -13,
 	},
 	labelActiveLeft: {
 		type: Number,
@@ -435,7 +493,22 @@ const props = defineProps({
 	darkTextColorLabelActive: {
 		type: String,
 		default: '#ffffff'
-	}
+	},
+	fontFamilyChip: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	fontSizeChip: {
+		type: String,
+		default: '1.2em'
+	},
+	fontWeightChip: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 700 : value
+		}
+  },
 })
 
 const {
@@ -459,7 +532,9 @@ const {
 	inputPlaceholder,
 	inputUppercase,
 	inputReadonly,
+	blockPaste,
 	inputAutocomplete,
+	inputMask,
 	required,
 	textAlign,
 	hasBorderRadius,
@@ -498,6 +573,7 @@ const {
 	labelBackground,
 	labelPadding,
 	labelBorderRadius,
+	labelBreakOnActive,
 	labelLeft,
 	inputLabelMarginActive,
 	labelActiveTop,
@@ -509,7 +585,10 @@ const {
 	lightTextColorLabel,
 	lightTextColorLabelActive,
 	darkTextColorLabel,
-	darkTextColorLabelActive
+	darkTextColorLabelActive,
+	fontFamilyChip,
+	fontSizeChip,
+	fontWeightChip,
 } = toRefs(props)
 
 const chipInputValue = ref('');
@@ -531,7 +610,7 @@ const formatDefaultValues = computed(() => {
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.4em' : fontSize.value
+	const fontSizeValue = !fontSize.value ? '1.2em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 	const minChipsValue = ((minChips.value !== 0 && !minChips.value) || minChips.value < 0) ? 0 : minChips.value
 	const maxChipsValue = ((maxChips.value !== 0 && !maxChips.value) || maxChips.value < 0) ? 10 : maxChips.value
@@ -546,7 +625,7 @@ const formatDefaultValues = computed(() => {
 	const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
 	const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
 	const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
-	const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? 13 : labelActiveTop.value
+	const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
 	const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
 	const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
 	const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
@@ -556,6 +635,11 @@ const formatDefaultValues = computed(() => {
 	const darkTextColorLabelValue = !darkTextColorLabel.value ? '#ffffff' : darkTextColorLabel.value
 	const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#333333' : lightTextColorLabelActive.value
 	const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#ffffff' : darkTextColorLabelActive.value
+
+  // Chip default values
+  const fontFamilyChipValue = !fontFamilyChip.value ? `'Lato', sans-serif` : fontFamilyChip.value
+  const fontSizeChipValue = !fontSizeChip.value ? '1.2em' : fontSizeChip.value
+  const fontWeightChipValue = !fontWeightChip.value ? 400 : fontWeightChip.value
 
 	return {
 		disabled: disabledValue,
@@ -591,7 +675,10 @@ const formatDefaultValues = computed(() => {
 		lightTextColorLabel: lightTextColorLabelValue,
 		darkTextColorLabel: darkTextColorLabelValue,
 		lightTextColorLabelActive: lightTextColorLabelActiveValue,
-		darkTextColorLabelActive: darkTextColorLabelActiveValue
+		darkTextColorLabelActive: darkTextColorLabelActiveValue,
+		fontFamilyChip: fontFamilyChipValue,
+		fontSizeChip: fontSizeChipValue,
+		fontWeightChip: fontWeightChipValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -606,7 +693,11 @@ const wrapperStyle = computed(() => {
 	return {
 		display: defaultValues.display,
 		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
-		paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+    // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+    paddingTop: '0px',
+		// Esconde o label quando não está ativo usando overflow hidden
+		// Se não tem label ou está ativo, permite overflow visible para não cortar conteúdo
+		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden'
 	}
 })
 const fontSizeStyle = computed(() => {
@@ -614,7 +705,7 @@ const fontSizeStyle = computed(() => {
 	
 	if (defaultValues.fontSize) return defaultValues.fontSize
 
-	return '1.4em'
+	return '1.2em'
 })
 
 const componentStyle = computed(() => {
@@ -750,7 +841,25 @@ const styleLabel = computed(() => {
     backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
     padding: isActive ? defaultValues.labelPadding : '0',
     borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
+    // Se labelBreakOnActive for true (padrão), usa ellipsis quando ativo. Se false, quebra linha
+    ...(isActive ? {
+      whiteSpace: !labelBreakOnActive.value ? 'normal' : 'nowrap',
+      wordWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+      overflowWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+      maxWidth: '100%',
+      textOverflow: labelBreakOnActive.value ? 'ellipsis' : 'clip',
+      overflow: labelBreakOnActive.value ? 'hidden' : 'visible',
+    } : {}),
   }
+})
+const fontSizeChipStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return {
+    fontSize: defaultValues.fontSizeChip,
+    fontWeight: defaultValues.fontWeightChip,
+    fontFamily: defaultValues.fontFamilyChip
+	}
 })
 const themeStyle = computed(() => {
 	switch (theme.value) {
@@ -770,8 +879,21 @@ const inputStyleClass = computed(() => {
 			return 'component__input--background'
 	}
 })
-const interacted = () => {
-	emit('clicked')
+
+const hasInputMask = computed(() => {
+	const m = inputMask.value
+	if (m == null || m === '') return false
+	return !(Array.isArray(m) && m.length === 0)
+})
+
+const inputMaskForDirective = computed(() => {
+	const m = inputMask.value
+	if (Array.isArray(m)) return m.slice()
+	return m
+})
+
+const interacted = (event) => {
+	emit('clicked', event)
 }
 
 const handleFocus = () => {
@@ -782,6 +904,20 @@ const handleBlur = () => {
   isActive.value = false
   emit('blurred')
 }
+
+const handlePaste = async (event) => {
+  // Capturar o valor do clipboard
+  const pastedValue = event.clipboardData?.getData('text') || ''
+  
+  // Sempre emitir o evento
+  emit('paste', pastedValue)
+  
+  // Bloquear o paste se blockPaste for true
+  if (blockPaste.value) {
+    event.preventDefault()
+  }
+}
+
 const handleKeyDown = (event) => {
   if (disabled.value || inputReadonly.value) {
     return;
@@ -800,19 +936,31 @@ const handleKeyDown = (event) => {
 }
 const addChip = (text) => {
   chipList.value.push(text);
-  emit('added', text);
+  emit('added', {
+    chip: text,
+    index: chipList.value.indexOf(text),
+    list: chipList.value,
+  });
 }
 const removeChip = (chip) => {
   chipList.value = chipList.value.filter(chipItem => chipItem !== chip);
-  emit('removed', chip);
+  emit('removed', {
+    chip: chip,
+    index: chipList.value.indexOf(chip),
+    list: chipList.value,
+  });
 }
 
 watch(currentList, (newList) => {
   chipList.value = newList;
-  emit('changed', newList);
+  emit('changed', {
+    list: newList,
+  });
 })
 watch(chipInputValue, (newValue) => {
-  emit('input-changed', newValue);
+  emit('input-changed', {
+    value: newValue,
+  });
 })
 </script>
 
@@ -828,8 +976,6 @@ watch(chipInputValue, (newValue) => {
 	box-sizing: border-box;
 	vertical-align: bottom;
 	position: relative;
-	// Permite que o label fique visível quando está na posição ativa
-	overflow: visible;
 }
 
 .nb-reset {
@@ -853,13 +999,13 @@ watch(chipInputValue, (newValue) => {
 
 .component__label {
     position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
     z-index: 1;
-    transition: top 0.2s ease;
     pointer-events: none;
-    // Quando ativo, o label pode sair do componente, mas o wrapper tem padding-top para acomodá-lo
+
+    .component__label--required {
+      color: red;
+      display: contents;
+    }
   }
 
 .component {
@@ -1010,7 +1156,6 @@ watch(chipInputValue, (newValue) => {
       border-radius: 16px;
       padding: 5px 10px;
       margin: 5px;
-      font-size: 14px;
       overflow-wrap: anywhere;
 
       .chip-remove {

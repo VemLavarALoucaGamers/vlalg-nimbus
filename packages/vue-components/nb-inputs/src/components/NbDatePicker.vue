@@ -4,13 +4,14 @@
       :class="['nb-wrapper', componentDisabled]"
       :style="[wrapperStyle, inputWidthStyle, borderRadiusStyle]"
       role="input"
+      :title="title"
       v-bind="computedAriaAttrs"
     >
       <div
         :id="nbId"
         :class="['nb-reset', 'component', sizeMediaQueryStyle, themeStyle, componentReadonly, inputStyleClass]"
         :style="[componentStyle, inputWidthStyle, borderRadiusStyle]"
-        @click="interacted"
+        @click="interacted($event)"
       >
         <label
           v-if="showLabel"
@@ -18,7 +19,7 @@
           class="component__label"
           :style="[styleLabel]"
           @click="handleLabelClick"
-        >{{ label }}</label>
+        >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
   
         <input
           ref="inputRef"
@@ -37,10 +38,10 @@
           :placeholder="computedPlaceholder"
           :disabled="disabled || inputReadonly"
           :required="required"
-          :readonly="inputReadonly"
+          :readonly="shouldBlockInputEdit"
           :autocomplete="inputAutocomplete"
-          :min="shouldUseCustomCalendar ? undefined : min"
-          :max="shouldUseCustomCalendar ? undefined : max"
+          :min="nativeMin"
+          :max="nativeMax"
           :step="shouldUseCustomCalendar ? undefined : step"
           :tabindex="disabled || inputReadonly ? -1 : tabindex"
           role="input"
@@ -49,11 +50,17 @@
           @blur="handleInputBlur"
           @click="handleInputClick"
           @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+          @paste="handlePaste"
         />
       </div>
       <div
         v-if="validShowMsg"
-        :class="['component__message', hasCustomMsg ? 'component__message--custom' : 'component__message--default']"
+        :class="[
+          'component__message',
+          'component__extra-content',
+          hasCustomMsg ? 'component__message--custom' : 'component__message--default',
+          { 'component__extra-content--absolute': extraContendAbsolute },
+        ]"
       >
         <slot name="message">{{ message }}</slot>
       </div>
@@ -72,6 +79,7 @@
             :nb-id="`${nbId}-calendar`"
             :value="calendarValue"
             :input-type="inputType"
+            :has-seconds="shouldUseSeconds"
             :min="min"
             :max="max"
             :step="step"
@@ -80,8 +88,69 @@
             :locale="locale"
             :theme="theme"
             :allow-range="allowRange"
+            :block-clicks-without-events="blockClicksWithoutEvents"
+            :font-family="calendarFontFamily"
+            :font-size="calendarFontSize"
+            :font-weight="calendarFontWeight"
+            :primary-color="calendarPrimaryColor"
+            :selection-color="calendarSelectionColor"
+            :event-color="calendarEventColor"
+            :today-color="calendarTodayColor"
+            :hover-text-color="calendarHoverTextColor"
+            :normal-text-color="calendarNormalTextColor"
+            :month-year-item-bg="calendarMonthYearItemBg"
+            :month-year-item-bg-hover="calendarMonthYearItemBgHover"
+            :day-hover-bg="calendarDayHoverBg"
+            :day-hover-text-color="calendarDayHoverTextColor"
+            :time-display-text-color="calendarTimeDisplayTextColor"
+            :time-edit-button-bg="calendarTimeEditButtonBg"
+            :time-edit-button-text-color="calendarTimeEditButtonTextColor"
+            :time-edit-button-bg-hover="calendarTimeEditButtonBgHover"
+            :time-edit-button-text-color-hover="calendarTimeEditButtonTextColorHover"
+            :time-edit-button-font-family="calendarTimeEditButtonFontFamily"
+            :time-edit-button-font-size="calendarTimeEditButtonFontSize"
+            :time-edit-button-padding="calendarTimeEditButtonPadding"
+            :time-edit-button-border-radius="calendarTimeEditButtonBorderRadius"
+            :time-edit-button-font-weight="calendarTimeEditButtonFontWeight"
+            :time-edit-button-border="calendarTimeEditButtonBorder"
+            :time-edit-button-text="calendarTimeEditButtonText"
+            :today-button-bg="calendarTodayButtonBg"
+            :today-button-text-color="calendarTodayButtonTextColor"
+            :today-button-bg-hover="calendarTodayButtonBgHover"
+            :today-button-text-color-hover="calendarTodayButtonTextColorHover"
+            :today-button-font-family="calendarTodayButtonFontFamily"
+            :today-button-font-size="calendarTodayButtonFontSize"
+            :today-button-padding="calendarTodayButtonPadding"
+            :today-button-border-radius="calendarTodayButtonBorderRadius"
+            :today-button-font-weight="calendarTodayButtonFontWeight"
+            :today-button-border="calendarTodayButtonBorder"
+            :today-button-text="calendarTodayButtonText"
+            :now-button-text="calendarNowButtonText"
+            :show-clear-button="calendarShowClearButton"
+            :show-today-button="calendarShowTodayButton"
+            :clear-button-keep-current-month="calendarClearButtonKeepCurrentMonth"
+            :start-week-on-monday="calendarStartWeekOnMonday"
+            :edit-range="calendarEditRange"
+            :max-range-days="calendarMaxRangeDays"
+            :min-year="calendarMinYear"
+            :max-year="calendarMaxYear"
+            :go-to-date="calendarGoToDate"
+            :is-required="calendarIsRequired"
+            :width-full="calendarWidthFull"
+            :border-radius="calendarBorderRadius"
+            :scroll-class="calendarScrollClass"
+            :events="calendarEvents"
+            :select-month-text="calendarSelectMonthText"
+            :select-year-text="calendarSelectYearText"
+            :select-time-text="calendarSelectTimeText"
+            :time-display-label-text="calendarTimeDisplayLabelText"
+            :clear-button-title="calendarClearButtonTitle"
+            :clear-button-symbol="calendarClearButtonSymbol"
+            :iso-string-timezone-format="calendarIsoStringTimezoneFormat"
             @changed="handleCalendarChanged"
             @date-selected="handleCalendarDateSelected"
+            @month-changed="handleCalendarMonthChanged"
+            @valid="handleCalendarValid"
             @mousedown="isCalendarInteraction = true"
             @click="isCalendarInteraction = true"
           />
@@ -93,6 +162,10 @@
   <script setup>
   import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick, Teleport } from 'vue'
   import { defineAsyncComponent } from 'vue'
+  // Importar funções utilitárias do nb-calendar
+  // Em desenvolvimento (monorepo), usar caminho relativo
+  // Em produção, será resolvido pelo build do pacote
+  import { formatTimeValue, formatISOLocal, formatISOString as formatISOStringUtil, isSameDay, parseLocalDate, buildCompleteDataFromInputText as buildCompleteDataFromInputTextUtil } from '../../../nb-calendar/src/utils/dateUtils.js'
   
 // Importar do pacote npm (funciona localmente via Yarn workspaces e após publicação)
 // Durante desenvolvimento: Yarn workspaces resolve automaticamente
@@ -123,10 +196,16 @@ const Calendar = defineAsyncComponent(() =>
   const emit = defineEmits([
     'current-value',
     'changed',
+    'current-value-complete',
+    'changed-complete',
     'focused',
     'blurred',
     'clicked',
-    'entered'
+    'entered',
+    'paste',
+    'valid',
+    'date-selected',
+    'month-changed'
   ])
   
   const props = defineProps({
@@ -157,6 +236,10 @@ const Calendar = defineAsyncComponent(() =>
     ariaAttrs: {
       type: Object,
       default: () => ({})
+    },
+    title: {
+      type: String,
+      default: ''
     },
       caretColor: {
           type: String,
@@ -260,27 +343,28 @@ const Calendar = defineAsyncComponent(() =>
       },
     },
     min: {
-      type: String,
+      type: [Date, String],
       default: '',
     },
     max: {
-      type: String,
+      type: [Date, String],
       default: '',
     },
     step: {
       type: [String, Number],
       default: '',
     },
-    useCustomCalendar: {
+    hasSeconds: {
+      // null = detectar automaticamente baseado no valor/time format
       type: Boolean,
-      default: true, // true = usa customizado por padrão, false = força nativo
+      default: null,
       validator: value => {
-        return typeof value === 'boolean'
-      }
+        return value === null || typeof value === 'boolean'
+      },
     },
     locale: {
       type: String,
-      default: 'pt-BR',
+      default: 'en-US',
       validator: value => {
         return ['pt-BR', 'en-US'].includes(value)
       }
@@ -304,6 +388,382 @@ const Calendar = defineAsyncComponent(() =>
       default: 350,
       validator: value => {
         return typeof value === 'number' && value >= 280
+      }
+    },
+    blockClicksWithoutEvents: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    // Calendar props - Font
+    calendarFontFamily: {
+      type: String,
+      default: `'Lato', sans-serif`
+    },
+    calendarFontSize: {
+      type: String,
+      default: '1.6em',
+      validator: value => {
+        return !value ? '1.6em' : value
+      }
+    },
+    calendarFontWeight: {
+      type: Number,
+      default: 400,
+      validator: value => {
+        return !value ? 400 : value
+      }
+    },
+    // Calendar props - Colors
+    calendarPrimaryColor: {
+      type: String,
+      default: '#007bff',
+      validator: value => {
+        return typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
+      }
+    },
+    calendarSelectionColor: {
+      type: String,
+      default: '#1976d2',
+      validator: value => {
+        return typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
+      }
+    },
+    calendarEventColor: {
+      type: String,
+      default: '#4caf50',
+      validator: value => {
+        return typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
+      }
+    },
+    calendarTodayColor: {
+      type: String,
+      default: '#007bff',
+      validator: value => {
+        return typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
+      }
+    },
+    calendarHoverTextColor: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+      }
+    },
+    calendarNormalTextColor: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+      }
+    },
+    calendarMonthYearItemBg: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
+      }
+    },
+    calendarMonthYearItemBgHover: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
+      }
+    },
+    calendarDayHoverBg: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
+      }
+    },
+    calendarDayHoverTextColor: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+      }
+    },
+    calendarTimeDisplayTextColor: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+      }
+    },
+    // Calendar props - Time Edit Button
+    calendarTimeEditButtonBg: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
+      }
+    },
+    calendarTimeEditButtonTextColor: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+      }
+    },
+    calendarTimeEditButtonBgHover: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
+      }
+    },
+    calendarTimeEditButtonTextColorHover: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+      }
+    },
+    calendarTimeEditButtonFontFamily: {
+      type: String,
+      default: `'Lato', sans-serif`
+    },
+    calendarTimeEditButtonFontSize: {
+      type: String,
+      default: '14px',
+      validator: value => {
+        return !value ? '14px' : value
+      }
+    },
+    calendarTimeEditButtonPadding: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string')
+      }
+    },
+    calendarTimeEditButtonBorderRadius: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string')
+      }
+    },
+    calendarTimeEditButtonFontWeight: {
+      type: Number,
+      default: 500,
+      validator: value => {
+        return !value ? 500 : value
+      }
+    },
+    calendarTimeEditButtonBorder: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string')
+      }
+    },
+    calendarTimeEditButtonText: {
+      type: String,
+      default: 'Edit'
+    },
+    // Calendar props - Today Button
+    calendarTodayButtonBg: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
+      }
+    },
+    calendarTodayButtonTextColor: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+      }
+    },
+    calendarTodayButtonBgHover: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value) || /^(rgb|rgba)\(/.test(value)))
+      }
+    },
+    calendarTodayButtonTextColorHover: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string' && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+      }
+    },
+    calendarTodayButtonFontFamily: {
+      type: String,
+      default: `'Lato', sans-serif`
+    },
+    calendarTodayButtonFontSize: {
+      type: String,
+      default: '1.1rem',
+      validator: value => {
+        return !value ? '1.1rem' : value
+      }
+    },
+    calendarTodayButtonPadding: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string')
+      }
+    },
+    calendarTodayButtonBorderRadius: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string')
+      }
+    },
+    calendarTodayButtonFontWeight: {
+      type: Number,
+      default: 400,
+      validator: value => {
+        return !value ? 400 : value
+      }
+    },
+    calendarTodayButtonBorder: {
+      type: String,
+      default: null,
+      validator: value => {
+        return !value || (typeof value === 'string')
+      }
+    },
+    calendarTodayButtonText: {
+      type: String,
+      default: 'Today'
+    },
+    calendarNowButtonText: {
+      type: String,
+      default: 'Now'
+    },
+    // Calendar props - Configuration
+    calendarShowClearButton: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarShowTodayButton: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarClearButtonKeepCurrentMonth: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarStartWeekOnMonday: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarEditRange: {
+      type: Boolean,
+      default: true,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarMaxRangeDays: {
+      type: Number,
+      default: null,
+      validator: value => {
+        return value === null || (typeof value === 'number' && value > 0 && Number.isInteger(value))
+      }
+    },
+    calendarMinYear: {
+      type: Number,
+      default: 1900,
+      validator: value => {
+        return typeof value === 'number' && value >= 0
+      }
+    },
+    calendarMaxYear: {
+      type: Number,
+      default: 2100,
+      validator: value => {
+        return typeof value === 'number' && value >= 0
+      }
+    },
+    calendarGoToDate: {
+      type: [Date, String],
+      default: null
+    },
+    calendarIsRequired: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarWidthFull: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarBorderRadius: {
+      type: Number,
+      default: 0
+    },
+    calendarScrollClass: {
+      type: String,
+      default: ''
+    },
+    calendarEvents: {
+      type: Array,
+      default: () => [],
+      validator: value => {
+        return Array.isArray(value) && value.every(event => {
+          return event && event.date && (event.color || true)
+        })
+      }
+    },
+    // Calendar props - Text
+    calendarSelectMonthText: {
+      type: String,
+      default: 'Select month'
+    },
+    calendarSelectYearText: {
+      type: String,
+      default: 'Select year'
+    },
+    calendarSelectTimeText: {
+      type: String,
+      default: 'Select time'
+    },
+    calendarTimeDisplayLabelText: {
+      type: String,
+      default: 'Time:'
+    },
+    calendarClearButtonTitle: {
+      type: String,
+      default: 'Clear selection'
+    },
+    calendarClearButtonSymbol: {
+      type: String,
+      default: '×'
+    },
+    calendarIsoStringTimezoneFormat: {
+      type: String,
+      default: 'Z',
+      validator: value => {
+        return ['Z', '+00:00'].includes(value)
       }
     },
     hasTrim: {
@@ -343,6 +803,13 @@ const Calendar = defineAsyncComponent(() =>
       default: false,
       validator: value => {
               return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    blockPaste: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
       }
     },
     inputAutocomplete: {
@@ -433,6 +900,13 @@ const Calendar = defineAsyncComponent(() =>
         return typeof value === 'boolean' && [true, false].includes(value)
       },
     },
+    extraContendAbsolute: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      },
+    },
     showLabel: {
       type: Boolean,
       default: false,
@@ -443,6 +917,13 @@ const Calendar = defineAsyncComponent(() =>
     label: {
       type: String,
       default: 'Label text',
+    },
+    labelBreakOnActive: {
+      type: Boolean,
+      default: true,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      },
     },
     labelBackground: {
       type: String,
@@ -471,6 +952,14 @@ const Calendar = defineAsyncComponent(() =>
     labelActiveLeft: {
       type: Number,
       default: 5,
+    },
+    labelRight: {
+      type: Number,
+      default: 0,
+    },
+    labelActiveRight: {
+      type: Number,
+      default: 0,
     },
     fontFamilyLabel: {
           type: String,
@@ -539,6 +1028,7 @@ const Calendar = defineAsyncComponent(() =>
       activeTextStyle,
       sizeMediaQuery,
       inputReadonly,
+      blockPaste,
       inputType,
     hasTrim,
       inputUppercase,
@@ -547,12 +1037,13 @@ const Calendar = defineAsyncComponent(() =>
     min,
     max,
     step,
-    useCustomCalendar,
+    hasSeconds,
     locale,
     theme,
     allowRange,
     calendarZIndex,
     calendarWidth,
+    blockClicksWithoutEvents,
     tabindex,
       lightBgColor,
       lightBgColorFocus,
@@ -565,7 +1056,10 @@ const Calendar = defineAsyncComponent(() =>
     textAlign,
     showMsg,
     hasMsg,
+    extraContendAbsolute,
     showLabel,
+    label,
+    labelBreakOnActive,
     labelBackground,
     labelPadding,
     labelBorderRadius,
@@ -573,6 +1067,8 @@ const Calendar = defineAsyncComponent(() =>
     inputLabelMarginActive,
     labelActiveTop,
     labelActiveLeft,
+    labelRight,
+    labelActiveRight,
     fontFamilyLabel,
     fontSizeLabel,
     fontSizeLabelActive,
@@ -580,7 +1076,8 @@ const Calendar = defineAsyncComponent(() =>
     lightTextColorLabel,
     lightTextColorLabelActive,
     darkTextColorLabel,
-    darkTextColorLabelActive
+    darkTextColorLabelActive,
+    required
   } = toRefs(props)
   
   // Refs para armazenar valores do componente
@@ -593,6 +1090,44 @@ const Calendar = defineAsyncComponent(() =>
 
   const formatCalendarWidth = computed(() => {
     return !calendarWidth.value || calendarWidth.value < 280 ? 280 : parseInt(calendarWidth.value, 10)
+  })
+  
+  /*
+    Computed para decidir se o calendário deve exibir segundos
+    Regras:
+    - Se a prop hasSeconds for definida (true/false), usar o valor dela
+    - Caso contrário, detectar automaticamente se o valor atual possui segundos
+      - Para datetime-local: verificar se a parte do tempo tem HH:mm:ss
+      - Para time: verificar se o valor tem HH:mm:ss
+  */
+  const shouldUseSeconds = computed(() => {
+    // Se definido explicitamente pelo consumidor, respeitar
+    if (hasSeconds.value !== null) {
+      return hasSeconds.value
+    }
+  
+    // Detectar automaticamente apenas para time e datetime-local
+    if (inputType.value === 'time' || inputType.value === 'datetime-local') {
+      const hasSecondsIn = (val) => {
+        if (!val || typeof val !== 'string') return false
+        // Remover timezone, se houver (ex: 2026-01-09T21:07:50.624+00:00)
+        let timePart = val
+        if (inputType.value === 'datetime-local') {
+          timePart = val.split('T')[1] || ''
+          timePart = timePart.split(/[Z+-]/)[0] || ''
+        }
+        // Para time, já é só HH:mm[:ss]
+        const parts = timePart.split(':')
+        return parts.length >= 3
+      }
+  
+      // Priorizar inputValue (valor interno normalizado)
+      if (hasSecondsIn(inputValue.value)) return true
+      // Fallback para inputText original
+      if (hasSecondsIn(inputText.value)) return true
+    }
+  
+    return false
   })
   
   /*
@@ -721,45 +1256,118 @@ const Calendar = defineAsyncComponent(() =>
       }
       
       // Formato: DD/MM/YYYY para pt-BR, MM/DD/YYYY para en-US
-      // Verificar se está no formato YYYY-MM-DD
-      if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-        // Separar ano, mês e dia
-        const [year, month, day] = value.split('-')
+      // Aceitar formatos: YYYY-MM-DD (nativo) ou ISO com timezone ou objeto Date
+      if (typeof value === 'string') {
+        // Verificar se está no formato YYYY-MM-DD (formato nativo)
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+          // Separar ano, mês e dia
+          const [year, month, day] = value.split('-')
+          
+          // Formatar baseado no locale
+          if (loc === 'pt-BR') {
+            // Formato brasileiro: DD/MM/YYYY
+            return `${day}/${month}/${year}`
+          } else {
+            // Formato americano: MM/DD/YYYY
+            return `${month}/${day}/${year}`
+          }
+        }
         
-        // Formatar baseado no locale
-        if (loc === 'pt-BR') {
-          // Formato brasileiro: DD/MM/YYYY
-          return `${day}/${month}/${year}`
-        } else {
-          // Formato americano: MM/DD/YYYY
-          return `${month}/${day}/${year}`
+        // Verificar se está no formato ISO com timezone (ex: 2026-01-09T00:00:00.000Z)
+        // Aceitar qualquer parte de tempo, desde que tenha a data
+        const isoDateRegex = /^(\d{4}-\d{2}-\d{2})(T\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})?)?$/
+        if (isoDateRegex.test(value) && value.includes('T')) {
+          // Criar Date object para converter para timezone local
+          const date = new Date(value)
+          
+          // Verificar se a data é válida
+          if (!isNaN(date.getTime())) {
+            // Extrair partes da data local
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            
+            // Formatar baseado no locale
+            if (loc === 'pt-BR') {
+              // Formato brasileiro: DD/MM/YYYY
+              return `${day}/${month}/${year}`
+            } else {
+              // Formato americano: MM/DD/YYYY
+              return `${month}/${day}/${year}`
+            }
+          }
+        }
+      } else if (value instanceof Date) {
+        // Se for objeto Date, converter para formato local
+        if (!isNaN(value.getTime())) {
+          const year = value.getFullYear()
+          const month = String(value.getMonth() + 1).padStart(2, '0')
+          const day = String(value.getDate()).padStart(2, '0')
+          
+          // Formatar baseado no locale
+          if (loc === 'pt-BR') {
+            return `${day}/${month}/${year}`
+          } else {
+            return `${month}/${day}/${year}`
+          }
         }
       }
       
-      // Se não estiver no formato esperado, retornar como está
-      return value
+      // Se não estiver em um formato suportado, retornar vazio
+      return ''
     } else if (type === 'datetime-local') {
       // Formato: DD/MM/YYYY HH:mm para pt-BR, MM/DD/YYYY HH:mm para en-US
-      // Verificar se está no formato YYYY-MM-DDTHH:mm ou YYYY-MM-DDTHH:mm:ss
-      if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(value)) {
-        // Separar parte da data e parte do tempo
-        const [datePart, timePart] = value.split('T')
+      // Aceitar formatos de entrada controlados; se não bater em nenhum, retornar vazio
+      if (typeof value === 'string') {
+        // 1) Formato nativo do input datetime-local: YYYY-MM-DDTHH:mm ou YYYY-MM-DDTHH:mm:ss (sem timezone)
+        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(value)) {
+          // Separar parte da data e parte do tempo
+          const [datePart, timePart] = value.split('T')
+          
+          // Separar ano, mês e dia
+          const [year, month, day] = datePart.split('-')
+          
+          // Formatar baseado no locale
+          if (loc === 'pt-BR') {
+            // Formato brasileiro: DD/MM/YYYY HH:mm
+            return `${day}/${month}/${year} ${timePart}`
+          } else {
+            // Formato americano: MM/DD/YYYY HH:mm
+            return `${month}/${day}/${year} ${timePart}`
+          }
+        }
         
-        // Separar ano, mês e dia
-        const [year, month, day] = datePart.split('-')
-        
-        // Formatar baseado no locale
-        if (loc === 'pt-BR') {
-          // Formato brasileiro: DD/MM/YYYY HH:mm
-          return `${day}/${month}/${year} ${timePart}`
-        } else {
-          // Formato americano: MM/DD/YYYY HH:mm
-          return `${month}/${day}/${year} ${timePart}`
+        // 2) Formato ISO completo com timezone (ex: 2026-01-09T21:07:50.624+00:00)
+        // Regex para aceitar: YYYY-MM-DDTHH:mm(:ss[.SSS])?(Z|+/-HH:mm)
+        const isoRegex = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?)(?:Z|[+-]\d{2}:\d{2})?$/
+        if (isoRegex.test(value)) {
+          // Criar Date object para converter para timezone local
+          const date = new Date(value)
+          
+          // Verificar se a data é válida
+          if (!isNaN(date.getTime())) {
+            // Extrair partes da data local
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            const hours = String(date.getHours()).padStart(2, '0')
+            const minutes = String(date.getMinutes()).padStart(2, '0')
+            const seconds = String(date.getSeconds()).padStart(2, '0')
+            
+            // Formatar baseado no locale
+            if (loc === 'pt-BR') {
+              // Formato brasileiro: DD/MM/YYYY HH:mm:ss
+              return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
+            } else {
+              // Formato americano: MM/DD/YYYY HH:mm:ss
+              return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`
+            }
+          }
         }
       }
       
-      // Se não estiver no formato esperado, retornar como está
-      return value
+      // Se não estiver em um formato suportado, considerar como vazio
+      return ''
     } else if (type === 'month') {
       // Formato: MM/YYYY para pt-BR, MM/YYYY para en-US (mesmo formato)
       // Verificar se está no formato YYYY-MM
@@ -1091,6 +1699,7 @@ const Calendar = defineAsyncComponent(() =>
   const calendarPosition = ref({ top: 0, left: 0 }) // Posição do calendário na tela
   const inputRef = ref(null) // Referência ao elemento input
   const calendarRef = ref(null) // Referência ao elemento do calendário
+  const useCustomCalendar = ref(true) // Flag para usar calendário customizado
   
   /*
     Computed para determinar se deve usar calendário customizado
@@ -1128,7 +1737,7 @@ const Calendar = defineAsyncComponent(() =>
     const inputReadonlyValue = !inputReadonly.value ? false : inputReadonly.value
     const inputTypeValue = !inputType.value ? 'date' : inputType.value
     const inputUppercaseValue = !inputUppercase.value ? false : inputUppercase.value
-    const themeValue = !theme.value ? 'normal' : theme.value
+    const themeValue = !theme.value ? 'light' : theme.value
     const textAlignValue = !textAlign.value ? 'left' : textAlign.value
     const inputStyleValue = !inputStyle.value ? 'background' : inputStyle.value
   
@@ -1139,7 +1748,9 @@ const Calendar = defineAsyncComponent(() =>
     const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
     const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
     const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
-    const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? -10 : labelActiveLeft.value
+    const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
+    const labelRightValue = (labelRight.value === null || labelRight.value === undefined) ? 0 : labelRight.value
+    const labelActiveRightValue = (labelActiveRight.value === null || labelActiveRight.value === undefined) ? 0 : labelActiveRight.value
     const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
     const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
     const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
@@ -1181,6 +1792,8 @@ const Calendar = defineAsyncComponent(() =>
       inputLabelMarginActive: inputLabelMarginActiveValue,
       labelActiveTop: labelActiveTopValue,
       labelActiveLeft: labelActiveLeftValue,
+      labelRight: labelRightValue,
+      labelActiveRight: labelActiveRightValue,
       fontFamilyLabel: fontFamilyLabelValue,
       fontSizeLabel: fontSizeLabelValue,
       fontSizeLabelActive: fontSizeLabelActiveValue,
@@ -1208,9 +1821,15 @@ const Calendar = defineAsyncComponent(() =>
   */
   const wrapperStyle = computed(() => {
       const defaultValues = formatDefaultValues.value
-  
+
       return {
-          display: defaultValues.display
+        display: defaultValues.display,
+        // Adiciona padding-top quando o label está ativo para evitar que seja cortado
+        // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+        paddingTop: '0px',
+        // overflow do label fica no .component (componentStyle): se hidden for aqui, corta
+        // .component__message com position fora do fluxo (irmão do .component dentro do wrapper)
+        overflow: 'visible',
       }
   })
   /*
@@ -1251,8 +1870,10 @@ const Calendar = defineAsyncComponent(() =>
     const isActive = isLabelActive.value
   
       return {
-          fontWeight: defaultValues.fontWeight,
-          marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
+        fontWeight: defaultValues.fontWeight,
+        marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
+        // Mesma regra que antes estava no wrapper: esconde label inativo; não afeta .component__message
+		    overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden',
       }
   })
   /*
@@ -1599,11 +2220,22 @@ const Calendar = defineAsyncComponent(() =>
       color: defaultValues.theme === 'dark' ? darkTextColorLabel : lightTextColorLabel,
       top: isActive ? `${defaultValues.labelActiveTop}px` : '50%',
       left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
+      right: isActive ? `${defaultValues.labelActiveRight}px` : `${defaultValues.labelRight}px`,
       transform: isActive ? 'translateY(0)' : 'translateY(-50%)',
       transition: 'all 0.2s ease',
       backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
       padding: isActive ? defaultValues.labelPadding : '0',
       borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
+      // Se labelBreakOnActive for true (padrão), usa ellipsis quando ativo. Se false, quebra linha
+      ...(isActive ? {
+        width: 'fit-content',
+        whiteSpace: !labelBreakOnActive.value ? 'normal' : 'nowrap',
+        wordWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+        overflowWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+        maxWidth: '100%',
+        textOverflow: labelBreakOnActive.value ? 'ellipsis' : 'clip',
+        overflow: labelBreakOnActive.value ? 'hidden' : 'visible',
+      } : {}),
     }
   })
 
@@ -1633,8 +2265,8 @@ const Calendar = defineAsyncComponent(() =>
     Esta função é usada para processar quando o usuário interage com o componente.
     Ela emite o evento clicked.
   */
-  const interacted = () => {
-      emit('clicked')
+  const interacted = (event) => {
+      emit('clicked', event)
   }
   /*
     Handler para quando o label é clicado
@@ -1675,6 +2307,19 @@ const Calendar = defineAsyncComponent(() =>
     if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
   
     emit('entered', inputValue.value)
+  }
+
+  const handlePaste = async (event) => {
+    // Capturar o valor do clipboard
+    const pastedValue = event.clipboardData?.getData('text') || ''
+    
+    // Sempre emitir o evento
+    emit('paste', pastedValue)
+    
+    // Bloquear o paste se blockPaste for true
+    if (blockPaste.value) {
+      event.preventDefault()
+    }
   }
   
   /*
@@ -1862,6 +2507,505 @@ const Calendar = defineAsyncComponent(() =>
     // Retornar a data no formato YYYY-MM-DD
     return `${year}-${month}-${day}`
   }
+  
+  /*
+    Função para validar se um valor é um formato de data válido para input-type="date"
+    Aceita:
+    - String no formato YYYY-MM-DD (formato nativo do input date)
+    - String ISO com timezone (ex: 2026-01-09T00:00:00.000Z ou 2026-01-09T00:00:00+00:00)
+    - Objeto Date
+    - null/undefined (considerados como vazios, não inválidos)
+    Retorna true se o valor é válido, false caso contrário
+  */
+  const isValidDateValue = (value) => {
+    // null/undefined são considerados vazios (válidos, mas sem valor)
+    if (value === null || value === undefined || value === '') return true
+    
+    // Se for objeto Date, verificar se é válido
+    if (value instanceof Date) {
+      return !isNaN(value.getTime())
+    }
+    
+    // Se for string, verificar formatos aceitos
+    if (typeof value === 'string') {
+      // Formato nativo: YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        // Validar se a data é válida (ex: não aceitar 2026-13-45)
+        const [year, month, day] = value.split('-').map(Number)
+        const date = new Date(year, month - 1, day)
+        return date.getFullYear() === year && 
+               date.getMonth() === month - 1 && 
+               date.getDate() === day
+      }
+      
+      // Formato ISO com timezone (ex: 2026-01-09T00:00:00.000Z ou 2026-01-09T00:00:00+00:00)
+      // Aceitar qualquer parte de tempo, desde que tenha a data
+      const isoDateRegex = /^(\d{4}-\d{2}-\d{2})(T\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})?)?$/
+      if (isoDateRegex.test(value) && value.includes('T')) {
+        const date = new Date(value)
+        return !isNaN(date.getTime())
+      }
+    }
+    
+    return false
+  }
+  
+  /*
+    Função para normalizar um valor de data para o formato YYYY-MM-DD
+    Aceita os mesmos formatos que isValidDateValue
+    Retorna string no formato YYYY-MM-DD ou string vazia se inválido ou vazio
+  */
+  const normalizeDateValue = (value) => {
+    // null/undefined são tratados como vazios (retornam string vazia)
+    if (value === null || value === undefined || value === '') return ''
+    
+    // Se for objeto Date, converter para YYYY-MM-DD
+    if (value instanceof Date) {
+      if (isNaN(value.getTime())) return ''
+      return dateToISOString(value)
+    }
+    
+    // Se for string, processar
+    if (typeof value === 'string') {
+      // Formato nativo: YYYY-MM-DD - manter como está
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        // Validar se a data é válida
+        const [year, month, day] = value.split('-').map(Number)
+        const date = new Date(year, month - 1, day)
+        if (date.getFullYear() === year && 
+            date.getMonth() === month - 1 && 
+            date.getDate() === day) {
+          return value
+        }
+        return '' // Data inválida
+      }
+      
+      // Formato ISO com timezone - converter para timezone local e depois para YYYY-MM-DD
+      const isoDateRegex = /^(\d{4}-\d{2}-\d{2})(T\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})?)?$/
+      if (isoDateRegex.test(value)) {
+        const date = new Date(value)
+        if (!isNaN(date.getTime())) {
+          return dateToISOString(date)
+        }
+        return ''
+      }
+    }
+    
+    // Se não for nenhum formato aceito, retornar vazio
+    return ''
+  }
+  
+  /*
+    Função para parsear data mínima ou máxima
+    Esta função é usada para parsear uma data mínima ou máxima a partir de diferentes formatos.
+  */
+  const parseMinMaxDate = (value) => {
+    if (!value) return null
+    if (value instanceof Date) {
+      const date = new Date(value.getTime())
+      date.setHours(0, 0, 0, 0)
+      return date
+    }
+    if (typeof value === 'string') {
+      // Para strings no formato YYYY-MM-DD, criar data local (não UTC)
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        const [year, month, day] = value.split('-').map(Number)
+        const date = new Date(year, month - 1, day)
+        date.setHours(0, 0, 0, 0)
+        return date
+      }
+      // Para outros formatos, tentar parse normal
+      const date = new Date(value)
+      if (!isNaN(date.getTime())) {
+        date.setHours(0, 0, 0, 0)
+        return date
+      }
+    }
+    return null
+  }
+  
+  /*
+    Função para parsear tempo mínimo ou máximo
+    Esta função é usada para parsear um tempo mínimo ou máximo a partir de diferentes formatos.
+  */
+  const parseTimeMinMax = (value) => {
+    if (!value) return null
+    
+    // Se for objeto Date, extrair hora, minuto e segundo
+    if (value instanceof Date && !isNaN(value.getTime())) {
+      const hour = value.getHours()
+      const minute = value.getMinutes()
+      const second = value.getSeconds()
+      
+      // Validar valores
+      if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59) {
+        return { hour, minute, second }
+      }
+    }
+    
+    // Se for string, processar
+    if (typeof value === 'string') {
+      // Para datetime-local, pode estar no formato YYYY-MM-DDTHH:mm ou YYYY-MM-DDTHH:mm:ss
+      // Extrair apenas a parte do tempo
+      let timePart = value
+      
+      // Se contém 'T', separar data e hora
+      if (value.includes('T')) {
+        const parts = value.split('T')
+        if (parts.length === 2) {
+          timePart = parts[1]
+        }
+      }
+      
+      // Formato HH:mm ou HH:mm:ss
+      const timeRegex = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/
+      const match = timePart.match(timeRegex)
+      
+      if (match) {
+        const hour = parseInt(match[1], 10)
+        const minute = parseInt(match[2], 10)
+        const second = match[3] ? parseInt(match[3], 10) : 0
+        
+        // Validar valores
+        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59) {
+          return { hour, minute, second }
+        }
+      }
+    }
+    
+    return null
+  }
+  
+  /*
+    Função para verificar se uma data está desabilitada (fora do range min/max)
+    Esta função é usada para verificar se uma data está dentro do range permitido.
+  */
+  const isDateDisabled = (dateValue) => {
+    if (!dateValue) return false
+    
+    // Converter para Date se for string
+    let date = null
+    if (dateValue instanceof Date) {
+      date = new Date(dateValue.getTime())
+      date.setHours(0, 0, 0, 0)
+    } else if (typeof dateValue === 'string') {
+      // Formato YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+        const [year, month, day] = dateValue.split('-').map(Number)
+        date = new Date(year, month - 1, day)
+        date.setHours(0, 0, 0, 0)
+      } else {
+        // Tentar parse normal
+        date = new Date(dateValue)
+        if (!isNaN(date.getTime())) {
+          date.setHours(0, 0, 0, 0)
+        } else {
+          return true // Data inválida
+        }
+      }
+    }
+    
+    if (!date || isNaN(date.getTime())) return true
+    
+    // Verificar min (datas antes do min são desabilitadas)
+    const minDate = parseMinMaxDate(min.value)
+    if (minDate) {
+      const normalizedMin = new Date(minDate.getTime())
+      normalizedMin.setHours(0, 0, 0, 0)
+      if (date < normalizedMin) {
+        return true
+      }
+    }
+    
+    // Verificar max (datas depois do max são desabilitadas)
+    const maxDate = parseMinMaxDate(max.value)
+    if (maxDate) {
+      const normalizedMax = new Date(maxDate.getTime())
+      normalizedMax.setHours(0, 0, 0, 0)
+      if (date > normalizedMax) {
+        return true
+      }
+    }
+    
+    return false
+  }
+  
+  /*
+    Função para verificar se um tempo está desabilitado (fora do range min/max)
+    Esta função é usada para verificar se um tempo está dentro do range permitido.
+  */
+  const isTimeDisabled = (hour, minute, second = 0) => {
+    // Converter tempo para segundos
+    const timeInSeconds = hour * 3600 + minute * 60 + second
+    
+    // Verificar min (tempos antes do min são desabilitados)
+    const timeMin = parseTimeMinMax(min.value)
+    if (timeMin) {
+      const minTime = timeMin.hour * 3600 + timeMin.minute * 60 + (timeMin.second || 0)
+      if (timeInSeconds < minTime) {
+        return true
+      }
+    }
+    
+    // Verificar max (tempos depois do max são desabilitados)
+    const timeMax = parseTimeMinMax(max.value)
+    if (timeMax) {
+      const maxTime = timeMax.hour * 3600 + timeMax.minute * 60 + (timeMax.second || 0)
+      if (timeInSeconds > maxTime) {
+        return true
+      }
+    }
+    
+    return false
+  }
+  
+  /*
+    Função para verificar se um valor de data está em formato válido
+    Esta função verifica se o valor está em um formato válido antes de verificar min/max.
+  */
+  const isValidDateFormat = (value, type) => {
+    if (!value || value === '') return true // Vazio é válido
+    
+    if (type === 'date') {
+      // Formato YYYY-MM-DD
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+      const [year, month, day] = value.split('-').map(Number)
+      const date = new Date(year, month - 1, day)
+      return date.getFullYear() === year && 
+             date.getMonth() === month - 1 && 
+             date.getDate() === day
+    } else if (type === 'time') {
+      // Formato HH:mm ou HH:mm:ss
+      const timeRegex = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/
+      const match = value.match(timeRegex)
+      if (!match) return false
+      const hour = parseInt(match[1], 10)
+      const minute = parseInt(match[2], 10)
+      const second = match[3] ? parseInt(match[3], 10) : 0
+      return hour >= 0 && hour <= 23 && 
+             minute >= 0 && minute <= 59 && 
+             second >= 0 && second <= 59
+    } else if (type === 'datetime-local') {
+      // Formato YYYY-MM-DDTHH:mm ou YYYY-MM-DDTHH:mm:ss
+      const parts = value.split('T')
+      if (parts.length !== 2) return false
+      const datePart = parts[0]
+      const timePart = parts[1]
+      return isValidDateFormat(datePart, 'date') && isValidDateFormat(timePart, 'time')
+    } else if (type === 'month') {
+      // Formato YYYY-MM
+      if (!/^\d{4}-\d{2}$/.test(value)) return false
+      const [year, month] = value.split('-').map(Number)
+      return year >= 1900 && year <= 2100 && month >= 1 && month <= 12
+    } else if (type === 'week') {
+      // Formato YYYY-Www (ex: 2024-W01)
+      if (!/^\d{4}-W\d{2}$/.test(value)) return false
+      const [year, week] = value.split('-W').map(Number)
+      return year >= 1900 && year <= 2100 && week >= 1 && week <= 53
+    }
+    
+    return false
+  }
+  
+  /*
+    Função para verificar se o valor atual é válido e emitir evento valid
+    Esta função é usada para verificar se o valor atual (data, tempo ou datetime) está dentro do range permitido.
+    Ela emite o evento 'valid' com true ou false.
+    
+    IMPORTANTE: Valida o inputText.value original, não o inputValue.value normalizado.
+    Se o inputText.value for inválido e foi normalizado para '', ainda deve ser considerado inválido.
+  */
+  const checkAndEmitValid = () => {
+    let isValid = true
+    
+    // Verificar se o valor está vazio (null, undefined ou string vazia)
+    const isEmpty = inputText.value === null || inputText.value === undefined || inputText.value === ''
+    
+    if (isEmpty) {
+      // Se o campo é obrigatório (required=true), valor vazio é inválido
+      // Se o campo não é obrigatório (required=false), valor vazio é válido (campo opcional)
+      isValid = !required.value
+      emit('valid', isValid)
+      return
+    }
+    
+    // PRIMEIRO: Verificar se o formato do valor ORIGINAL (inputText) é válido
+    // Se o valor original não pode ser normalizado, é inválido
+    if (inputType.value === 'date') {
+      // Para date, verificar se o valor original pode ser normalizado
+      const normalized = normalizeDateValue(inputText.value)
+      if (normalized === '' && inputText.value !== '' && inputText.value !== null && inputText.value !== undefined) {
+        // Valor original não era vazio mas foi normalizado para vazio = inválido
+        emit('valid', false)
+        return
+      }
+      // Se normalizado para vazio e original era vazio, é válido (já tratado acima)
+      if (normalized === '') {
+        emit('valid', true)
+        return
+      }
+      // Verificar formato do valor normalizado
+      if (!isValidDateFormat(normalized, inputType.value)) {
+        emit('valid', false)
+        return
+      }
+      // Verificar min/max
+      isValid = !isDateDisabled(normalized)
+    } else if (inputType.value === 'time') {
+      // Para time, verificar formato diretamente
+      if (!isValidDateFormat(inputText.value, inputType.value)) {
+        emit('valid', false)
+        return
+      }
+      // Se formato válido, verificar min/max
+      const timeParts = inputText.value.split(':')
+      if (timeParts.length >= 2) {
+        const hour = parseInt(timeParts[0], 10) || 0
+        const minute = parseInt(timeParts[1], 10) || 0
+        const second = timeParts[2] ? parseInt(timeParts[2], 10) : 0
+        isValid = !isTimeDisabled(hour, minute, second)
+      }
+    } else if (inputType.value === 'datetime-local') {
+      // Para datetime-local, verificar se o valor original pode ser normalizado
+      let normalized = inputText.value
+      if (typeof inputText.value === 'string') {
+        const plainRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/
+        const isoRegex = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?)(?:Z|[+-]\d{2}:\d{2})?$/
+        
+        if (!plainRegex.test(inputText.value) && !isoRegex.test(inputText.value)) {
+          // Valor não está em formato válido
+          emit('valid', false)
+          return
+        }
+        
+        if (isoRegex.test(inputText.value)) {
+          const date = new Date(inputText.value)
+          if (isNaN(date.getTime())) {
+            emit('valid', false)
+            return
+          }
+        }
+      } else if (inputText.value !== null && inputText.value !== undefined && inputText.value !== '') {
+        // Tipo inválido para datetime-local
+        emit('valid', false)
+        return
+      }
+      
+      // Se chegou aqui, formato é válido, verificar min/max usando inputValue normalizado
+      if (inputValue.value) {
+        const parts = inputValue.value.split('T')
+        if (parts.length === 2) {
+          const datePart = parts[0]
+          const timePart = parts[1]
+          
+          // Verificar data
+          const dateValid = !isDateDisabled(datePart)
+          
+          // Verificar tempo
+          const timeParts = timePart.split(':')
+          let timeValid = true
+          if (timeParts.length >= 2) {
+            const hour = parseInt(timeParts[0], 10) || 0
+            const minute = parseInt(timeParts[1], 10) || 0
+            const second = timeParts[2] ? parseInt(timeParts[2], 10) : 0
+            timeValid = !isTimeDisabled(hour, minute, second)
+          }
+          
+          isValid = dateValid && timeValid
+        }
+      }
+    } else if (inputType.value === 'month') {
+      // Para month, verificar formato
+      if (!isValidDateFormat(inputText.value, inputType.value)) {
+        emit('valid', false)
+        return
+      }
+      // Verificar min/max (se houver)
+      isValid = !isDateDisabled(inputText.value + '-01') // Adicionar dia para verificar
+    } else if (inputType.value === 'week') {
+      // Para week, verificar formato
+      if (!isValidDateFormat(inputText.value, inputType.value)) {
+        emit('valid', false)
+        return
+      }
+      // Para week, não verificamos min/max por enquanto (pode ser implementado depois)
+      isValid = true
+    }
+    
+    // Emitir evento valid
+    emit('valid', isValid)
+  }
+  
+  /*
+    Handler para quando o Calendar emite evento valid
+    Esta função repassa o evento valid do Calendar para o componente pai.
+  */
+  const handleCalendarValid = (isValid) => {
+    emit('valid', isValid)
+  }
+  
+  /*
+    Handler para quando o Calendar emite evento month-changed
+    Esta função repassa o evento month-changed do Calendar para o componente pai.
+  */
+  const handleCalendarMonthChanged = (data) => {
+    emit('month-changed', data)
+  }
+  
+  /*
+    Função auxiliar para converter Date para string no formato correto baseado no inputType
+    Esta função é usada para converter objetos Date para strings no formato esperado pelo input HTML.
+    Para date: YYYY-MM-DD
+    Para time: HH:mm ou HH:mm:ss
+    Para datetime-local: YYYY-MM-DDTHH:mm ou YYYY-MM-DDTHH:mm:ss
+  */
+  const dateToInputString = (date, type) => {
+    // Se não for Date, retornar como está (já é string)
+    if (!date || !(date instanceof Date)) return date || ''
+    
+    if (type === 'date') {
+      return dateToISOString(date)
+    } else if (type === 'time') {
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${hours}:${minutes}:${seconds}`
+    } else if (type === 'datetime-local') {
+      const datePart = dateToISOString(date)
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${datePart}T${hours}:${minutes}:${seconds}`
+    } else if (type === 'month') {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      return `${year}-${month}`
+    } else if (type === 'week') {
+      // Para week, precisamos calcular a semana ISO
+      // Por enquanto, retornar apenas a data
+      return dateToISOString(date)
+    }
+    
+    // Se não for nenhum tipo conhecido, retornar string vazia
+    return ''
+  }
+  
+  // Computed properties para converter min/max para string quando necessário (input nativo)
+  const nativeMin = computed(() => {
+    if (shouldUseCustomCalendar.value) return undefined
+    return dateToInputString(min.value, inputType.value)
+  })
+  
+  const nativeMax = computed(() => {
+    if (shouldUseCustomCalendar.value) return undefined
+    return dateToInputString(max.value, inputType.value)
+  })
+  
+  // Computed para tornar o input readonly quando está usando calendário customizado
+  // Isso força o usuário a usar o calendário para selecionar valores, garantindo validação correta
+  const shouldBlockInputEdit = computed(() => {
+    return true
+  })
   
   /*
     Handler para quando o calendário emite evento changed
@@ -2223,11 +3367,13 @@ const Calendar = defineAsyncComponent(() =>
   /*
     Handler para quando o calendário emite evento date-selected
     Esta função é usada para processar eventos de seleção de data do calendário.
-    Por enquanto, apenas sincroniza via handleCalendarChanged, mas pode ser usado para lógica adicional se necessário.
+    Emite os eventos changed-complete e current-value-complete com os dados completos do calendário.
   */
   const handleCalendarDateSelected = (data) => {
-    // Pode ser usado para lógica adicional se necessário
-    // Por enquanto, apenas sincroniza via handleCalendarChanged
+    // Emitir evento changed-complete com os dados completos do calendário
+    emit('changed-complete', data)
+    // Emitir evento current-value-complete (mesmo valor, nome diferente para compatibilidade)
+    emit('current-value-complete', data)
   }
   
   /*
@@ -2500,8 +3646,55 @@ const Calendar = defineAsyncComponent(() =>
   })
   
   onMounted(() => {
-    // Atualizar o inputValue com o valor do inputText
-    inputValue.value = inputText.value
+    let initialValue = inputText.value
+
+    // Normalizar/validar valor inicial específico para date
+    if (inputType.value === 'date') {
+      initialValue = normalizeDateValue(inputText.value)
+    }
+    // Normalizar/validar valor inicial específico para datetime-local
+    else if (inputType.value === 'datetime-local') {
+      // null/undefined são tratados como vazios (não limpos)
+      if (inputText.value === null || inputText.value === undefined || inputText.value === '') {
+        initialValue = ''
+      } else if (typeof inputText.value === 'string') {
+        const plainRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/
+        const isoRegex = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?)(?:Z|[+-]\d{2}:\d{2})?$/
+
+        if (plainRegex.test(inputText.value)) {
+          // Já está no formato esperado pelo input
+          initialValue = inputText.value
+        } else if (isoRegex.test(inputText.value)) {
+          const date = new Date(inputText.value)
+          if (!isNaN(date.getTime())) {
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            const hours = String(date.getHours()).padStart(2, '0')
+            const minutes = String(date.getMinutes()).padStart(2, '0')
+            const seconds = String(date.getSeconds()).padStart(2, '0')
+
+            const timePart = inputText.value.split('T')[1]?.split(/[Z+-]/)[0] || ''
+            const hasSeconds = timePart.includes(':') && timePart.split(':').length >= 3
+            initialValue = hasSeconds
+              ? `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+              : `${year}-${month}-${day}T${hours}:${minutes}`
+          } else {
+            // Data inválida -> limpar
+            initialValue = ''
+          }
+        } else {
+          // String que não representa um datetime-local/ISO suportado -> limpar
+          initialValue = ''
+        }
+      } else {
+        // Qualquer outro tipo não é aceito para datetime-local
+        initialValue = ''
+      }
+    }
+    
+    // Atualizar o inputValue com o valor normalizado/validado
+    inputValue.value = initialValue
 
     // Inicializar displayValue com formato formatado
     displayValue.value = formatDisplayValue(inputText.value, inputType.value)
@@ -2514,6 +3707,11 @@ const Calendar = defineAsyncComponent(() =>
 
     // Adicionar evento de resize para recalcular a posição do calendário
     window.addEventListener('resize', handleResize)
+    
+    // Verificar e emitir validade do valor inicial
+    nextTick(() => {
+      checkAndEmitValid()
+    })
   })
   
   onUnmounted(() => {
@@ -2557,20 +3755,100 @@ const Calendar = defineAsyncComponent(() =>
     Esta função é usada para atualizar o inputValue e displayValue quando o inputText mudar.
     Ela atualiza o inputValue com o valor do inputText e o displayValue com o valor do inputText formatado.
   */
+  /*
+    Wrapper para formatISOString usando função utilitária com prop
+  */
+  const formatISOString = (date) => {
+    return formatISOStringUtil(date, props.calendarIsoStringTimezoneFormat)
+  }
+
+  /*
+    Função para construir objeto completo a partir do inputText usando função utilitária
+  */
+  const buildCompleteDataFromInputText = (value) => {
+    return buildCompleteDataFromInputTextUtil(value, {
+      inputType: inputType.value,
+      hasSeconds: props.hasSeconds,
+      allowRange: allowRange.value,
+      timezoneFormat: props.calendarIsoStringTimezoneFormat,
+      locale: props.calendarLocale
+    })
+  }
+
   watch(inputText, value => {
-    // Verificar se o valor do inputText é diferente do inputValue
+      // Verificar se o valor do inputText é diferente do inputValue
     if (value !== inputValue.value) {
-      // Atualizar o inputValue com o valor do inputText
-      inputValue.value = value
+      let nextValue = value
+
+      // Para date, normalizar ou limpar o valor se não for suportado
+      if (inputType.value === 'date') {
+        nextValue = normalizeDateValue(value)
+      }
+      // Para datetime-local, normalizar ou limpar o valor se não for suportado
+      else if (inputType.value === 'datetime-local') {
+        // null/undefined são tratados como vazios (não limpos)
+        if (value === null || value === undefined || value === '') {
+          nextValue = ''
+        } else if (typeof value === 'string') {
+          const plainRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/
+          const isoRegex = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?)(?:Z|[+-]\d{2}:\d{2})?$/
+
+          if (plainRegex.test(value)) {
+            // Já está no formato nativo do input, manter como está
+            nextValue = value
+          } else if (isoRegex.test(value)) {
+            // ISO com timezone -> converter para datetime-local no timezone local
+            const date = new Date(value)
+            if (!isNaN(date.getTime())) {
+              const year = date.getFullYear()
+              const month = String(date.getMonth() + 1).padStart(2, '0')
+              const day = String(date.getDate()).padStart(2, '0')
+              const hours = String(date.getHours()).padStart(2, '0')
+              const minutes = String(date.getMinutes()).padStart(2, '0')
+              const seconds = String(date.getSeconds()).padStart(2, '0')
+
+              const timePart = value.split('T')[1]?.split(/[Z+-]/)[0] || ''
+              const hasSeconds = timePart.includes(':') && timePart.split(':').length >= 3
+              nextValue = hasSeconds
+                ? `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+                : `${year}-${month}-${day}T${hours}:${minutes}`
+            } else {
+              // Data inválida -> limpar
+              nextValue = ''
+            }
+          } else {
+            // String que não é um datetime-local/ISO válido -> limpar
+            nextValue = ''
+          }
+        } else {
+          // Qualquer outro tipo não é aceito para datetime-local
+          nextValue = ''
+        }
+      }
+
+      // Atualizar o inputValue com o valor normalizado/validado
+      inputValue.value = nextValue
       
       // Atualizar o displayValue com o valor do inputText formatado
       const formatted = formatDisplayValue(value, inputType.value)
       
       // Atualizar o lastValidDisplayValue com o valor do inputText formatado
       displayValue.value = formatted
+      
+      // Verificar e emitir validade após normalização
+      nextTick(() => {
+        checkAndEmitValid()
+      })
 
       // Atualizar o lastValidDisplayValue com o valor do inputText formatado
       lastValidDisplayValue.value = formatted
+
+      // Emitir eventos changed-complete e current-value-complete quando inputText muda
+      const completeData = buildCompleteDataFromInputText(nextValue)
+      if (completeData) {
+        emit('changed-complete', completeData)
+        emit('current-value-complete', completeData)
+      }
     }
   }, { immediate: true })
 
@@ -2706,6 +3984,18 @@ const Calendar = defineAsyncComponent(() =>
   
     // Emitir o evento current-value com o valor
     emit('current-value', value)
+    
+    // Verificar e emitir validade quando o valor muda
+    nextTick(() => {
+      checkAndEmitValid()
+    })
+  })
+  
+  // Watch para min e max - quando mudarem, revalidar o valor atual
+  watch([min, max], () => {
+    nextTick(() => {
+      checkAndEmitValid()
+    })
   })
   // Watch removido - date picker não precisa de lógica especial para password
   </script>
@@ -3055,18 +4345,15 @@ const Calendar = defineAsyncComponent(() =>
   
       .component__label {
         position: absolute;
-        top: 50%;
-        left: 0;
-        transform: translateY(-50%);
         z-index: 1;
-        transition: top 0.2s ease;
+        pointer-events: none;
+
+        .component__label--required {
+          color: red;
+          display: contents;
+        }
       }
   
-      &:has(.component__input:focus) .component__label,
-      &:has(.component__input:active) .component__label {
-        top: -10px;
-        transform: translateY(0);
-      }
   
       // inicio INPUT
       .component__input {
@@ -3182,6 +4469,19 @@ const Calendar = defineAsyncComponent(() =>
         // fim propUppercase
       }
       // fim INPUT
+  }
+
+  .component__extra-content {
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .component__extra-content--absolute {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 1;
   }
   
   .component__message {

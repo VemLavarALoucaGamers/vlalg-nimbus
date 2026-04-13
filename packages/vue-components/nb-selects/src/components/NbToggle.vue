@@ -3,6 +3,7 @@
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]"
+    :title="title"
   >
     <div
       :id="nbId"
@@ -22,7 +23,7 @@
           type="checkbox"
           :disabled="disabled"
           class="component-toggle__checkbox"
-          @change="handleChange"
+          @change="handleChange($event)"
         />
         <div
           :id="`toggle-switch-${nbId}`"
@@ -89,6 +90,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
   theme: {
     type: String,
@@ -233,10 +238,10 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-const handleChange = () => {
+const handleChange = (event) => {
   emit('changed', currentStatus.value)
   emit('current-value', currentStatus.value)
-  emit('clicked')
+  emit('clicked', event)
 }
 
 watch(value, (newValue) => {

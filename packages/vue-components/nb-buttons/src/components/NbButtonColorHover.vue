@@ -5,10 +5,11 @@
 		:style="[wrapperStyle]"
     :tabIndex="tabIndex"
     role="button"
+    :title="title"
     v-bind="computedAriaAttrs"
-    @click="interacted"
-    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
-    @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
+    @click="interacted($event)"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted($event)"
+    @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted($event)"
 	>
 		<div
 			:id="nbId"
@@ -64,6 +65,10 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  title: {
+    type: String,
+    default: ''
+  },
 	paddingX: {
 		type: Number,
 		default: 1,
@@ -106,6 +111,10 @@ const props = defineProps({
 		validator: value => {
 			return !value ? 700 : value
 		}
+	},
+	lineHeight: {
+		type: Number,
+		default: 1.42857143
 	},
 	theme: {
 		type: String,
@@ -169,6 +178,7 @@ const {
 	fontFamily,
 	fontSize,
 	fontWeight,
+	lineHeight,
 	theme,
 	lightButtonColor,
 	lightButtonColorHover,
@@ -189,8 +199,9 @@ const formatDefaultValues = computed(() => {
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.6rem' : fontSize.value
+	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
+	const lineHeightValue = ((lineHeight.value !== 0 && !lineHeight.value) || lineHeight.value < 0) ? 1.42857143 : lineHeight.value
 	const themeValue = !theme.value ? 'light' : theme.value
 
 	return {
@@ -199,6 +210,7 @@ const formatDefaultValues = computed(() => {
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
+		lineHeight: lineHeightValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
 		borderRadius: borderRadiusValue,
@@ -224,6 +236,7 @@ const componentStyle = computed(() => {
 	return {
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		borderRadius: `${defaultValues.borderRadius}rem`,
+		lineHeight: defaultValues.lineHeight,
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight
 	}
@@ -265,8 +278,8 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 </script>
 
@@ -306,7 +319,6 @@ const interacted = () => {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	line-height: 1.42857143;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -321,6 +333,10 @@ const interacted = () => {
 	-webkit-text-decoration-line: none;
 	text-decoration-line: none;
 	white-space: nowrap;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
 	text-transform: none;
 	padding: 0 14px;

@@ -5,10 +5,11 @@
 		:style="[wrapperStyle]"
     :tabIndex="tabIndex"
     role="button"
+    :title="title"
     v-bind="computedAriaAttrs"
-    @click="interacted"
-    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted()"
-    @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted()"
+    @click="interacted($event)"
+    @keydown.enter.prevent="!disabled && hasTabIndexEnter && interacted($event)"
+    @keydown.space.prevent="!disabled && hasTabIndexSpace && interacted($event)"
 	>
 		<div
 			:id="nbId"
@@ -64,6 +65,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	theme: {
 		type: String,
@@ -240,12 +245,12 @@ const computedAriaAttrs = computed(() => {
   )
 })
 
-const interacted = () => {
+const interacted = (event) => {
 	const status = !buttonStatus.value
 
 	buttonStatus.value = status
 
-	emit('clicked', status)
+	emit('clicked', status, event)
 }
 
 watch(status, () => {

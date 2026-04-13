@@ -4,20 +4,21 @@
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle, inputWidthStyle, borderRadiusStyle]"
     role="input"
+    :title="title"
     v-bind="computedAriaAttrs"
   >
     <div
       :id="nbId"
       :class="['nb-reset', 'component', themeStyle, componentReadonly, inputStyleClass]"
       :style="[componentStyle, inputWidthStyle, borderRadiusStyle]"
-      @click="interacted"
+      @click="interacted($event)"
     >
       <label
         v-if="showLabel"
         :for="computedInputName"
         class="component__label"
         :style="[styleLabel]"
-      >{{ label }}</label>
+      >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
 
       <textarea
         v-model="inputValue"
@@ -36,16 +37,22 @@
         :autocomplete="inputAutocomplete"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
         role="textbox"
-        :style="[borderRadiusStyle, textareaResizeStyle, textareaWrapStyle]"
+        :style="[borderRadiusStyle, textareaResizeStyle, textareaWrapStyle, textareaMinWidthStyle, textareaMaxWidthStyle, textareaMinHeightStyle, textareaMaxHeightStyle]"
         @focus="isActive = true"
         @blur="isActive = false"
         @input="handleCurrentValue"
         @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+        @paste="handlePaste"
       ></textarea>
     </div>
     <div
       v-if="validShowMsg"
-      :class="['component__message', hasCustomMsg ? 'component__message--custom' : 'component__message--default']"
+      :class="[
+        'component__message',
+        'component__extra-content',
+        hasCustomMsg ? 'component__message--custom' : 'component__message--default',
+        { 'component__extra-content--absolute': extraContendAbsolute },
+      ]"
     >
       <slot name="message">{{ message }}</slot>
     </div>
@@ -73,7 +80,8 @@ const emit = defineEmits([
   'focused',
   'blurred',
   'clicked',
-  'entered'
+  'entered',
+  'paste'
 ])
 
 const props = defineProps({
@@ -104,6 +112,10 @@ const props = defineProps({
   ariaAttrs: {
     type: Object,
     default: () => ({})
+  },
+  title: {
+    type: String,
+    default: ''
   },
 	textColor: { // TESTAR AINDA
 		type: String,
@@ -235,6 +247,10 @@ const props = defineProps({
   inputReadonly: {
     type: Boolean,
     default: false,
+  },
+  blockPaste: {
+    type: Boolean,
+    default: false,
     validator: value => {
 			return typeof value === 'boolean' && [true, false].includes(value)
     }
@@ -327,6 +343,13 @@ const props = defineProps({
       return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
+  extraContendAbsolute: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
   showLabel: {
     type: Boolean,
     default: false,
@@ -350,6 +373,13 @@ const props = defineProps({
 		type: Number,
 		default: 0
 	},
+  labelBreakOnActive: {
+    type: Boolean,
+    default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
   labelLeft: {
     type: Number,
     default: 5,
@@ -365,6 +395,14 @@ const props = defineProps({
   labelActiveLeft: {
     type: Number,
     default: 5,
+  },
+  labelRight: {
+    type: Number,
+    default: 0,
+  },
+  labelActiveRight: {
+    type: Number,
+    default: 0,
   },
   fontFamilyLabel: {
 		type: String,
@@ -464,6 +502,22 @@ const props = defineProps({
       return ['none', 'both', 'vertical', 'horizontal'].indexOf(value) !== -1
     },
   },
+  minWidth: { // Largura mínima do textarea
+    type: String,
+    default: 'auto',
+  },
+  maxWidth: { // Largura máxima do textarea
+    type: String,
+    default: 'auto',
+  },
+  minHeight: { // Altura mínima do textarea
+    type: String,
+    default: 'auto',
+  },
+  maxHeight: { // Altura máxima do textarea
+    type: String,
+    default: 'auto',
+  },
   autoResize: { // Redimensionamento automático
     type: Boolean,
     default: false,
@@ -511,6 +565,7 @@ const {
       inputStyle,
       activeTextStyle,
       inputReadonly,
+      blockPaste,
   hasTrim,
   inputUppercase,
   inputName,
@@ -529,14 +584,18 @@ const {
   textAlign,
     showMsg,
     hasMsg,
+    extraContendAbsolute,
     showLabel,
   labelBackground,
   labelPadding,
   labelBorderRadius,
+  labelBreakOnActive,
   labelLeft,
   inputLabelMarginActive,
   labelActiveTop,
   labelActiveLeft,
+  labelRight,
+  labelActiveRight,
   fontFamilyLabel,
   fontSizeLabel,
   fontSizeLabelActive,
@@ -553,6 +612,10 @@ const {
   spellcheck,
   autofocus,
   resize,
+  minWidth,
+  maxWidth,
+  minHeight,
+  maxHeight,
   autoResize,
   minRows,
   maxRows
@@ -581,7 +644,7 @@ const formatDefaultValues = computed(() => {
   const activeTextStyleValue = !activeTextStyle.value ? 'normal' : activeTextStyle.value
   const inputReadonlyValue = !inputReadonly.value ? false : inputReadonly.value
   const inputUppercaseValue = !inputUppercase.value ? false : inputUppercase.value
-  const themeValue = !theme.value ? 'normal' : theme.value
+  const themeValue = !theme.value ? 'light' : theme.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
   const inputStyleValue = !inputStyle.value ? 'background' : inputStyle.value
 
@@ -592,7 +655,9 @@ const formatDefaultValues = computed(() => {
   const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
   const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
   const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
-  const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? -10 : labelActiveLeft.value
+  const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
+  const labelRightValue = (labelRight.value === null || labelRight.value === undefined) ? 0 : labelRight.value
+  const labelActiveRightValue = (labelActiveRight.value === null || labelActiveRight.value === undefined) ? 0 : labelActiveRight.value
   const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
   const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
   const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
@@ -610,6 +675,10 @@ const formatDefaultValues = computed(() => {
   const spellcheckValue = spellcheck.value !== undefined ? spellcheck.value : 'default'
   const autofocusValue = autofocus.value !== undefined ? autofocus.value : false
   const resizeValue = resize.value && ['none', 'both', 'vertical', 'horizontal'].includes(resize.value) ? resize.value : 'vertical'
+  const minWidthValue = !minWidth.value ? 'auto' : minWidth.value
+  const maxWidthValue = !maxWidth.value ? 'auto' : maxWidth.value
+  const minHeightValue = !minHeight.value ? 'auto' : minHeight.value
+  const maxHeightValue = !maxHeight.value ? 'auto' : maxHeight.value
   const autoResizeValue = autoResize.value !== undefined ? autoResize.value : false
   const minRowsValue = minRows.value !== null && minRows.value > 0 ? minRows.value : null
   const maxRowsValue = maxRows.value !== null && maxRows.value > 0 ? maxRows.value : null
@@ -645,6 +714,8 @@ const formatDefaultValues = computed(() => {
     inputLabelMarginActive: inputLabelMarginActiveValue,
     labelActiveTop: labelActiveTopValue,
     labelActiveLeft: labelActiveLeftValue,
+    labelRight: labelRightValue,
+    labelActiveRight: labelActiveRightValue,
     fontFamilyLabel: fontFamilyLabelValue,
     fontSizeLabel: fontSizeLabelValue,
     fontSizeLabelActive: fontSizeLabelActiveValue,
@@ -661,6 +732,10 @@ const formatDefaultValues = computed(() => {
     spellcheck: spellcheckValue,
     autofocus: autofocusValue,
     resize: resizeValue,
+    minWidth: minWidthValue,
+    maxWidth: maxWidthValue,
+    minHeight: minHeightValue,
+    maxHeight: maxHeightValue,
     autoResize: autoResizeValue,
     minRows: minRowsValue,
     maxRows: maxRowsValue,
@@ -675,7 +750,13 @@ const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		display: defaultValues.display
+		display: defaultValues.display,
+		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
+    // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
+    paddingTop: '0px',
+		// overflow do label fica no .component (componentStyle): se hidden for aqui, corta
+		// .component__message com position fora do fluxo (irmão do .component dentro do wrapper)
+		overflow: 'visible',
 	}
 })
 const fontSizeStyle = computed(() => {
@@ -693,6 +774,13 @@ const componentStyle = computed(() => {
 	return {
 		fontWeight: defaultValues.fontWeight,
 		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
+		// Quando o label está ativo, define altura mínima igual ao input para alinhar baseline
+		// Mas permite que o textarea cresça quando há conteúdo
+		minHeight: isActive && showLabel.value ? '28px' : '28px',
+		height: isActive && showLabel.value ? 'auto' : '28px',
+		maxHeight: isActive && showLabel.value ? undefined : '28px',
+		// Mesma regra que antes estava no wrapper: esconde label inativo; não afeta .component__message
+		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden',
 	}
 })
 const borderRadiusStyle = computed(() => {
@@ -862,12 +950,22 @@ const styleLabel = computed(() => {
     fontWeight: defaultValues.fontWeightLabel,
     color: defaultValues.theme === 'dark' ? darkTextColorLabel : lightTextColorLabel,
     top: isActive ? `${defaultValues.labelActiveTop}px` : '50%',
-    left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
     transform: isActive ? 'translateY(0)' : 'translateY(-50%)',
+    left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
+    right: isActive ? `${defaultValues.labelActiveRight}px` : `${defaultValues.labelRight}px`,
     transition: 'all 0.2s ease',
     backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
     padding: isActive ? defaultValues.labelPadding : '0',
     borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
+    // Se labelBreakOnActive for true (padrão), usa ellipsis quando ativo. Se false, quebra linha
+    ...(isActive ? {
+      whiteSpace: !labelBreakOnActive.value ? 'normal' : 'nowrap',
+      wordWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+      overflowWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
+      maxWidth: '100%',
+      textOverflow: labelBreakOnActive.value ? 'ellipsis' : 'clip',
+      overflow: labelBreakOnActive.value ? 'hidden' : 'visible',
+    } : {}),
   }
 })
 const styleLabelActive = computed(() => {
@@ -918,18 +1016,76 @@ const textareaWrapStyle = computed(() => {
 
   return {}
 })
+const textareaMinWidthStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.minWidth === 'auto') {
+    return {}
+  }
+
+  return {
+    minWidth: defaultValues.minWidth
+  }
+})
+const textareaMaxWidthStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.maxWidth === 'auto') {
+    return {}
+  }
+
+  return {
+    maxWidth: defaultValues.maxWidth
+  }
+})
+const textareaMinHeightStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.minHeight === 'auto') {
+    return {}
+  }
+
+  return {
+    minHeight: defaultValues.minHeight
+  }
+})
+const textareaMaxHeightStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.maxHeight === 'auto') {
+    return {}
+  }
+
+  return {
+    maxHeight: defaultValues.maxHeight
+  }
+})
 const startValue = () => {
   inputValue.value = inputText.value
 }
 
-const interacted = () => {
-	emit('clicked')
+const interacted = (event) => {
+	emit('clicked', event)
 }
 const enterConfirm = () => {
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
 
   emit('entered', inputValue.value)
 }
+
+const handlePaste = async (event) => {
+  // Capturar o valor do clipboard
+  const pastedValue = event.clipboardData?.getData('text') || ''
+  
+  // Sempre emitir o evento
+  emit('paste', pastedValue)
+  
+  // Bloquear o paste se blockPaste for true
+  if (blockPaste.value) {
+    event.preventDefault()
+  }
+}
+
 const handleCurrentValue = () => {
   let value = inputValue.value
   if (hasTrim.value) value = value.trim()
@@ -967,6 +1123,7 @@ watch(inputValue, () => {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	vertical-align: bottom;
+	position: relative;
 }
 
 .nb-reset {
@@ -992,7 +1149,6 @@ watch(inputValue, () => {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	line-height: 1.42857143;
 	font-family: v-bind('font');
 
 	user-select: none;
@@ -1009,14 +1165,13 @@ watch(inputValue, () => {
 	white-space: nowrap;
   
   // Component style start below:
-  margin-bottom: 3px;
   text-align: left;
   position: relative;
   margin: 0;
   padding: 0;
-  height: 28px;
-  max-height: 28px;
+  min-height: 28px;
   display: inline-block;
+  line-height: 1.42857143;
 
 
     .component__input {
@@ -1274,17 +1429,14 @@ watch(inputValue, () => {
 
     .component__label {
       position: absolute;
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%);
       z-index: 1;
-      transition: top 0.2s ease;
-    }
+      pointer-events: none;
+      line-height: 1.42857143;
 
-    &:has(.component__input:focus) .component__label,
-    &:has(.component__input:active) .component__label {
-      top: -10px;
-      transform: translateY(0);
+      .component__label--required {
+        color: red;
+        display: contents;
+      }
     }
 
     // inicio TEXTAREA
@@ -1309,6 +1461,7 @@ watch(inputValue, () => {
       box-shadow: none;
       text-align: v-bind('textAlign');
       padding: v-bind('inputPadding');
+      margin: 0;
 
       &:focus,
       &:active {
@@ -1342,6 +1495,19 @@ watch(inputValue, () => {
       // fim propUppercase
     }
     // fim INPUT
+}
+
+.component__extra-content {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.component__extra-content--absolute {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 1;
 }
 
 .component__message {
