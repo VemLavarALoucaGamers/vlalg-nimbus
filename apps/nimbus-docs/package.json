@@ -27,8 +27,7 @@
     "@vlalg-nimbus/nb-buttons": "^5.0.3",
     "@vlalg-nimbus/nb-calendar": "^1.0.0",
     "@vlalg-nimbus/nb-images": "^2.0.3",
-    "@vlalg-nimbus/nb-inputs": "^8.0.6",
-    "vue-the-mask": "0.11.1",
+    "@vlalg-nimbus/nb-inputs": "^10.0.0",
     "@vlalg-nimbus/nb-loaders": "^1.0.3",
     "@vlalg-nimbus/nb-overlays": "^1.0.2",
     "@vlalg-nimbus/nb-pagination": "^1.0.0",
@@ -41,6 +40,7 @@
     "add": "^2.0.6",
     "sass": "^1.81.0",
     "vue-loader": "^17.4.2",
+    "vue-the-mask": "0.11.1",
     "yarn": "^1.22.22"
   },
   "config": {
