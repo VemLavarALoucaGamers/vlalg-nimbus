@@ -2160,6 +2160,10 @@ const removeAllFiles = () => {
   emit('current-value', [])
 }
 
+defineExpose({
+  clear: removeAllFiles,
+})
+
 /* Watch is active */
 watch(isActive, value => {
   if (value) {
