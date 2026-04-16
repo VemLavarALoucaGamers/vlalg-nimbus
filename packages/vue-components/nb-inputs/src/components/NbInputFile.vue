@@ -544,6 +544,17 @@ const props = defineProps({
       return typeof value === 'boolean' && [true, false].includes(value)
     },
   },
+  /**
+   * Quando `true` e existir `file-extension` / `file-extensions` ou `allowed-extensions`,
+   * acrescenta um segmento na linha de restrições com os tipos aceites (MIME/extensões).
+   */
+  showConstraintsAccept: {
+    type: Boolean,
+    default: true,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    },
+  },
   /** Remove foco do controle visível ao cancelar/fechar o seletor sem escolher arquivo. */
   blurOnDialogCancel: {
     type: Boolean,
@@ -916,6 +927,7 @@ const {
   showFilesCounter,
   locale,
   showConstraintsText,
+  showConstraintsAccept,
   blurOnDialogCancel,
   multipleFilesSelectedText,
   theme,
@@ -1015,6 +1027,7 @@ const DEFAULT_FILE_UI_LOCALE = {
   multipleFilesLimit: 'Multiple files',
   upToFilesLimit: 'Up to {max} files',
   maxSizePerFile: 'Max size per file: {size}',
+  acceptedLine: 'Accept: {accept} · Extensions: {extensions}',
 }
 
 /* Accepted file extensions */
@@ -1089,6 +1102,61 @@ const maxFilesAllowed = computed(() => {
   return maxFiles.value
 })
 
+/** Segmento opcional: um template `acceptedLine` com `{accept}` e `{extensions}`. */
+const constraintsAcceptTypesSegment = computed(() => {
+  // Check if show constraints accept
+  if (!showConstraintsAccept.value) return ''
+
+  // Get accepted file extensions
+  const accept = String(acceptedFileExtensions.value || '').trim()
+
+  // Get allowed extensions
+  const raw = allowedExtensions.value
+
+  // Get extension list
+  const extList = Array.isArray(raw)
+    ? raw
+      .map((e) => String(e).trim())
+      .filter(Boolean)
+      .map((e) => (e.startsWith('.') ? e : `.${e}`))
+    : []
+
+  // Get extensions display
+  const extensionsDisplay = extList.length ? extList.join(', ') : ''
+
+  // Check if no accept and no extensions
+  if (!accept && !extensionsDisplay) return ''
+
+  // Get template
+  const tpl = resolvedFileUiLocale.value.acceptedLine
+
+  // Check if use built-in default
+  const useBuiltInDefault = tpl === DEFAULT_ACCEPTED_LINE
+
+  // Check if use built-in default
+  if (useBuiltInDefault) {
+    // Check if accept and extensions display
+    if (accept && extensionsDisplay) {
+      return formatLocaleMessage(DEFAULT_ACCEPTED_LINE, {
+        accept,
+        extensions: extensionsDisplay,
+      })
+    }
+
+    // Check if only accept
+    if (accept) return formatLocaleMessage('Accept: {accept}', { accept })
+
+    // Check if only extensions
+    return formatLocaleMessage('Extensions: {extensions}', { extensions: extensionsDisplay })
+  }
+
+  // Return formatted message
+  return formatLocaleMessage(tpl, {
+    accept: accept || '',
+    extensions: extensionsDisplay || '',
+  })
+})
+
 /* Constraints text */
 const constraintsText = computed(() => {
   // Get max files text
@@ -1111,8 +1179,12 @@ const constraintsText = computed(() => {
     size: formatBytes(maxFileSizeBytes.value),
   })
 
+  const acceptSeg = constraintsAcceptTypesSegment.value
+  const parts = [maxFilesText, maxPerFile]
+  if (acceptSeg) parts.push(acceptSeg)
+
   // Return constraints text
-  return `${maxFilesText} • ${maxPerFile}`
+  return parts.join(' • ')
 })
 
 /* Format default values */
@@ -2160,6 +2232,7 @@ const removeAllFiles = () => {
   emit('current-value', [])
 }
 
+/* Expose clear method */
 defineExpose({
   clear: removeAllFiles,
 })
