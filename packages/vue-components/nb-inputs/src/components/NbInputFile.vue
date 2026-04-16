@@ -1131,13 +1131,13 @@ const constraintsAcceptTypesSegment = computed(() => {
   const tpl = resolvedFileUiLocale.value.acceptedLine
 
   // Check if use built-in default
-  const useBuiltInDefault = tpl === DEFAULT_ACCEPTED_LINE
+  const useBuiltInDefault = tpl === DEFAULT_FILE_UI_LOCALE.acceptedLine
 
   // Check if use built-in default
   if (useBuiltInDefault) {
     // Check if accept and extensions display
     if (accept && extensionsDisplay) {
-      return formatLocaleMessage(DEFAULT_ACCEPTED_LINE, {
+      return formatLocaleMessage(DEFAULT_FILE_UI_LOCALE.acceptedLine, {
         accept,
         extensions: extensionsDisplay,
       })
