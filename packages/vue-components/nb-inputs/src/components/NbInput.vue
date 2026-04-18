@@ -121,9 +121,14 @@
 <script setup>
 import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import * as vueTheMask from 'vue-the-mask'
+import masker from 'vue-the-mask/src/masker'
+import { getMaskCompletionState } from '../utils/vueTheMaskCompletion.js'
 
 // O default do pacote é só o `Vue.use` installer; a diretiva está na exportação nomeada `mask`.
 const vMask = vueTheMask.mask
+
+/** Tokens padrão do `vue-the-mask` (mesmos da diretiva `v-mask`). */
+const maskTokensDefault = vueTheMask.tokens
 
 defineOptions({
 	name: 'NbInput',
@@ -153,7 +158,8 @@ const emit = defineEmits([
   'show-input-eye',
   'clicked',
   'entered',
-  'paste'
+  'paste',
+  'mask-error'
 ])
 
 const props = defineProps({
@@ -318,6 +324,16 @@ const props = defineProps({
       if (typeof value === 'string') return true
       return Array.isArray(value) && value.every(s => typeof s === 'string')
     },
+  },
+  /**
+   * Só com máscara ativa (`input-mask` + `input-type="text"`).
+   * Formato do valor em `changed`, `current-value` e `entered`:
+   * `masked` — string com máscara; `clean` — só caracteres dos tokens da máscara; `both` — `{ masked, clean }`.
+   */
+  inputMaskEmit: {
+    type: String,
+    default: 'masked',
+    validator: value => ['masked', 'clean', 'both'].includes(value),
   },
   hasTrim: {
     type: Boolean,
@@ -709,6 +725,7 @@ const {
 	showInputEye,
 	inputType,
 	inputMask,
+  inputMaskEmit,
   hasTrim,
 	inputUppercase,
   inputName,
@@ -1285,6 +1302,17 @@ const formatValueForEmit = (value) => {
       return isNaN(numValue) ? value : numValue
     }
   }
+  if (!hasInputMask.value || inputMaskEmit.value === 'masked') {
+    return value
+  }
+  const maskedStr = value == null ? '' : String(value)
+  const clean = masker(maskedStr, inputMaskForDirective.value, false, maskTokensDefault)
+  if (inputMaskEmit.value === 'clean') {
+    return clean
+  }
+  if (inputMaskEmit.value === 'both') {
+    return { masked: maskedStr, clean }
+  }
   return value
 }
 
@@ -1312,8 +1340,38 @@ const handleLabelClick = (event) => {
   }
 }
 
+/** Emite `mask-error` se houver máscara, texto trimado não vazio e slots incompletos. */
+const emitMaskErrorIfIncomplete = (trigger) => {
+  // Se não houver máscara, não emitir
+  if (!hasInputMask.value) return false
+
+  // Se o texto trimado estiver vazio, não emitir
+  const strForMask = String(inputValue.value ?? '').trim()
+  if (strForMask === '') return false
+  
+  // Se o texto trimado não for completo, emitir
+  const maskState = getMaskCompletionState(strForMask, inputMaskForDirective.value, maskTokensDefault)
+  if (!maskState.complete) {
+    emit('mask-error', {
+      reason: 'incomplete',
+      trigger,
+      masked: strForMask,
+      clean: maskState.clean,
+      requiredTokenCount: maskState.requiredTokens,
+      filledTokenCount: maskState.filledTokens,
+      activePattern: maskState.pattern,
+    })
+    return true
+  }
+
+  // Se o texto trimado for completo, não emitir
+  return false
+}
+
 const enterConfirm = () => {
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
+
+  if (emitMaskErrorIfIncomplete('enter')) return
 
   emit('entered', formatValueForEmit(inputValue.value))
 }
@@ -1352,6 +1410,7 @@ watch(inputValue, value => {
   }
 
   emit('changed', formatValueForEmit(value))
+  emitMaskErrorIfIncomplete('changed')
 })
 watch(isActive, value => {
   if (value) {

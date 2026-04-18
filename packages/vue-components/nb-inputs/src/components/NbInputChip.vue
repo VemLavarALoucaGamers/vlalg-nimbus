@@ -22,11 +22,16 @@
       :style="[componentStyle, styleWidth, borderRadiusStyle]"
     >
       <div v-if="chipList.length > 0" ref="chips" class="chips">
-        <div v-for="chip in chipList" :key="chip" class="chip">
+        <div
+          v-for="(chip, index) in chipList"
+          :key="`${index}-${String(chip)}`"
+          class="chip"
+        >
           <slot
             name="chip"
             :chips="chipList"
             :chip="chip"
+            :index="index"
             :removeChip="removeChip"
           >
             <span class="chip-text" :style="[fontSizeChipStyle]">{{ chip }}</span>
@@ -34,7 +39,7 @@
               v-if="!disabled && !inputReadonly"
               class="chip-remove"
               :style="[fontSizeChipStyle]"
-              @click="removeChip(chip)">×</span>
+              @click="removeChip(index)">×</span>
           </slot>
         </div>
       </div>
@@ -85,8 +90,11 @@
 <script setup>
 import { defineProps, ref, toRefs, computed, onMounted, watch } from 'vue'
 import * as vueTheMask from 'vue-the-mask'
+import masker from 'vue-the-mask/src/masker'
+import { getMaskCompletionState } from '../utils/vueTheMaskCompletion.js'
 
 const vMask = vueTheMask.mask
+const maskTokensDefault = vueTheMask.tokens
 
 defineOptions({
   name: 'NbInputChip',
@@ -94,10 +102,23 @@ defineOptions({
 })
 
 onMounted(() => {
-  if (currentList.value.length > 0) chipList.value = currentList.value;
+  // Cópia: evita compartilhar referência com a prop `current-list` (push em addChip mutaria o array do pai).
+  if (currentList.value.length > 0) chipList.value = [...currentList.value]
 })
 
-const emit = defineEmits(['clicked', 'changed', 'removed', 'added', 'input-changed', 'focused', 'blurred', 'paste'])
+const emit = defineEmits([
+  'clicked',
+  'changed',
+  'added',
+  'added-complete',
+  'removed',
+  'removed-complete',
+  'input-changed',
+  'focused',
+  'blurred',
+  'paste',
+  'mask-error'
+])
 
 const props = defineProps({
 	nbId: {
@@ -288,6 +309,15 @@ const props = defineProps({
 			if (typeof value === 'string') return true
 			return Array.isArray(value) && value.every(s => typeof s === 'string')
 		},
+	},
+	/**
+	 * Com `input-mask`: `input-changed`, `added` e `removed` seguem o modo — `masked` (só string mascarada), `clean` (só tokens), `both` (`{ masked, clean }`).
+	 * Sem máscara, só string. `added-complete` / `removed-complete` sempre com `chip` e itens de `list` como `{ masked, clean }`.
+	 */
+	inputMaskEmit: {
+		type: String,
+		default: 'masked',
+		validator: value => ['masked', 'clean', 'both'].includes(value),
 	},
 	required: {
 		type: Boolean,
@@ -535,6 +565,7 @@ const {
 	blockPaste,
 	inputAutocomplete,
 	inputMask,
+	inputMaskEmit,
 	required,
 	textAlign,
 	hasBorderRadius,
@@ -892,6 +923,48 @@ const inputMaskForDirective = computed(() => {
 	return m
 })
 
+const formatChipInputMaskEmit = (maskedStr) => {
+	if (!hasInputMask.value || inputMaskEmit.value === 'masked') {
+		return maskedStr
+	}
+	const s = maskedStr == null ? '' : String(maskedStr)
+	const clean = masker(s, inputMaskForDirective.value, false, maskTokensDefault)
+	if (inputMaskEmit.value === 'clean') {
+		return clean
+	}
+	if (inputMaskEmit.value === 'both') {
+		return { masked: s, clean }
+	}
+	return maskedStr
+}
+
+/** Valor sem máscara (para `added` / `remove`); sem máscara no input, equivale ao texto. */
+const chipStorageToClean = (maskedStorage) => {
+	if (!hasInputMask.value) return String(maskedStorage ?? '')
+	return masker(String(maskedStorage ?? ''), inputMaskForDirective.value, false, maskTokensDefault)
+}
+
+/** Par mascarado + limpo (para `*-complete`). */
+const chipStorageToPair = (maskedStorage) => {
+	const masked = String(maskedStorage ?? '')
+	return { masked, clean: chipStorageToClean(masked) }
+}
+
+/** Lista interna → lista de `{ masked, clean }` (ref computada para payloads *-complete). */
+const chipListPairsPayload = computed(() => chipList.value.map(c => chipStorageToPair(c)))
+
+/** `chip` / itens de `list` em `added` e `removed` — mesmo critério que `NbInput` + `input-mask-emit`. */
+const chipPayloadForMaskEmit = (maskedStorage) => {
+	if (!hasInputMask.value) return String(maskedStorage ?? '')
+	const masked = String(maskedStorage ?? '')
+	if (inputMaskEmit.value === 'masked') return masked
+	if (inputMaskEmit.value === 'clean') return chipStorageToClean(masked)
+	if (inputMaskEmit.value === 'both') return chipStorageToPair(masked)
+	return masked
+}
+
+const chipListForMaskEmit = () => chipList.value.map(c => chipPayloadForMaskEmit(c))
+
 const interacted = (event) => {
 	emit('clicked', event)
 }
@@ -928,38 +1001,81 @@ const handleKeyDown = (event) => {
     if (inputUppercase.value) {
       chipValue = chipValue.toUpperCase();
     }
+    if (hasInputMask.value) {
+      const maskState = getMaskCompletionState(chipValue, inputMaskForDirective.value, maskTokensDefault)
+      if (!maskState.complete) {
+        emit('mask-error', {
+          reason: 'incomplete',
+          masked: chipValue,
+          clean: maskState.clean,
+          requiredTokenCount: maskState.requiredTokens,
+          filledTokenCount: maskState.filledTokens,
+          activePattern: maskState.pattern,
+        })
+        return
+      }
+    }
     if (allowDuplicates.value || !chipList.value.includes(chipValue)) {
-      addChip(chipValue);
+      addChip(chipValue)
     }
     chipInputValue.value = '';
   }
 }
-const addChip = (text) => {
-  chipList.value.push(text);
+const addChip = (storedMaskedText) => {
+  chipList.value.push(storedMaskedText)
+  const index = chipList.value.length - 1
+  const pairChip = chipStorageToPair(storedMaskedText)
+  const listPairs = [...chipListPairsPayload.value]
+
   emit('added', {
-    chip: text,
-    index: chipList.value.indexOf(text),
-    list: chipList.value,
-  });
+    chip: chipPayloadForMaskEmit(storedMaskedText),
+    index,
+    list: chipListForMaskEmit(),
+  })
+  emit('added-complete', {
+    chip: pairChip,
+    index,
+    list: listPairs,
+  })
 }
-const removeChip = (chip) => {
-  chipList.value = chipList.value.filter(chipItem => chipItem !== chip);
+
+/**
+ * Remove um chip pela posição (permite `allow-duplicates`: mesmo texto em índices diferentes).
+ * O slot recebe `removeChip` — chame com o `index` do slot, não com o valor do chip.
+ */
+const removeChip = (index) => {
+  if (disabled.value || inputReadonly.value) return
+  const i = typeof index === 'number' ? index : Number(index)
+  if (!Number.isInteger(i) || i < 0 || i >= chipList.value.length) return
+
+  const storedValue = chipList.value[i]
+  const pairChip = chipStorageToPair(storedValue)
+  chipList.value = chipList.value.filter((_, idx) => idx !== i)
+
   emit('removed', {
-    chip: chip,
-    index: chipList.value.indexOf(chip),
-    list: chipList.value,
-  });
+    chip: chipPayloadForMaskEmit(storedValue),
+    index: i,
+    list: chipListForMaskEmit(),
+  })
+  emit('removed-complete', {
+    chip: pairChip,
+    index: i,
+    list: [...chipListPairsPayload.value],
+  })
 }
 
 watch(currentList, (newList) => {
-  chipList.value = newList;
+  const next = Array.isArray(newList) ? [...newList] : []
+  chipList.value = next
   emit('changed', {
-    list: newList,
+    list: [...next],
   });
 })
 watch(chipInputValue, (newValue) => {
+  const raw = newValue == null ? '' : String(newValue)
+  const value = hasInputMask.value ? formatChipInputMaskEmit(raw) : raw
   emit('input-changed', {
-    value: newValue,
+    value,
   });
 })
 </script>
