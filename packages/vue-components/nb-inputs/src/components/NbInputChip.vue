@@ -319,6 +319,15 @@ const props = defineProps({
 		default: 'masked',
 		validator: value => ['masked', 'clean', 'both'].includes(value),
 	},
+	/**
+	 * Tokens extras do [`vue-the-mask`](https://www.npmjs.com/package/vue-the-mask), mesclados aos padrão (`#`, `X`, `S`…).
+	 * Mesma API que `NbInput` `input-mask-tokens`. Com máscara ativa, o binding da diretiva e o `masker` usam o mesmo merge.
+	 */
+	inputMaskTokens: {
+		type: Object,
+		default: null,
+		validator: value => value == null || (typeof value === 'object' && !Array.isArray(value)),
+	},
 	required: {
 		type: Boolean,
 		default: false,
@@ -566,6 +575,7 @@ const {
 	inputAutocomplete,
 	inputMask,
 	inputMaskEmit,
+	inputMaskTokens,
 	required,
 	textAlign,
 	hasBorderRadius,
@@ -917,10 +927,29 @@ const hasInputMask = computed(() => {
 	return !(Array.isArray(m) && m.length === 0)
 })
 
-const inputMaskForDirective = computed(() => {
+const inputMaskPattern = computed(() => {
 	const m = inputMask.value
-	if (Array.isArray(m)) return m.slice()
-	return m
+	if (m == null || m === '') return null
+	return Array.isArray(m) ? m.slice() : m
+})
+
+const maskTokensMerged = computed(() => ({
+	...maskTokensDefault,
+	...(inputMaskTokens.value != null ? inputMaskTokens.value : {}),
+}))
+
+const hasCustomMaskTokens = computed(() => {
+	const t = inputMaskTokens.value
+	return t != null && typeof t === 'object' && !Array.isArray(t) && Object.keys(t).length > 0
+})
+
+const inputMaskForDirective = computed(() => {
+	const pattern = inputMaskPattern.value
+	if (pattern == null || pattern === '') return pattern
+	if (hasCustomMaskTokens.value) {
+		return { mask: pattern, tokens: maskTokensMerged.value }
+	}
+	return pattern
 })
 
 const formatChipInputMaskEmit = (maskedStr) => {
@@ -928,7 +957,9 @@ const formatChipInputMaskEmit = (maskedStr) => {
 		return maskedStr
 	}
 	const s = maskedStr == null ? '' : String(maskedStr)
-	const clean = masker(s, inputMaskForDirective.value, false, maskTokensDefault)
+	const pattern = inputMaskPattern.value
+	if (pattern == null || pattern === '') return maskedStr
+	const clean = masker(s, pattern, false, maskTokensMerged.value)
 	if (inputMaskEmit.value === 'clean') {
 		return clean
 	}
@@ -941,7 +972,7 @@ const formatChipInputMaskEmit = (maskedStr) => {
 /** Valor sem máscara (para `added` / `remove`); sem máscara no input, equivale ao texto. */
 const chipStorageToClean = (maskedStorage) => {
 	if (!hasInputMask.value) return String(maskedStorage ?? '')
-	return masker(String(maskedStorage ?? ''), inputMaskForDirective.value, false, maskTokensDefault)
+	return masker(String(maskedStorage ?? ''), inputMaskPattern.value, false, maskTokensMerged.value)
 }
 
 /** Par mascarado + limpo (para `*-complete`). */
@@ -1002,7 +1033,9 @@ const handleKeyDown = (event) => {
       chipValue = chipValue.toUpperCase();
     }
     if (hasInputMask.value) {
-      const maskState = getMaskCompletionState(chipValue, inputMaskForDirective.value, maskTokensDefault)
+      const pattern = inputMaskPattern.value
+      if (pattern == null || pattern === '') return
+      const maskState = getMaskCompletionState(chipValue, pattern, maskTokensMerged.value)
       if (!maskState.complete) {
         emit('mask-error', {
           reason: 'incomplete',

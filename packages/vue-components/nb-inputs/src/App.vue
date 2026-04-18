@@ -278,8 +278,37 @@
           Padrão com <code>#</code> (dígito) e strings no <code>input-mask</code>; moeda usa <strong>array</strong> de máscaras
           para ir de <code>R$ 0,00</code> até valores grandes. Por padrão o <code>@changed</code> envia o texto mascarado;
           use <code>input-mask-emit</code> para <code>clean</code> (só tokens) ou <code>both</code> (<code>&#123; masked, clean &#125;</code>).
+          Tokens custom do <code>vue-the-mask</code> via <code>input-mask-tokens</code> (merge com o padrão); ex.: inteiro com sinal opcional usando máscara <code>N###</code> e token <code>N</code>.
         </p>
         <div style="display: grid; gap: 1.25rem; max-width: 42rem">
+          <p style="color: #000;">Valor do input: {{ refFakeChange }}</p>
+          <NbInput
+            nb-id="test-input-mask-cpf"
+            display="b"
+            :input-text="refFakeChange"
+            input-style="border"
+            input-name="test-input-mask-cpf"
+            input-mask="###"
+            label="CPF"
+            :show-label="true"
+            input-placeholder="000.000.000-00"
+            autocomplete="off"
+            @changed="fakeChange"
+            @blurred="fakeBlur"
+          />
+          <NbInput
+            nb-id="test-input-mask-signed-int"
+            display="b"
+            input-style="border"
+            input-name="test-input-mask-signed-int"
+            input-mask="N###"
+            :input-mask-tokens="signedIntMaskTokens"
+            label="Inteiro (sinal opcional, N###)"
+            :show-label="true"
+            input-placeholder="-123"
+            autocomplete="off"
+            @changed="($event) => console.log('signed int', $event)"
+          />
           <NbInput
             nb-id="test-input-mask-cpf"
             display="b"
@@ -574,6 +603,41 @@
           aria-label="Chips com máscara CPF"
           allow-duplicates
           @added="($event) => console.log('added', $event)"
+        />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile" style="color: #000;">NbInputChip — input-mask-tokens (N###, sinal opcional)</h4>
+        <p style="max-width: 48rem; margin: 0 0 0.75rem; line-height: 1.5; color: #1e293b">
+          Mesmo token <code>N</code> que o <code>NbInput</code> acima: primeiro slot <code>-</code> ou dígito, depois 3× <code>#</code>. Confirme com Enter.
+        </p>
+        <NbInputChip
+          nb-id="chip-mask-signed-int"
+          input-name="chip-input-mask-signed-int"
+          theme="dark"
+          input-style="border"
+          :input-mask="['N###', 'N##', 'N#', '#']"
+          :input-mask-tokens="signedIntMaskTokens"
+          input-placeholder="-42 e Enter"
+          :current-list="[]"
+          aria-label="Chips com máscara inteiro assinado"
+          allow-duplicates
+          @added="($event) => console.log('chip signed int added', $event)"
+          @mask-error="($event) => console.log('chip signed int mask-error', $event)"
+        />
+        <NbInputChip
+          nb-id="chip-mask-signed-int1"
+          input-name="chip-input-mask-signed-int"
+          theme="dark"
+          input-style="border"
+          :input-mask="['-##', '-#', '##', '#']"
+          :input-mask-tokens="signedIntMaskTokens"
+          input-placeholder="-99 ate 999"
+          :current-list="[]"
+          aria-label="Chips com máscara inteiro assinado"
+          allow-duplicates
+          @added="($event) => console.log('chip signed int added', $event)"
+          @mask-error="($event) => console.log('chip signed int mask-error', $event)"
         />
 
         <br><br>
@@ -3607,7 +3671,7 @@ const NbInputClean = defineAsyncComponent(() => import('@components/NbInputClean
 const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.vue'))
 const NbInputSearch = defineAsyncComponent(() => import('@components/NbInputSearch.vue'))
 
-const btType = ref('inputChip')
+const btType = ref('input')
 
 /** vue-the-mask: padrão BR (milhar `.`, centavos `,`) com prefixo `R$ ` — vários tamanhos até bilhões. */
 const demoMaskMoedaReal = [
@@ -4097,6 +4161,29 @@ const onMultipleBorderValidationErrors = (messages) => {
 /** Um evento por item: { file, fileName, msg, errorType }. */
 const onMultipleBorderValidationItem = (payload) => {
   console.warn('File multiple border — validation-error:', payload)
+}
+
+/** Token custom: primeiro slot aceita `-` ou dígito; em seguida 3× `#` (vue-the-mask). */
+const signedIntMaskTokens = {
+  N: { pattern: /[-0-9]/ },
+}
+
+const refFakeChange = ref('')
+const fakeChange = (event) => {
+  refFakeChange.value = event
+}
+const fakeBlur = () => {
+  const event = refFakeChange.value
+  if (event === '') return
+
+  const valueNumber = Number(event)
+  if (!Number.isFinite(valueNumber)) return
+
+  console.log('newValue', event, valueNumber, typeof valueNumber)
+
+  const newValue = valueNumber < 5 ? 5 : valueNumber > 10 ? 10 : valueNumber
+
+  refFakeChange.value = String(newValue)
 }
 </script>
 
