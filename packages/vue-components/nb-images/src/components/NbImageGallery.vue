@@ -78,7 +78,23 @@
               @keydown.enter.prevent="!disabled && hasTabIndexEnter && selectImage(index, $event)"
               @keydown.space.prevent="!disabled && hasTabIndexSpace && selectImage(index, $event)"
             >
-              <div class="component__thumbnail-inner">
+              <div
+                class="component__thumbnail-inner"
+              >
+                <div
+                  v-if="hasThumbnailCustomContent"
+                  class="component__thumbnail-inner-custom-content"
+                >
+                  <slot
+                    :name="`thumbnail-image-${index}`"
+                    :images="images"
+                    :image="image"
+                    :index="index"
+                    :slot-name="`thumbnail-image-${index}`"
+                  >
+                    Image Custom Slot
+                  </slot>
+                </div>
                 <img
                   :src="image.url"
                   :alt="image.alt || `Thumbnail ${index + 1}`"
@@ -350,6 +366,13 @@ const props = defineProps({
   imageBackground: { // transparent, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9), #ffffff, #000000
     type: String,
     default: 'transparent'
+  },
+  hasThumbnailCustomContent: {
+    type: Boolean,
+    default: false,
+    validator: value => {
+      return typeof value === 'boolean' && [true, false].includes(value)
+    }
   },
   hasThumbnailBorder: { // has border or not
     type: Boolean,
@@ -1370,6 +1393,15 @@ watch(() => images.value?.length, (newLength, oldLength) => {
             border-radius: v-bind('styleThumbnailBorderRadius');
             transition: transform 0.2s ease;
             background: v-bind('styleThumbnailInnerBackground');
+            position: relative;
+
+            .component__thumbnail-inner-custom-content {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+            }
 
             .component__thumbnail-inner-image {
               width: 100%;
@@ -1383,6 +1415,10 @@ watch(() => images.value?.length, (newLength, oldLength) => {
           &:hover:not([tabindex="-1"]) {
             .component__thumbnail-inner {
               transform: scale(1.05);
+            }
+
+            .component__thumbnail-inner:has(.component__thumbnail-inner-custom-content > div:hover) {
+              transform: scale(1);
             }
           }
 

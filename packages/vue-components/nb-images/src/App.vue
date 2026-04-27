@@ -41,7 +41,21 @@
             max-width="500px"
             zoom-button-bg-type="blur"
             zoom-button-type="zoom"
+            :has-thumbnail-custom-content="true"
           >
+            <template
+              v-for="(_, index) in images"
+              :key="`thumbnail-image-slot-${index}`"
+              #[`thumbnail-image-${index}`]="slotProps"
+            >
+              <div
+                class="component__thumbnail-inner-custom-content--fora"
+                @click.stop="handleThumbnailClick(slotProps)"
+              >
+                X
+              </div>
+            </template>
+
             <template #preview-controls="{
               previewRotateLeft,
               previewRotateRight,
@@ -275,7 +289,7 @@ import { defineAsyncComponent, ref } from 'vue'
 const NbImageGallery = defineAsyncComponent(() => import('@components/NbImageGallery.vue'))
 const NbImage = defineAsyncComponent(() => import('@components/NbImage.vue'))
 
-const btType = ref('image')
+const btType = ref('image-gallery')
 const optionsLoaders = ref([
   'image-gallery',
   'image',
@@ -336,6 +350,17 @@ const images = ref([
 const handleImageClick = (type) => {
   console.log(`Image clicked - Type: ${type}`)
 }
+
+const handleThumbnailClick = (slotProps) => {
+  console.log('aqui')
+  console.log('Thumbnail clicked - Slot Props: ', slotProps)
+  // handleRemoveImage(slotProps)
+}
+const handleRemoveImage = (slotProps) => {
+  console.log('Remove image - Slot Props: ', slotProps)
+  const { index } = slotProps
+  images.value.splice(index, 1)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -392,5 +417,41 @@ const handleImageClick = (type) => {
       background-color: #0056b3;
     }
   }
+}
+
+/*.component__thumbnail-inner-custom-content--fora {
+  background-color: #007bff;
+    position: absolute;
+    top: -0;
+    right: 0;
+
+    &:hover {
+      scale: 1.1;
+    }
+    
+    div {
+      padding: 2px 8px;
+    }
+}*/
+.component__thumbnail-inner-custom-content--fora {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    padding: 2px 6px !important;
+    border-bottom-left-radius: 5px;
+    background-color: #fff;
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    transition: transform 0.2s ease;
+    width: fit-content;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    
+
+    &:hover {
+      // transform: scale(1.1);
+      background-color: #007bff;
+      color: #fff;
+    }
 }
 </style>
