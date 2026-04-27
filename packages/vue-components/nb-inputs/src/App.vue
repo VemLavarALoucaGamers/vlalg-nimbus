@@ -1167,6 +1167,7 @@
         <h4 class="test-page__content-tile" style="margin-top: 40px; color: #000;">NbInputFile - Multiple (background / border / line)</h4>
 
         <NbInputFile
+          ref="fileInputRemoveAtIndexRef"
           nb-id="file-multi-bg"
           display="b"
           input-name="file-multi-bg"
@@ -1181,8 +1182,14 @@
           :show-constraints-text="true"
           aria-label="File multiple background"
           @current-value="($event) => console.log('file-multi-bg current-value', $event)"
-          @changed="($event) => console.log('file-multi-bg changed', $event)"
+          @changed="changeFileInputRemove($event)"
         />
+
+        <ul style="margin: 10px 0 30px; color: #000;">
+          <li v-for="(file, index) in fileInputRemove" :key="index">
+            {{ file.name }} <button @click="removeFile(file.index)">Remover</button>
+          </li>
+        </ul>
 
         <NbInputFile
           nb-id="file-multi-border"
@@ -3671,7 +3678,7 @@ const NbInputClean = defineAsyncComponent(() => import('@components/NbInputClean
 const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.vue'))
 const NbInputSearch = defineAsyncComponent(() => import('@components/NbInputSearch.vue'))
 
-const btType = ref('input')
+const btType = ref('file')
 
 /** vue-the-mask: padrão BR (milhar `.`, centavos `,`) com prefixo `R$ ` — vários tamanhos até bilhões. */
 const demoMaskMoedaReal = [
@@ -4184,6 +4191,16 @@ const fakeBlur = () => {
   const newValue = valueNumber < 5 ? 5 : valueNumber > 10 ? 10 : valueNumber
 
   refFakeChange.value = String(newValue)
+}
+
+const fileInputRemove = ref([])
+const fileInputRemoveAtIndexRef = ref(null)
+const changeFileInputRemove = (files) => {
+  fileInputRemove.value = files
+}
+const removeFile = (index) => {
+  console.log('remove file => ', index)
+  fileInputRemoveAtIndexRef.value.removeAt(index)
 }
 </script>
 
