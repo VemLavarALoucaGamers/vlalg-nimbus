@@ -276,9 +276,39 @@
         <h4 class="test-page__content-tile" style="color: #000;">NbInput — máscaras (vue-the-mask)</h4>
         <p style="max-width: 52rem; margin: 0 0 1rem; line-height: 1.5; color: #1e293b">
           Padrão com <code>#</code> (dígito) e strings no <code>input-mask</code>; moeda usa <strong>array</strong> de máscaras
-          para ir de <code>R$ 0,00</code> até valores grandes. O <code>@changed</code> envia o texto já formatado (string).
+          para ir de <code>R$ 0,00</code> até valores grandes. Por padrão o <code>@changed</code> envia o texto mascarado;
+          use <code>input-mask-emit</code> para <code>clean</code> (só tokens) ou <code>both</code> (<code>&#123; masked, clean &#125;</code>).
+          Tokens custom do <code>vue-the-mask</code> via <code>input-mask-tokens</code> (merge com o padrão); ex.: inteiro com sinal opcional usando máscara <code>N###</code> e token <code>N</code>.
         </p>
         <div style="display: grid; gap: 1.25rem; max-width: 42rem">
+          <p style="color: #000;">Valor do input: {{ refFakeChange }}</p>
+          <NbInput
+            nb-id="test-input-mask-cpf"
+            display="b"
+            :input-text="refFakeChange"
+            input-style="border"
+            input-name="test-input-mask-cpf"
+            input-mask="###"
+            label="CPF"
+            :show-label="true"
+            input-placeholder="000.000.000-00"
+            autocomplete="off"
+            @changed="fakeChange"
+            @blurred="fakeBlur"
+          />
+          <NbInput
+            nb-id="test-input-mask-signed-int"
+            display="b"
+            input-style="border"
+            input-name="test-input-mask-signed-int"
+            input-mask="N###"
+            :input-mask-tokens="signedIntMaskTokens"
+            label="Inteiro (sinal opcional, N###)"
+            :show-label="true"
+            input-placeholder="-123"
+            autocomplete="off"
+            @changed="($event) => console.log('signed int', $event)"
+          />
           <NbInput
             nb-id="test-input-mask-cpf"
             display="b"
@@ -289,6 +319,7 @@
             :show-label="true"
             input-placeholder="000.000.000-00"
             @changed="($event) => console.log('mask cpf', $event)"
+            @mask-error="($event) => console.log('mask-error', $event)"
           />
           <NbInput
             nb-id="test-input-mask-cep"
@@ -300,6 +331,7 @@
             :show-label="true"
             input-placeholder="00000-000"
             @changed="($event) => console.log('mask cep', $event)"
+            @mask-error="($event) => console.log('mask-error', $event)"
           />
           <NbInput
             nb-id="test-input-mask-fone"
@@ -334,6 +366,44 @@
             input-placeholder="S 0,00"
             @changed="($event) => console.log('mask prefix S', $event)"
           />
+
+          <div style="margin-top: 0.5rem; padding-top: 1.25rem; border-top: 1px solid #e2e8f0">
+            <p style="margin: 0 0 0.75rem; line-height: 1.5; color: #1e293b; font-weight: 600">
+              <code>input-mask-emit</code> (só com máscara + <code>text</code>)
+            </p>
+            <div style="display: grid; gap: 1rem">
+              <div>
+                <NbInput
+                  nb-id="test-input-mask-emit-clean"
+                  display="b"
+                  input-style="border"
+                  input-name="test-input-mask-emit-clean"
+                  input-mask="###.###.###-##"
+                  input-mask-emit="clean"
+                  label="CPF → @changed só dígitos"
+                  :show-label="true"
+                  input-placeholder="000.000.000-00"
+                  @changed="onDemoMaskEmitCleanChanged"
+                />
+                <pre style="margin: 0.5rem 0 0; padding: 0.5rem 0.75rem; background: #f1f5f9; border-radius: 6px; font-size: 12px; overflow: auto; color: #000;">@changed (clean): {{ demoMaskEmitCleanLast || '(vazio)' }}</pre>
+              </div>
+              <div>
+                <NbInput
+                  nb-id="test-input-mask-emit-both"
+                  display="b"
+                  input-style="border"
+                  input-name="test-input-mask-emit-both"
+                  input-mask="(##) #####-####"
+                  input-mask-emit="both"
+                  label="Celular → @changed objeto"
+                  :show-label="true"
+                  input-placeholder="(00) 00000-0000"
+                  @changed="onDemoMaskEmitBothChanged"
+                />
+                <pre style="margin: 0.5rem 0 0; padding: 0.5rem 0.75rem; background: #f1f5f9; border-radius: 6px; font-size: 12px; overflow: auto; color: #000;">@changed (both): {{ JSON.stringify(demoMaskEmitBothLast) }}</pre>
+              </div>
+            </div>
+          </div>
         </div>
 
         <NbInput
@@ -505,6 +575,7 @@
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          allow-duplicates
           @clicked="() => console.log('clicked')"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
@@ -513,9 +584,9 @@
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
         >
-          <template #chip="{ chip, removeChip }">
+          <template #chip="{ chip, index, removeChip }">
             <span class="chip-text">{{ chip }}asdas</span>
-            <span class="chip-remove" @click="removeChip(chip)">×</span>
+            <span class="chip-remove" @click="removeChip(index)">×</span>
           </template>
         </NbInputChip>
 
@@ -530,8 +601,91 @@
           input-placeholder="CPF e Enter"
           :current-list="[]"
           aria-label="Chips com máscara CPF"
+          allow-duplicates
           @added="($event) => console.log('added', $event)"
         />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile" style="color: #000;">NbInputChip — input-mask-tokens (N###, sinal opcional)</h4>
+        <p style="max-width: 48rem; margin: 0 0 0.75rem; line-height: 1.5; color: #1e293b">
+          Mesmo token <code>N</code> que o <code>NbInput</code> acima: primeiro slot <code>-</code> ou dígito, depois 3× <code>#</code>. Confirme com Enter.
+        </p>
+        <NbInputChip
+          nb-id="chip-mask-signed-int"
+          input-name="chip-input-mask-signed-int"
+          theme="dark"
+          input-style="border"
+          :input-mask="['N###', 'N##', 'N#', '#']"
+          :input-mask-tokens="signedIntMaskTokens"
+          input-placeholder="-42 e Enter"
+          :current-list="[]"
+          aria-label="Chips com máscara inteiro assinado"
+          allow-duplicates
+          @added="($event) => console.log('chip signed int added', $event)"
+          @mask-error="($event) => console.log('chip signed int mask-error', $event)"
+        />
+        <NbInputChip
+          nb-id="chip-mask-signed-int1"
+          input-name="chip-input-mask-signed-int"
+          theme="dark"
+          input-style="border"
+          :input-mask="['-##', '-#', '##', '#']"
+          :input-mask-tokens="signedIntMaskTokens"
+          input-placeholder="-99 ate 999"
+          :current-list="[]"
+          aria-label="Chips com máscara inteiro assinado"
+          allow-duplicates
+          @added="($event) => console.log('chip signed int added', $event)"
+          @mask-error="($event) => console.log('chip signed int mask-error', $event)"
+        />
+
+        <br><br>
+
+        <h4 class="test-page__content-tile" style="color: #000;">NbInputChip — input-mask-emit</h4>
+        <p style="max-width: 48rem; margin: 0 0 0.75rem; line-height: 1.5; color: #1e293b">
+          <code>input-mask-emit</code> em <code>added</code> / <code>removed</code> e <code>input-changed</code>: <code>masked</code> só string com máscara, <code>clean</code> só limpo, <code>both</code> objeto <code>&#123; masked, clean &#125;</code>. <code>added-complete</code> / <code>removed-complete</code> sempre com par <code>&#123; masked, clean &#125;</code>. Sincronize <code>current-list</code> com <code>*-complete.list</code> mapeando <code>.masked</code>.
+        </p>
+        <div style="display: grid; gap: 1.25rem; max-width: 42rem">
+          <div>
+            <NbInputChip
+              nb-id="chip-mask-emit-clean"
+              input-name="chip-mask-emit-clean"
+              theme="dark"
+              input-style="border"
+              input-mask="###.###.###-##"
+              input-mask-emit="masked"
+              input-placeholder="CPF — Enter; chips mascarados, emit clean"
+              :current-list="demoChipMaskEmitCleanList"
+              aria-label="Chip máscara emit clean"
+              allow-duplicates
+              @input-changed="onDemoChipMaskEmitCleanInput"
+              @added="onDemoChipMaskEmitCleanAdded"
+              @added-complete="onDemoChipMaskEmitCleanAddedComplete"
+              @mask-error="($event) => console.log('mask-error', $event)"
+            />
+            <pre style="margin: 0.5rem 0 0; padding: 0.5rem 0.75rem; background: #f1f5f9; border-radius: 6px; font-size: 12px; overflow: auto; color: #000;">input-changed: {{ demoChipMaskEmitCleanInput || '(vazio)' }} · added.chip: {{ demoChipMaskEmitCleanLastAdded || '(nenhum)' }} · added-complete.chip: {{ demoChipMaskEmitCleanLastCompleteJson || '(nenhum)' }}</pre>
+          </div>
+          <div>
+            <NbInputChip
+              nb-id="chip-mask-emit-both"
+              input-name="chip-mask-emit-both"
+              theme="dark"
+              input-style="border"
+              input-mask="###.###.###-##"
+              input-mask-emit="both"
+              input-placeholder="CPF — Enter; input-changed com objeto"
+              :current-list="demoChipMaskEmitBothList"
+              aria-label="Chip máscara emit both"
+              allow-duplicates
+              @input-changed="onDemoChipMaskEmitBothInput"
+              @added="onDemoChipMaskEmitBothAdded"
+              @added-complete="onDemoChipMaskEmitBothAddedComplete"
+              @mask-error="($event) => console.log('mask-error', $event)"
+            />
+            <pre style="margin: 0.5rem 0 0; padding: 0.5rem 0.75rem; background: #f1f5f9; border-radius: 6px; font-size: 12px; overflow: auto; color: #000;">input-changed: {{ demoChipMaskEmitBothInput || '(vazio)' }} · added.chip: {{ demoChipMaskEmitBothLastAdded || '(nenhum)' }} · added-complete.chip: {{ demoChipMaskEmitBothLastCompleteJson || '(nenhum)' }}</pre>
+          </div>
+        </div>
 
         <br><br>
 
@@ -3548,6 +3702,87 @@ const demoMaskMoedaPrefixoS = [
 /** Celular / fixo BR: máscara dinâmica por quantidade de dígitos. */
 const demoMaskTelefoneBr = ['(##) ####-####', '(##) #####-####']
 
+/** App demo: último @changed com input-mask-emit="clean" | "both". */
+const demoMaskEmitCleanLast = ref('')
+const demoMaskEmitBothLast = ref({ masked: '', clean: '' })
+
+const onDemoMaskEmitCleanChanged = (v) => {
+  console.log('onDemoMaskEmitCleanChanged => ', v)
+  demoMaskEmitCleanLast.value = v === '' || v == null ? '' : String(v)
+}
+
+const onDemoMaskEmitBothChanged = (v) => {
+  console.log('onDemoMaskEmitBothChanged => ', v)
+  if (v && typeof v === 'object' && 'masked' in v && 'clean' in v) {
+    demoMaskEmitBothLast.value = { masked: String(v.masked ?? ''), clean: String(v.clean ?? '') }
+  } else {
+    demoMaskEmitBothLast.value = { masked: '', clean: '' }
+  }
+}
+
+/** App demo: NbInputChip + input-mask-emit */
+const demoChipMaskEmitCleanList = ref([])
+const demoChipMaskEmitCleanInput = ref('')
+const demoChipMaskEmitCleanLastAdded = ref('')
+const demoChipMaskEmitCleanLastCompleteJson = ref('')
+
+const onDemoChipMaskEmitCleanInput = (e) => {
+  const v = e?.value
+  if (v == null || v === '') {
+    demoChipMaskEmitCleanInput.value = ''
+    return
+  }
+  demoChipMaskEmitCleanInput.value = typeof v === 'object' ? JSON.stringify(v) : String(v)
+}
+
+const onDemoChipMaskEmitCleanAdded = (e) => {
+  console.log('onDemoChipMaskEmitCleanAdded => ', e)
+  const chip = e?.chip
+  demoChipMaskEmitCleanLastAdded.value =
+    chip == null || chip === '' ? '' : typeof chip === 'object' ? JSON.stringify(chip) : String(chip)
+}
+
+const onDemoChipMaskEmitCleanAddedComplete = (e) => {
+  console.log('onDemoChipMaskEmitCleanAddedComplete => ', e)
+  const c = e?.chip
+  demoChipMaskEmitCleanLastCompleteJson.value =
+    c && typeof c === 'object' ? JSON.stringify(c) : c == null || c === '' ? '' : String(c)
+  if (Array.isArray(e?.list)) {
+    demoChipMaskEmitCleanList.value = e.list.map(p => String(p.masked ?? ''))
+  }
+}
+
+const demoChipMaskEmitBothList = ref([])
+const demoChipMaskEmitBothInput = ref('')
+const demoChipMaskEmitBothLastAdded = ref('')
+const demoChipMaskEmitBothLastCompleteJson = ref('')
+
+const onDemoChipMaskEmitBothInput = (e) => {
+  const v = e?.value
+  if (v == null || v === '') {
+    demoChipMaskEmitBothInput.value = ''
+    return
+  }
+  demoChipMaskEmitBothInput.value = typeof v === 'object' ? JSON.stringify(v) : String(v)
+}
+
+const onDemoChipMaskEmitBothAdded = (e) => {
+  console.log('onDemoChipMaskEmitBothAdded => ', e)
+  const chip = e?.chip
+  demoChipMaskEmitBothLastAdded.value =
+    chip == null || chip === '' ? '' : typeof chip === 'object' ? JSON.stringify(chip) : String(chip)
+}
+
+const onDemoChipMaskEmitBothAddedComplete = (e) => {
+  console.log('onDemoChipMaskEmitBothAddedComplete => ', e)
+  const c = e?.chip
+  demoChipMaskEmitBothLastCompleteJson.value =
+    c && typeof c === 'object' ? JSON.stringify(c) : c == null || c === '' ? '' : String(c)
+  if (Array.isArray(e?.list)) {
+    demoChipMaskEmitBothList.value = e.list.map(p => String(p.masked ?? ''))
+  }
+}
+
 /** Demo NbInputSearch: log em tela para debounce, Enter e interactionFunction */
 const searchDemoLogs = ref([])
 const searchDemoLastChanged = ref('')
@@ -3926,6 +4161,29 @@ const onMultipleBorderValidationErrors = (messages) => {
 /** Um evento por item: { file, fileName, msg, errorType }. */
 const onMultipleBorderValidationItem = (payload) => {
   console.warn('File multiple border — validation-error:', payload)
+}
+
+/** Token custom: primeiro slot aceita `-` ou dígito; em seguida 3× `#` (vue-the-mask). */
+const signedIntMaskTokens = {
+  N: { pattern: /[-0-9]/ },
+}
+
+const refFakeChange = ref('')
+const fakeChange = (event) => {
+  refFakeChange.value = event
+}
+const fakeBlur = () => {
+  const event = refFakeChange.value
+  if (event === '') return
+
+  const valueNumber = Number(event)
+  if (!Number.isFinite(valueNumber)) return
+
+  console.log('newValue', event, valueNumber, typeof valueNumber)
+
+  const newValue = valueNumber < 5 ? 5 : valueNumber > 10 ? 10 : valueNumber
+
+  refFakeChange.value = String(newValue)
 }
 </script>
 
