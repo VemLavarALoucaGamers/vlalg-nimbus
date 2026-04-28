@@ -1306,7 +1306,7 @@
   resolved "https://registry.npmjs.org/@iconify/types/-/types-2.0.0.tgz"
   integrity sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==
 
-"@iconify/vue@^4.1.0", "@iconify/vue@^5.0.0":
+"@iconify/vue@^4.1.0":
   version "4.1.2"
   resolved "https://registry.npmjs.org/@iconify/vue/-/vue-4.1.2.tgz"
   integrity sha512-CQnYqLiQD5LOAaXhBrmj1mdL2/NCJvwcC4jtW2Z8ukhThiFkLDkutarTOV2trfc9EXqUqRs0KqXOL9pZ/IyysA==
@@ -2999,11 +2999,21 @@
     loupe "^2.3.6"
     pretty-format "^29.5.0"
 
-"@vlalg-nimbus/bee-css-reset@^2.0.2", "@vlalg-nimbus/bee-css-reset@file:G:\\projetos\\vlalg-nimbus\\packages\\scss\\bee-css-reset":
+"@vlalg-nimbus/bee-css-reset@^2.0.2":
+  version "2.0.3"
+  resolved "https://registry.npmjs.org/@vlalg-nimbus/bee-css-reset/-/bee-css-reset-2.0.3.tgz"
+  integrity sha512-4iBJHW37hDdWpdQ9qyv2VJi71BZkYIR/dMjqyeBnj3R/h/4Fsj1Gbr/tIgf8L+0tD9cb2AbzTrZSYaYWfS5kCw==
+
+"@vlalg-nimbus/bee-css-reset@file:G:\\projetos\\vlalg-nimbus\\packages\\scss\\bee-css-reset":
   version "3.0.0"
   resolved "file:packages/scss/bee-css-reset"
 
-"@vlalg-nimbus/chameleon-grid-layout@^1.0.2", "@vlalg-nimbus/chameleon-grid-layout@file:G:\\projetos\\vlalg-nimbus\\packages\\scss\\chameleon-grid-layout":
+"@vlalg-nimbus/chameleon-grid-layout@^1.0.2":
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/@vlalg-nimbus/chameleon-grid-layout/-/chameleon-grid-layout-1.0.3.tgz"
+  integrity sha512-maqImfQv0IdyO83y/MzFvlZgktubzhr2PQDEQEqZbvDl6Ot8u7HX9FOslt7thDzD2lMVUt+V/x7Ds0hiQF5ZHw==
+
+"@vlalg-nimbus/chameleon-grid-layout@file:G:\\projetos\\vlalg-nimbus\\packages\\scss\\chameleon-grid-layout":
   version "2.0.0"
   resolved "file:packages/scss/chameleon-grid-layout"
 
@@ -3080,7 +3090,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-images@^2.0.3", "@vlalg-nimbus/nb-images@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-images":
-  version "2.2.0"
+  version "2.3.0"
   resolved "file:packages/vue-components/nb-images"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3088,17 +3098,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-inputs@^10.0.0", "@vlalg-nimbus/nb-inputs@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-inputs":
-  version "10.0.0"
-  resolved "file:packages/vue-components/nb-inputs"
-  dependencies:
-    "@vlalg-nimbus/bee-css-reset" "^2.0.2"
-    "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
-    "@vlalg-nimbus/magic-debounce" "^3.0.2"
-    "@vlalg-nimbus/nb-calendar" "^2.1.1"
-    vue "^3.3.4"
-
-"@vlalg-nimbus/nb-inputs@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-inputs":
-  version "10.0.0"
+  version "10.1.0"
   resolved "file:packages/vue-components/nb-inputs"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3119,6 +3119,14 @@
 "@vlalg-nimbus/nb-loaders@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-loaders":
   version "3.1.0"
   resolved "file:packages/vue-components/nb-loaders"
+  dependencies:
+    "@vlalg-nimbus/bee-css-reset" "^2.0.2"
+    "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
+    vue "^3.3.4"
+
+"@vlalg-nimbus/nb-navigation@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-navigation":
+  version "1.0.0"
+  resolved "file:packages/vue-components/nb-navigation"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
@@ -10106,7 +10114,7 @@ negotiator@0.6.3:
     "@vlalg-nimbus/nb-buttons" "^5.0.3"
     "@vlalg-nimbus/nb-calendar" "^1.0.0"
     "@vlalg-nimbus/nb-images" "^2.0.3"
-    "@vlalg-nimbus/nb-inputs" "^8.0.6"
+    "@vlalg-nimbus/nb-inputs" "^10.0.0"
     "@vlalg-nimbus/nb-loaders" "^1.0.3"
     "@vlalg-nimbus/nb-overlays" "^1.0.2"
     "@vlalg-nimbus/nb-pagination" "^1.0.0"
@@ -14490,7 +14498,7 @@ vue-loader@^17.4.2:
     hash-sum "^2.0.0"
     watchpack "^2.4.0"
 
-vue-router@^4.2.4, vue-router@^4.4.0, vue-router@^4.4.5, vue-router@^4.6.3:
+vue-router@^4.2.4, vue-router@^4.4.0, vue-router@^4.4.5:
   version "4.6.3"
   resolved "https://registry.npmjs.org/vue-router/-/vue-router-4.6.3.tgz"
   integrity sha512-ARBedLm9YlbvQomnmq91Os7ck6efydTSpRP3nuOKCvgJOHNrhRoJDSKtee8kcL1Vf7nz6U+PMBL+hTvR3bTVQg==

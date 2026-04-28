@@ -18,13 +18,83 @@
 
     <div v-if="btType === 'tabs'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
-        style="margin-top: 50px; margin-bottom: 50px;">
+        style="margin-top: 50px; margin-bottom: 50px; background-color: #fff; color: #000">
         <h4 class="test-page__content-tile">NbTabs</h4>
         
         <NbTabs
           nb-id="tabs-light-1"
           display="b"
+          input-style="background"
+          theme="light"
+          tab-model="one"
+          :tabs="[
+            { key: 'features', label: 'Features' },
+            { key: 'specs', label: 'Specs' },
+            { key: 'dimensions', label: 'Dimensions' },
+            { key: 'contact', label: 'Contact' }
+          ]"
+          :disabled-tabs="disabledTabs"
+          :active-tab="activeTab"
+          :padding-x=".5"
+          :padding-y=".2"
+          :gap="10"
+          :has-border-radius="true"
+          lightBgColor="tomato"
+          lightBorderColor="green"
+          @changed="changedTab"
         />
+        <br />
+        <NbTabs
+          nb-id="tabs-light-2"
+          display="b"
+          input-style="line"
+          theme="light"
+          tab-model="one"
+          :tabs="[
+            { key: 'features', label: 'Features' },
+            { key: 'specs', label: 'Specs' },
+            { key: 'dimensions', label: 'Dimensions' },
+            { key: 'contact', label: 'Contact' }
+          ]"
+          :disabled-tabs="disabledTabs"
+          :active-tab="activeTab"
+          :padding-x=".5"
+          :padding-y=".2"
+          :gap="0"
+          :has-border-radius="true"
+          lightBgColor="tomato"
+          lightBorderColor="green"
+          @changed="changedTab"
+        />
+        <br />
+        <NbTabs
+          nb-id="tabs-light-3"
+          display="b"
+          input-style="border"
+          theme="light"
+          tab-model="one"
+          :tabs="[
+            { key: 'features', label: 'Features' },
+            { key: 'specs', label: 'Specs' },
+            { key: 'dimensions', label: 'Dimensions' },
+            { key: 'contact', label: 'Contact' }
+          ]"
+          :disabled-tabs="disabledTabs"
+          :active-tab="activeTab"
+          :padding-x=".5"
+          :padding-y=".2"
+          :gap="0"
+          :has-border-radius="true"
+          lightBgColor="tomato"
+          lightBorderColor="green"
+          @changed="changedTab"
+        />
+        <div>
+          <div v-if="activeTab === 1">Conteudo de Specs</div>
+          <div v-else-if="activeTab === 2">Conteudo de Dimensions</div>
+          <div v-else-if="activeTab === 3">Conteudo de Contact</div>
+          <div v-else>Conteudo de Features</div>
+        </div>
       </div>
     </div>
   </div>
@@ -36,6 +106,14 @@ import { defineAsyncComponent, ref } from 'vue'
 const NbTabs = defineAsyncComponent(() => import('@components/NbTabs.vue'))
 
 const btType = ref('tabs')
+
+
+/* tests tab - model one*/
+const activeTab = ref(1)
+const disabledTabs = ref([1])
+const changedTab = (value) => {
+  activeTab.value = value.index
+}
 </script>
 
 <style lang="scss" scoped>
