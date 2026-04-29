@@ -11,7 +11,8 @@
     <div class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content" style="margin-bottom: 50px; overflow: hidden">
         <select v-model="btType">
-          <option value="tabs">tabs</option>
+          <option value="without-label">without-label</option>
+          <option value="with-label">with-label</option>
         </select>
       </div>
     </div>
@@ -21,8 +22,13 @@
         style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbTabs</h4>
         
-        <NbTabs
+        <NbBaseWithoutLabel
           nb-id="tabs-light-1"
+          display="b"
+        />
+
+        <NbBaseWithLabel
+          nb-id="tabs-light-2"
           display="b"
         />
       </div>
@@ -33,7 +39,8 @@
 <script setup>
 import { defineAsyncComponent, ref } from 'vue'
 
-const NbTabs = defineAsyncComponent(() => import('@components/NbTabs.vue'))
+const NbBaseWithoutLabel = defineAsyncComponent(() => import('@components/NbBaseWithoutLabel.vue'))
+const NbBaseWithLabel = defineAsyncComponent(() => import('@components/NbBaseWithLabel.vue'))
 
 const btType = ref('tabs')
 </script>

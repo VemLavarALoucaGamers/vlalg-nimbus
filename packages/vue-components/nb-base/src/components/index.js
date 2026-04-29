@@ -1,5 +1,7 @@
-import NbTabs from '@components/NbTabs.vue';
+import NbBaseWithoutLabel from '@components/NbBaseWithoutLabel.vue';
+import NbBaseWithLabel from '@components/NbBaseWithLabel.vue';
 
 export default {
-  NbTabs
+  NbBaseWithoutLabel,
+  NbBaseWithLabel
 };

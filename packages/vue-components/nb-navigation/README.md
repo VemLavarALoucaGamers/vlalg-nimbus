@@ -35,6 +35,7 @@ app.mount('#app')
 The components that are part of this lib are:
 
 - <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-tabs" target="_blank">nb-tabs</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-stepper" target="_blank">nb-stepper</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

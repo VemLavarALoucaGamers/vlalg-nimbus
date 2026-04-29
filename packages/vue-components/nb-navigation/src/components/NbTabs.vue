@@ -3,25 +3,31 @@
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]"
-    role="input"
+    role="navigation"
     :title="title"
     v-bind="computedAriaAttrs"
-    @click="interacted($event)"
-  >
-    <label
-      v-if="showLabel"
-      :for="computedInputName"
-      class="component__label"
-      :style="[styleLabel]"
-    >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
-    
+  >    
     <div
       :id="nbId"
-      ref="chipsContainer"
+      ref="tabsContainer"
       :class="['nb-reset', 'component', themeStyle, inputStyleClass, tabModelStyle]"
       :style="[componentStyle, styleWidth]"
     >
-      <div class="tabs-header" ref="tabsHeaderRef">
+      <div
+        :class="[
+          'tabs-header',
+          scrollClassStyle,
+          {
+            'tabs-header--dragging': isDraggingTabs
+          }
+        ]"
+        :style="{ overflowX: isScrollClass ? 'auto' : 'hidden' }"
+        ref="tabsHeaderRef"
+        @mousedown="handleTabsDragStart"
+        @mousemove="handleTabsDragMove"
+        @mouseup="handleTabsDragEnd"
+        @mouseleave="handleTabsDragEnd"
+      >
         <div
           :class="[
             'tab-indicator'
@@ -29,32 +35,28 @@
           :style="[indicatorStyle, borderRadiusStyle]"
         ></div>
 
-        <button
+        <div
           v-for="(tab, index) in tabs"
           :key="index"
           :ref="el => { if (el) tabRefs[tab.key] = el }"
+          :tabIndex="isTabDisabled(index) || disabled ? -1 : tabIndex"
           class="tab-btn"
           :class="[
             'tab-btn', 
             {
               active: currentActiveTab === tab.key,
               'tab-btn--disabled': isTabDisabled(index)
-            }
+            },
+            activeTextStyleClass
           ]"
           @click="changeTab(index)"
+          @keydown.enter.prevent="handleTabIndexEnter(index)"
           :disabled="isTabDisabled(index)"
         >
           {{ tab.label }}
-        </button>
-      </div>
-
-      <!-- Tabs Content -->
-      <div class="tabs-content">
-        <div v-for="(tab, index) in tabs" :key="index">
-            <section v-if="currentActiveTab === tab.key">
-                <slot :name="tab.key" />
-            </section>
         </div>
+
+        <div class="tabs-header__line"></div>
       </div>
     </div>
   </div>
@@ -70,33 +72,30 @@ defineOptions({
 
 onMounted(async () => {
   await startTabs()
+  window.addEventListener('mouseup', handleTabsDragEnd)
+  window.addEventListener('pointerup', handleTabsDragEnd)
+  window.addEventListener('blur', handleTabsDragEnd)
+  window.addEventListener('resize', handleWindowResize)
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('mouseup', handleTabsDragEnd)
+  window.removeEventListener('pointerup', handleTabsDragEnd)
+  window.removeEventListener('blur', handleTabsDragEnd)
+  window.removeEventListener('resize', handleWindowResize)
   if (headerResizeObserver.value) {
     headerResizeObserver.value.disconnect()
   }
 })
 
 const emit = defineEmits([
-  'clicked',
-  'changed',
-  'focused',
-  'blurred'
+  'changed'
 ])
 
 const props = defineProps({
 	nbId: {
 		type: String,
 		required: true
-	},
-	display: {
-		type: String,
-		default: 'b',
-		validator: (value = 'b') => {
-			const currentValue = value.toLowerCase()
-			return ['b', 'ib'].includes(currentValue)
-		}
 	},
 	tabIndex: {
     type: Number,
@@ -122,13 +121,6 @@ const props = defineProps({
     type: String,
     default: 'black'
   },
-	width: {
-		type: Number,
-		default: 185,
-		validator: value => {
-			return !value ? 185 : value
-		}
-	},
 	paddingX: {
 		type: Number,
 		default: 0.2,
@@ -167,25 +159,25 @@ const props = defineProps({
 	},
 	fontSize: {
 		type: String,
-		default: null
+		default: '1.6em'
 	},
 	fontWeight: {
 		type: Number,
 		default: 400,
 		validator: value => {
-			return !value ? 700 : value
+			return !value ? 400 : value
 		}
   },
-	required: {
-		type: Boolean,
-		default: false,
+	fontWeightActive: {
+		type: Number,
+		default: 400,
 		validator: value => {
-			return typeof value === 'boolean' && [true, false].includes(value)
+			return !value ? 400 : value
 		}
-	},
+  },
 	textAlign: {
 		type: String,
-		default: 'left',
+		default: 'right',
 		validator: value => {
 			return ['center', 'left', 'right'].indexOf(value) !== -1
 		}
@@ -204,6 +196,13 @@ const props = defineProps({
 			return ['dark', 'light'].indexOf(value) !== -1
 		}
 	},
+  opacityDisabled: {
+    type: Number,
+    default: 0.2,
+    validator: value => {
+      return !value ? 0.2 : value
+    }
+  },
 	inputStyle: {
 		type: String,
 		default: 'background',
@@ -220,40 +219,36 @@ const props = defineProps({
 		type: String,
 		default: '#eaeaea' // '#353734'
 	},
-	lightDisabledBgColor: {
+	lightTabBorderColor: {
 		type: String,
-		default: '#dfdfd9'
+		default: '#f8f8f2'
 	},
 	lightTextColor: {
 		type: String,
 		default: '#000000'
 	},
-	lightDisabledBorderColor: {
+	lightTextColorActive: {
 		type: String,
-		default: 'rgba(53, 55, 52, 0.3)'
+		default: '#1a73e8'
 	},
 	// Cores do tema dark
 	darkBgColor: {
 		type: String,
 		default: '#353734'
 	},
-	darkBgColorFocus: {
-		type: String,
-		default: '#272936'
-	},
 	darkBorderColor: {
 		type: String,
 		default: '#44475a'
 	},
-	darkBorderColorFocus: {
+	darkTabBorderColor: {
 		type: String,
-		default: 'rgba(68, 71, 90, 0.4)'
-	},
-	darkDisabledBgColor: {
-		type: String,
-		default: 'rgba(40, 42, 54, 1)'
+		default: '#353734'
 	},
 	darkTextColor: {
+		type: String,
+		default: '#000000'
+	},
+	darkTextColorActive: {
 		type: String,
 		default: '#ffffff'
 	},
@@ -261,94 +256,6 @@ const props = defineProps({
 	darkDisabledBorderColor: {
 		type: String,
 		default: 'rgba(68, 71, 90, 0.3)'
-	},
-	// Label props
-	showLabel: {
-		type: Boolean,
-		default: false,
-		validator: value => {
-			return typeof value === 'boolean' && [true, false].includes(value)
-		},
-	},
-	label: {
-		type: String,
-		default: 'Label text',
-	},
-	labelBackground: {
-		type: String,
-		default: 'transparent',
-	},
-	labelPadding: {
-		type: String,
-		default: '1px 5px',
-	},
-	labelBorderRadius: {
-		type: Number,
-		default: 0
-	},
-  labelBreakOnActive: {
-    type: Boolean,
-    default: true,
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    },
-  },
-  labelLeft: {
-		type: Number,
-		default: 5,
-	},
-	inputLabelMarginActive: {
-		type: Number,
-		default: 15,
-	},
-	labelActiveTop: {
-		type: Number,
-		default: -13,
-	},
-	labelActiveLeft: {
-		type: Number,
-		default: 5,
-	},
-	fontFamilyLabel: {
-		type: String,
-		default: `'Lato', sans-serif`
-	},
-	fontSizeLabel: {
-		type: String,
-		default: '1em',
-		validator: value => {
-			return !value ? '1em' : value
-		}
-	},
-	fontSizeLabelActive: {
-		type: String,
-		default: '0.8em',
-		validator: value => {
-			return !value ? '0.8em' : value
-		}
-	},
-	fontWeightLabel: {
-		type: Number,
-		default: 400,
-		validator: value => {
-			return !value ? 700 : value
-		}
-	},
-	lightTextColorLabel: {
-		type: String,
-		default: '#333333'
-	},
-	lightTextColorLabelActive: {
-		type: String,
-		default: '#333333'
-	},
-	darkTextColorLabel: {
-		type: String,
-		default: '#ffffff'
-	},
-	darkTextColorLabelActive: {
-		type: String,
-		default: '#ffffff'
 	},
   tabs: {
     type: Array,
@@ -378,7 +285,7 @@ const props = defineProps({
     type: String,
     default: 'one',
     validator: (value) => {
-      return ['one', 'two'].includes(value)
+      return ['one'].includes(value)
     }
   },
   gap: {
@@ -387,12 +294,33 @@ const props = defineProps({
     validator: value => {
       return !value ? 24 : value
     }
-  }
+  },
+  indicatorWidth: {
+    type: Number,
+    default: 2,
+    validator: value => {
+      return !value ? 2 : value
+    }
+  },
+  barPaddingLeft: {
+    type: Number,
+    default: 0
+  },
+  isScrollClass: {
+		type: Boolean,
+		default: false,
+		validator: value => {
+			return typeof value === 'boolean' && [true, false].includes(value)
+		}
+	},
+	scrollClass: {
+		type: String,
+		default: ''
+	}
 })
 
 const {
 	nbId,
-	display,
 	paddingX,
 	paddingY,
 	borderRadius,
@@ -400,123 +328,76 @@ const {
 	fontFamily,
 	fontSize,
 	fontWeight,
+  fontWeightActive,
 	textColor,
-	width,
-	required,
 	textAlign,
 	hasBorderRadius,
 	activeTextStyle,
 	theme,
+  opacityDisabled,
 	inputStyle,
 	lightBgColor,
 	lightBorderColor,
-	lightDisabledBgColor,
+	lightTabBorderColor,
 	lightTextColor,
-	lightChipBgColor,
-	lightChipTextColor,
-	lightChipRemoveColor,
-	lightDisabledBorderColor,
+	lightTextColorActive,
 	darkBgColor,
-	darkBgColorFocus,
 	darkBorderColor,
-	darkBorderColorFocus,
+	darkTabBorderColor,
 	darkDisabledBgColor,
 	darkTextColor,
+	darkTextColorActive,
 	darkDisabledBorderColor,
 	tabIndex,
 	hasTabIndexEnter,
 	ariaLabel,
 	ariaAttrs,
-	showLabel,
-	label,
-	labelBackground,
-	labelPadding,
-	labelBorderRadius,
-	labelBreakOnActive,
-	labelLeft,
-	inputLabelMarginActive,
-	labelActiveTop,
-	labelActiveLeft,
-	fontFamilyLabel,
-	fontSizeLabel,
-	fontSizeLabelActive,
-	fontWeightLabel,
-	lightTextColorLabel,
-	lightTextColorLabelActive,
-	darkTextColorLabel,
-	darkTextColorLabelActive,
   activeTab,
   disabledTabs,
   tabModel,
-  gap
+  gap,
+  indicatorWidth,
+  barPaddingLeft,
+  isScrollClass,
+  scrollClass
 } = toRefs(props)
-
-const isActive = ref(false)
 
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
-	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const widthValue = !width.value || width.value < 185 ? 185 : width.value
+	const displayValue = 'block'
 	const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.2em' : fontSize.value
+	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
-	const themeValue = !theme.value ? 'light' : theme.value
+	const fontWeightActiveValue = ((fontWeightActive.value !== 0 && !fontWeightActive.value) || fontWeightActive.value < 0) ? 100 : fontWeightActive.value
+  const themeValue = !theme.value ? 'light' : theme.value
   const textColorValue = !textColor.value ? 'black' : textColor.value
 
-	// Label default values
-	const showLabelValue = !showLabel.value ? false : showLabel.value
-	const labelLeftValue = ((labelLeft.value !== 0 && !labelLeft.value) || labelLeft.value < 0) ? 5 : labelLeft.value
-	const labelBackgroundValue = !labelBackground.value ? 'transparent' : labelBackground.value
-	const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
-	const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
-	const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
-	const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
-	const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
-	const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
-	const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
-	const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
-	const fontWeightLabelValue = !fontWeightLabel.value ? 400 : fontWeightLabel.value
-	const lightTextColorLabelValue = !lightTextColorLabel.value ? '#333333' : lightTextColorLabel.value
-	const darkTextColorLabelValue = !darkTextColorLabel.value ? '#ffffff' : darkTextColorLabel.value
-	const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#333333' : lightTextColorLabelActive.value
-	const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#ffffff' : darkTextColorLabelActive.value
-
-  const tabModelValue = !tabModel.value ? 'one' : tabModel.value
+  const tabModelValue = !tabModel.value || tabModel.value !== 'one' ? 'one' : tabModel.value
   const gapStyleValue = ((gap.value !== 0 && !gap.value) || gap.value < 0) ? 24 : gap.value
+  const indicatorWidthValue = ((indicatorWidth.value !== 0 && !indicatorWidth.value) || indicatorWidth.value < 0) ? 2 : indicatorWidth.value
+  const opacityDisabledValue = ((opacityDisabled.value !== 0 && !opacityDisabled.value) || opacityDisabled.value < 0) ? 0.2 : opacityDisabled.value
+  const barPaddingLeftValue = ((barPaddingLeft.value !== 0 && !barPaddingLeft.value) || barPaddingLeft.value < 0) ? 0 : barPaddingLeft.value
 
 	return {
 		disabled: disabledValue,
 		display: displayValue,
-		width: widthValue,
 		font: fontValue,
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
+    fontWeightActive: fontWeightActiveValue,
 		paddingX: paddingXValue,
 		paddingY: paddingYValue,
     borderRadius: borderRadiusValue,
 		theme: themeValue,
-		showLabel: showLabelValue,
-		labelLeft: labelLeftValue,
-		labelBackground: labelBackgroundValue,
-		inputLabelMarginActive: inputLabelMarginActiveValue,
-		labelPadding: labelPaddingValue,
-		labelBorderRadius: labelBorderRadiusValue,
-		labelActiveTop: labelActiveTopValue,
-		labelActiveLeft: labelActiveLeftValue,
-		fontFamilyLabel: fontFamilyLabelValue,
-		fontSizeLabel: fontSizeLabelValue,
-		fontSizeLabelActive: fontSizeLabelActiveValue,
-		fontWeightLabel: fontWeightLabelValue,
-		lightTextColorLabel: lightTextColorLabelValue,
-		darkTextColorLabel: darkTextColorLabelValue,
-		lightTextColorLabelActive: lightTextColorLabelActiveValue,
-		darkTextColorLabelActive: darkTextColorLabelActiveValue,
 		textColor: textColorValue,
 		tabModel: tabModelValue,
 		gap: gapStyleValue,
+		indicatorWidth: indicatorWidthValue,
+		opacityDisabled: opacityDisabledValue,
+		barPaddingLeft: barPaddingLeftValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -526,35 +407,27 @@ const componentDisabled = computed(() => {
 })
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
-	const isActive = isLabelActive.value
 
 	return {
 		display: defaultValues.display,
-		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
-    // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
     paddingTop: '0px',
-		// Esconde o label quando não está ativo usando overflow hidden
-		// Se não tem label ou está ativo, permite overflow visible para não cortar conteúdo
-		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden'
+		overflow: 'hidden'
 	}
 })
 const fontSizeStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	
-	if (defaultValues.fontSize) return defaultValues.fontSize
-
-	return '1.2em'
+	return defaultValues.fontSize
 })
 
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
-	const isActive = isLabelActive.value
 
 	return {
 		color: defaultValues.textColor,
 		fontWeight: defaultValues.fontWeight,
 		textAlign: textAlign.value,
-		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
+		marginTop: '0',
 	}
 })
 const activeTextStyleClass = computed(() => {
@@ -608,47 +481,7 @@ const computedAriaAttrs = computed(() => {
   )
 })
 const styleWidth = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-  const widthIb = {
-    width: `${defaultValues.width}px`
-  }
-
-  return defaultValues.display === 'block' ? { width: 'auto' } : widthIb
-})
-const isLabelActive = computed(() => {
-  // Label está ativo se o input estiver focado
-  return isActive.value
-})
-const styleLabel = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  const isActive = isLabelActive.value
-
-  const lightTextColorLabel = isActive ? defaultValues.lightTextColorLabelActive : defaultValues.lightTextColorLabel
-  const darkTextColorLabel = isActive ? defaultValues.darkTextColorLabelActive : defaultValues.darkTextColorLabel
-
-  return {
-    fontFamily: defaultValues.fontFamilyLabel,
-    fontSize: isActive ? defaultValues.fontSizeLabelActive : defaultValues.fontSizeLabel,
-    fontWeight: defaultValues.fontWeightLabel,
-    color: defaultValues.theme === 'dark' ? darkTextColorLabel : lightTextColorLabel,
-    top: isActive ? `${defaultValues.labelActiveTop}px` : '50%',
-    left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
-    transform: isActive ? 'translateY(0)' : 'translateY(-50%)',
-    transition: 'all 0.2s ease',
-    backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
-    padding: isActive ? defaultValues.labelPadding : '0',
-    borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
-    // Se labelBreakOnActive for true (padrão), usa ellipsis quando ativo. Se false, quebra linha
-    ...(isActive ? {
-      whiteSpace: !labelBreakOnActive.value ? 'normal' : 'nowrap',
-      wordWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
-      overflowWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
-      maxWidth: '100%',
-      textOverflow: labelBreakOnActive.value ? 'ellipsis' : 'clip',
-      overflow: labelBreakOnActive.value ? 'hidden' : 'visible',
-    } : {}),
-  }
+  return { width: 'auto' }
 })
 const themeStyle = computed(() => {
 	switch (theme.value) {
@@ -669,67 +502,76 @@ const inputStyleClass = computed(() => {
 	}
 })
 
-const interacted = (event) => {
-	emit('clicked', event)
-}
-
-const handleFocus = () => {
-  isActive.value = true
-  emit('focused')
-}
-const handleBlur = () => {
-  isActive.value = false
-  emit('blurred')
-}
-
 /* New logic below */
-const currentActiveTab = ref('')
-const tabsHeaderRef = ref(null)
-const tabRefs = ref({})
-const indicatorVersion = ref(0)
-const headerResizeObserver = ref(null)
+const currentActiveTab = ref('') // current active tab key
+const tabsHeaderRef = ref(null) // tabs header reference
+const tabRefs = ref({}) // tab references
+const indicatorVersion = ref(0) // indicator version
+const headerResizeObserver = ref(null) // header resize observer
+const isDraggingTabs = ref(false) // is dragging tabs
+const dragStartX = ref(0) // drag start x
+const dragStartScrollLeft = ref(0) // drag start scroll left
+const hasMovedDuringDrag = ref(false) // has moved during drag
 
+// bump indicator version
 const bumpIndicatorVersion = () => {
   indicatorVersion.value += 1
 }
 
+// setup header resize observer
 const setupHeaderResizeObserver = () => {
+  // check if ResizeObserver is supported
   if (typeof ResizeObserver === 'undefined') return
 
+  // disconnect existing observer
   if (headerResizeObserver.value) {
     headerResizeObserver.value.disconnect()
   }
 
+  // create new observer
   headerResizeObserver.value = new ResizeObserver(() => {
     bumpIndicatorVersion()
   })
 
+  // observe tabs header
   if (tabsHeaderRef.value) {
     headerResizeObserver.value.observe(tabsHeaderRef.value)
   }
 }
 
+// indicator style
 const indicatorStyle = computed(() => {
   // Dependencia reativa para forcar recalc quando o layout do header mudar (gap, fonte, resize, etc.)
   indicatorVersion.value
+
+  // get active tab element
   const activeTabEl = tabRefs.value[currentActiveTab.value]
+
+  // check if active tab element or tabs header reference is not found
   if (!activeTabEl || !tabsHeaderRef.value) {
     return { width: '0', left: '0' }
   }
-  
+
+  // get tabs header and active tab element bounding client rect
   const headerRect = tabsHeaderRef.value.getBoundingClientRect()
+
+  // get active tab element bounding client rect
   const tabRect = activeTabEl.getBoundingClientRect()
   
+  // return indicator style
   return {
     width: `${tabRect.width}px`,
-    left: `${tabRect.left - headerRect.left}px`
+    left: `${tabRect.left - headerRect.left + tabsHeaderRef.value.scrollLeft}px`
   }
 })
+// disabled tabs list
 const disabledTabList = computed(() => {
+  // check if disabled tabs list is empty
   if (!Array.isArray(props.disabledTabs) || props.disabledTabs.length === 0) {
     return []
   }
 
+  // return disabled tabs list
   return props.disabledTabs
 })
 const tabModelStyle = computed(() => {
@@ -747,8 +589,117 @@ const gapStyle = computed(() => {
   
   return `${defaultValues.gap}px`
 })
+const fontWeightActiveAStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  
+  return defaultValues.fontWeightActive
+})
+const indicatorWidthStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  
+  return `${defaultValues.indicatorWidth}px`
+})
+const opacityDisabledStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  
+  return defaultValues.opacityDisabled
+})
+const barPaddingLeftStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  
+  return `${defaultValues.barPaddingLeft}px`
+})
+const currentActiveTabIndex = computed(() => {
+  return props.tabs.findIndex(tab => tab.key === currentActiveTab.value)
+})
+const scrollClassStyle = computed(() => {
+  return isScrollClass.value ? scrollClass.value : ''
+})
 
+// get first enabled tab index
+const getFirstEnabledTabIndex = () => {
+  return props.tabs.findIndex((_, index) => !isTabDisabled(index))
+}
+// handle tab index enter
+const handleTabIndexEnter = (tabIndex) => {
+  // check if disabled or has tab index enter is disabled
+  if (disabled.value || !hasTabIndexEnter.value) return
+
+  // get first enabled tab index
+  const firstEnabledTabIndex = getFirstEnabledTabIndex()
+
+  // get active tab index
+  const activeTabIndex = Number.isInteger(tabIndex)
+    ? tabIndex
+    : (currentActiveTabIndex.value >= 0 ? currentActiveTabIndex.value : firstEnabledTabIndex)
+
+  // check if active tab index is greater than 0
+  if (activeTabIndex >= 0) {
+    changeTab(activeTabIndex)
+  }
+}
+// handle tabs drag start
+const handleTabsDragStart = (event) => {
+  // check if is scroll class or tabs header reference is not found
+  if (!isScrollClass.value || !tabsHeaderRef.value) return
+
+  // prevent default event
+  event.preventDefault()
+
+  // set is dragging tabs to true
+  isDraggingTabs.value = true
+  
+  // set has moved during drag to false
+  hasMovedDuringDrag.value = false
+  
+  // set drag start x to event client x
+  dragStartX.value = event.clientX
+
+  // set drag start scroll left to tabs header scroll left
+  dragStartScrollLeft.value = tabsHeaderRef.value.scrollLeft
+}
+// handle tabs drag move
+const handleTabsDragMove = (event) => {
+  // check if is dragging tabs or tabs header reference is not found
+  if (!isDraggingTabs.value || !tabsHeaderRef.value) return
+
+  // get delta x
+  const deltaX = event.clientX - dragStartX.value
+
+  // check if delta x is greater than 4
+  if (Math.abs(deltaX) > 4) {
+    // set has moved during drag to true
+    hasMovedDuringDrag.value = true
+  }
+
+  // set tabs header scroll left to drag start scroll left minus delta x
+  tabsHeaderRef.value.scrollLeft = dragStartScrollLeft.value - deltaX
+}
+// handle tabs drag end
+const handleTabsDragEnd = () => {
+  // set has moved during drag to false
+  hasMovedDuringDrag.value = false // set has moved during drag to false
+
+  // set is dragging tabs to false
+  isDraggingTabs.value = false // set is dragging tabs to false
+}
+// change tab
 const changeTab = (tabIndex) => {
+  // check if has moved during drag
+  if (hasMovedDuringDrag.value) {
+    // set has moved during drag to false
+    hasMovedDuringDrag.value = false
+
+    // return
+    return
+  }
+
+  // check if disabled
+  if (disabled.value) return
+
+  // check if tab is disabled
+  if (isTabDisabled(tabIndex)) return
+
   // resolve tab key
   const tabKey = resolveTabKey(tabIndex)
 
@@ -760,6 +711,7 @@ const changeTab = (tabIndex) => {
     key: tabKey
   })
 }
+// resolve tab key
 const resolveTabKey = (tabIndex) => {
   // check if tabs list is empty
   if (!Array.isArray(props.tabs) || props.tabs.length === 0) {
@@ -772,10 +724,8 @@ const resolveTabKey = (tabIndex) => {
   // resolve tab key
   return props.tabs[normalizedIndex]?.key ?? props.tabs[0].key
 }
+// is tab disabled
 const isTabDisabled = (tabIdentifier) => {
-  // check if component is disabled
-  if (disabled.value) return true
-
   // check if disabled tabs list is empty
   if (!Array.isArray(disabledTabList.value) || disabledTabList.value.length === 0) {
     return false
@@ -794,6 +744,7 @@ const isTabDisabled = (tabIdentifier) => {
   // check if tab index or tab key is in disabled tabs list
   return disabledTabList.value.includes(tabIndex) || disabledTabList.value.includes(tabKey)
 }
+// set active tab
 const setActiveTab = (tabIndex) => {
   // normalize index
   const normalizedIndex = Number.isInteger(tabIndex) ? tabIndex : 0
@@ -810,6 +761,7 @@ const setActiveTab = (tabIndex) => {
   // set current active tab
   currentActiveTab.value = resolvedTabKey
 }
+// get first enabled tab
 const getFirstEnabledTab = () => {
   // get first enabled tab
   const enabledTabs = props.tabs.filter((tab, index) => !isTabDisabled(index))
@@ -818,6 +770,7 @@ const getFirstEnabledTab = () => {
   return enabledTabs.length > 0 ? enabledTabs[0].key : ''
 }
 
+// start tabs
 const startTabs = async () => {
   // active tab initial
   setActiveTab(activeTab.value)
@@ -830,7 +783,16 @@ const startTabs = async () => {
   // bump indicator version to force recalc when the layout of the header changes (gap, font, resize, etc.)
   bumpIndicatorVersion()
 }
+// handle window resize
+const handleWindowResize = async () => {
+  // await next tick to ensure the DOM is updated
+  await nextTick()
 
+  // bump indicator version to force recalc when the layout of the header changes (gap, font, resize, etc.)
+  bumpIndicatorVersion()
+}
+
+// no empty number
 const noEmptyNumber = (value) => {
   return value !== '' && value !== null && value !== undefined
 }
@@ -841,7 +803,7 @@ watch(activeTab, (newValue, oldValue) => {
 watch(disabledTabs, () => {
   startTabs()
 })
-watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
+watch(props, async () => {
   await nextTick()
   bumpIndicatorVersion()
 })
@@ -880,17 +842,6 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
 	}
 }
 
-.component__label {
-    position: absolute;
-    z-index: 1;
-    pointer-events: none;
-
-    .component__label--required {
-      color: red;
-      display: contents;
-    }
-  }
-
 .component {
 	margin: 0;
 	padding: 0;
@@ -898,7 +849,7 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
 	line-height: 1.42857143;
 	font-family: v-bind('font');
 
-	user-select: none;
+	// user-select: none;
 
 	touch-action: manipulation;
 
@@ -917,23 +868,24 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
 
   // inicio propTheme
   &.component__theme--light {
-    color: v-bind('lightTextColor');
+    .tabs-header {
+      .tab-btn {
+        color: v-bind('lightTextColor') !important;
+
+        &.active {
+          color: v-bind('lightTextColorActive') !important;
+        }
+      }
+
+      .tabs-header__line {
+        border-bottom: 1px solid v-bind('lightBorderColor');
+      }
+    }
 
     &.component__tab--background {
-      border: 0;
-
       &.component--model-one {
         .tabs-header {
-          border-bottom: 1px solid v-bind('lightBorderColor');
-
-          .tab-btn {
-            &.active {
-              color: #7b7b7b !important;
-            }
-          }
-
           .tab-indicator {
-            height: 100%;
             background-color: v-bind('lightBgColor');
           }
         }
@@ -941,23 +893,15 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
     }
 
     &.component__tab--line {
-      // background-color: transparent;
-      border: 0;
-      // border-bottom: 1px solid v-bind('lightBorderColor');
-      
-
       &.component--model-one {
         .tabs-header {
-          border-bottom: 1px solid v-bind('lightBorderColor');
-
           .tab-btn {
             &.active {
-              color: #7b7b7b !important;
+              color: v-bind('lightTextColorActive') !important;
             }
           }
 
           .tab-indicator {
-            height: 2px;
             background-color: v-bind('lightBgColor');
           }
         }
@@ -966,26 +910,22 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
 
     &.component__tab--border {
       border: 0;
-      // background-color: transparent;
-      // border: 1px solid v-bind('lightBorderColor');
 
       &.component--model-one {
         .tabs-header {
-          border-bottom: 1px solid v-bind('lightBorderColor');
-
           .tab-btn {
             &.active {
-              color: #7b7b7b !important;
+              color: v-bind('lightTextColorActive') !important;
             }
           }
 
           .tab-indicator {
             height: 100%;
-            background-color: #fff;
-            border-left: 1px solid v-bind('lightBgColor');
-            border-right: 1px solid v-bind('lightBgColor');
+            background-color: v-bind('lightBgColor');
+            border-left: 1px solid v-bind('lightTabBorderColor');
+            border-right: 1px solid v-bind('lightTabBorderColor');
             border-bottom: none;
-            border-top: 1px solid v-bind('lightBgColor');
+            border-top: 1px solid v-bind('lightTabBorderColor');
           }
         }
       }
@@ -994,23 +934,69 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
     &.component--model-one {}
   }
 
+  
   &.component__theme--dark {
-    color: v-bind('darkTextColor');
+    .tabs-header {
+      .tab-btn {
+        color: v-bind('darkTextColor') !important;
+
+        &.active {
+          color: v-bind('darkTextColorActive') !important;
+        }
+      }
+
+      .tabs-header__line {
+        border-bottom: 1px solid v-bind('darkBorderColor');
+      }
+    }
 
     &.component__tab--background {
-      background-color: v-bind('darkBgColor');
-      border: 0;
+      &.component--model-one {
+        .tabs-header {
+          .tab-indicator {
+            background-color: v-bind('darkBgColor');
+          }
+        }
+      }
     }
 
     &.component__tab--line {
-      background-color: transparent;
-      border: 0;
-      border-bottom: 1px solid v-bind('darkBorderColor');
+      &.component--model-one {
+        .tabs-header {
+          .tab-btn {
+            &.active {
+              color: v-bind('darkTextColorActive') !important;
+            }
+          }
+
+          .tab-indicator {
+            background-color: v-bind('darkBgColor');
+          }
+        }
+      }
     }
 
     &.component__tab--border {
-      background-color: transparent;
-      border: 1px solid v-bind('darkBorderColor');
+      border: 0;
+
+      &.component--model-one {
+        .tabs-header {
+          .tab-btn {
+            &.active {
+              color: v-bind('darkTextColorActive') !important;
+            }
+          }
+
+          .tab-indicator {
+            height: 100%;
+            background-color: v-bind('darkBgColor');
+            border-left: 1px solid v-bind('darkTabBorderColor');
+            border-right: 1px solid v-bind('darkTabBorderColor');
+            border-bottom: none;
+            border-top: 1px solid v-bind('darkTabBorderColor');
+          }
+        }
+      }
     }
 
     &.component--model-one {}
@@ -1019,31 +1005,39 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
 
   // inicio inputStyle
   &.component__tab--background {
-    // Mantém o comportamento padrão com background
+    border: 0;
+
+    &.component--model-one {
+      .tabs-header {
+        .tab-indicator {
+          height: 100%;
+        }
+      }
+    }
   }
 
   &.component__tab--line {
-    &:focus-within {
-      // border-bottom: 1px solid v-bind('lightBorderColorFocus');
-    }
+    border: 0;
 
-    &.component__theme--dark {
-      &:focus-within {
-        // border-bottom: 1px solid v-bind('darkBorderColorFocus');
+    &.component--model-one {
+      .tabs-header {
+        .tab-indicator {
+          height: v-bind('indicatorWidthStyle');
+        }
       }
     }
   }
 
   &.component__tab--border {
-    &:focus-within {
-      // border: 1px solid v-bind('lightBorderColorFocus');
-    }
+      border: 0;
 
-    &.component__theme--dark {
-      &:focus-within {
-        // border: 1px solid v-bind('darkBorderColorFocus');
+      &.component--model-one {
+        .tabs-header {
+          .tab-indicator {
+            height: 100%;
+          }
+        }
       }
-    }
   }
   // fim inputStyle
 
@@ -1051,48 +1045,81 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
     .tabs-header {
       display: flex;
       gap: v-bind('gapStyle');
-      border-bottom: 1px solid #e5e5e5;
       position: relative;
       width: 100%;
+      padding-left: v-bind('barPaddingLeftStyle');
+      overflow: hidden;
+
+      &.tabs-header--dragging {
+        cursor: grabbing;
+        user-select: none;
+
+        .tab-btn,
+        .tab-btn:hover,
+        .tab-btn:active,
+        .tab-btn.tab-btn--disabled,
+        .tab-btn.tab-btn--disabled:hover {
+          cursor: grabbing !important;
+        }
+      }
 
       .tab-btn {
         // background: none;
         border: none;
         padding: v-bind('tabPaddingStyle') !important;
-        font-size: 14px;
-        color: #666;
         background: none;
         cursor: pointer;
         position: relative;
+        font-size: v-bind('fontSizeStyle') !important;
         transition: background-color 0.3s ease, color 0.3s ease;
+        z-index: 2;
 
         &.active {
-          color: #1a73e8;
-          font-weight: 500;
+          color: v-bind('lightTextColorActive');
+          font-weight: v-bind('fontWeightActiveAStyle');
         }
 
         &.tab-btn--disabled {
           user-select: none;
-
-          opacity: 0.8;
+          opacity: v-bind('opacityDisabledStyle');
 
           &:hover {
             cursor: default !important;
           }
         }
+
+        // inicio activeTextStyle
+        &.component__text--italic {
+          font-style: italic;
+        }
+
+        &.component__text--oblique {
+          font-style: oblique;
+        }
+
+        &.component__text--normal {
+          font-style: normal;
+        }
+        // fim activeTextStyle
       }
 
       .tab-indicator {
         position: absolute;
         bottom: -1px;
-        height: 2px;
+        height: v-bind('indicatorWidthStyle');
         background-color: #1a73e8;
         transition: background-color 0.3s ease, left 0.3s ease, width 0.3s ease, background-color 0.3s ease;
+        z-index: 1;
       }
-    }
 
-    .tabs-content {
-      // padding: 24px 0;
+      .tabs-header__line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0px;
+        z-index: 0;
+      }
     }
   }
 }
@@ -1102,40 +1129,27 @@ watch([currentActiveTab, tabPaddingStyle, gapStyle], async () => {
 	pointer-events: none;
 	user-select: none;
 
-	opacity: 0.8;
-
 	.component {
 		--disabled-button-color: v-bind('styleButtonColor');
 		--disabled-color: v-bind('styleTextColor');
 		border-radius: inherit;
 
-		&.component__theme--light {
-			&.component__tab--background {
-				background-color: v-bind('lightDisabledBgColor') !important;
-			}
 
-			&.component__tab--line {
-				border-bottom: 1px solid v-bind('lightDisabledBorderColor') !important;
-			}
+    &.component--model-one {
+      .tabs-header {
+        .tab-btn {
+          opacity: 0.4;
 
-			&.component__tab--border {
-				border: 1px solid v-bind('lightDisabledBorderColor') !important;
-			}
-		}
+          &.tab-btn--disabled {
+            opacity: 0.4;
+          }
+        }
+      }
+    }
 
-		&.component__theme--dark {
-			&.component__tab--background {
-				background-color: v-bind('darkDisabledBgColor') !important;
-			}
+		&.component__theme--light {}
 
-			&.component__tab--line {
-				border-bottom: 1px solid v-bind('darkDisabledBorderColor') !important;
-			}
-
-			&.component__tab--border {
-				border: 1px solid v-bind('darkDisabledBorderColor') !important;
-			}
-		}
+		&.component__theme--dark {}
 	}
 }
 </style>

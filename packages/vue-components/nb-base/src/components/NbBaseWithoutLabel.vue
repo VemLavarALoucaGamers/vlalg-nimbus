@@ -8,20 +8,15 @@
     v-bind="computedAriaAttrs"
     @click="interacted($event)"
   >
-    <label
-      v-if="showLabel"
-      :for="computedInputName"
-      class="component__label"
-      :style="[styleLabel]"
-    >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
-    
     <div
       :id="nbId"
-      ref="chipsContainer"
+      ref="componentContainer"
       :class="['nb-reset', 'component', themeStyle, inputStyleClass]"
       :style="[componentStyle, styleWidth, borderRadiusStyle]"
+      :tabIndex="disabled ? -1 : tabIndex"
+      @keydown.enter.prevent="handleTabIndexEnter()"
     >
-      <div class="component__content">
+      <div :class="['component__content', componentContentClass]">
         Content here
       </div>
     </div>
@@ -127,7 +122,7 @@ const props = defineProps({
 	},
 	fontSize: {
 		type: String,
-		default: null
+		default: '1.6em'
 	},
 	fontWeight: {
 		type: Number,
@@ -229,95 +224,7 @@ const props = defineProps({
 	darkDisabledBorderColor: {
 		type: String,
 		default: 'rgba(68, 71, 90, 0.3)'
-	},
-	// Label props
-	showLabel: {
-		type: Boolean,
-		default: false,
-		validator: value => {
-			return typeof value === 'boolean' && [true, false].includes(value)
-		},
-	},
-	label: {
-		type: String,
-		default: 'Label text',
-	},
-	labelBackground: {
-		type: String,
-		default: 'transparent',
-	},
-	labelPadding: {
-		type: String,
-		default: '1px 5px',
-	},
-	labelBorderRadius: {
-		type: Number,
-		default: 0
-	},
-  labelBreakOnActive: {
-    type: Boolean,
-    default: true,
-    validator: value => {
-      return typeof value === 'boolean' && [true, false].includes(value)
-    },
-  },
-  labelLeft: {
-		type: Number,
-		default: 5,
-	},
-	inputLabelMarginActive: {
-		type: Number,
-		default: 15,
-	},
-	labelActiveTop: {
-		type: Number,
-		default: -13,
-	},
-	labelActiveLeft: {
-		type: Number,
-		default: 5,
-	},
-	fontFamilyLabel: {
-		type: String,
-		default: `'Lato', sans-serif`
-	},
-	fontSizeLabel: {
-		type: String,
-		default: '1em',
-		validator: value => {
-			return !value ? '1em' : value
-		}
-	},
-	fontSizeLabelActive: {
-		type: String,
-		default: '0.8em',
-		validator: value => {
-			return !value ? '0.8em' : value
-		}
-	},
-	fontWeightLabel: {
-		type: Number,
-		default: 400,
-		validator: value => {
-			return !value ? 700 : value
-		}
-	},
-	lightTextColorLabel: {
-		type: String,
-		default: '#333333'
-	},
-	lightTextColorLabelActive: {
-		type: String,
-		default: '#333333'
-	},
-	darkTextColorLabel: {
-		type: String,
-		default: '#ffffff'
-	},
-	darkTextColorLabelActive: {
-		type: String,
-		default: '#ffffff'
-	},
+	}
 })
 
 const {
@@ -332,7 +239,6 @@ const {
 	fontWeight,
 	textColor,
 	width,
-	required,
 	textAlign,
 	hasBorderRadius,
 	activeTextStyle,
@@ -344,9 +250,6 @@ const {
 	lightBorderColorFocus,
 	lightDisabledBgColor,
 	lightTextColor,
-	lightChipBgColor,
-	lightChipTextColor,
-	lightChipRemoveColor,
 	lightDisabledBorderColor,
 	darkBgColor,
 	darkBgColorFocus,
@@ -358,28 +261,8 @@ const {
 	tabIndex,
 	hasTabIndexEnter,
 	ariaLabel,
-	ariaAttrs,
-	showLabel,
-	label,
-	labelBackground,
-	labelPadding,
-	labelBorderRadius,
-	labelBreakOnActive,
-	labelLeft,
-	inputLabelMarginActive,
-	labelActiveTop,
-	labelActiveLeft,
-	fontFamilyLabel,
-	fontSizeLabel,
-	fontSizeLabelActive,
-	fontWeightLabel,
-	lightTextColorLabel,
-	lightTextColorLabelActive,
-	darkTextColorLabel,
-	darkTextColorLabelActive
+	ariaAttrs
 } = toRefs(props)
-
-const isActive = ref(false)
 
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
@@ -389,28 +272,10 @@ const formatDefaultValues = computed(() => {
 	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
 	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.2em' : fontSize.value
+	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 	const themeValue = !theme.value ? 'light' : theme.value
   const textColorValue = !textColor.value ? 'black' : textColor.value
-
-	// Label default values
-	const showLabelValue = !showLabel.value ? false : showLabel.value
-	const labelLeftValue = ((labelLeft.value !== 0 && !labelLeft.value) || labelLeft.value < 0) ? 5 : labelLeft.value
-	const labelBackgroundValue = !labelBackground.value ? 'transparent' : labelBackground.value
-	const inputLabelMarginActiveValue = ((inputLabelMarginActive.value !== 0 && !inputLabelMarginActive.value) || inputLabelMarginActive.value < 0) ? 15 : inputLabelMarginActive.value
-	const labelPaddingValue = !labelPadding.value ? '1px 5px' : labelPadding.value
-	const labelBorderRadiusValue = ((labelBorderRadius.value !== 0 && !labelBorderRadius.value) || labelBorderRadius.value < 0) ? 0 : labelBorderRadius.value
-	const labelActiveTopValue = (labelActiveTop.value === null || labelActiveTop.value === undefined) ? -13 : labelActiveTop.value
-	const labelActiveLeftValue = (labelActiveLeft.value === null || labelActiveLeft.value === undefined) ? 5 : labelActiveLeft.value
-	const fontFamilyLabelValue = !fontFamilyLabel.value ? `'Lato', sans-serif` : fontFamilyLabel.value
-	const fontSizeLabelValue = !fontSizeLabel.value ? '1em' : fontSizeLabel.value
-	const fontSizeLabelActiveValue = !fontSizeLabelActive.value ? '0.8em' : fontSizeLabelActive.value
-	const fontWeightLabelValue = !fontWeightLabel.value ? 400 : fontWeightLabel.value
-	const lightTextColorLabelValue = !lightTextColorLabel.value ? '#333333' : lightTextColorLabel.value
-	const darkTextColorLabelValue = !darkTextColorLabel.value ? '#ffffff' : darkTextColorLabel.value
-	const lightTextColorLabelActiveValue = !lightTextColorLabelActive.value ? '#333333' : lightTextColorLabelActive.value
-	const darkTextColorLabelActiveValue = !darkTextColorLabelActive.value ? '#ffffff' : darkTextColorLabelActive.value
 
 	return {
 		disabled: disabledValue,
@@ -423,22 +288,6 @@ const formatDefaultValues = computed(() => {
 		paddingY: paddingYValue,
     borderRadius: borderRadiusValue,
 		theme: themeValue,
-		showLabel: showLabelValue,
-		labelLeft: labelLeftValue,
-		labelBackground: labelBackgroundValue,
-		inputLabelMarginActive: inputLabelMarginActiveValue,
-		labelPadding: labelPaddingValue,
-		labelBorderRadius: labelBorderRadiusValue,
-		labelActiveTop: labelActiveTopValue,
-		labelActiveLeft: labelActiveLeftValue,
-		fontFamilyLabel: fontFamilyLabelValue,
-		fontSizeLabel: fontSizeLabelValue,
-		fontSizeLabelActive: fontSizeLabelActiveValue,
-		fontWeightLabel: fontWeightLabelValue,
-		lightTextColorLabel: lightTextColorLabelValue,
-		darkTextColorLabel: darkTextColorLabelValue,
-		lightTextColorLabelActive: lightTextColorLabelActiveValue,
-		darkTextColorLabelActive: darkTextColorLabelActiveValue,
 		textColor: textColorValue,
 	}
 })
@@ -449,36 +298,28 @@ const componentDisabled = computed(() => {
 })
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
-	const isActive = isLabelActive.value
 
 	return {
 		display: defaultValues.display,
-		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
-    // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
     paddingTop: '0px',
-		// Esconde o label quando não está ativo usando overflow hidden
-		// Se não tem label ou está ativo, permite overflow visible para não cortar conteúdo
-		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden'
+		overflow: 'hidden'
 	}
 })
 const fontSizeStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	
-	if (defaultValues.fontSize) return defaultValues.fontSize
-
-	return '1.2em'
+	return defaultValues.fontSize
 })
 
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
-	const isActive = isLabelActive.value
 
 	return {
 		color: defaultValues.textColor,
 		padding: `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`,
 		fontWeight: defaultValues.fontWeight,
 		textAlign: textAlign.value,
-		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
+		marginTop: '0',
 	}
 })
 const activeTextStyleClass = computed(() => {
@@ -542,40 +383,6 @@ const styleWidth = computed(() => {
 
   return defaultValues.display === 'block' ? { width: 'auto' } : widthIb
 })
-const isLabelActive = computed(() => {
-  // Label está ativo se o input estiver focado
-  return isActive.value
-})
-const styleLabel = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  const isActive = isLabelActive.value
-
-  const lightTextColorLabel = isActive ? defaultValues.lightTextColorLabelActive : defaultValues.lightTextColorLabel
-  const darkTextColorLabel = isActive ? defaultValues.darkTextColorLabelActive : defaultValues.darkTextColorLabel
-
-  return {
-    fontFamily: defaultValues.fontFamilyLabel,
-    fontSize: isActive ? defaultValues.fontSizeLabelActive : defaultValues.fontSizeLabel,
-    fontWeight: defaultValues.fontWeightLabel,
-    color: defaultValues.theme === 'dark' ? darkTextColorLabel : lightTextColorLabel,
-    top: isActive ? `${defaultValues.labelActiveTop}px` : '50%',
-    left: isActive ? `${defaultValues.labelActiveLeft}px` : `${defaultValues.labelLeft}px`,
-    transform: isActive ? 'translateY(0)' : 'translateY(-50%)',
-    transition: 'all 0.2s ease',
-    backgroundColor: isActive ? defaultValues.labelBackground : 'transparent',
-    padding: isActive ? defaultValues.labelPadding : '0',
-    borderRadius: isActive ? `${defaultValues.labelBorderRadius}rem` : '0',
-    // Se labelBreakOnActive for true (padrão), usa ellipsis quando ativo. Se false, quebra linha
-    ...(isActive ? {
-      whiteSpace: !labelBreakOnActive.value ? 'normal' : 'nowrap',
-      wordWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
-      overflowWrap: !labelBreakOnActive.value ? 'break-word' : 'normal',
-      maxWidth: '100%',
-      textOverflow: labelBreakOnActive.value ? 'ellipsis' : 'clip',
-      overflow: labelBreakOnActive.value ? 'hidden' : 'visible',
-    } : {}),
-  }
-})
 const themeStyle = computed(() => {
 	switch (theme.value) {
 		case 'dark':
@@ -595,16 +402,23 @@ const inputStyleClass = computed(() => {
 	}
 })
 
+// handle tab index enter
+const handleTabIndexEnter = () => {
+  // check if disabled or has tab index enter is disabled
+  if (disabled.value || !hasTabIndexEnter.value) return
+
+  // get first enabled tab index
+  console.log('tabIndex')
+}
+
 const interacted = (event) => {
 	emit('clicked', event)
 }
 
 const handleFocus = () => {
-  isActive.value = true
   emit('focused')
 }
 const handleBlur = () => {
-  isActive.value = false
   emit('blurred')
 }
 
@@ -644,17 +458,6 @@ const handleBlur = () => {
 	}
 }
 
-.component__label {
-    position: absolute;
-    z-index: 1;
-    pointer-events: none;
-
-    .component__label--required {
-      color: red;
-      display: contents;
-    }
-  }
-
 .component {
 	margin: 0;
 	padding: 0;
@@ -680,6 +483,7 @@ const handleBlur = () => {
   flex-direction: v-bind('styleInputPosition');
   overflow: hidden;
   position: relative;
+  font-size: v-bind('fontSizeStyle') !important;
 
   // inicio propTheme
   &.component__theme--light {
