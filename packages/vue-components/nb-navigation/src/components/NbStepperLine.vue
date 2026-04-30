@@ -1,4 +1,4 @@
-<template>
+<template>{{ selected }}
   <div
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
@@ -22,33 +22,33 @@
               <div class="nb-stepper-line__track">
                 <div class="nb-stepper-line__nav">
                   <button
-                    v-for="item in navItems"
-                    :key="item.id"
+                    v-for="(item, index) in navItems"
+                    :key="index"
                     :aria-label="item.title"
                     role="tab"
                     class="nb-stepper-line__item"
                     :class="{
-                      'nb-stepper-line__item--selected': selected === item.id,
-                      'nb-stepper-line__item--future': item.future
+                      'nb-stepper-line__item--selected': selected === index,
                     }"
-                    @click="changeSelected(item.id)"
+                    @click="handleStepChange(index)"
                   >
-                    <span class="nb-stepper-line__counter">{{ item.id }}.</span>
                     <span
-                      aria-hidden="true"
+                      v-if="tabNumberShow"
+                      class="nb-stepper-line__counter"
+                      :style="ellipsisTextStyle"
+                    >
+                      <slot name="tab-number" :item="item">{{ index + 1 }}.</slot>
+                    </span>
+
+                    <span class="nb-stepper-line__line"></span>
+                    
+                    <span
+                      v-if="labelShow"
                       class="nb-stepper-line__label"
-                      :class="{ 'nb-stepper-line__label--selected': selected === item.id }"
+                      :style="ellipsisTextStyle"
                     >
                       <strong>{{ item.title }}</strong>
-                      <span>{{ item.title }}</span>
                     </span>
-                    <em
-                      v-if="item.isNew"
-                      class="nb-stepper-line__new"
-                      :class="{ 'nb-stepper-line__new--selected': selected === item.id }"
-                    >
-                      Novo
-                    </em>
                   </button>
                 </div>
               </div>
@@ -167,34 +167,8 @@ const props = defineProps({
       return value >= 2
     }
   },
-  transition: {
-    type: String,
-    default: '0.3s',
-    validator: (value) => {
-        return ['0.3s', '0.5s', '1s'].includes(value)
-    }
-  },
-  circleSize: {
-    type: Number,
-    default: 0.8,
-    validator: (value) => {
-        return value >= 0.8
-    }
-  },
-  circleBorderSize: {
-    type: Number,
-    default: 0.13,
-    validator: (value) => {
-        return value >= 0.13
-    }
-  },
-  lineSize: {
-    type: Number,
-    default: 0.1,
-    validator: (value) => {
-        return value >= 0.1
-    }
-  },
+
+
   blockClick: {
     type: Boolean,
     default: true,
@@ -202,6 +176,153 @@ const props = defineProps({
         return typeof value === 'boolean' && [true, false].includes(value)
     }
   },
+  gap: {
+    type: Number,
+    default: 1,
+    validator: (value) => {
+        return value >= 0
+    }
+  },
+  ellipsisText: {
+    type: Boolean,
+    default: true,
+    validator: (value) => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  tabNumberShow: {
+    type: Boolean,
+    default: true,
+    validator: (value) => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  tabTextAlign: {
+    type: String,
+    default: 'right',
+    validator: (value) => {
+        return ['left', 'center', 'right'].includes(value)
+    }
+  },
+  minWidth: {
+    type: Number,
+    default: 20,
+    validator: (value) => {
+        return value >= 20
+    }
+  },
+  minWidthSelected: {
+    type: Number,
+    default: 6,
+    validator: (value) => {
+        return value >= 6
+    }
+  },
+  maxWidth: {
+    type: Number,
+    default: 50,
+    validator: (value) => {
+        return value >= 50
+    }
+  },
+  tabOpacity: {
+    type: Number,
+    default: 0.2,
+    validator: (value) => {
+        return value >= 0 && value <= 1
+    }
+  },
+  tabSelectedOpacity: {
+    type: Number,
+    default: 1,
+    validator: (value) => {
+        return value >= 0 && value <= 1
+    }
+  },
+  tabColor: {
+    type: String,
+    default: 'brown',
+    validator: (value) => {
+        return typeof value === 'string'
+    }
+  },
+  tabColorSelected: {
+    type: String,
+    default: 'green',
+    validator: (value) => {
+        return typeof value === 'yellow'
+    }
+  },
+  lineOpacity: {
+    type: Number,
+    default: 0.3,
+    validator: (value) => {
+        return value >= 0 && value <= 1
+    }
+  },
+  lineSelectedOpacity: {
+    type: Number,
+    default: 1,
+    validator: (value) => {
+        return value >= 0 && value <= 1
+    }
+  },
+  lineMarginTop: {
+    type: Number,
+    default: 3,
+    validator: (value) => {
+        return value >= 0
+    }
+  },
+  lineMarginBottom: {
+    type: Number,
+    default: 3,
+    validator: (value) => {
+        return value >= 0
+    }
+  },
+  lineHeight: {
+    type: Number,
+    default: 2,
+    validator: (value) => {
+        return value >= 2
+    }
+  },
+  lineBackground: {
+    type: String,
+    default: 'red',
+    validator: (value) => {
+        return typeof value === 'string'
+    }
+  },
+  lineBackgroundSelected: {
+    type: String,
+    default: 'blue',
+    validator: (value) => {
+        return typeof value === 'yellow'
+    }
+  },
+  labelShow: {
+    type: Boolean,
+    default: true,
+    validator: (value) => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  labelTextAlign: {
+    type: String,
+    default: 'left',
+    validator: (value) => {
+        return ['left', 'center', 'right'].includes(value)
+    }
+  },
+  labelSelectedOpacity: {
+    type: Number,
+    default: 1,
+    validator: (value) => {
+        return value >= 0 && value <= 1
+    }
+  }
 })
 
 const {
@@ -224,31 +345,43 @@ const {
 	ariaAttrs,
 	step,
 	steps,
-	transition,
-	circleSize,
-	circleBorderSize,
-	lineSize,
-	blockClick
+  
+	blockClick,
+  gap,
+  ellipsisText,
+  tabTextAlign,
+  minWidth,
+  maxWidth,
+  minWidthSelected,
+  tabOpacity,
+  tabSelectedOpacity,
+  tabColor,
+  tabColorSelected,
+  lineOpacity,
+  lineSelectedOpacity,
+  lineMarginTop,
+  lineMarginBottom,
+  lineHeight,
+  labelSelectedOpacity,
+  labelTextAlign,
+  lineBackground,
+  lineBackgroundSelected,
 } = toRefs(props)
 
-const selected = ref(step.value || 1)
+const selected = ref(1)
 const navItems = computed(() => {
   if (Array.isArray(steps.value)) {
     return steps.value.map((item, index) => {
       if (typeof item === 'object' && item !== null) {
         return {
           id: item.id ?? index + 1,
-          title: item.title ?? `Step ${index + 1}`,
-          isNew: Boolean(item.isNew),
-          future: Boolean(item.future)
+          title: item.title ?? `Step ${index + 1}`
         }
       }
 
       return {
         id: index + 1,
-        title: String(item),
-        isNew: false,
-        future: false
+        title: String(item)
       }
     })
   }
@@ -256,16 +389,9 @@ const navItems = computed(() => {
   const total = Number(steps.value) >= 2 ? Number(steps.value) : 2
   return Array.from({ length: total }, (_, index) => ({
     id: index + 1,
-    title: `Step ${index + 1}`,
-    isNew: false,
-    future: false
+    title: `Step ${index + 1}`
   }))
 })
-
-const changeSelected = (value) => {
-  selected.value = value
-  handleStepChange(value)
-}
 
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
@@ -274,20 +400,55 @@ const formatDefaultValues = computed(() => {
   
   const stepsCount = Array.isArray(steps.value) ? steps.value.length : steps.value
   const stepsValue = ((stepsCount !== 0 && !stepsCount) || stepsCount < 2) ? 2 : stepsCount
-  const transitionValue = !transition.value ? '0.3s' : transition.value
-  const circleSizeValue = !circleSize.value ? 0.8 : circleSize.value
-  const circleBorderSizeValue = !circleBorderSize.value ? 0.13 : circleBorderSize.value
-  const lineSizeValue = !lineSize.value ? 0.1 : lineSize.value
 
+  const gapValue = !gap.value ? 0.5 : gap.value
+  const ellipsisTextValue = typeof ellipsisText.value === 'boolean'
+    ? ellipsisText.value
+    : false
+  const tabTextAlignValue = !tabTextAlign.value ? 'right' : tabTextAlign.value
+  const minWidthValue = ((minWidth.value !== 0 && !minWidth.value) || minWidth.value < 10) ? 20 : minWidth.value
+  const minWidthSelectedValue = ((minWidthSelected.value !== 0 && !minWidthSelected.value) || minWidthSelected.value < 6) ? 6 : minWidthSelected.value
+  const maxWidthValue = ((maxWidth.value !== 0 && !maxWidth.value) || maxWidth.value < 10) ? 50 : maxWidth.value
+  const tabOpacityValue = ((tabOpacity.value !== 0 && !tabOpacity.value) || tabOpacity.value < 0 || tabOpacity.value > 1) ? 0.5 : tabOpacity.value
+  const tabSelectedOpacityValue = ((tabSelectedOpacity.value !== 0 && !tabSelectedOpacity.value) || tabSelectedOpacity.value < 0 || tabSelectedOpacity.value > 1) ? 1 : tabSelectedOpacity.value
+  const tabColorValue = !tabColor.value ? 'brown' : tabColor.value
+  const tabColorSelectedValue = !tabColorSelected.value ? 'blue' : tabColorSelected.value
+  const lineOpacityValue = ((lineOpacity.value !== 0 && !lineOpacity.value) || lineOpacity.value < 0 || lineOpacity.value > 1) ? 0.2 : lineOpacity.value
+  const lineSelectedOpacityValue = ((lineSelectedOpacity.value !== 0 && !lineSelectedOpacity.value) || lineSelectedOpacity.value < 0 || lineSelectedOpacity.value > 1) ? 1 : lineSelectedOpacity.value
+  const lineMarginTopValue = !lineMarginTop.value ? 3 : lineMarginTop.value
+  const lineMarginBottomValue = !lineMarginBottom.value ? 4 : lineMarginBottom.value
+  const lineHeightValue = !lineHeight.value ? 2 : lineHeight.value
+  const lineBackgroundColorValue = !lineBackground.value ? '#1a1a1a' : lineBackground.value
+  const lineBackgroundColorSelectedValue = !lineBackgroundSelected.value ? 'red' : lineBackgroundSelected.value
+  const labelSelectedOpacityValue = ((labelSelectedOpacity.value !== 0 && !labelSelectedOpacity.value) || labelSelectedOpacity.value < 0 || labelSelectedOpacity.value > 1) ? 0.1 : labelSelectedOpacity.value
+  const labelTextAlignValue = !labelTextAlign.value ? 'left' : labelTextAlign.value
+  
 	return {
 		disabled: disabledValue,
 		display: displayValue,
 		theme: themeValue,
 		steps: stepsValue,
-		transition: transitionValue,
-		circleSize: circleSizeValue,
-		circleBorderSize: circleBorderSizeValue,
-		lineSize: lineSizeValue,
+
+
+    gap: gapValue,
+		ellipsisText: ellipsisTextValue,
+		tabTextAlign: tabTextAlignValue,
+		minWidth: minWidthValue,
+		minWidthSelected: minWidthSelectedValue,
+		maxWidth: maxWidthValue,
+		tabOpacity: tabOpacityValue,
+		tabSelectedOpacity: tabSelectedOpacityValue,
+		tabColor: tabColorValue,
+		tabColorSelected: tabColorSelectedValue,
+		lineOpacity: lineOpacityValue,
+		lineSelectedOpacity: lineSelectedOpacityValue,
+    lineMarginTop: lineMarginTopValue,
+    lineMarginBottom: lineMarginBottomValue,
+		lineHeight: lineHeightValue,
+		lineBackground: lineBackgroundColorValue,
+		lineBackgroundSelected: lineBackgroundColorSelectedValue,
+		labelSelectedOpacity: labelSelectedOpacityValue,
+		labelTextAlign: labelTextAlignValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -332,6 +493,8 @@ const computedAriaAttrs = computed(() => {
   )
 })
 const themeStyle = computed(() => {
+  return ''
+
 	switch (theme.value) {
 		case 'dark':
 			return 'component__theme--dark'
@@ -377,80 +540,120 @@ const formatedValue = computed(() => {
   }
 })
 
-const transitionStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  return `all ${defaultValues.transition} ease-in-out`
-})
 
-const circleSizeStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  return `${defaultValues.circleSize}rem`
-})
-const circleBorderSizeStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  return `${defaultValues.circleBorderSize}rem`
-})
-const lineSizeStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  return `${defaultValues.lineSize}rem`
-})
-
-const isFirstItem = (index) => {
-  return index === 0
-}
-const isActualStep = (itemStep) => {
-  return formatedValue.value.step === itemStep && formatedValue.value.step <= formatedValue.value.steps
-}
-const isDoneStep = (itemStep) => {
-  return formatedValue.value.step > itemStep && itemStep < formatedValue.value.steps
-}
-const isFinishedStep = (itemStep) => {
-  return formatedValue.value.step > formatedValue.value.steps && itemStep === formatedValue.value.steps
-}
 const cursorStyle = computed(() => {
   return blockClick.value ? 'default' : 'pointer'
 })
+const gapStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.gap}em`
+})
+const ellipsisTextStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (!defaultValues.ellipsisText) return {}
+
+  return {
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap'
+  }
+})
+const minWidthStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.minWidth}px`
+})
+const minWidthSelectedStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.minWidthSelected}em`
+})
+const maxWidthStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.maxWidth}px`
+})
+const tabOpacityStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.tabOpacity}`
+})
+const tabSelectedOpacityStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.tabSelectedOpacity}`
+})
+const tabTextAlignStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  switch (defaultValues.tabTextAlign) {
+    case 'center':
+      return 'center'
+    case 'right':
+      return 'end'
+    default:
+      return 'start'
+  }
+})
+const tabColorStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return defaultValues.tabColor
+})
+const tabColorSelectedStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return defaultValues.tabColorSelected
+})
+const lineHeightStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.lineHeight}px`
+})
+const lineOpacityStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.lineOpacity}`
+})
+const lineSelectedOpacityStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.lineSelectedOpacity}`
+})
+const lineMarginStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.lineMarginTop}px 0 ${defaultValues.lineMarginBottom}px 0`
+})
+const lineBackgroundStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return defaultValues.lineBackground
+})
+const lineBackgroundSelectedStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return defaultValues.lineBackgroundSelected
+})
+const labelSelectedOpacityStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.labelSelectedOpacity}`
+})
+const labelTextAlignStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  switch (defaultValues.labelTextAlign) {
+    case 'center':
+      return 'center'
+    case 'right':
+      return 'end'
+    default:
+      return 'start'
+  }
+})
+
 
 const handleStepChange = (newStep) => {
   if (blockClick.value) return
 
-  emit('changed', newStep)
+  changeStep(newStep)
 }
 const changeStep = (newStep) => {
-  const currentStep = newStep
+  selected.value = newStep ?? 1
 
-  emit('changed', currentStep)
-}
-const whereIsTheStep = (newStep) => {
-  const currentStep = newStep
-
-  let status = 'start'
-
-  const firstStep = 1
-  const lastStep = formatedValue.value.steps
-  const finishedStep = lastStep + 1
-
-  if (currentStep > lastStep) {
-    status = 'finished'
-  } else if (currentStep === lastStep) {
-    status = 'end'
-  } else if (currentStep > firstStep && currentStep < lastStep) {
-    status = 'in progress'
-  } else if (currentStep === firstStep) {
-    status = 'start'
-  } else if (currentStep >= finishedStep) {
-    status = 'finished'
-  }
-
-  emit('status', status)
+  emit('changed', selected.value)
 }
 
 watch(step, (newVal, oldVal) => {
-  selected.value = newVal
-
   if (newVal !== oldVal) changeStep(newVal)
-
-  whereIsTheStep(newVal)
 }, { immediate: true })
 </script>
 
@@ -512,271 +715,181 @@ watch(step, (newVal, oldVal) => {
   position: relative;
 
   // inicio propTheme
-  &.component__theme--light {
-    .component__content {
-      .circle {
-        border-color: v-bind('lightCircleColor');
+  &.component__theme--light {}
 
-        &.actual-step {
-          border-color: v-bind('lightActiveColor');
-        }
-      }
-
-      .line {
-        border-color: v-bind('lightLineColor');
-        background-color: v-bind('lightLineColor');
-      }
-
-      .line,
-      .circle {
-        &.done-step  {
-          background-color: v-bind('lightDoneColor');
-          border-color: v-bind('lightDoneColor');
-        }
-      }
-
-      .circle {
-        &.finished-step  {
-          background-color: v-bind('lightFinishedColor');
-          border-color: v-bind('lightFinishedColor');
-        }
-      }
-    }
-  }
-
-  &.component__theme--dark {
-    .component__content {
-      .circle {
-        border-color: v-bind('darkCircleColor');
-
-        &.actual-step {
-          border-color: v-bind('darkActiveColor');
-        }
-      }
-
-      .line {
-        border-color: v-bind('darkLineColor');
-        background-color: v-bind('darkLineColor');
-      }
-
-      .line,
-      .circle {
-        &.done-step  {
-          background-color: v-bind('darkDoneColor');
-          border-color: v-bind('darkDoneColor');
-        }
-      }
-
-      .circle {
-        &.finished-step  {
-          background-color: v-bind('darkFinishedColor');
-          border-color: v-bind('darkFinishedColor');
-        }
-      }
-    }
-  }
+  &.component__theme--dark {}
   // fim propTheme
 
   .component__content {
     display: inline-flex;
     align-items: center;
     width: 100%;
+  }
+}
 
-    .circle,
-    .line {
-      transition: v-bind('transitionStyle');
-    }
+.component__content .nb-stepper-line {
+  color: #1a1a1a;
+  display: block;
+  font-size: 14px;
+  width: 100%;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
 
-    .circle {
-      flex-shrink: 0;
+  .nb-stepper-line__items {
+    align-items: center;
+    display: flex;
+    width: 100%;
 
-      width: v-bind('circleSizeStyle');
-      height: v-bind('circleSizeStyle');
-
-      border-radius: 50%;
-      border-style: solid;
-      border-width: v-bind('circleBorderSizeStyle');
-    }
-
-    .line {
+    .nb-stepper-line__fit {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      height: 100%;
       width: 100%;
-      border-style: solid;
-      border-width: v-bind('lineSizeStyle');
+
+      .nb-stepper-line__track {
+        position: relative;
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 100%;
+        height: 100%;
+        width: 100%;
+
+        .nb-stepper-line__nav {
+          display: flex;
+          align-items: center;
+          justify-content: stretch;
+          width: 100%;
+          height: 100%;
+          position: relative;
+          gap: v-bind('gapStyle');
+          overflow-x: auto;
+          overflow-y: hidden;
+
+          .nb-stepper-line__item {
+            appearance: none;
+            background: transparent none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 0;
+            flex-shrink: 1;
+            flex-basis: v-bind('maxWidthStyle');
+            min-width: v-bind('minWidthStyle');
+            max-width: v-bind('maxWidthStyle');
+            overflow: hidden;
+            position: relative;
+            text-align: left;
+            color: inherit;
+            line-height: 1;
+            transition: flex-basis 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
+              max-width 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
+              color 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
+              opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
+
+            &:first-child,
+            &:last-child {
+              padding-right: 0;
+            }
+
+            &.nb-stepper-line__item--selected {
+              flex-grow: 1;
+              flex-shrink: 1;
+              flex-basis: 12em;
+              min-width: max(120px, v-bind('minWidthSelectedStyle'));
+              max-width: 100%;
+
+              .nb-stepper-line__counter {
+                color: v-bind('tabColorSelectedStyle');
+                opacity: v-bind('tabSelectedOpacityStyle');
+              }
+
+              .nb-stepper-line__line {
+                background-color: v-bind('lineBackgroundSelectedStyle');
+                opacity: v-bind('lineSelectedOpacityStyle');
+              }
+
+              .nb-stepper-line__label {
+                max-width: 100%;
+                opacity: v-bind('labelSelectedOpacityStyle') !important;
+
+                &>strong {
+                  opacity: 1;
+                }
+                &>span {
+                  opacity: 0;
+                }
+              }
+            }
+
+            &:not(.nb-stepper-line__item--selected) {
+              .nb-stepper-line__counter {
+                color: v-bind('tabColorStyle');
+                opacity: v-bind('tabOpacityStyle');
+              }
+
+              .nb-stepper-line__line {
+                background-color: v-bind('lineBackgroundStyle');
+                opacity: v-bind('lineOpacityStyle');
+              }
+
+              .nb-stepper-line__label {
+                opacity: 0;
+                max-width: 0;
+              }
+            }
+
+            .nb-stepper-line__counter {
+              display: block;
+              text-align: v-bind('tabTextAlignStyle');
+              overflow: hidden;
+            }
+
+            .nb-stepper-line__line {
+              display: block;
+              width: 100%;
+              height: v-bind('lineHeightStyle');
+              margin: v-bind('lineMarginStyle');
+              transition: opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
+            }
+
+            .nb-stepper-line__label {
+              max-width: 0;
+              overflow: hidden;
+              position: relative;
+              white-space: nowrap;
+              text-align: v-bind('labelTextAlignStyle');
+              transition: max-width 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
+                opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
+
+              &>strong,
+              &>span {
+                transition: opacity 0.1s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
+              }
+
+              &>strong {
+                font-weight: 600;
+                opacity: 0;
+              }
+
+              &>span {
+                left: 0;
+                position: absolute;
+                top: 0;
+                width: 100%;
+                text-align: center;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
 
-.nb-stepper-line {
-  color: #1a1a1a;
-  display: block;
-  font-size: clamp(14px, 0.9375vw, 18px);
-  height: clamp(72px, 5vw, 96px);
-  width: 100%;
-  padding: 8px 0 8px;
-  position: relative;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
-}
 
-.nb-stepper-line__items {
-  align-items: center;
-  display: flex;
-  width: 100%;
-}
-
-.nb-stepper-line__fit {
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: space-between;
-  height: 100%;
-  width: 100%;
-}
-
-.nb-stepper-line__track {
-  position: relative;
-  display: grid;
-  grid-template-columns: 100%;
-  grid-template-rows: 100%;
-  height: 100%;
-  width: 100%;
-}
-
-.nb-stepper-line__nav {
-  display: flex;
-  align-items: center;
-  justify-content: stretch;
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.nb-stepper-line__item {
-  appearance: none;
-  background: transparent none;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  flex: 0 1 2.4em;
-  min-width: 1.6em;
-  max-height: 4em;
-  opacity: 0.5;
-  overflow: hidden;
-  padding-top: 2em;
-  padding-inline: 0.5em;
-  position: relative;
-  text-align: left;
-  color: inherit;
-  line-height: 1;
-  transition: flex 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
-    color 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
-    opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
-}
-
-.nb-stepper-line__item::before {
-  background-color: currentColor;
-  content: "";
-  display: block;
-  height: 2px;
-  left: 0.5em;
-  opacity: 0.5;
-  position: absolute;
-  right: 0.5em;
-  top: 50%;
-  transition: opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
-}
-
-.nb-stepper-line__item--future {
-  opacity: 0.75;
-}
-
-.nb-stepper-line__item--selected {
-  color: #1a59c8;
-  flex: 1 1 8em;
-  min-width: 6em;
-  opacity: 1;
-}
-
-.nb-stepper-line__item--selected::before {
-  opacity: 1;
-}
-
-.nb-stepper-line__counter {
-  left: 0.5em;
-  position: absolute;
-  text-align: end;
-  top: 0.5em;
-  white-space: nowrap;
-}
-
-.nb-stepper-line__label {
-  line-height: 1.5;
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  position: relative;
-  white-space: nowrap;
-  transition: max-width 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
-    opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
-}
-
-.nb-stepper-line__label--selected {
-  max-width: 20em;
-  opacity: 1;
-}
-
-.nb-stepper-line__label > strong,
-.nb-stepper-line__label > span {
-  transition: opacity 0.1s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
-}
-
-.nb-stepper-line__label > strong {
-  font-weight: 600;
-  opacity: 0;
-}
-
-.nb-stepper-line__label > span {
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  text-align: center;
-}
-
-.nb-stepper-line__label--selected > strong {
-  opacity: 1;
-}
-
-.nb-stepper-line__label--selected > span {
-  opacity: 0;
-}
-
-.nb-stepper-line__new {
-  background: #fec846;
-  border-radius: 0.25em;
-  color: #000;
-  display: inline-block;
-  flex: none;
-  font-size: clamp(6px, 0.5em, 8px);
-  font-style: normal;
-  font-weight: 600;
-  margin-inline-start: 0.66em;
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  padding: 0.33em;
-  position: relative;
-  text-transform: uppercase;
-  top: 0.25em;
-  white-space: nowrap;
-  transition: max-width 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
-    opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
-}
-
-.nb-stepper-line__new--selected {
-  max-width: 20em;
-  opacity: 1;
-}
 
 .component-disabled {
 	cursor: not-allowed;

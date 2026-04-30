@@ -306,38 +306,77 @@
         Disabled <input type="checkbox" v-model="disabled"> {{ disabled }} <br />
         Vertical Stepper Height (px) <input type="number" v-model="verticalStepperHeight" min="100" max="1000" step="0"> <br />
 
-        <NbStepperLine
-          nb-id="stepper-1"
-          display="b"
-          theme="light"
-          orientation="horizontal"
-          :step="activeStep"
-          :steps="steps"
-          :circle-size="circleSize"
-          :circle-border-size="circleBorderSize"
-          :line-size="lineSize"
-          :block-click="blockClick"
-          :has-tab-index-enter="hasTabIndexEnter"
-          :disabled="disabled"
-          @changed="changedStep"
-          @status="($event) => console.log('status', $event)"
-        />
-        <NbStepperLine
-          nb-id="stepper-2"
-          display="b"
-          theme="light"
-          orientation="horizontal"
-          :step="activeStep"
-          :steps="stepsText"
-          :circle-size="circleSize"
-          :circle-border-size="circleBorderSize"
-          :line-size="lineSize"
-          :block-click="blockClick"
-          :has-tab-index-enter="hasTabIndexEnter"
-          :disabled="disabled"
-          @changed="changedStep"
-          @status="($event) => console.log('status', $event)"
-        />
+        <br />
+
+        <div style="background-color: white">
+          <NbStepperLine
+            nb-id="stepper-1"
+            display="b"
+            theme="light"
+            orientation="horizontal"
+            :step="activeStep"
+            :steps="steps"
+            :circle-size="circleSize"
+            :circle-border-size="circleBorderSize"
+            :line-size="lineSize"
+            :block-click="blockClick"
+            :has-tab-index-enter="hasTabIndexEnter"
+            :disabled="disabled"
+            @changed="changedStep"
+            @status="($event) => console.log('status', $event)"
+          />
+        </div>
+
+        <br />
+
+        <div style="background-color: yellow">
+          <NbStepperLine
+            nb-id="stepper-2"
+            display="b"
+            theme="light"
+            orientation="horizontal"
+            :step="activeStep"
+            :steps="stepsText"
+            :circle-size="circleSize"
+            :circle-border-size="circleBorderSize"
+            :line-size="lineSize"
+            :block-click="blockClick"
+            :has-tab-index-enter="hasTabIndexEnter"
+            :disabled="disabled"
+            :tab-number-show="false"
+            @changed="changedStep"
+            @status="($event) => console.log('status', $event)"
+          />
+        </div>
+
+        <br />
+
+        <div>
+          <NbStepperLine
+            nb-id="stepper-2"
+            display="b"
+            theme="light"
+            orientation="horizontal"
+            :step="activeStep"
+            :steps="stepsText"
+            :circle-size="circleSize"
+            :circle-border-size="circleBorderSize"
+            :line-size="lineSize"
+            :block-click="blockClick"
+            :has-tab-index-enter="hasTabIndexEnter"
+            :disabled="disabled"
+            :show-tab-number="true"
+            @changed="changedStep"
+            @status="($event) => console.log('status', $event)"
+          >
+            <template #tab-number="{ item }">
+              <span>{{ item.title }}.</span>
+            </template>
+          </NbStepperLine>
+        </div>
+
+        <br />
+
         <p>Algo depois</p>
         <NbStepperLine
           nb-id="stepper-3"
