@@ -1,17 +1,18 @@
-<template>{{ selected }}
+<template>
   <div
     v-if="nbId"
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]"
-    role="stepper"
     v-bind="computedAriaAttrs"
   >
     <div
       :id="nbId"
       ref="componentContainer"
       :class="['nb-reset', 'component', themeStyle]"
-      :style="[componentStyle]"
-      :tabIndex="!blockClick || !hasTabIndexEnter || disabled ? -1 : tabIndex"
+      :style="[componentStyle]"      
+      :tabindex="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? -1 : tabIndex"
+      :role="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? undefined : 'tab'"
+      :aria-disabled="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled"
     >
       <div
         :class="['component__content']"
@@ -21,7 +22,7 @@
             <div class="nb-stepper-line__fit">
               <div class="nb-stepper-line__track">
                 <div class="nb-stepper-line__nav">
-                  <button
+                  <div
                     v-for="(item, index) in navItems"
                     :key="index"
                     :aria-label="item.title"
@@ -29,8 +30,14 @@
                     class="nb-stepper-line__item"
                     :class="{
                       'nb-stepper-line__item--selected': selected === index,
+                      'nb-stepper-line__item--disabled': isStepDisabled(index)
                     }"
+                    :tabindex="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? -1 : tabIndex"
+                    :role="blockClick || !hasTabIndexEnter || !hasTabIndexSpace  || disabled ? undefined : 'tab'"
+                    :aria-disabled="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled || isStepDisabled(index)"
                     @click="handleStepChange(index)"
+                    @keydown.enter.prevent="handleTabIndex(index, 'enter')"
+                    @keydown.space.prevent="handleTabIndex(index, 'space')"
                   >
                     <span
                       v-if="tabNumberShow"
@@ -49,7 +56,7 @@
                     >
                       <strong>{{ item.title }}</strong>
                     </span>
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -64,7 +71,7 @@
 import { defineProps, ref, toRefs, computed, onMounted, watch } from 'vue'
 
 defineOptions({
-  name: 'NbStepper',
+  name: 'NbStepperLine',
   inheritAttrs: false
 })
 
@@ -85,6 +92,10 @@ const props = defineProps({
     default: 0
   },
   hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
     type: Boolean,
     default: true
   },
@@ -119,10 +130,6 @@ const props = defineProps({
 		type: String,
 		default: 'red'
 	},
-	lightActiveColor: {
-		type: String,
-		default: 'green'
-	},
 	lightDoneColor: {
 		type: String,
 		default: 'blue'
@@ -139,10 +146,6 @@ const props = defineProps({
   darkCircleColor: {
 		type: String,
 		default: '#79d1ef'
-	},
-	darkActiveColor: {
-		type: String,
-		default: '#066f93'
 	},
 	darkDoneColor: {
 		type: String,
@@ -167,6 +170,28 @@ const props = defineProps({
       return value >= 2
     }
   },
+  stepsDisabled: {
+    type: Array,
+    default: () => [],
+    validator: (value) => {
+      if (!Array.isArray(value)) return false
+
+      return value.every((item) => typeof item === 'number')
+    },
+  },
+  opacityDisabled: {
+    type: Number,
+    default: 0.4,
+    validator: value => {
+      return !value ? 0.4 : value
+    }
+  },
+
+
+
+  
+
+
 
 
   blockClick: {
@@ -250,8 +275,34 @@ const props = defineProps({
     type: String,
     default: 'green',
     validator: (value) => {
-        return typeof value === 'yellow'
+        return typeof value === 'string'
     }
+  },
+	tabFontFamily: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	tabFontSize: {
+		type: String,
+		default: '1.6em'
+	},
+	tabFontSizeActive: {
+		type: String,
+		default: '1.2em'
+	},
+	tabFontWeight: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 400 : value
+		}
+  },
+	tabFontWeightActive: {
+		type: Number,
+		default: 400,
+		validator: value => {
+			return !value ? 400 : value
+		}
   },
   lineOpacity: {
     type: Number,
@@ -269,14 +320,28 @@ const props = defineProps({
   },
   lineMarginTop: {
     type: Number,
-    default: 3,
+    default: .1,
+    validator: (value) => {
+        return value >= 0
+    }
+  },
+  lineMarginTopActive: {
+    type: Number,
+    default: .15,
     validator: (value) => {
         return value >= 0
     }
   },
   lineMarginBottom: {
     type: Number,
-    default: 3,
+    default: .1,
+    validator: (value) => {
+        return value >= 0
+    }
+  },
+  lineMarginBottomActive: {
+    type: Number,
+    default: .15,
     validator: (value) => {
         return value >= 0
     }
@@ -299,7 +364,7 @@ const props = defineProps({
     type: String,
     default: 'blue',
     validator: (value) => {
-        return typeof value === 'yellow'
+        return typeof value === 'string'
     }
   },
   labelShow: {
@@ -322,6 +387,32 @@ const props = defineProps({
     validator: (value) => {
         return value >= 0 && value <= 1
     }
+  },
+  labelFontFamily: {
+    type: String,
+    default: `'Lato', sans-serif`
+  },
+  labelFontSize: {
+    type: String,
+    default: '1.6em'
+  },
+  labelFontSizeActive: {
+    type: String,
+    default: '1.2em'
+  },
+  labelFontWeight: {
+    type: Number,
+    default: 400,
+    validator: value => {
+      return !value ? 400 : value
+    }
+  },
+  labelFontWeightActive: {
+    type: Number,
+    default: 400,
+    validator: value => {
+      return !value ? 400 : value
+    }
   }
 })
 
@@ -331,21 +422,23 @@ const {
 	theme,
 	lightLineColor,
   lightCircleColor,
-  lightActiveColor,
   lightDoneColor,
   lightFinishedColor,
 	darkLineColor,
   darkCircleColor,
-  darkActiveColor,
   darkDoneColor,
   darkFinishedColor,
 	tabIndex,
 	hasTabIndexEnter,
+  hasTabIndexSpace,
 	ariaLabel,
 	ariaAttrs,
 	step,
 	steps,
-  
+  stepsDisabled,
+  opacityDisabled,
+
+
 	blockClick,
   gap,
   ellipsisText,
@@ -357,15 +450,27 @@ const {
   tabSelectedOpacity,
   tabColor,
   tabColorSelected,
+  tabFontFamily,
+  tabFontSize,
+  tabFontSizeActive,
+  tabFontWeight,
+  tabFontWeightActive,
   lineOpacity,
   lineSelectedOpacity,
   lineMarginTop,
+  lineMarginTopActive,
   lineMarginBottom,
+  lineMarginBottomActive,
   lineHeight,
   labelSelectedOpacity,
   labelTextAlign,
   lineBackground,
   lineBackgroundSelected,
+  labelFontFamily,
+  labelFontSize,
+  labelFontSizeActive,
+  labelFontWeight,
+  labelFontWeightActive,
 } = toRefs(props)
 
 const selected = ref(1)
@@ -400,8 +505,9 @@ const formatDefaultValues = computed(() => {
   
   const stepsCount = Array.isArray(steps.value) ? steps.value.length : steps.value
   const stepsValue = ((stepsCount !== 0 && !stepsCount) || stepsCount < 2) ? 2 : stepsCount
+  const opacityDisabledValue = ((opacityDisabled.value !== 0 && !opacityDisabled.value) || opacityDisabled.value < 0 || opacityDisabled.value > 1) ? 0.4 : opacityDisabled.value
 
-  const gapValue = !gap.value ? 0.5 : gap.value
+  const gapValue = ((gap.value !== 0 && !gap.value) || gap.value < 0) ? 1 : gap.value
   const ellipsisTextValue = typeof ellipsisText.value === 'boolean'
     ? ellipsisText.value
     : false
@@ -413,22 +519,34 @@ const formatDefaultValues = computed(() => {
   const tabSelectedOpacityValue = ((tabSelectedOpacity.value !== 0 && !tabSelectedOpacity.value) || tabSelectedOpacity.value < 0 || tabSelectedOpacity.value > 1) ? 1 : tabSelectedOpacity.value
   const tabColorValue = !tabColor.value ? 'brown' : tabColor.value
   const tabColorSelectedValue = !tabColorSelected.value ? 'blue' : tabColorSelected.value
+  const tabFontFamilyValue = !tabFontFamily.value ? `'Lato', sans-serif` : tabFontFamily.value
+	const tabFontSizeValue = !tabFontSize.value ? '1.6em' : tabFontSize.value
+	const tabFontSizeActiveValue = !tabFontSizeActive.value ? '1.2em' : tabFontSizeActive.value
+	const tabFontWeightValue = ((tabFontWeight.value !== 0 && !tabFontWeight.value) || tabFontWeight.value < 0) ? 100 : tabFontWeight.value
+	const tabFontWeightActiveValue = ((tabFontWeightActive.value !== 0 && !tabFontWeightActive.value) || tabFontWeightActive.value < 0) ? 100 : tabFontWeightActive.value
   const lineOpacityValue = ((lineOpacity.value !== 0 && !lineOpacity.value) || lineOpacity.value < 0 || lineOpacity.value > 1) ? 0.2 : lineOpacity.value
   const lineSelectedOpacityValue = ((lineSelectedOpacity.value !== 0 && !lineSelectedOpacity.value) || lineSelectedOpacity.value < 0 || lineSelectedOpacity.value > 1) ? 1 : lineSelectedOpacity.value
-  const lineMarginTopValue = !lineMarginTop.value ? 3 : lineMarginTop.value
-  const lineMarginBottomValue = !lineMarginBottom.value ? 4 : lineMarginBottom.value
+  const lineMarginTopValue = ((lineMarginTop.value !== 0 && !lineMarginTop.value) || lineMarginTop.value < 0) ? .1 : lineMarginTop.value
+  const lineMarginTopActiveValue = ((lineMarginTopActive.value !== 0 && !lineMarginTopActive.value) || lineMarginTopActive.value < 0) ? .15 : lineMarginTopActive.value
+  const lineMarginBottomValue = ((lineMarginBottom.value !== 0 && !lineMarginBottom.value) || lineMarginBottom.value < 0) ? .1 : lineMarginBottom.value
+  const lineMarginBottomActiveValue = ((lineMarginBottomActive.value !== 0 && !lineMarginBottomActive.value) || lineMarginBottomActive.value < 0) ? .15 : lineMarginBottomActive.value
   const lineHeightValue = !lineHeight.value ? 2 : lineHeight.value
   const lineBackgroundColorValue = !lineBackground.value ? '#1a1a1a' : lineBackground.value
   const lineBackgroundColorSelectedValue = !lineBackgroundSelected.value ? 'red' : lineBackgroundSelected.value
   const labelSelectedOpacityValue = ((labelSelectedOpacity.value !== 0 && !labelSelectedOpacity.value) || labelSelectedOpacity.value < 0 || labelSelectedOpacity.value > 1) ? 0.1 : labelSelectedOpacity.value
   const labelTextAlignValue = !labelTextAlign.value ? 'left' : labelTextAlign.value
-  
+  const labelFontFamilyValue = !labelFontFamily.value ? `'Lato', sans-serif` : labelFontFamily.value
+  const labelFontSizeValue = !labelFontSize.value ? '1.6em' : labelFontSize.value
+  const labelFontSizeActiveValue = !labelFontSizeActive.value ? '1.2em' : labelFontSizeActive.value
+  const labelFontWeightValue = ((labelFontWeight.value !== 0 && !labelFontWeight.value) || labelFontWeight.value < 0) ? 100 : labelFontWeight.value
+  const labelFontWeightActiveValue = ((labelFontWeightActive.value !== 0 && !labelFontWeightActive.value) || labelFontWeightActive.value < 0) ? 100 : labelFontWeightActive.value
+
 	return {
 		disabled: disabledValue,
 		display: displayValue,
 		theme: themeValue,
 		steps: stepsValue,
-
+    opacityDisabled: opacityDisabledValue,
 
     gap: gapValue,
 		ellipsisText: ellipsisTextValue,
@@ -440,15 +558,27 @@ const formatDefaultValues = computed(() => {
 		tabSelectedOpacity: tabSelectedOpacityValue,
 		tabColor: tabColorValue,
 		tabColorSelected: tabColorSelectedValue,
+		tabFontFamily: tabFontFamilyValue,
+		tabFontSize: tabFontSizeValue,
+		tabFontSizeActive: tabFontSizeActiveValue,
+		tabFontWeight: tabFontWeightValue,
+		tabFontWeightActive: tabFontWeightActiveValue,
 		lineOpacity: lineOpacityValue,
 		lineSelectedOpacity: lineSelectedOpacityValue,
     lineMarginTop: lineMarginTopValue,
+    lineMarginTopActive: lineMarginTopActiveValue,
     lineMarginBottom: lineMarginBottomValue,
+    lineMarginBottomActive: lineMarginBottomActiveValue,
 		lineHeight: lineHeightValue,
 		lineBackground: lineBackgroundColorValue,
 		lineBackgroundSelected: lineBackgroundColorSelectedValue,
 		labelSelectedOpacity: labelSelectedOpacityValue,
-		labelTextAlign: labelTextAlignValue
+		labelTextAlign: labelTextAlignValue,
+		labelFontFamily: labelFontFamilyValue,
+		labelFontSize: labelFontSizeValue,
+		labelFontSizeActive: labelFontSizeActiveValue,
+		labelFontWeight: labelFontWeightValue,
+		labelFontWeightActive: labelFontWeightActiveValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -493,8 +623,6 @@ const computedAriaAttrs = computed(() => {
   )
 })
 const themeStyle = computed(() => {
-  return ''
-
 	switch (theme.value) {
 		case 'dark':
 			return 'component__theme--dark'
@@ -502,30 +630,14 @@ const themeStyle = computed(() => {
 			return 'component__theme--light'
 	}
 })
-const styleDisabledColor = computed(() => {
-  switch (theme.value) {
-    case 'dark':
-      return darkDisabledColor.value
-    default:
-      return lightDisabledColor.value
-  }
-})
-const styleActiveColor = computed(() => {
-  switch (theme.value) {
-    case 'dark':
-      return darkActiveColor.value
-    default:
-      return lightActiveColor.value
-  }
-})
 
 // handle tab index enter
-const handleTabIndexEnter = (tabIndex) => {
+const handleTabIndex = (tabIndex, type = 'enter') => {
   // check if disabled or has tab index enter is disabled
-  if (disabled.value || !hasTabIndexEnter.value) return
+  if (disabled.value || (type === 'enter' && !hasTabIndexEnter.value) || (type === 'space' && !hasTabIndexSpace.value)) return
 
   // change step
-  changeStep(tabIndex)
+  handleStepChange(tabIndex)
 }
 
 /* New logic below */
@@ -540,7 +652,10 @@ const formatedValue = computed(() => {
   }
 })
 
-
+const opacityDisabledStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.opacityDisabled}`
+})
 const cursorStyle = computed(() => {
   return blockClick.value ? 'default' : 'pointer'
 })
@@ -599,6 +714,26 @@ const tabColorSelectedStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
   return defaultValues.tabColorSelected
 })
+const tabFontFamilyStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.tabFontFamily}`
+})
+const tabFontSizeStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.tabFontSize}`
+})
+const tabFontSizeActiveStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.tabFontSizeActive}`
+})
+const tabFontWeightStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.tabFontWeight}`
+})
+const tabFontWeightActiveStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.tabFontWeightActive}`
+})
 const lineHeightStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
   return `${defaultValues.lineHeight}px`
@@ -613,7 +748,11 @@ const lineSelectedOpacityStyle = computed(() => {
 })
 const lineMarginStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
-  return `${defaultValues.lineMarginTop}px 0 ${defaultValues.lineMarginBottom}px 0`
+  return `${defaultValues.lineMarginTop}em 0 ${defaultValues.lineMarginBottom}em 0`
+})
+const lineMarginActiveStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.lineMarginTopActive}em 0 ${defaultValues.lineMarginBottomActive}em 0`
 })
 const lineBackgroundStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
@@ -639,10 +778,43 @@ const labelTextAlignStyle = computed(() => {
       return 'start'
   }
 })
+const labelFontFamilyStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.labelFontFamily}`
+})
+const labelFontSizeStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.labelFontSize}`
+})
+const labelFontSizeActiveStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.labelFontSizeActive}`
+})
+const labelFontWeightStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.labelFontWeight}`
+})
+const labelFontWeightActiveStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+  return `${defaultValues.labelFontWeightActive}`
+})
 
+const isStepDisabled = (stepIdentifier) => {
+  if (disabled.value) return true
 
+  // check if disabled steps list is empty
+  if (!Array.isArray(stepsDisabled.value) || stepsDisabled.value.length === 0) {
+    return false
+  }
+
+  // resolve step index
+  const stepIndex = stepIdentifier
+
+  // check if step index is in disabled steps list
+  return stepsDisabled.value.includes(stepIndex)
+}
 const handleStepChange = (newStep) => {
-  if (blockClick.value) return
+  if (blockClick.value || isStepDisabled(newStep)) return
 
   changeStep(newStep)
 }
@@ -703,7 +875,6 @@ watch(step, (newVal, oldVal) => {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 
-	cursor: v-bind('cursorStyle');
 	-webkit-text-decoration-line: none;
 	text-decoration-line: none;
 	white-space: nowrap;
@@ -730,7 +901,6 @@ watch(step, (newVal, oldVal) => {
 .component__content .nb-stepper-line {
   color: #1a1a1a;
   display: block;
-  font-size: 14px;
   width: 100%;
   position: relative;
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
@@ -757,8 +927,8 @@ watch(step, (newVal, oldVal) => {
 
         .nb-stepper-line__nav {
           display: flex;
-          align-items: center;
           justify-content: stretch;
+          align-items: baseline;
           width: 100%;
           height: 100%;
           position: relative;
@@ -771,7 +941,7 @@ watch(step, (newVal, oldVal) => {
             background: transparent none;
             border: none;
             border-radius: 4px;
-            cursor: pointer;
+            cursor: v-bind('cursorStyle');
             display: flex;
             flex-direction: column;
             flex-grow: 0;
@@ -787,7 +957,10 @@ watch(step, (newVal, oldVal) => {
             transition: flex-basis 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
               max-width 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
               color 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
-              opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
+              opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
+              font-family 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
+              font-size 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
+              font-weight 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
 
             &:first-child,
             &:last-child {
@@ -804,23 +977,38 @@ watch(step, (newVal, oldVal) => {
               .nb-stepper-line__counter {
                 color: v-bind('tabColorSelectedStyle');
                 opacity: v-bind('tabSelectedOpacityStyle');
+                font-family: v-bind('tabFontFamilyStyle');
+                font-size: v-bind('tabFontSizeActiveStyle');
+                font-weight: v-bind('tabFontWeightActiveStyle');
               }
 
               .nb-stepper-line__line {
                 background-color: v-bind('lineBackgroundSelectedStyle');
                 opacity: v-bind('lineSelectedOpacityStyle');
+                margin: v-bind('lineMarginActiveStyle');
               }
 
               .nb-stepper-line__label {
                 max-width: 100%;
                 opacity: v-bind('labelSelectedOpacityStyle') !important;
-
+                font-family: v-bind('labelFontFamilyStyle');
+                font-size: v-bind('labelFontSizeActiveStyle');
+                font-weight: v-bind('labelFontWeightActiveStyle');
                 &>strong {
                   opacity: 1;
                 }
                 &>span {
                   opacity: 0;
                 }
+              }
+            }
+
+            &.nb-stepper-line__item--disabled {
+              user-select: none;
+              opacity: v-bind('opacityDisabledStyle');
+
+              &:hover {
+                cursor: default !important;
               }
             }
 
@@ -845,6 +1033,9 @@ watch(step, (newVal, oldVal) => {
               display: block;
               text-align: v-bind('tabTextAlignStyle');
               overflow: hidden;
+              font-family: v-bind('tabFontFamilyStyle');
+              font-size: v-bind('tabFontSizeStyle');
+              font-weight: v-bind('tabFontWeightStyle');
             }
 
             .nb-stepper-line__line {
@@ -861,6 +1052,9 @@ watch(step, (newVal, oldVal) => {
               position: relative;
               white-space: nowrap;
               text-align: v-bind('labelTextAlignStyle');
+              font-family: v-bind('labelFontFamilyStyle');
+              font-size: v-bind('labelFontSizeStyle');
+              font-weight: v-bind('labelFontWeightStyle');
               transition: max-width 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms,
                 opacity 0.65s cubic-bezier(0.165, 0.84, 0.44, 1) 0ms;
 
@@ -896,12 +1090,26 @@ watch(step, (newVal, oldVal) => {
 	pointer-events: none;
 	user-select: none;
 
-	opacity: 0.5;
-
 	.component {
 		&.component__theme--light {}
 
 		&.component__theme--dark {}
+
+    .component__content .nb-stepper-line {
+      .nb-stepper-line__items {
+        .nb-stepper-line__fit {
+          .nb-stepper-line__track {
+            .nb-stepper-line__nav {
+              .nb-stepper-line__item {
+                &.nb-stepper-line__item--disabled {
+                  opacity: v-bind('opacityDisabledStyle') !important;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 	}
 }
 </style>

@@ -11,7 +11,9 @@
       ref="componentContainer"
       :class="['nb-reset', 'component', themeStyle, orientationComponentClass]"
       :style="[componentStyle]"
-      :tabIndex="!blockClick || !hasTabIndexEnter || disabled ? -1 : tabIndex"
+      :tabindex="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? -1 : tabIndex"
+      :role="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? undefined : 'stepper'"
+      :aria-disabled="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled"
     >
       <div
         :class="['component__content', orientationClass]"
@@ -33,11 +35,12 @@
               'done-step': isDoneStep(itemStep),
               'finished-step': isFinishedStep(itemStep)
             }"
-            :tabindex="blockClick || !hasTabIndexEnter || disabled ? -1 : 0"
-            :role="blockClick || !hasTabIndexEnter || disabled ? undefined : 'button'"
-            :aria-disabled="blockClick || !hasTabIndexEnter || disabled"
+            :tabindex="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? -1 : tabIndex"
+            :role="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? undefined : 'stepper'"
+            :aria-disabled="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled"
             @click="handleStepChange(itemStep)"
-            @keydown.enter.prevent="handleTabIndexEnter(itemStep)"
+            @keydown.enter.prevent="handleTabIndex(itemStep, 'enter')"
+            @keydown.space.prevent="handleTabIndex(itemStep, 'space')"
           ></div>
         </template>
       </div>
@@ -70,6 +73,10 @@ const props = defineProps({
     default: 0
   },
   hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
     type: Boolean,
     default: true
   },
@@ -116,6 +123,10 @@ const props = defineProps({
 		type: String,
 		default: 'cyan'
 	},
+  lightFocusColor: {
+		type: String,
+		default: 'red'
+	},
 	// Cores do tema dark
   darkLineColor: {
 		type: String,
@@ -136,6 +147,10 @@ const props = defineProps({
 	darkFinishedColor: {
 		type: String,
 		default: '#003041'
+	},
+	darkFocusColor: {
+		type: String,
+		default: '#7dd3fc'
 	},
   step: {
     type: Number,
@@ -204,13 +219,16 @@ const {
   lightActiveColor,
   lightDoneColor,
   lightFinishedColor,
+  lightFocusColor,
 	darkLineColor,
   darkCircleColor,
   darkActiveColor,
   darkDoneColor,
   darkFinishedColor,
+  darkFocusColor,
 	tabIndex,
 	hasTabIndexEnter,
+  hasTabIndexSpace,
 	ariaLabel,
 	ariaAttrs,
 	step,
@@ -312,9 +330,9 @@ const styleActiveColor = computed(() => {
 })
 
 // handle tab index enter
-const handleTabIndexEnter = (tabIndex) => {
+const handleTabIndex = (tabIndex, type = 'enter') => {
   // check if disabled or has tab index enter is disabled
-  if (disabled.value || !hasTabIndexEnter.value) return
+  if (disabled.value || (type === 'enter' && !hasTabIndexEnter.value) || (type === 'space' && !hasTabIndexSpace.value)) return
 
   // change step
   changeStep(tabIndex)
@@ -512,6 +530,11 @@ watch(step, (newVal, oldVal) => {
           background-color: v-bind('lightFinishedColor');
           border-color: v-bind('lightFinishedColor');
         }
+
+        &:focus-visible {
+          background-color: v-bind('lightFocusColor');
+          border-color: v-bind('lightFocusColor') ;
+        }
       }
     }
   }
@@ -544,6 +567,11 @@ watch(step, (newVal, oldVal) => {
           background-color: v-bind('darkFinishedColor');
           border-color: v-bind('darkFinishedColor');
         }
+
+        &:focus-visible {
+          background-color: v-bind('darkFocusColor');
+          border-color: v-bind('darkFocusColor');
+        }
       }
     }
   }
@@ -568,6 +596,14 @@ watch(step, (newVal, oldVal) => {
       border-radius: 50%;
       border-style: solid;
       border-width: v-bind('circleBorderSizeStyle');
+
+      &:focus {
+      }
+
+      &:focus-visible {
+        /* Mantem indicador de foco sem "borda de radio" nativa */
+        box-shadow: 0 0 0 2px currentColor;
+      }
     }
 
     .line {

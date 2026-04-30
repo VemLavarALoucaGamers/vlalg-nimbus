@@ -316,6 +316,7 @@
             orientation="horizontal"
             :step="activeStep"
             :steps="steps"
+            :steps-disabled="[]"
             :circle-size="circleSize"
             :circle-border-size="circleBorderSize"
             :line-size="lineSize"
@@ -445,7 +446,7 @@ const circleSize = ref(0.8)
 const circleBorderSize = ref(0.13)
 const lineSize = ref(0.1)
 const blockClick = ref(false)
-const hasTabIndexEnter = ref(false)
+const hasTabIndexEnter = ref(true)
 const disabled = ref(false)
 const verticalStepperHeight = ref(225)
 const changedStep = (value) => {

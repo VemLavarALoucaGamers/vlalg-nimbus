@@ -39,7 +39,9 @@
           v-for="(tab, index) in tabs"
           :key="index"
           :ref="el => { if (el) tabRefs[tab.key] = el }"
-          :tabIndex="isTabDisabled(index) || disabled ? -1 : tabIndex"
+          :tabindex="isTabDisabled(index) || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? -1 : tabIndex"
+          :role="isTabDisabled(index) || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? undefined : 'tab'"
+          :aria-disabled="isTabDisabled(index) || !hasTabIndexEnter || !hasTabIndexSpace || disabled"
           class="tab-btn"
           :class="[
             'tab-btn', 
@@ -50,7 +52,8 @@
             activeTextStyleClass
           ]"
           @click="changeTab(index)"
-          @keydown.enter.prevent="handleTabIndexEnter(index)"
+          @keydown.enter.prevent="handleTabIndex(index, 'enter')"
+          @keydown.space.prevent="handleTabIndex(index, 'space')"
           :disabled="isTabDisabled(index)"
         >
           {{ tab.label }}
@@ -102,6 +105,10 @@ const props = defineProps({
     default: 0
   },
   hasTabIndexEnter: {
+    type: Boolean,
+    default: true
+  },
+  hasTabIndexSpace: {
     type: Boolean,
     default: true
   },
@@ -264,8 +271,7 @@ const props = defineProps({
       return value.every((item) => {
         return typeof item.key === 'string' && typeof item.label === 'string'
       })
-    },
-    required: true
+    }
   },
   activeTab: {
     type: Number,
@@ -274,7 +280,7 @@ const props = defineProps({
   },
   disabledTabs: {
     type: Array,
-    default: [],
+    default: () => [],
     validator: (value) => {
       return value.every((item) => {
         return typeof item === 'number' || typeof item === 'string'
@@ -344,12 +350,11 @@ const {
 	darkBgColor,
 	darkBorderColor,
 	darkTabBorderColor,
-	darkDisabledBgColor,
 	darkTextColor,
 	darkTextColorActive,
-	darkDisabledBorderColor,
 	tabIndex,
 	hasTabIndexEnter,
+  hasTabIndexSpace,
 	ariaLabel,
 	ariaAttrs,
   activeTab,
@@ -621,9 +626,9 @@ const getFirstEnabledTabIndex = () => {
   return props.tabs.findIndex((_, index) => !isTabDisabled(index))
 }
 // handle tab index enter
-const handleTabIndexEnter = (tabIndex) => {
+const handleTabIndex = (tabIndex, type = 'enter') => {
   // check if disabled or has tab index enter is disabled
-  if (disabled.value || !hasTabIndexEnter.value) return
+  if (disabled.value || (type === 'enter' && !hasTabIndexEnter.value) || (type === 'space' && !hasTabIndexSpace.value)) return
 
   // get first enabled tab index
   const firstEnabledTabIndex = getFirstEnabledTabIndex()
@@ -1138,10 +1143,10 @@ watch(props, async () => {
     &.component--model-one {
       .tabs-header {
         .tab-btn {
-          opacity: 0.4;
+          opacity: v-bind('opacityDisabledStyle');
 
           &.tab-btn--disabled {
-            opacity: 0.4;
+            opacity: v-bind('opacityDisabledStyle');
           }
         }
       }
