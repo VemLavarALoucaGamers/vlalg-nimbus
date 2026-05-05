@@ -15,6 +15,7 @@
           <option value="stepper">stepper</option>
           <option value="stepperLine">stepperLine</option>
           <option value="segmentedButton">segmentedButton</option>
+          <option value="collapse">collapse</option>
         </select>
 
        <div v-if="btType === 'tabs'">
@@ -576,6 +577,53 @@
         />
       </div>
     </div>
+
+    <div v-if="btType === 'collapse'" class="row" style="background-color: white; color: #000;">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px; background-color: #fff; color: #000">
+        <h4 class="test-page__content-tile">NbCollapse</h4>
+
+        <NbCollapse
+          nb-id="collapse-1"
+          display="b"
+          theme="light"
+          :has-tab-index-enter="hasTabIndexEnter"
+          :disabled="disabled"
+          componentType="animation"
+          @clicked="console.log('clicked')"
+          @changed="console.log('changed')"
+          @focused="console.log('focused')"
+          @blurred="console.log('blurred')"
+          @outside-clicked="console.log('outside-clicked')"
+          @resized="console.log('resized', $event)"
+          @right-clicked="console.log('right-clicked')"
+          @outside-right-clicked="console.log('outside-right-clicked')"
+          @copied="console.log('copied', $event)"
+          @pasted="console.log('pasted', $event)"
+          @cut="console.log('cut', $event)"
+        />
+        <NbCollapse
+          nb-id="collapse-1"
+          display="b"
+          theme="light"
+          :has-tab-index-enter="hasTabIndexEnter"
+          :disabled="disabled"
+          componentType="normal"
+          @clicked="console.log('clicked')"
+          @changed="console.log('changed')"
+          @focused="console.log('focused')"
+          @blurred="console.log('blurred')"
+          @outside-clicked="console.log('outside-clicked')"
+          @resized="console.log('resized', $event)"
+          @right-clicked="console.log('right-clicked')"
+          @outside-right-clicked="console.log('outside-right-clicked')"
+          @copied="console.log('copied', $event)"
+          @pasted="console.log('pasted', $event)"
+          @cut="console.log('cut', $event)"
+        />
+        asdasdas
+      </div>
+    </div>
   </div>
 </template>
 
@@ -585,10 +633,10 @@ import { defineAsyncComponent, ref } from 'vue'
 const NbTabs = defineAsyncComponent(() => import('@components/NbTabs.vue'))
 const NbStepper = defineAsyncComponent(() => import('@components/NbStepper.vue'))
 const NbStepperLine = defineAsyncComponent(() => import('@components/NbStepperLine.vue'))
-
 const NbSegmentedButton = defineAsyncComponent(() => import('@components/NbSegmentedButton.vue'))
+const NbCollapse = defineAsyncComponent(() => import('@components/NbCollapse.vue'))
 
-const btType = ref('tabs')
+const btType = ref('collapse')
 
 
 /* tests tab - model one*/
@@ -645,6 +693,22 @@ const segmentedButtonGap = ref(0.5)
 const handleSegmentedButtonClicked = (value) => {
   console.log('handleSegmentedButtonClicked', value)
   segmentedButtonSelected.value = value.index
+}
+
+/* tests collapse */
+const AccordionItems = ref([
+  { key: 'features', label: 'Features' },
+  { key: 'specs', label: 'Specs' },
+  { key: 'dimensions', label: 'Dimensions' },
+  { key: 'contact', label: 'Contact' },
+])
+const collapseSelected = ref(0)
+const collapseDisabled = ref(false)
+const collapseActives = ref([])
+const collapseDisableds = ref([])
+const handleCollapseClicked = (value) => {
+  console.log('handleCollapseClicked', value)
+  collapseSelected.value = value.index
 }
 </script>
 

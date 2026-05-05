@@ -17,7 +17,6 @@
       :tabindex="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? -1 : tabIndex"
       :role="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? undefined : 'tab'"
       :aria-disabled="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled"
-      @click="clicked()"
       @focus="handleFocus"
       @blur="handleBlur"
       @contextmenu="handleRightClick"
@@ -27,16 +26,33 @@
       @keydown.enter.prevent="handleTabIndex('enter')"
       @keydown.space.prevent="handleTabIndex('space')"
     >
-      Content here
+      <div
+        @click="clicked"
+        :class="['component__button', isActive ? 'component__button--active' : 'component__button--deactivate']"
+      >
+        Open Collapsible
+        {{ isActive }}
+      </div>
+      <div
+        ref="contentRef"
+        :class="[
+          'component__content',
+          componentType === 'normal' ? 'component__content--normal' : 'component__content--animation',
+          { 'component__content--active': isActive }
+        ]"
+        :style="[displayContent]"
+      >
+        <p>Lorem ipsum...</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch } from 'vue'
+import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 
 defineOptions({
-  name: 'NbBase',
+  name: 'NbCollapse',
   inheritAttrs: false
 })
 
@@ -120,7 +136,7 @@ const props = defineProps({
 		validator: value => {
 			return typeof value === 'boolean' && [true, false].includes(value)
 		}
-	},
+	},  
   blockClick: {
     type: Boolean,
     default: false,
@@ -142,14 +158,14 @@ const props = defineProps({
 
 	paddingX: {
 		type: Number,
-		default: 0.2,
+		default: 1, // 0.2rem
 		validator: value => {
 			return !value ? 1 : value
 		}
 	},
 	paddingY: {
 		type: Number,
-		default: 0.2,
+		default: 1, // 0.2rem
 		validator: value => {
 			return !value ? 0.2 : value
 		}
@@ -195,7 +211,14 @@ const props = defineProps({
 	scrollClass: {
 		type: String,
 		default: ''
-	}
+	},
+  componentType: {
+    type: String,
+    default: 'normal',
+    validator: (value) => {
+        return ['normal', 'animation'].includes(value)
+    }
+  }
 })
 
 const {
@@ -225,6 +248,7 @@ const {
 	blockClick,
 	ellipsisText,
 	scrollClass,
+  componentType,
 } = toRefs(props)
 
 // para o container do componente
@@ -254,6 +278,7 @@ const formatDefaultValues = computed(() => {
     ? ellipsisText.value
     : false
   const scrollClassValue = scrollClass.value !== '' ? scrollClass.value : ''
+  const componentTypeValue = !componentType.value ? 'normal' : componentType.value
 
 	return {
 		disabled: disabledValue,
@@ -270,6 +295,7 @@ const formatDefaultValues = computed(() => {
 
     ellipsisText: ellipsisTextValue,
     scrollClass: scrollClassValue,
+    componentType: componentTypeValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -390,21 +416,25 @@ const handleTabIndex = (tabIndex, type = 'enter') => {
 const changeActive = (value) => {
   isActive.value = value
 }
-const clicked = () => {
-  if (blockClick.value) return
+const clicked = (event = null) => {
+  if (blockClick.value || disabled.value) return
 
-  changeActive(true)
+  const newValeu = !isActive.value
+
+  changeActive(newValeu)
+
+  changeContentHeight(event)
 
   emit('clicked')
 }
 
 const handleFocus = () => {
-  changeActive(true)
+  // changeActive(true)
 
   emit('focused')
 }
 const handleBlur = () => {
-  changeActive(false)
+  // changeActive(false)
 
   emit('blurred')
 }
@@ -475,7 +505,7 @@ const handleClickOutside = (event) => {
   if (!shouldEmitOutsideClick.value) return
 
   // mudar o estado do componente para false
-  changeActive(false)
+  // changeActive(false)
 
   // emitir o evento outside-clicked
   emit('outside-clicked', event)
@@ -520,7 +550,7 @@ const handleOutsideRightClick = (event) => {
   if (!shouldEmitOutsideClick.value) return
 
   // mudar o estado do componente para false
-  changeActive(false)
+  // changeActive(false)
 
   // emitir o evento outside-right-clicked
   emit('outside-right-clicked', event)
@@ -548,6 +578,33 @@ onUnmounted(() => {
 })
 
 /* New logic below */
+const contentRef = ref(null)
+const displayContent = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (defaultValues.componentType === 'animation') return {};
+
+  return {
+    display: isActive.value ? 'block' : 'none',
+  };
+});
+const changeContentHeight = async (event) => {
+  if (blockClick.value || disabled.value || !contentRef.value) return
+
+  const defaultValues = formatDefaultValues.value
+
+  event?.stopPropagation?.()
+
+  if (defaultValues.componentType === 'animation') {
+    if (isActive.value) {
+      await nextTick()
+      contentRef.value.style.maxHeight = `${contentRef.value.scrollHeight}px`
+      return
+    }
+
+    contentRef.value.style.maxHeight = '0px'
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -592,7 +649,6 @@ onUnmounted(() => {
   font-size: v-bind('fontSizeStyle');
   font-weight: v-bind('fontWeightStyle');
 
-  padding: v-bind('paddingStyle');
   text-align: v-bind('textAlignStyle');
 
 	// user-select: none;
@@ -602,16 +658,92 @@ onUnmounted(() => {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 
-	cursor: pointer;
 	-webkit-text-decoration-line: none;
 	text-decoration-line: none;
 	white-space: nowrap;
 
-  &.component--active {
-    border: 1px solid blue;
-  }
+  &.component--active {}
   
   // Component style start below:
+  .component__button {
+    background-color: #f1f7ff;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+
+    &:after {
+      content: '\02795'; /* Unicode character for "plus" sign (+) */
+      font-size: 7px;
+      color: white;
+      float: right;
+      margin-left: 5px;
+    }
+
+    &.component__button--active,
+    &:hover {
+      background-color: #dce9fb;
+    }
+
+    &.component__button--active {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+
+      &:after {
+        content: '\2796'; /* Unicode character for "minus" sign (-) */
+      }
+
+      &~.component__content {
+        background-color: rgb(115, 115, 233);
+        border-style: solid;
+        border-color: #f1f1f1;
+        border-left-width: 1px;
+        border-right-width: 1px;
+        border-top-width: 0px;
+        border-bottom-width: 1px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
+    }
+
+    &.component__button--deactivate {
+      &~.component__content {
+        border: 0;
+      }
+    }
+  }
+
+  .component__content {
+    padding: v-bind('paddingStyle');
+    overflow: hidden;
+    display: none;
+    background-color: rgb(239, 13, 13);
+
+    &.component__content--animation {
+      display: block;
+      padding: 0;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.25s ease, opacity 0.2s ease;
+      will-change: max-height, opacity;
+
+      &.component__content--active {
+        padding: v-bind('paddingStyle');
+        opacity: 1;
+      }
+    }
+    &.component__content--normal {
+      display: none;
+    }
+  }
 
   // inicio propTheme
   &.component__theme--light {
