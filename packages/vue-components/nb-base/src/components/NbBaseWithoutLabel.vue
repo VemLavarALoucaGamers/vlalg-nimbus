@@ -16,7 +16,7 @@
       :tabIndex="disabled ? -1 : tabIndex"
       @keydown.enter.prevent="handleTabIndexEnter()"
     >
-      <div :class="['component__content', componentContentClass]">
+      <div :class="['component__content']">
         Content here
       </div>
     </div>

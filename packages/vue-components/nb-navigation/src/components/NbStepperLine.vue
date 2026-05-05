@@ -21,7 +21,7 @@
           <div class="nb-stepper-line__items">
             <div class="nb-stepper-line__fit">
               <div class="nb-stepper-line__track">
-                <div class="nb-stepper-line__nav">
+                <div :class="['nb-stepper-line__nav', scrollClassStyle]">
                   <div
                     v-for="(item, index) in navItems"
                     :key="index"
@@ -40,21 +40,35 @@
                     @keydown.space.prevent="handleTabIndex(index, 'space')"
                   >
                     <span
-                      v-if="tabNumberShow"
+                      v-if="showTab"
                       class="nb-stepper-line__counter"
                       :style="ellipsisTextStyle"
                     >
-                      <slot name="tab-number" :item="item">{{ index + 1 }}.</slot>
+                      <slot
+                        v-if="showTab"
+                        :name="`tab-number-${index}`"
+                        :option="item"
+                        :index="index"
+                        :options="navItems"
+                      >{{ index + 1 }}.</slot>
                     </span>
 
                     <span class="nb-stepper-line__line"></span>
                     
                     <span
-                      v-if="labelShow"
+                      v-if="showLabel"
                       class="nb-stepper-line__label"
                       :style="ellipsisTextStyle"
                     >
-                      <strong>{{ item.title }}</strong>
+                      <slot
+                        v-if="showLabel"
+                        :name="`label-${index}`"
+                        :option="item"
+                        :index="index"
+                        :options="navItems"
+                      >
+                        <strong>{{ item.title }}</strong>
+                      </slot>
                     </span>
                   </div>
                 </div>
@@ -78,8 +92,7 @@ defineOptions({
 onMounted(() => {})
 
 const emit = defineEmits([
-  'changed',
-  'status'
+  'changed'
 ])
 
 const props = defineProps({
@@ -121,39 +134,63 @@ const props = defineProps({
 			return ['dark', 'light'].indexOf(value) !== -1
 		}
 	},
-	// Cores do tema light
-  lightLineColor: {
+	/** ---------- Tema claro (`theme="light"`) — defaults iguais ao NbSegmentedButton ---------- */
+	lightTabColor: {
 		type: String,
-		default: 'tomato'
+		default: '#000000',
+		validator: (value) => {
+			return typeof value === 'string'
+		}
 	},
-  lightCircleColor: {
+	lightTabColorSelected: {
 		type: String,
-		default: 'red'
+		default: '#000000',
+		validator: (value) => {
+			return typeof value === 'string'
+		}
 	},
-	lightDoneColor: {
+	lightLineBackground: {
 		type: String,
-		default: 'blue'
+		default: '#bdbdbd',
+		validator: (value) => {
+			return typeof value === 'string'
+		}
 	},
-	lightFinishedColor: {
+	lightLineBackgroundSelected: {
 		type: String,
-		default: 'cyan'
+		default: '#bdbdbd',
+		validator: (value) => {
+			return typeof value === 'string'
+		}
 	},
-	// Cores do tema dark
-  darkLineColor: {
+	/** ---------- Tema escuro (`theme="dark"`) ---------- */
+	darkTabColor: {
 		type: String,
-		default: '#a1def3'
+		default: '#000000',
+		validator: (value) => {
+			return typeof value === 'string'
+		}
 	},
-  darkCircleColor: {
+	darkTabColorSelected: {
 		type: String,
-		default: '#79d1ef'
+		default: '#000000',
+		validator: (value) => {
+			return typeof value === 'string'
+		}
 	},
-	darkDoneColor: {
+	darkLineBackground: {
 		type: String,
-		default: '#066f93'
+		default: '#353734',
+		validator: (value) => {
+			return typeof value === 'string'
+		}
 	},
-	darkFinishedColor: {
+	darkLineBackgroundSelected: {
 		type: String,
-		default: '#003041'
+		default: '#353734',
+		validator: (value) => {
+			return typeof value === 'string'
+		}
 	},
   step: {
     type: Number,
@@ -186,14 +223,6 @@ const props = defineProps({
       return !value ? 0.4 : value
     }
   },
-
-
-
-  
-
-
-
-
   blockClick: {
     type: Boolean,
     default: true,
@@ -209,13 +238,6 @@ const props = defineProps({
     }
   },
   ellipsisText: {
-    type: Boolean,
-    default: true,
-    validator: (value) => {
-        return typeof value === 'boolean' && [true, false].includes(value)
-    }
-  },
-  tabNumberShow: {
     type: Boolean,
     default: true,
     validator: (value) => {
@@ -250,6 +272,13 @@ const props = defineProps({
         return value >= 50
     }
   },
+  showTab: {
+    type: Boolean,
+    default: true,
+    validator: (value) => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
   tabOpacity: {
     type: Number,
     default: 0.2,
@@ -262,20 +291,6 @@ const props = defineProps({
     default: 1,
     validator: (value) => {
         return value >= 0 && value <= 1
-    }
-  },
-  tabColor: {
-    type: String,
-    default: 'brown',
-    validator: (value) => {
-        return typeof value === 'string'
-    }
-  },
-  tabColorSelected: {
-    type: String,
-    default: 'green',
-    validator: (value) => {
-        return typeof value === 'string'
     }
   },
 	tabFontFamily: {
@@ -353,21 +368,7 @@ const props = defineProps({
         return value >= 2
     }
   },
-  lineBackground: {
-    type: String,
-    default: 'red',
-    validator: (value) => {
-        return typeof value === 'string'
-    }
-  },
-  lineBackgroundSelected: {
-    type: String,
-    default: 'blue',
-    validator: (value) => {
-        return typeof value === 'string'
-    }
-  },
-  labelShow: {
+  showLabel: {
     type: Boolean,
     default: true,
     validator: (value) => {
@@ -413,21 +414,17 @@ const props = defineProps({
     validator: value => {
       return !value ? 400 : value
     }
-  }
+  },
+	scrollClass: {
+		type: String,
+		default: ''
+	}
 })
 
 const {
 	nbId,
 	disabled,
 	theme,
-	lightLineColor,
-  lightCircleColor,
-  lightDoneColor,
-  lightFinishedColor,
-	darkLineColor,
-  darkCircleColor,
-  darkDoneColor,
-  darkFinishedColor,
 	tabIndex,
 	hasTabIndexEnter,
   hasTabIndexSpace,
@@ -448,8 +445,6 @@ const {
   minWidthSelected,
   tabOpacity,
   tabSelectedOpacity,
-  tabColor,
-  tabColorSelected,
   tabFontFamily,
   tabFontSize,
   tabFontSizeActive,
@@ -464,13 +459,20 @@ const {
   lineHeight,
   labelSelectedOpacity,
   labelTextAlign,
-  lineBackground,
-  lineBackgroundSelected,
   labelFontFamily,
   labelFontSize,
   labelFontSizeActive,
   labelFontWeight,
   labelFontWeightActive,
+  scrollClass,
+  lightTabColor,
+  lightTabColorSelected,
+  lightLineBackground,
+  lightLineBackgroundSelected,
+  darkTabColor,
+  darkTabColorSelected,
+  darkLineBackground,
+  darkLineBackgroundSelected,
 } = toRefs(props)
 
 const selected = ref(1)
@@ -517,8 +519,6 @@ const formatDefaultValues = computed(() => {
   const maxWidthValue = ((maxWidth.value !== 0 && !maxWidth.value) || maxWidth.value < 10) ? 50 : maxWidth.value
   const tabOpacityValue = ((tabOpacity.value !== 0 && !tabOpacity.value) || tabOpacity.value < 0 || tabOpacity.value > 1) ? 0.5 : tabOpacity.value
   const tabSelectedOpacityValue = ((tabSelectedOpacity.value !== 0 && !tabSelectedOpacity.value) || tabSelectedOpacity.value < 0 || tabSelectedOpacity.value > 1) ? 1 : tabSelectedOpacity.value
-  const tabColorValue = !tabColor.value ? 'brown' : tabColor.value
-  const tabColorSelectedValue = !tabColorSelected.value ? 'blue' : tabColorSelected.value
   const tabFontFamilyValue = !tabFontFamily.value ? `'Lato', sans-serif` : tabFontFamily.value
 	const tabFontSizeValue = !tabFontSize.value ? '1.6em' : tabFontSize.value
 	const tabFontSizeActiveValue = !tabFontSizeActive.value ? '1.2em' : tabFontSizeActive.value
@@ -531,8 +531,6 @@ const formatDefaultValues = computed(() => {
   const lineMarginBottomValue = ((lineMarginBottom.value !== 0 && !lineMarginBottom.value) || lineMarginBottom.value < 0) ? .1 : lineMarginBottom.value
   const lineMarginBottomActiveValue = ((lineMarginBottomActive.value !== 0 && !lineMarginBottomActive.value) || lineMarginBottomActive.value < 0) ? .15 : lineMarginBottomActive.value
   const lineHeightValue = !lineHeight.value ? 2 : lineHeight.value
-  const lineBackgroundColorValue = !lineBackground.value ? '#1a1a1a' : lineBackground.value
-  const lineBackgroundColorSelectedValue = !lineBackgroundSelected.value ? 'red' : lineBackgroundSelected.value
   const labelSelectedOpacityValue = ((labelSelectedOpacity.value !== 0 && !labelSelectedOpacity.value) || labelSelectedOpacity.value < 0 || labelSelectedOpacity.value > 1) ? 0.1 : labelSelectedOpacity.value
   const labelTextAlignValue = !labelTextAlign.value ? 'left' : labelTextAlign.value
   const labelFontFamilyValue = !labelFontFamily.value ? `'Lato', sans-serif` : labelFontFamily.value
@@ -556,8 +554,6 @@ const formatDefaultValues = computed(() => {
 		maxWidth: maxWidthValue,
 		tabOpacity: tabOpacityValue,
 		tabSelectedOpacity: tabSelectedOpacityValue,
-		tabColor: tabColorValue,
-		tabColorSelected: tabColorSelectedValue,
 		tabFontFamily: tabFontFamilyValue,
 		tabFontSize: tabFontSizeValue,
 		tabFontSizeActive: tabFontSizeActiveValue,
@@ -570,15 +566,13 @@ const formatDefaultValues = computed(() => {
     lineMarginBottom: lineMarginBottomValue,
     lineMarginBottomActive: lineMarginBottomActiveValue,
 		lineHeight: lineHeightValue,
-		lineBackground: lineBackgroundColorValue,
-		lineBackgroundSelected: lineBackgroundColorSelectedValue,
 		labelSelectedOpacity: labelSelectedOpacityValue,
 		labelTextAlign: labelTextAlignValue,
 		labelFontFamily: labelFontFamilyValue,
 		labelFontSize: labelFontSizeValue,
 		labelFontSizeActive: labelFontSizeActiveValue,
 		labelFontWeight: labelFontWeightValue,
-		labelFontWeightActive: labelFontWeightActiveValue,
+		labelFontWeightActive: labelFontWeightActiveValue
 	}
 })
 const componentDisabled = computed(() => {
@@ -596,8 +590,6 @@ const wrapperStyle = computed(() => {
 })
 
 const componentStyle = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
 	return {
 		marginTop: '0',
 	}
@@ -641,17 +633,6 @@ const handleTabIndex = (tabIndex, type = 'enter') => {
 }
 
 /* New logic below */
-const formatedValue = computed(() => {
-	const defaultValues = formatDefaultValues.value
-  const normalizedSteps = defaultValues.steps < 2 ? 2 : defaultValues.steps
-  const normalizedStep = Math.min(Math.max(step.value, 0), normalizedSteps + 1)
-
-  return {
-    step: normalizedStep,
-    steps: normalizedSteps
-  }
-})
-
 const opacityDisabledStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
   return `${defaultValues.opacityDisabled}`
@@ -706,14 +687,6 @@ const tabTextAlignStyle = computed(() => {
       return 'start'
   }
 })
-const tabColorStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  return defaultValues.tabColor
-})
-const tabColorSelectedStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  return defaultValues.tabColorSelected
-})
 const tabFontFamilyStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
   return `${defaultValues.tabFontFamily}`
@@ -754,14 +727,6 @@ const lineMarginActiveStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
   return `${defaultValues.lineMarginTopActive}em 0 ${defaultValues.lineMarginBottomActive}em 0`
 })
-const lineBackgroundStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  return defaultValues.lineBackground
-})
-const lineBackgroundSelectedStyle = computed(() => {
-  const defaultValues = formatDefaultValues.value
-  return defaultValues.lineBackgroundSelected
-})
 const labelSelectedOpacityStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
   return `${defaultValues.labelSelectedOpacity}`
@@ -797,6 +762,22 @@ const labelFontWeightStyle = computed(() => {
 const labelFontWeightActiveStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
   return `${defaultValues.labelFontWeightActive}`
+})
+const scrollClassStyle = computed(() => {
+  return scrollClass.value ? scrollClass.value : ''
+})
+
+const tabColorStyle = computed(() => {
+  return theme.value === 'dark' ? darkTabColor.value : lightTabColor.value
+})
+const tabColorSelectedStyle = computed(() => {
+  return theme.value === 'dark' ? darkTabColorSelected.value : lightTabColorSelected.value
+})
+const lineBackgroundStyle = computed(() => {
+  return theme.value === 'dark' ? darkLineBackground.value : lightLineBackground.value
+})
+const lineBackgroundSelectedStyle = computed(() => {
+  return theme.value === 'dark' ? darkLineBackgroundSelected.value : lightLineBackgroundSelected.value
 })
 
 const isStepDisabled = (stepIdentifier) => {

@@ -14,6 +14,7 @@
           <option value="tabs">tabs</option>
           <option value="stepper">stepper</option>
           <option value="stepperLine">stepperLine</option>
+          <option value="segmentedButton">segmentedButton</option>
         </select>
 
        <div v-if="btType === 'tabs'">
@@ -45,15 +46,20 @@
           :padding-y=".2"
           :gap="10"
           :has-border-radius="true"
-          lightBgColor="tomato"
-          lightTextColor="green"
-          lightTextColorActive="yellow"
           font-family="Chocolate, Arial, sans-serif"
           :is-scroll-class="true"
           scroll-class="custom-scrollbar"
           :disabled="activeTabDisabled"
           @changed="changedTab"
-        />
+        >
+          <template #tab-0="{ option, index, options }">
+            <span>{{ option.label }} - {{ index }} - {{ options.length }}</span>
+          </template>
+          <template #tab-1="{ option, index, options }">
+            <span>{{ option.label }} - {{ index }} - {{ options.length }}</span>
+          </template>
+        </NbTabs>
+        
         <NbTabs
           nb-id="tabs-light-2"
           display="b"
@@ -72,9 +78,6 @@
           :padding-y=".2"
           :gap="0"
           :has-border-radius="true"
-          lightBgColor="tomato"
-          lightTextColor="green"
-          lightTextColorActive="yellow"
           :disabled="activeTabDisabled"
           :is-scroll-class="true"
           scroll-class="custom-scrollbar"
@@ -98,10 +101,6 @@
           :padding-y=".2"
           :gap="0"
           :has-border-radius="true"
-          lightBgColor="#fff"
-          lightTextColor="green"
-          lightTextColorActive="yellow"
-          lightTabBorderColor="tomato"
           :disabled="activeTabDisabled"
           :is-scroll-class="true"
           scroll-class="custom-scrollbar"
@@ -128,7 +127,6 @@
           :padding-y=".2"
           :gap="10"
           :has-border-radius="true"
-          darkBgColor="tomato"
           :disabled="activeTabDisabled"
           :is-scroll-class="true"
           scroll-class="custom-scrollbar"
@@ -152,8 +150,6 @@
           :padding-y=".2"
           :gap="0"
           :has-border-radius="true"
-          darkBgColor="tomato"
-          darkTextColorActive="black"
           :disabled="activeTabDisabled"
           :is-scroll-class="true"
           scroll-class="custom-scrollbar"
@@ -177,10 +173,6 @@
           :padding-y=".2"
           :gap="0"
           :has-border-radius="true"
-          darkBgColor="#fff"
-          darkTextColor="black"
-          darkTextColorActive="black"
-          darkTabBorderColor="tomato"
           :disabled="activeTabDisabled"
           :is-scroll-class="true"
           scroll-class="custom-scrollbar"
@@ -220,6 +212,7 @@
         Disabled <input type="checkbox" v-model="disabled"> {{ disabled }} <br />
         Vertical Stepper Height (px) <input type="number" v-model="verticalStepperHeight" min="100" max="1000" step="0"> <br />
 
+        <div style="background-color: yellow; color: #000;">
         <NbStepper
           nb-id="stepper-1"
           display="b"
@@ -236,7 +229,9 @@
           @changed="changedStep"
           @status="($event) => console.log('status', $event)"
         />
-        <p>Algo depois</p>
+
+        <br />
+
         <NbStepper
           nb-id="stepper-2"
           display="b"
@@ -254,9 +249,29 @@
           @status="($event) => console.log('status', $event)"
         />
 
+        </div>
+
+        <p>Algo depois</p>
+        <NbStepper
+          nb-id="stepper-3"
+          display="b"
+          theme="dark"
+          orientation="horizontal"
+          :step="activeStep"
+          :steps="steps"
+          :circle-size="circleSize"
+          :circle-border-size="circleBorderSize"
+          :line-size="lineSize"
+          :block-click="blockClick"
+          :has-tab-index-enter="hasTabIndexEnter"
+          :disabled="disabled"
+          @changed="changedStep"
+          @status="($event) => console.log('status', $event)"
+        />
+
         <div :style="{ height: verticalStepperHeight + 'px' }" style="border: 1px solid #353734;">
           <NbStepper
-            nb-id="stepper-3"
+            nb-id="stepper-4"
             display="b"
             theme="dark"
             orientation="vertical"
@@ -274,10 +289,6 @@
 
           Algo depois
         </div>
-
-        <br /><br />
-        <p>StepperTwo</p>
-        <StepperTwo/>
       </div>
     </div>
 
@@ -308,7 +319,7 @@
 
         <br />
 
-        <div style="background-color: white">
+        <div>
           <NbStepperLine
             nb-id="stepper-1"
             display="b"
@@ -326,11 +337,28 @@
             @changed="changedStep"
             @status="($event) => console.log('status', $event)"
           />
+          <NbStepperLine
+            nb-id="stepper-1"
+            display="b"
+            theme="dark"
+            orientation="horizontal"
+            :step="activeStep"
+            :steps="steps"
+            :steps-disabled="[]"
+            :circle-size="circleSize"
+            :circle-border-size="circleBorderSize"
+            :line-size="lineSize"
+            :block-click="blockClick"
+            :has-tab-index-enter="hasTabIndexEnter"
+            :disabled="disabled"
+            @changed="changedStep"
+            @status="($event) => console.log('status', $event)"
+          />
         </div>
 
         <br />
 
-        <div style="background-color: yellow">
+        <div>
           <NbStepperLine
             nb-id="stepper-2"
             display="b"
@@ -344,7 +372,9 @@
             :block-click="blockClick"
             :has-tab-index-enter="hasTabIndexEnter"
             :disabled="disabled"
-            :tab-number-show="false"
+            :show-tab="false"
+            :show-label="false"
+            scrollClass="custom-scrollbar"
             @changed="changedStep"
             @status="($event) => console.log('status', $event)"
           />
@@ -367,11 +397,15 @@
             :has-tab-index-enter="hasTabIndexEnter"
             :disabled="disabled"
             :show-tab-number="true"
+            scrollClass="custom-scrollbar"
             @changed="changedStep"
             @status="($event) => console.log('status', $event)"
           >
-            <template #tab-number="{ item }">
-              <span>{{ item.title }}.</span>
+            <template #tab-number-0="{ option, index, options }">
+              <span>({{ index + 1 }})</span>
+            </template>
+            <template #label-0="{ option, index, options }">
+              <span>{{ option.title }}</span>
             </template>
           </NbStepperLine>
         </div>
@@ -392,13 +426,154 @@
           :block-click="blockClick"
           :has-tab-index-enter="hasTabIndexEnter"
           :disabled="disabled"
+          scrollClass="custom-scrollbar"
           @changed="changedStep"
           @status="($event) => console.log('status', $event)"
         />
+      </div>
+    </div>
 
-        <br /><br />
-        <p>StepperTwo</p>
-        <StepperTwo/>
+    <div v-if="btType === 'segmentedButton'" class="row" style="background-color: white; color: #000;">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px; background-color: #fff; color: #000">
+        <h4 class="test-page__content-tile">NbSegmentedButton</h4>
+
+        {{ segmentedButtonDisabled }} <input type="checkbox" v-model="segmentedButtonDisabled"> Disabled <br />
+        {{ segmentedButtonHasScroll }} <input type="checkbox" v-model="segmentedButtonHasScroll"> Has Scroll <br />
+        {{ segmentedButtonHasRadius }} <input type="checkbox" v-model="segmentedButtonHasRadius"> Has Container Radius <br />
+        {{ segmentedButtonGap }} <input type="number" v-model="segmentedButtonGap" min="0" max="999" step="1"> Gap <br />
+        {{ segmentedButtonFontStrongActive }} <input type="checkbox" v-model="segmentedButtonFontStrongActive"> Font Strong Active <br />
+        <input type="number" v-model="segmentedButtonRadius" min="0" max="100" step="0.001" :disabled="!segmentedButtonHasRadius"> <br />
+
+        {{ segmentedButtonHasSelectedBorderRadius }} <input type="checkbox" v-model="segmentedButtonHasSelectedBorderRadius"> Has Selected Border Radius
+        <input type="number" v-model="segmentedButtonSelectedBorderRadius" min="0" max="100" step="0.001" :disabled="!segmentedButtonHasSelectedBorderRadius"><br />
+
+        {{ segmentedButtonHasSelectedAnimation }} <input type="checkbox" v-model="segmentedButtonHasSelectedAnimation"> Has Selected Animation <br />
+
+        Lado de fora:
+        index: {{ segmentedButtonSelected }} <br />
+        value: {{ segmentedButtonOptions[segmentedButtonSelected] }} <br /><br />
+
+        <NbSegmentedButton
+          nb-id="segmented-button-1"
+          display="b"
+          :options="segmentedButtonOptions"
+          :selected="segmentedButtonSelected"
+          :selecteds-disabled="segmentedButtonSelectedDisabled"
+          :disabled="segmentedButtonDisabled"
+          :has-scroll="segmentedButtonHasScroll"
+          :has-border-radius="segmentedButtonHasRadius"
+          :border-radius="segmentedButtonRadius"
+          :has-selected-border-radius="segmentedButtonHasSelectedBorderRadius"
+          :selected-border-radius="segmentedButtonSelectedBorderRadius"
+          :font-strong-active="segmentedButtonFontStrongActive"
+          :gap="segmentedButtonGap"
+          :is-scroll-class="segmentedButtonHasScroll"
+          scrollClass="custom-scrollbar"
+          @clicked="handleSegmentedButtonClicked"
+        />
+        <br />
+        <NbSegmentedButton
+          nb-id="segmented-button-1"
+          display="b"
+          :options="segmentedButtonOptions"
+          :selected="segmentedButtonSelected"
+          :selecteds-disabled="segmentedButtonSelectedDisabled"
+          :disabled="segmentedButtonDisabled"
+          :has-scroll="segmentedButtonHasScroll"
+          :has-border-radius="segmentedButtonHasRadius"
+          :border-radius="segmentedButtonRadius"
+          :has-selected-border-radius="segmentedButtonHasSelectedBorderRadius"
+          :selected-border-radius="segmentedButtonSelectedBorderRadius"
+          :has-selected-animation="segmentedButtonHasSelectedAnimation"
+          :font-strong-active="segmentedButtonFontStrongActive"
+          :gap="segmentedButtonGap"
+          @clicked="handleSegmentedButtonClicked"
+        />
+
+        <br />
+
+        <NbSegmentedButton
+          nb-id="segmented-button-1"
+          display="b"
+          theme="dark"
+          :options="segmentedButtonOptions"
+          :selected="segmentedButtonSelected"
+          :selecteds-disabled="segmentedButtonSelectedDisabled"
+          :disabled="segmentedButtonDisabled"
+          :has-scroll="segmentedButtonHasScroll"
+          :has-border-radius="segmentedButtonHasRadius"
+          :border-radius="segmentedButtonRadius"
+          :has-selected-border-radius="segmentedButtonHasSelectedBorderRadius"
+          :selected-border-radius="segmentedButtonSelectedBorderRadius"
+          :font-strong-active="segmentedButtonFontStrongActive"
+          :gap="segmentedButtonGap"
+          @clicked="handleSegmentedButtonClicked"
+        />
+        <br />
+        <NbSegmentedButton
+          nb-id="segmented-button-1"
+          display="b"
+          theme="dark"
+          :options="segmentedButtonOptions"
+          :selected="segmentedButtonSelected"
+          :selecteds-disabled="segmentedButtonSelectedDisabled"
+          :disabled="segmentedButtonDisabled"
+          :has-scroll="segmentedButtonHasScroll"
+          :has-border-radius="segmentedButtonHasRadius"
+          :border-radius="segmentedButtonRadius"
+          :has-selected-border-radius="segmentedButtonHasSelectedBorderRadius"
+          :selected-border-radius="segmentedButtonSelectedBorderRadius"
+          :has-selected-animation="segmentedButtonHasSelectedAnimation"
+          :font-strong-active="segmentedButtonFontStrongActive"
+          :gap="segmentedButtonGap"
+          @clicked="handleSegmentedButtonClicked"
+        />
+
+        <br />
+        <NbSegmentedButton
+          nb-id="segmented-button-1"
+          display="b"
+          theme="dark"
+          :options="segmentedButtonOptions"
+          :selected="segmentedButtonSelected"
+          :selecteds-disabled="segmentedButtonSelectedDisabled"
+          :disabled="segmentedButtonDisabled"
+          :has-scroll="segmentedButtonHasScroll"
+          :has-border-radius="segmentedButtonHasRadius"
+          :border-radius="segmentedButtonRadius"
+          :has-selected-border-radius="segmentedButtonHasSelectedBorderRadius"
+          :selected-border-radius="segmentedButtonSelectedBorderRadius"
+          :has-selected-animation="segmentedButtonHasSelectedAnimation"
+          :font-strong-active="segmentedButtonFontStrongActive"
+          :gap="segmentedButtonGap"
+          @clicked="handleSegmentedButtonClicked"
+        >
+          <template #option-0="{ option, index, options }">
+            <span>{{ option }} - {{ index }} - {{ options.length }}</span>
+          </template>
+          <template #option-1="{ option, index, options }">
+            <span>{{ option }} - {{ index }} - {{ options.length }}</span>
+          </template>
+        </NbSegmentedButton>
+        <br />
+
+        <NbSegmentedButton
+          nb-id="segmented-button-1"
+          display="ib"
+          :options="segmentedButtonOptions"
+          :selected="segmentedButtonSelected"
+          :selecteds-disabled="segmentedButtonSelectedDisabled"
+          :disabled="segmentedButtonDisabled"
+          :has-scroll="segmentedButtonHasScroll"
+          :has-border-radius="segmentedButtonHasRadius"
+          :border-radius="segmentedButtonRadius"
+          :has-selected-border-radius="segmentedButtonHasSelectedBorderRadius"
+          :selected-border-radius="segmentedButtonSelectedBorderRadius"
+          :font-strong-active="segmentedButtonFontStrongActive"
+          :gap="segmentedButtonGap"
+          @clicked="handleSegmentedButtonClicked"
+        />
       </div>
     </div>
   </div>
@@ -411,9 +586,9 @@ const NbTabs = defineAsyncComponent(() => import('@components/NbTabs.vue'))
 const NbStepper = defineAsyncComponent(() => import('@components/NbStepper.vue'))
 const NbStepperLine = defineAsyncComponent(() => import('@components/NbStepperLine.vue'))
 
-const StepperTwo = defineAsyncComponent(() => import('@components/StepperTwo.vue'))
+const NbSegmentedButton = defineAsyncComponent(() => import('@components/NbSegmentedButton.vue'))
 
-const btType = ref('stepperLine')
+const btType = ref('tabs')
 
 
 /* tests tab - model one*/
@@ -451,6 +626,25 @@ const disabled = ref(false)
 const verticalStepperHeight = ref(225)
 const changedStep = (value) => {
   activeStep.value = value
+}
+
+/* tests segmented button */
+const segmentedButtonOptions = ref(['Browser', 'Network', 'Security', 'Extensions'])
+const segmentedButtonSelected = ref(1)
+const segmentedButtonSelectedDisabled = ref([0])
+const segmentedButtonDisabled = ref(false)
+const segmentedButtonHasScroll = ref(false)
+const segmentedButtonHasRadius = ref(false)
+const segmentedButtonRadius = ref(0.375)
+const segmentedButtonHasSelectedBorderRadius = ref(false)
+const segmentedButtonSelectedBorderRadius = ref(0.375)
+const segmentedButtonHasSelectedAnimation = ref(true)
+const segmentedButtonFontStrongActive = ref(true)
+const segmentedButtonGap = ref(0.5)
+
+const handleSegmentedButtonClicked = (value) => {
+  console.log('handleSegmentedButtonClicked', value)
+  segmentedButtonSelected.value = value.index
 }
 </script>
 
@@ -517,4 +711,47 @@ const changedStep = (value) => {
       }
     }
   }
+
+:deep(.component) {
+    &.custom-scrollbar {
+      &::-webkit-scrollbar {
+        height: 5px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: tomato;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #640dfb;
+        border-radius: 4px;
+
+        &:hover {
+          background: #4d0bc0;
+        }
+      }
+    }
+  }
+
+:deep(.nb-stepper-line__nav) {
+    &.custom-scrollbar {
+      &::-webkit-scrollbar {
+        height: 5px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: tomato;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #640dfb;
+        border-radius: 4px;
+
+        &:hover {
+          background: #4d0bc0;
+        }
+      }
+    }
+  }
+
 </style>

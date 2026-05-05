@@ -36,6 +36,8 @@ The components that are part of this lib are:
 
 - <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-tabs" target="_blank">nb-tabs</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-stepper" target="_blank">nb-stepper</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-stepper-line" target="_blank">nb-stepper-line</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-segmented-button" target="_blank">nb-segmented-button</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

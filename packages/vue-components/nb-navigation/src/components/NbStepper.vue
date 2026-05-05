@@ -103,54 +103,55 @@ const props = defineProps({
 		}
 	},
 	// Cores do tema light
-  lightLineColor: {
+	lightLineColor: {
 		type: String,
-		default: 'tomato'
+		default: '#cccccc'
 	},
-  lightCircleColor: {
+	lightCircleColor: {
 		type: String,
-		default: 'red'
+		default: '#cccccc'
 	},
 	lightActiveColor: {
 		type: String,
-		default: 'green'
+		default: '#9e9e9e'
 	},
 	lightDoneColor: {
 		type: String,
-		default: 'blue'
+		default: '#9e9e9e'
 	},
 	lightFinishedColor: {
 		type: String,
-		default: 'cyan'
+		default: '#ebebeb'
 	},
-  lightFocusColor: {
+	lightFocusColor: {
 		type: String,
-		default: 'red'
+		default: '#9e9e9e'
 	},
-	// Cores do tema dark
+	// Cores do tema dark — mesma rampa que o light (trilha → borda → ativo → feito → final), em tons sobre fundo escuro
+  
   darkLineColor: {
 		type: String,
-		default: '#a1def3'
+		default: '#939090'
 	},
   darkCircleColor: {
 		type: String,
-		default: '#79d1ef'
+		default: '#939090'
 	},
 	darkActiveColor: {
 		type: String,
-		default: '#066f93'
+		default: '#646464'
 	},
 	darkDoneColor: {
 		type: String,
-		default: '#066f93'
+		default: '#525151'
 	},
 	darkFinishedColor: {
 		type: String,
-		default: '#003041'
+		default: '#000000'
 	},
-	darkFocusColor: {
+  darkFocusColor: {
 		type: String,
-		default: '#7dd3fc'
+		default: '#525151'
 	},
   step: {
     type: Number,
@@ -278,8 +279,6 @@ const wrapperStyle = computed(() => {
 })
 
 const componentStyle = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
 	return {
 		marginTop: '0',
 	}
@@ -311,22 +310,6 @@ const themeStyle = computed(() => {
 		default:
 			return 'component__theme--light'
 	}
-})
-const styleDisabledColor = computed(() => {
-  switch (theme.value) {
-    case 'dark':
-      return darkDisabledColor.value
-    default:
-      return lightDisabledColor.value
-  }
-})
-const styleActiveColor = computed(() => {
-  switch (theme.value) {
-    case 'dark':
-      return darkActiveColor.value
-    default:
-      return lightActiveColor.value
-  }
 })
 
 // handle tab index enter

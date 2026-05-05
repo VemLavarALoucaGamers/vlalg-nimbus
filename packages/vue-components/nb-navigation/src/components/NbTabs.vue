@@ -4,7 +4,6 @@
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle]"
     role="navigation"
-    :title="title"
     v-bind="computedAriaAttrs"
   >    
     <div
@@ -48,15 +47,16 @@
             {
               active: currentActiveTab === tab.key,
               'tab-btn--disabled': isTabDisabled(index)
-            },
-            activeTextStyleClass
+            }
           ]"
           @click="changeTab(index)"
           @keydown.enter.prevent="handleTabIndex(index, 'enter')"
           @keydown.space.prevent="handleTabIndex(index, 'space')"
           :disabled="isTabDisabled(index)"
         >
-          {{ tab.label }}
+          <slot :name="`tab-${index}`" :option="tab" :index="index" :options="tabs">
+            {{ tab.label }}
+          </slot>
         </div>
 
         <div class="tabs-header__line"></div>
@@ -69,7 +69,7 @@
 import { defineProps, ref, toRefs, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 
 defineOptions({
-  name: 'NbBase',
+  name: 'NbTabs',
   inheritAttrs: false
 })
 
@@ -114,19 +114,11 @@ const props = defineProps({
   },
   ariaLabel: {
     type: String,
-    default: 'Input Base'
+    default: 'Tab'
   },
   ariaAttrs: {
     type: Object,
     default: () => ({})
-  },
-  title: {
-    type: String,
-    default: ''
-  },
-  textColor: {
-    type: String,
-    default: 'black'
   },
 	paddingX: {
 		type: Number,
@@ -182,20 +174,6 @@ const props = defineProps({
 			return !value ? 400 : value
 		}
   },
-	textAlign: {
-		type: String,
-		default: 'right',
-		validator: value => {
-			return ['center', 'left', 'right'].indexOf(value) !== -1
-		}
-	},
-	activeTextStyle: {
-		type: String,
-		default: 'normal',
-		validator: value => {
-			return ['normal', 'italic', 'oblique'].indexOf(value) !== -1
-		}
-	},
 	theme: {
 		type: String,
 		default: 'light',
@@ -217,35 +195,35 @@ const props = defineProps({
 			return ['background', 'line', 'border'].indexOf(value) !== -1
 		}
 	},
-	// Cores do tema light
+	// Cores tema light — mesma base que NbSegmentedButton (fundo / borda / texto / ativo)
 	lightBgColor: {
-		type: String,
-		default: '#f8f8f2'
-	},
-	lightBorderColor: {
-		type: String,
-		default: '#eaeaea' // '#353734'
-	},
-	lightTabBorderColor: {
-		type: String,
-		default: '#f8f8f2'
-	},
-	lightTextColor: {
 		type: String,
 		default: '#000000'
 	},
+	lightBorderColor: {
+		type: String,
+		default: '#eaeaea'
+	},
+	lightTabBorderColor: {
+		type: String,
+		default: '#000000'
+	},
+	lightTextColor: {
+		type: String,
+		default: '#333333'
+	},
 	lightTextColorActive: {
 		type: String,
-		default: '#1a73e8'
+		default: '#ffffff'
 	},
-	// Cores do tema dark
+	// Cores tema dark — barra #353734, realce #5f5f5f, texto claro (não preto)
 	darkBgColor: {
 		type: String,
 		default: '#353734'
 	},
 	darkBorderColor: {
 		type: String,
-		default: '#44475a'
+		default: '#5f5f5f'
 	},
 	darkTabBorderColor: {
 		type: String,
@@ -253,16 +231,16 @@ const props = defineProps({
 	},
 	darkTextColor: {
 		type: String,
-		default: '#000000'
+		default: '#c8c8c8'
 	},
 	darkTextColorActive: {
 		type: String,
-		default: '#ffffff'
+		default: '#ebebeb'
 	},
 
 	darkDisabledBorderColor: {
 		type: String,
-		default: 'rgba(68, 71, 90, 0.3)'
+		default: 'rgba(95, 95, 95, 0.45)'
 	},
   tabs: {
     type: Array,
@@ -303,9 +281,9 @@ const props = defineProps({
   },
   indicatorWidth: {
     type: Number,
-    default: 2,
+    default: 3,
     validator: value => {
-      return !value ? 2 : value
+      return !value ? 3 : value
     }
   },
   barPaddingLeft: {
@@ -335,10 +313,7 @@ const {
 	fontSize,
 	fontWeight,
   fontWeightActive,
-	textColor,
-	textAlign,
 	hasBorderRadius,
-	activeTextStyle,
 	theme,
   opacityDisabled,
 	inputStyle,
@@ -378,11 +353,10 @@ const formatDefaultValues = computed(() => {
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
 	const fontWeightActiveValue = ((fontWeightActive.value !== 0 && !fontWeightActive.value) || fontWeightActive.value < 0) ? 100 : fontWeightActive.value
   const themeValue = !theme.value ? 'light' : theme.value
-  const textColorValue = !textColor.value ? 'black' : textColor.value
 
   const tabModelValue = !tabModel.value || tabModel.value !== 'one' ? 'one' : tabModel.value
   const gapStyleValue = ((gap.value !== 0 && !gap.value) || gap.value < 0) ? 24 : gap.value
-  const indicatorWidthValue = ((indicatorWidth.value !== 0 && !indicatorWidth.value) || indicatorWidth.value < 0) ? 2 : indicatorWidth.value
+  const indicatorWidthValue = ((indicatorWidth.value !== 0 && !indicatorWidth.value) || indicatorWidth.value < 0) ? 3 : indicatorWidth.value
   const opacityDisabledValue = ((opacityDisabled.value !== 0 && !opacityDisabled.value) || opacityDisabled.value < 0) ? 0.2 : opacityDisabled.value
   const barPaddingLeftValue = ((barPaddingLeft.value !== 0 && !barPaddingLeft.value) || barPaddingLeft.value < 0) ? 0 : barPaddingLeft.value
 
@@ -397,7 +371,6 @@ const formatDefaultValues = computed(() => {
 		paddingY: paddingYValue,
     borderRadius: borderRadiusValue,
 		theme: themeValue,
-		textColor: textColorValue,
 		tabModel: tabModelValue,
 		gap: gapStyleValue,
 		indicatorWidth: indicatorWidthValue,
@@ -429,20 +402,8 @@ const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return {
-		color: defaultValues.textColor,
 		fontWeight: defaultValues.fontWeight,
-		textAlign: textAlign.value,
 		marginTop: '0',
-	}
-})
-const activeTextStyleClass = computed(() => {
-	switch (activeTextStyle.value) {
-		case 'italic':
-			return 'component__text--italic'
-		case 'oblique':
-			return 'component__text--oblique'
-		default:
-			return 'component__text--normal'
 	}
 })
 const borderRadiusStyle = computed(() => {
@@ -459,11 +420,6 @@ const font = computed(() => {
 	const defaultValues = formatDefaultValues.value
 
 	return defaultValues.font
-})
-const styleTextColor = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.textColor
 })
 const computedAriaAttrs = computed(() => {
   const newAttrs = {}
@@ -1092,20 +1048,6 @@ watch(props, async () => {
             cursor: default !important;
           }
         }
-
-        // inicio activeTextStyle
-        &.component__text--italic {
-          font-style: italic;
-        }
-
-        &.component__text--oblique {
-          font-style: oblique;
-        }
-
-        &.component__text--normal {
-          font-style: normal;
-        }
-        // fim activeTextStyle
       }
 
       .tab-indicator {
@@ -1136,7 +1078,6 @@ watch(props, async () => {
 
 	.component {
 		--disabled-button-color: v-bind('styleButtonColor');
-		--disabled-color: v-bind('styleTextColor');
 		border-radius: inherit;
 
 
