@@ -1,0 +1,90 @@
+<template>
+  <div class="container-fluid test-page">
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1 test-page__title">
+        <h2>Test page</h2>
+        <p class="test-page__component-name"><strong>Component:</strong> NbInputs</p>
+        <p class="test-page__warning">Warning: Look at the console to see the click event</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content" style="margin-bottom: 50px; overflow: hidden">
+        <select v-model="btType">
+          <option value="without-label">without-label</option>
+          <option value="with-label">with-label</option>
+        </select>
+      </div>
+    </div>
+
+    <div v-if="btType === 'tabs'" class="row">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px;">
+        <h4 class="test-page__content-tile">NbTabs</h4>
+        
+        <NbBaseWithoutLabel
+          nb-id="tabs-light-1"
+          display="b"
+        />
+
+        <NbBaseWithLabel
+          nb-id="tabs-light-2"
+          display="b"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { defineAsyncComponent, ref } from 'vue'
+
+const NbBaseWithoutLabel = defineAsyncComponent(() => import('@components/NbBaseWithoutLabel.vue'))
+const NbBaseWithLabel = defineAsyncComponent(() => import('@components/NbBaseWithLabel.vue'))
+
+const btType = ref('tabs')
+</script>
+
+<style lang="scss" scoped>
+@import '@vlalg-nimbus/bee-css-reset/dist/bee-css-reset.min.css';
+@import '@vlalg-nimbus/chameleon-grid-layout/dist/chameleon-grid-layout.min.css';
+
+:global(body) {
+  background-color: #181818;
+  color: rgba(235, 235, 235, 0.64);
+}
+
+.test-page {
+  .test-page__title {
+    font-family: 'Lato', sans-serif;
+    margin-top: 40px;
+    margin-bottom: 50px;
+
+    h2 {
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    p {
+      font-weight: 500;
+      font-size: 1.2em;
+
+      &.test-page__component-name {
+        margin-bottom: 0px;
+      }
+
+      &.test-page__warning {
+        font-weight: 700;
+        font-size: 1em;
+        font-style: italic;
+      }
+    }
+  }
+
+  .test-page__content {
+    text-align: left;
+   
+  }
+}
+</style>
