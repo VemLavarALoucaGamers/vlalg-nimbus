@@ -13,7 +13,7 @@
         'nb-reset', 'component', themeStyle, inputStyleClass,
         { 'component--active': isActive }
       ]"
-      :style="[componentStyle, borderRadiusStyle]"
+      :style="[componentStyle, borderRadiusStyle, ellipsisTextStyle]"
       :tabindex="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? -1 : tabIndex"
       :role="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? undefined : 'tab'"
       :aria-disabled="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled"
@@ -374,6 +374,17 @@ const inputStyleClass = computed(() => {
 		default:
 			return 'component__input--background'
 	}
+})
+const ellipsisTextStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (!defaultValues.ellipsisText) return {}
+
+  return {
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap'
+  }
 })
 
 // handle tab index enter

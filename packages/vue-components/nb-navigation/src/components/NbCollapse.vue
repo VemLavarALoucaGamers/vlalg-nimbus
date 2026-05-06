@@ -13,7 +13,7 @@
         'nb-reset', 'component', themeStyle, inputStyleClass,
         { 'component--active': isActive }
       ]"
-      :style="[componentStyle, borderRadiusStyle]"
+      :style="[componentStyle]"
       :tabindex="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? -1 : tabIndex"
       :role="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled ? undefined : 'tab'"
       :aria-disabled="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled"
@@ -28,10 +28,27 @@
     >
       <div
         @click="clicked"
-        :class="['component__button', isActive ? 'component__button--active' : 'component__button--deactivate']"
+        :class="[
+          'component__button',
+          isActive ? 'component__button--active' : 'component__button--deactivate',
+          isActive ? activeTextStyleClass : ''
+        ]"
       >
-        Open Collapsible
-        {{ isActive }}
+        <div
+          :class="[
+            'component__button-label'
+          ]"
+          :style="ellipsisTextStyle"
+        >
+          <slot name="title" :title="title">{{ title }}</slot>
+        </div>
+        <div
+          class="component__button-trailing"
+          :style="titleIconWidthStyle"
+          aria-hidden="true"
+        >
+          <slot name="title-icon" :is-active="isActive">{{ isActive ? '−' : '+' }}</slot>
+        </div>
       </div>
       <div
         ref="contentRef"
@@ -42,7 +59,7 @@
         ]"
         :style="[displayContent]"
       >
-        <p>Lorem ipsum...</p>
+        <slot name="content"></slot>
       </div>
     </div>
   </div>
@@ -110,26 +127,8 @@ const props = defineProps({
 			return ['dark', 'light'].indexOf(value) !== -1
 		}
 	},
-	inputStyle: {
-		type: String,
-		default: 'background',
-		validator: value => {
-			return ['background', 'line', 'border'].indexOf(value) !== -1
-		}
-	},
 
 
-	hasBorderRadius: {
-		type: Boolean,
-		default: false,
-		validator: value => {
-			return typeof value === 'boolean' && [true, false].includes(value)
-		}
-	},
-	borderRadius: {
-		type: Number,
-		default: 0.375
-	},
 	disabled: {
 		type: Boolean,
 		default: false,
@@ -156,35 +155,6 @@ const props = defineProps({
 
   
 
-	paddingX: {
-		type: Number,
-		default: 1, // 0.2rem
-		validator: value => {
-			return !value ? 1 : value
-		}
-	},
-	paddingY: {
-		type: Number,
-		default: 1, // 0.2rem
-		validator: value => {
-			return !value ? 0.2 : value
-		}
-	},
-	fontFamily: {
-		type: String,
-		default: `'Lato', sans-serif`
-	},
-	fontSize: {
-		type: String,
-		default: '1.6em'
-	},
-	fontWeight: {
-		type: Number,
-		default: 400,
-		validator: value => {
-			return !value ? 700 : value
-		}
-  },
 	textAlign: {
 		type: String,
 		default: 'left',
@@ -218,7 +188,116 @@ const props = defineProps({
     validator: (value) => {
         return ['normal', 'animation'].includes(value)
     }
-  }
+  },
+  title: {
+    type: String,
+    default: 'Open Collapsible'
+  },
+  titleGap: {
+    type: Number,
+    default: 0.5,
+    validator: (value) => {
+        return typeof value === 'number' && value >= 0
+    }
+  },
+	titlePaddingX: {
+		type: Number,
+		default: 0.7,
+		validator: value => {
+			return !value ? 0.7 : value
+		}
+	},
+	titlePaddingY: {
+		type: Number,
+		default: 0.7, // 0.2rem
+		validator: value => {
+			return !value ? 0.7 : value
+		}
+	},
+	titleBorderRadius: {
+		type: String,
+		default: '5px 5px 5px 5px',
+		validator: value => {
+			return !value ? '5px 5px 5px 5px' : value
+		}
+	},
+	titleBorderRadiusActive: {
+		type: String,
+		default: '5px 5px 0px 0px',
+		validator: value => {
+			return !value ? '5px 5px 0px 0px' : value
+		}
+	},
+	titleFontFamily: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	titleFontSize: {
+		type: String,
+		default: '1.6em'
+	},
+	titleFontWeight: {
+		type: Number,
+		default: 500,
+		validator: value => {
+			return !value ? 500 : value
+		}
+  },
+  titleIconWidth: {
+    type: String,
+    default: '2.4rem'
+  },
+	titleIconFontFamily: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	titleIconFontSize: {
+		type: String,
+		default: '2em'
+	},
+	titleIconFontWeight: {
+		type: Number,
+		default: 700,
+		validator: value => {
+			return !value ? 700 : value
+		}
+  },
+	contentPaddingX: {
+		type: Number,
+		default: 1,
+		validator: value => {
+			return !value ? 1 : value
+		}
+	},
+	contentPaddingY: {
+		type: Number,
+		default: 1,
+		validator: value => {
+			return !value ? 1 : value
+		}
+	},
+	contentFontFamily: {
+		type: String,
+		default: `'Lato', sans-serif`
+	},
+	contentFontSize: {
+		type: String,
+		default: '1.6em'
+	},
+	contentFontWeight: {
+		type: Number,
+		default: 500,
+		validator: value => {
+			return !value ? 500 : value
+		}
+  },
+	contentBorderRadiusActive: {
+		type: String,
+		default: '0px 0px 5px 5px',
+		validator: value => {
+			return !value ? '0px 0px 5px 5px' : value
+		}
+	}
 })
 
 const {
@@ -230,18 +309,10 @@ const {
 	ariaLabel,
 	ariaAttrs,
 	theme,
-	inputStyle,
 
-	hasBorderRadius,
-	borderRadius,
 	disabled,
   blockRightClick,
   
-	paddingX,
-	paddingY,
-	fontFamily,
-	fontSize,
-	fontWeight,
 	textAlign,
 	activeTextStyle,
 
@@ -249,6 +320,24 @@ const {
 	ellipsisText,
 	scrollClass,
   componentType,
+  titleGap,
+	titlePaddingX,
+	titlePaddingY,
+	titleBorderRadius,
+	titleBorderRadiusActive,
+	titleFontFamily,
+	titleFontSize,
+	titleFontWeight,
+  titleIconWidth,
+	titleIconFontFamily,
+	titleIconFontSize,
+	titleIconFontWeight,
+	contentPaddingX,
+	contentPaddingY,
+	contentFontFamily,
+	contentFontSize,
+	contentFontWeight,
+	contentBorderRadiusActive,
 } = toRefs(props)
 
 // para o container do componente
@@ -263,14 +352,8 @@ const shouldEmitOutsideClick = ref(false)
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
 	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
-	const borderRadiusValue = ((borderRadius.value !== 0 && !borderRadius.value) || borderRadius.value < 0) ? 0 : borderRadius.value
 	const themeValue = !theme.value ? 'light' : theme.value
 
-  const paddingXValue = ((paddingX.value !== 0 && !paddingX.value) || paddingX.value < 0) ? 1 : paddingX.value
-	const paddingYValue = ((paddingY.value !== 0 && !paddingY.value) || paddingY.value < 0) ? 0.2 : paddingY.value
-	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
-	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
-	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 100 : fontWeight.value
   const textAlignValue = !textAlign.value ? 'left' : textAlign.value
   const activeTextStyleValue = !activeTextStyle.value ? 'normal' : activeTextStyle.value
   
@@ -280,22 +363,56 @@ const formatDefaultValues = computed(() => {
   const scrollClassValue = scrollClass.value !== '' ? scrollClass.value : ''
   const componentTypeValue = !componentType.value ? 'normal' : componentType.value
 
+  const titleGapValue = (typeof titleGap.value !== 'number' || Number.isNaN(titleGap.value) || titleGap.value < 0)
+    ? 0.5
+    : titleGap.value
+  const titleIconWidthValue = !titleIconWidth.value ? '2.4rem' : titleIconWidth.value
+  const titlePaddingXValue = ((titlePaddingX.value !== 0 && !titlePaddingX.value) || titlePaddingX.value < 0) ? 0.7 : titlePaddingX.value
+	const titlePaddingYValue = ((titlePaddingY.value !== 0 && !titlePaddingY.value) || titlePaddingY.value < 0) ? 0.7 : titlePaddingY.value
+	const titleBorderRadiusValue = !titleBorderRadius.value ? '5px 5px 5px 5px' : titleBorderRadius.value
+	const titleBorderRadiusActiveValue = !titleBorderRadiusActive.value ? '5px 5px 0px 0px' : titleBorderRadiusActive.value
+  const titleFontFamilyValue = !titleFontFamily.value ? `'Lato', sans-serif` : titleFontFamily.value
+	const titleFontSizeValue = !titleFontSize.value ? '1.6em' : titleFontSize.value
+	const titleFontWeightValue = ((titleFontWeight.value !== 0 && !titleFontWeight.value) || titleFontWeight.value < 0) ? 500 : titleFontWeight.value
+  const titleIconFontFamilyValue = !titleIconFontFamily.value ? `'Lato', sans-serif` : titleIconFontFamily.value
+	const titleIconFontSizeValue = !titleIconFontSize.value ? '1.6em' : titleIconFontSize.value
+	const titleIconFontWeightValue = ((titleIconFontWeight.value !== 0 && !titleIconFontWeight.value) || titleIconFontWeight.value < 0) ? 700 : titleIconFontWeight.value
+  const contentPaddingXValue = ((contentPaddingX.value !== 0 && !contentPaddingX.value) || contentPaddingX.value < 0) ? 1 : contentPaddingX.value
+	const contentPaddingYValue = ((contentPaddingY.value !== 0 && !contentPaddingY.value) || contentPaddingY.value < 0) ? 1 : contentPaddingY.value
+	const contentFontFamilyValue = !contentFontFamily.value ? `'Lato', sans-serif` : contentFontFamily.value
+	const contentFontSizeValue = !contentFontSize.value ? '1.6em' : contentFontSize.value
+	const contentFontWeightValue = ((contentFontWeight.value !== 0 && !contentFontWeight.value) || contentFontWeight.value < 0) ? 500 : contentFontWeight.value
+	const contentBorderRadiusActiveValue = !contentBorderRadiusActive.value ? '0px 0px 5px 5px' : contentBorderRadiusActive.value
+
 	return {
 		disabled: disabledValue,
 		display: displayValue,
-    borderRadius: borderRadiusValue,
 		theme: themeValue,
-		paddingX: paddingXValue,
-		paddingY: paddingYValue,
-		font: fontValue,
-		fontSize: fontSizeValue,
-		fontWeight: fontWeightValue,
     textAlign: textAlignValue,
     activeTextStyle: activeTextStyleValue,
 
     ellipsisText: ellipsisTextValue,
     scrollClass: scrollClassValue,
     componentType: componentTypeValue,
+
+    titleGap: titleGapValue,
+		titlePaddingX: titlePaddingXValue,
+		titlePaddingY: titlePaddingYValue,
+		titleBorderRadius: titleBorderRadiusValue,
+		titleBorderRadiusActive: titleBorderRadiusActiveValue,
+		titleFontFamily: titleFontFamilyValue,
+		titleFontSize: titleFontSizeValue,
+		titleFontWeight: titleFontWeightValue,
+    titleIconWidth: titleIconWidthValue,
+		titleIconFontFamily: titleIconFontFamilyValue,
+		titleIconFontSize: titleIconFontSizeValue,
+		titleIconFontWeight: titleIconFontWeightValue,
+		contentPaddingX: contentPaddingXValue,
+		contentPaddingY: contentPaddingYValue,
+		contentFontFamily: contentFontFamilyValue,
+		contentFontSize: contentFontSizeValue,
+		contentFontWeight: contentFontWeightValue,
+		contentBorderRadiusActive: contentBorderRadiusActiveValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -318,13 +435,7 @@ const componentStyle = computed(() => {
 	return {
 		marginTop: '0',
     textAlign: defaultValues.textAlign,
-    fontStyle: defaultValues.activeTextStyle,
 	}
-})
-const paddingStyle = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return `${defaultValues.paddingY}rem ${defaultValues.paddingX}rem`
 })
 const textAlignStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
@@ -340,28 +451,6 @@ const activeTextStyleClass = computed(() => {
 		default:
 			return 'component__text--normal'
 	}
-})
-const borderRadiusStyle = computed(() => {
-	const defaultValues = formatDefaultValues.value
-	if (defaultValues.inputStyle !== 'line' && hasBorderRadius.value) {
-		return { borderRadius: `${defaultValues.borderRadius}rem` }
-	}
-	return {}
-})
-const font = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.font
-})
-const fontSizeStyle = computed(() => {
-	const defaultValues = formatDefaultValues.value
-	
-	return defaultValues.fontSize
-})
-const fontWeightStyle = computed(() => {
-	const defaultValues = formatDefaultValues.value
-
-	return defaultValues.fontWeight
 })
 const computedAriaAttrs = computed(() => {
   const newAttrs = {}
@@ -392,14 +481,18 @@ const themeStyle = computed(() => {
 	}
 })
 const inputStyleClass = computed(() => {
-	switch (inputStyle.value) {
-		case 'line':
-			return 'component__input--line'
-		case 'border':
-			return 'component__input--border'
-		default:
-			return 'component__input--background'
-	}
+	return 'component__input--background'
+})
+const ellipsisTextStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  if (!defaultValues.ellipsisText) return {}
+
+  return {
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap'
+  }
 })
 
 // handle tab index enter
@@ -588,6 +681,93 @@ const displayContent = computed(() => {
     display: isActive.value ? 'block' : 'none',
   };
 });
+const titleGapStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return `${defaultValues.titleGap}rem`
+})
+const titleIconWidthStyle = computed(() => {
+  const w = formatDefaultValues.value.titleIconWidth
+
+  return {
+    flex: `0 0 ${w}`,
+    width: w,
+    minWidth: w,
+    maxWidth: w,
+    boxSizing: 'border-box'
+  }
+})
+const titlePaddingStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return `${defaultValues.titlePaddingY}rem ${defaultValues.titlePaddingX}rem`
+})
+const titleBorderRadiusStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.titleBorderRadius
+})
+const titleBorderRadiusActiveStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.titleBorderRadiusActive
+})
+const titleFontFamilyStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.titleFontFamily
+})
+const titleFontSizeStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+	
+	return defaultValues.titleFontSize
+})
+const titleFontWeightStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.titleFontWeight
+})
+const titleIconFontFamilyStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.titleIconFontFamily
+})
+const titleIconFontSizeStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.titleIconFontSize
+})
+const titleIconFontWeightStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.titleIconFontWeight
+})
+const contentPaddingStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return `${defaultValues.contentPaddingY}rem ${defaultValues.contentPaddingX}rem`
+})
+const contentFontFamilyStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.contentFontFamily
+})
+const contentFontSizeStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.contentFontSize
+})
+const contentFontWeightStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.contentFontWeight
+})
+const contentBorderRadiusActiveStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
+
+	return defaultValues.contentBorderRadiusActive
+})
+
 const changeContentHeight = async (event) => {
   if (blockClick.value || disabled.value || !contentRef.value) return
 
@@ -645,9 +825,6 @@ const changeContentHeight = async (event) => {
 	padding: 0;
 	box-sizing: border-box;
 	line-height: 1.42857143;
-	font-family: v-bind('font');
-  font-size: v-bind('fontSizeStyle');
-  font-weight: v-bind('fontWeightStyle');
 
   text-align: v-bind('textAlignStyle');
 
@@ -669,23 +846,58 @@ const changeContentHeight = async (event) => {
     background-color: #f1f7ff;
     color: #444;
     cursor: pointer;
-    padding: 18px;
+    padding: v-bind('titlePaddingStyle');
     width: 100%;
+    min-width: 0;
     border: none;
     text-align: left;
     outline: none;
-    font-size: 15px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    border-radius: v-bind('titleBorderRadiusStyle');
 
-    &:after {
-      content: '\02795'; /* Unicode character for "plus" sign (+) */
-      font-size: 7px;
-      color: white;
-      float: right;
-      margin-left: 5px;
+    display: flex;
+    align-items: center;
+    gap: v-bind('titleGapStyle');
+
+    // inicio activeTextStyle
+    &.component__text--italic {
+      .component__button-label {
+        font-style: italic;
+      }
+    }
+
+    &.component__text--oblique {
+      .component__button-label {
+        font-style: oblique;
+      }
+    }
+
+    &.component__text--normal {
+      .component__button-label {
+        font-style: normal;
+      }
+    }
+    // fim activeTextStyle
+
+    .component__button-label {
+      flex: 1 1 0%;
+      min-width: 0;
+      overflow: hidden;
+      font-family: v-bind('titleFontFamilyStyle');
+      font-size: v-bind('titleFontSizeStyle');
+      font-weight: v-bind('titleFontWeightStyle');
+    }
+
+    .component__button-trailing {
+      flex-shrink: 0;
+      flex-grow: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      text-align: center;
+      font-family: v-bind('titleIconFontFamilyStyle');
+      font-size: v-bind('titleIconFontSizeStyle');
+      font-weight: v-bind('titleIconFontWeightStyle');
     }
 
     &.component__button--active,
@@ -694,12 +906,7 @@ const changeContentHeight = async (event) => {
     }
 
     &.component__button--active {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-
-      &:after {
-        content: '\2796'; /* Unicode character for "minus" sign (-) */
-      }
+      border-radius: v-bind('titleBorderRadiusActiveStyle');
 
       &~.component__content {
         background-color: rgb(115, 115, 233);
@@ -722,10 +929,14 @@ const changeContentHeight = async (event) => {
   }
 
   .component__content {
-    padding: v-bind('paddingStyle');
+    padding: v-bind('contentPaddingStyle');
     overflow: hidden;
     display: none;
     background-color: rgb(239, 13, 13);
+    font-family: v-bind('contentFontFamilyStyle');
+    font-size: v-bind('contentFontSizeStyle');
+    font-weight: v-bind('contentFontWeightStyle');
+    border-radius: v-bind('contentBorderRadiusActiveStyle');
 
     &.component__content--animation {
       display: block;
@@ -736,7 +947,7 @@ const changeContentHeight = async (event) => {
       will-change: max-height, opacity;
 
       &.component__content--active {
-        padding: v-bind('paddingStyle');
+        padding: v-bind('contentPaddingStyle');
         opacity: 1;
       }
     }
@@ -768,44 +979,10 @@ const changeContentHeight = async (event) => {
     // Mantém o comportamento padrão com background
   }
 
-  &.component__input--line {
-    &:focus-within {
-      // border-bottom: 1px solid v-bind('lightBorderColorFocus');
-    }
+  &.component__input--line {}
 
-    &.component__theme--dark {
-      &:focus-within {
-        // border-bottom: 1px solid v-bind('darkBorderColorFocus');
-      }
-    }
-  }
-
-  &.component__input--border {
-    &:focus-within {
-      // border: 1px solid v-bind('lightBorderColorFocus');
-    }
-
-    &.component__theme--dark {
-      &:focus-within {
-        // border: 1px solid v-bind('darkBorderColorFocus');
-      }
-    }
-  }
+  &.component__input--border {}
   // fim inputStyle
-
-  // inicio activeTextStyle
-  &.component__text--italic {
-    font-style: italic;
-  }
-
-  &.component__text--oblique {
-    font-style: oblique;
-  }
-
-  &.component__text--normal {
-    font-style: normal;
-  }
-  // fim activeTextStyle
 
 }
 

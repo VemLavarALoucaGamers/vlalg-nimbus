@@ -583,13 +583,19 @@
         style="margin-top: 50px; margin-bottom: 50px; background-color: #fff; color: #000">
         <h4 class="test-page__content-tile">NbCollapse</h4>
 
+        <input type="text" v-model="collapseTitle"><br />
+        {{ collapseDisabled }} <input type="checkbox" v-model="collapseDisabled"> Disabled <br />
+
+        <br /><br />
+
         <NbCollapse
           nb-id="collapse-1"
           display="b"
           theme="light"
           :has-tab-index-enter="hasTabIndexEnter"
-          :disabled="disabled"
+          :disabled="collapseDisabled"
           componentType="animation"
+          :title="collapseTitle"
           @clicked="console.log('clicked')"
           @changed="console.log('changed')"
           @focused="console.log('focused')"
@@ -601,14 +607,19 @@
           @copied="console.log('copied', $event)"
           @pasted="console.log('pasted', $event)"
           @cut="console.log('cut', $event)"
-        />
+        >
+          <template #content>
+            <p>Lorem ipsum...</p>
+          </template>
+        </NbCollapse>
         <NbCollapse
           nb-id="collapse-1"
           display="b"
           theme="light"
           :has-tab-index-enter="hasTabIndexEnter"
-          :disabled="disabled"
+          :disabled="collapseDisabled"
           componentType="normal"
+          :title="collapseTitle"
           @clicked="console.log('clicked')"
           @changed="console.log('changed')"
           @focused="console.log('focused')"
@@ -620,8 +631,38 @@
           @copied="console.log('copied', $event)"
           @pasted="console.log('pasted', $event)"
           @cut="console.log('cut', $event)"
-        />
-        asdasdas
+        >
+          <template #content>
+            <p>Lorem ipsum...</p>
+          </template>
+        </NbCollapse>
+        <NbCollapse
+          nb-id="collapse-1"
+          display="b"
+          theme="light"
+          :has-tab-index-enter="hasTabIndexEnter"
+          :disabled="collapseDisabled"
+          componentType="normal"
+          :title="collapseTitle"
+          @clicked="console.log('clicked')"
+          @changed="console.log('changed')"
+          @focused="console.log('focused')"
+          @blurred="console.log('blurred')"
+          @outside-clicked="console.log('outside-clicked')"
+          @resized="console.log('resized', $event)"
+          @right-clicked="console.log('right-clicked')"
+          @outside-right-clicked="console.log('outside-right-clicked')"
+          @copied="console.log('copied', $event)"
+          @pasted="console.log('pasted', $event)"
+          @cut="console.log('cut', $event)"
+        >
+          <template #title-icon="{ isActive }">
+            <span>{{ isActive ? '=' : 'x' }}</span>
+          </template>
+          <template #content>
+            <p>Lorem ipsum...</p>
+          </template>
+        </NbCollapse>
       </div>
     </div>
   </div>
@@ -702,6 +743,7 @@ const AccordionItems = ref([
   { key: 'dimensions', label: 'Dimensions' },
   { key: 'contact', label: 'Contact' },
 ])
+const collapseTitle = ref('Open Collapsible')
 const collapseSelected = ref(0)
 const collapseDisabled = ref(false)
 const collapseActives = ref([])
