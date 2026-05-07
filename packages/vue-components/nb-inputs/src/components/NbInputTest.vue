@@ -12,12 +12,16 @@
       :style="[componentStyle, styleWidth, borderRadiusStyle]"
     >
       <div v-if="chipList.length > 0" ref="chips" class="chips">
-        <div v-for="chip in chipList" :key="chip" class="chip">
+        <div
+          v-for="(chip, index) in chipList"
+          :key="`${index}-${String(chip)}`"
+          class="chip"
+        >
           <span class="chip-text">{{ chip }}</span>
           <span 
             v-if="!disabled && !inputReadonly"
             class="chip-remove" 
-            @click="removeChip(chip)">×</span>
+            @click="removeChip(index)">×</span>
         </div>
       </div>
 
@@ -501,9 +505,12 @@ const addChip = (text) => {
   chipList.value.push(text);
   emit('added', text);
 }
-const removeChip = (chip) => {
-  chipList.value = chipList.value.filter(chipItem => chipItem !== chip);
-  emit('removed', chip);
+const removeChip = (index) => {
+  const i = typeof index === 'number' ? index : Number(index)
+  if (!Number.isInteger(i) || i < 0 || i >= chipList.value.length) return
+  const removed = chipList.value[i]
+  chipList.value = chipList.value.filter((_, idx) => idx !== i)
+  emit('removed', removed)
 }
 
 watch(currentList, (newList) => {

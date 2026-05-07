@@ -141,6 +141,13 @@ import {
   buildFileValidationErrorPayload,
 } from '@helpers/nbFileValidation.js'
 
+/** Position of the `File` in `files` (0…); updated when the component list changes. */
+function attachFileIndexes(list) {
+  list.forEach((file, i) => {
+    file.index = i
+  })
+}
+
 defineOptions({
 	name: 'NbInputFile',
 	inheritAttrs: false
@@ -1014,7 +1021,7 @@ const {
 const inputRef = ref(null) // input element reference
 const fileDisplayRef = ref(null) // file display reference
 const isActive = ref(false) // is active state
-const files = ref([]) // selected files
+const files = ref([]) // selected files (cada File ganha .index na lista deste componente)
 const errors = ref([]) // validation errors
 const fileDialogToken = ref(0) // file dialog token
 const isFileDialogOpen = ref(false) // is file dialog open state
@@ -2105,6 +2112,9 @@ const onChangeFile = async (event) => {
   // Check if user canceled selection and there are no files, deactivate visual state
   isActive.value = files.value.length > 0
 
+  // Attach file indexes
+  attachFileIndexes(files.value)
+
   emit('validation-errors', [...errors.value]) // Emit validation errors event
   emit('changed', files.value) // Emit changed event
   emit('current-value', files.value) // Emit current value event
@@ -2187,8 +2197,8 @@ const handleLabelClick = (event) => {
   triggerFileInput()
 }
 
-/* Remove file */
-const removeFile = (index) => {
+/* Remove file by index in this component's list */
+const removeFile = index => {
   // Check if index is less than 0 or greater than or equal to files length
   if (index < 0 || index >= files.value.length) return
   
@@ -2201,11 +2211,28 @@ const removeFile = (index) => {
   // Set active state
   isActive.value = files.value.length > 0
 
-  // Check if files is empty and input ref is valid
-  if (files.value.length === 0 && inputRef.value) {
-    // Set input value to empty string
-    inputRef.value.value = ''
+  // Keep native input in sync (FileList is immutable; partial removal needs DataTransfer)
+  if (inputRef.value) {
+    // Check if files is empty
+    if (files.value.length === 0) {
+      // Set input value to empty string
+      inputRef.value.value = ''
+    } else if (multiple.value) {
+      // Create DataTransfer object
+      const dt = new DataTransfer()
+
+      // Add files to DataTransfer object
+      for (const file of files.value) {
+        dt.items.add(file) // Add file to DataTransfer object
+      }
+
+      // Set input files to DataTransfer object
+      inputRef.value.files = dt.files
+    }
   }
+
+  // Attach file indexes
+  attachFileIndexes(files.value)
 
   emit('changed', files.value) // Emit changed event
   emit('current-value', files.value) // Emit current value event
@@ -2232,9 +2259,9 @@ const removeAllFiles = () => {
   emit('current-value', [])
 }
 
-/* Expose clear method */
 defineExpose({
   clear: removeAllFiles,
+  removeAt: removeFile,
 })
 
 /* Watch is active */

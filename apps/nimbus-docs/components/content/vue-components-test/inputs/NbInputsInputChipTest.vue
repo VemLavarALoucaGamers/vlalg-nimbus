@@ -21,9 +21,9 @@
           @focused="() => console.log('focused')"
           @blurred="() => console.log('blurred')"
         >
-          <template #chip="{ chip, removeChip }">
+          <template #chip="{ chip, index, removeChip }">
             <span class="chip-text">{{ chip }}</span>
-            <span class="chip-remove" @click="removeChip(chip)">×</span>
+            <span class="chip-remove" @click="removeChip(index)">×</span>
           </template>
         </NbInputChip>
       </div>
