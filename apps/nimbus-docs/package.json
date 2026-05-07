@@ -29,6 +29,7 @@
     "@vlalg-nimbus/nb-images": "^2.0.3",
     "@vlalg-nimbus/nb-inputs": "^10.0.0",
     "@vlalg-nimbus/nb-loaders": "^1.0.3",
+    "@vlalg-nimbus/nb-navigation": "^1.1.0",
     "@vlalg-nimbus/nb-overlays": "^1.0.2",
     "@vlalg-nimbus/nb-pagination": "^1.0.0",
     "@vlalg-nimbus/nb-password": "^5.0.0",

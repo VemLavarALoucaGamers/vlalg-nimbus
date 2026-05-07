@@ -11,6 +11,7 @@ import NbOverlaysComponents from '@vlalg-nimbus/nb-overlays';
 import NbImagesComponents from '@vlalg-nimbus/nb-images';
 import NbPaginationComponents from '@vlalg-nimbus/nb-pagination';
 import NbCalendarComponents from '@vlalg-nimbus/nb-calendar';
+import NbNavigationComponents from '@vlalg-nimbus/nb-navigation';
 
 import "@vlalg-nimbus/nb-buttons/dist/style.css";
 import "@vlalg-nimbus/nb-loaders/dist/style.css";
@@ -25,6 +26,7 @@ import "@vlalg-nimbus/nb-overlays/dist/style.css";
 import "@vlalg-nimbus/nb-images/dist/style.css";
 import "@vlalg-nimbus/nb-pagination/dist/style.css";
 import "@vlalg-nimbus/nb-calendar/dist/style.css";
+import "@vlalg-nimbus/nb-navigation/dist/style.css";
 
 export default defineNuxtPlugin(context => {
   context.vueApp.use(NbButtonsComponents)
@@ -40,4 +42,5 @@ export default defineNuxtPlugin(context => {
   context.vueApp.use(NbImagesComponents)
   context.vueApp.use(NbPaginationComponents)
   context.vueApp.use(NbCalendarComponents)
+  context.vueApp.use(NbNavigationComponents)
 })

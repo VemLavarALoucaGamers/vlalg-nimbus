@@ -19,10 +19,6 @@
       :aria-disabled="blockClick || !hasTabIndexEnter || !hasTabIndexSpace || disabled"
       @focus="handleFocus"
       @blur="handleBlur"
-      @contextmenu="handleRightClick"
-      @copy="handleCopy"
-      @paste="handlePaste"
-      @cut="handleCut"
       @keydown.enter.prevent="handleTabIndex('enter')"
       @keydown.space.prevent="handleTabIndex('space')"
     >
@@ -40,26 +36,26 @@
           ]"
           :style="ellipsisTextStyle"
         >
-          <slot name="title" :title="title">{{ title }}</slot>
+          <slot name="title" :title="title" :is-active="isActive" :disabled="disabled">{{ title }}</slot>
         </div>
         <div
           class="component__button-trailing"
           :style="titleIconWidthStyle"
           aria-hidden="true"
         >
-          <slot name="title-icon" :is-active="isActive">{{ isActive ? '−' : '+' }}</slot>
+          <slot name="title-icon" :title="title" :is-active="isActive" :disabled="disabled">{{ isActive ? '−' : '+' }}</slot>
         </div>
       </div>
       <div
         ref="contentRef"
         :class="[
           'component__content',
-          componentType === 'normal' ? 'component__content--normal' : 'component__content--animation',
-          { 'component__content--active': isActive }
+          { 'component__content--active': isActive },
+          scrollClassStyle
         ]"
-        :style="[displayContent]"
+        :style="[displayContent, contentHasBorderStyle]"
       >
-        <slot name="content"></slot>
+        <slot name="content" :title="title" :is-active="isActive" :disabled="disabled"></slot>
       </div>
     </div>
   </div>
@@ -75,16 +71,10 @@ defineOptions({
 
 const emit = defineEmits([
   'clicked',
-  'changed',
   'focused',
   'blurred',
   'outside-clicked',
   'resized',
-  'right-clicked',
-  'outside-right-clicked',
-  'copied',
-  'pasted',
-  'cut'
 ])
 
 const props = defineProps({
@@ -127,8 +117,6 @@ const props = defineProps({
 			return ['dark', 'light'].indexOf(value) !== -1
 		}
 	},
-
-
 	disabled: {
 		type: Boolean,
 		default: false,
@@ -151,10 +139,103 @@ const props = defineProps({
     }
   },
 	// Cores do tema light
+  lightTitleColor: {
+    type: String,
+    default: '#1f2937'
+  },
+  lightTitleColorActive: {
+    type: String,
+    default: '#1d4ed8'
+  },
+  lightTitleColorHover: {
+    type: String,
+    default: '#111827'
+  },
+  lightTitleIconColor: {
+    type: String,
+    default: '#6b7280'
+  },
+  lightTitleIconColorActive: {
+    type: String,
+    default: '#1d4ed8'
+  },
+  lightTitleIconColorHover: {
+    type: String,
+    default: '#374151'
+  },
+  lightButtonBgColor: {
+    type: String,
+    default: '#f3f4f6'
+  },
+  lightButtonBgColorActive: {
+    type: String,
+    default: '#e0e7ff'
+  },
+  lightButtonBgColorHover: {
+    type: String,
+    default: '#e5e7eb'
+  },
+  lightContentColor: {
+    type: String,
+    default: '#1f2937'
+  },
+  lightContentBgColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  lightContentBorderColor: {
+    type: String,
+    default: '#e5e7eb'
+  },
 	// Cores do tema dark
-
-  
-
+  darkTitleColor: {
+    type: String,
+    default: '#e5e7eb'
+  },
+  darkTitleColorActive: {
+    type: String,
+    default: '#60a5fa'
+  },
+  darkTitleColorHover: {
+    type: String,
+    default: '#f9fafb'
+  },
+  darkTitleIconColor: {
+    type: String,
+    default: '#9ca3af'
+  },
+  darkTitleIconColorActive: {
+    type: String,
+    default: '#60a5fa'
+  },
+  darkTitleIconColorHover: {
+    type: String,
+    default: '#d1d5db'
+  },
+  darkButtonBgColor: {
+    type: String,
+    default: '#1f2937'
+  },
+  darkButtonBgColorActive: {
+    type: String,
+    default: '#1e3a8a'
+  },
+  darkButtonBgColorHover: {
+    type: String,
+    default: '#374151'
+  },
+  darkContentColor: {
+    type: String,
+    default: '#e5e7eb'
+  },
+  darkContentBgColor: {
+    type: String,
+    default: '#111827'
+  },
+  darkContentBorderColor: {
+    type: String,
+    default: '#374151'
+  },
 	textAlign: {
 		type: String,
 		default: 'left',
@@ -169,11 +250,23 @@ const props = defineProps({
 			return ['normal', 'italic', 'oblique'].indexOf(value) !== -1
 		}
 	},
-
-
+  opened: {
+    type: Boolean,
+    default: false,
+    validator: (value) => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
   ellipsisText: {
     type: Boolean,
     default: true,
+    validator: (value) => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  isScrollClass: {
+    type: Boolean,
+    default: false,
     validator: (value) => {
         return typeof value === 'boolean' && [true, false].includes(value)
     }
@@ -182,13 +275,6 @@ const props = defineProps({
 		type: String,
 		default: ''
 	},
-  componentType: {
-    type: String,
-    default: 'normal',
-    validator: (value) => {
-        return ['normal', 'animation'].includes(value)
-    }
-  },
   title: {
     type: String,
     default: 'Open Collapsible'
@@ -297,7 +383,21 @@ const props = defineProps({
 		validator: value => {
 			return !value ? '0px 0px 5px 5px' : value
 		}
-	}
+	},
+  contentHasBorder: {
+    type: Boolean,
+    default: true,
+    validator: (value) => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+    }
+  },
+  contentMaxHeight: {
+    type: Number,
+    default: 200,
+    validator: (value) => {
+        return typeof value === 'number' && value >= 0
+    }
+  }
 })
 
 const {
@@ -309,17 +409,38 @@ const {
 	ariaLabel,
 	ariaAttrs,
 	theme,
-
 	disabled,
-  blockRightClick,
-  
+  lightTitleColor,
+  lightTitleColorActive,
+  lightTitleColorHover,
+  lightTitleIconColor,
+  lightTitleIconColorActive,
+  lightTitleIconColorHover,
+  lightButtonBgColor,
+  lightButtonBgColorActive,
+  lightButtonBgColorHover,
+  lightContentColor,
+	lightContentBgColor,
+  lightContentBorderColor,
+  darkTitleColor,
+  darkTitleColorActive,
+  darkTitleColorHover,
+  darkTitleIconColor,
+  darkTitleIconColorActive,
+  darkTitleIconColorHover,
+  darkButtonBgColor,
+  darkButtonBgColorActive,
+  darkButtonBgColorHover,
+  darkContentColor,
+	darkContentBgColor,
+  darkContentBorderColor,
 	textAlign,
 	activeTextStyle,
-
+  opened,
 	blockClick,
 	ellipsisText,
+  isScrollClass,
 	scrollClass,
-  componentType,
   titleGap,
 	titlePaddingX,
 	titlePaddingY,
@@ -338,6 +459,8 @@ const {
 	contentFontSize,
 	contentFontWeight,
 	contentBorderRadiusActive,
+  contentHasBorder,
+  contentMaxHeight,
 } = toRefs(props)
 
 // para o container do componente
@@ -360,8 +483,6 @@ const formatDefaultValues = computed(() => {
   const ellipsisTextValue = typeof ellipsisText.value === 'boolean'
     ? ellipsisText.value
     : false
-  const scrollClassValue = scrollClass.value !== '' ? scrollClass.value : ''
-  const componentTypeValue = !componentType.value ? 'normal' : componentType.value
 
   const titleGapValue = (typeof titleGap.value !== 'number' || Number.isNaN(titleGap.value) || titleGap.value < 0)
     ? 0.5
@@ -383,6 +504,33 @@ const formatDefaultValues = computed(() => {
 	const contentFontSizeValue = !contentFontSize.value ? '1.6em' : contentFontSize.value
 	const contentFontWeightValue = ((contentFontWeight.value !== 0 && !contentFontWeight.value) || contentFontWeight.value < 0) ? 500 : contentFontWeight.value
 	const contentBorderRadiusActiveValue = !contentBorderRadiusActive.value ? '0px 0px 5px 5px' : contentBorderRadiusActive.value
+  const contentHasBorderValue = typeof contentHasBorder.value === 'boolean' ? contentHasBorder.value : true
+  const contentMaxHeightValue = ((contentMaxHeight.value !== 0 && !contentMaxHeight.value) || contentMaxHeight.value < 0) ? 200 : contentMaxHeight.value
+
+  const lightTitleColorValue = !lightTitleColor.value ? '#1f2937' : lightTitleColor.value
+  const lightTitleColorActiveValue = !lightTitleColorActive.value ? '#1d4ed8' : lightTitleColorActive.value
+  const lightTitleColorHoverValue = !lightTitleColorHover.value ? '#111827' : lightTitleColorHover.value
+  const lightTitleIconColorValue = !lightTitleIconColor.value ? '#6b7280' : lightTitleIconColor.value
+  const lightTitleIconColorActiveValue = !lightTitleIconColorActive.value ? '#1d4ed8' : lightTitleIconColorActive.value
+  const lightTitleIconColorHoverValue = !lightTitleIconColorHover.value ? '#374151' : lightTitleIconColorHover.value
+  const lightButtonBgColorValue = !lightButtonBgColor.value ? '#f3f4f6' : lightButtonBgColor.value
+  const lightButtonBgColorActiveValue = !lightButtonBgColorActive.value ? '#e0e7ff' : lightButtonBgColorActive.value
+  const lightButtonBgColorHoverValue = !lightButtonBgColorHover.value ? '#e5e7eb' : lightButtonBgColorHover.value
+  const lightContentColorValue = !lightContentColor.value ? '#1f2937' : lightContentColor.value
+  const lightContentBgColorValue = !lightContentBgColor.value ? '#ffffff' : lightContentBgColor.value
+  const lightContentBorderColorValue = !lightContentBorderColor.value ? '#e5e7eb' : lightContentBorderColor.value
+  const darkTitleColorValue = !darkTitleColor.value ? '#e5e7eb' : darkTitleColor.value
+  const darkTitleColorActiveValue = !darkTitleColorActive.value ? '#60a5fa' : darkTitleColorActive.value
+  const darkTitleColorHoverValue = !darkTitleColorHover.value ? '#f9fafb' : darkTitleColorHover.value
+  const darkTitleIconColorValue = !darkTitleIconColor.value ? '#9ca3af' : darkTitleIconColor.value
+  const darkTitleIconColorActiveValue = !darkTitleIconColorActive.value ? '#60a5fa' : darkTitleIconColorActive.value
+  const darkTitleIconColorHoverValue = !darkTitleIconColorHover.value ? '#d1d5db' : darkTitleIconColorHover.value
+  const darkButtonBgColorValue = !darkButtonBgColor.value ? '#1f2937' : darkButtonBgColor.value
+  const darkButtonBgColorActiveValue = !darkButtonBgColorActive.value ? '#1e3a8a' : darkButtonBgColorActive.value
+  const darkButtonBgColorHoverValue = !darkButtonBgColorHover.value ? '#374151' : darkButtonBgColorHover.value
+  const darkContentColorValue = !darkContentColor.value ? '#e5e7eb' : darkContentColor.value
+  const darkContentBgColorValue = !darkContentBgColor.value ? '#111827' : darkContentBgColor.value
+  const darkContentBorderColorValue = !darkContentBorderColor.value ? '#374151' : darkContentBorderColor.value
 
 	return {
 		disabled: disabledValue,
@@ -390,11 +538,7 @@ const formatDefaultValues = computed(() => {
 		theme: themeValue,
     textAlign: textAlignValue,
     activeTextStyle: activeTextStyleValue,
-
     ellipsisText: ellipsisTextValue,
-    scrollClass: scrollClassValue,
-    componentType: componentTypeValue,
-
     titleGap: titleGapValue,
 		titlePaddingX: titlePaddingXValue,
 		titlePaddingY: titlePaddingYValue,
@@ -413,6 +557,32 @@ const formatDefaultValues = computed(() => {
 		contentFontSize: contentFontSizeValue,
 		contentFontWeight: contentFontWeightValue,
 		contentBorderRadiusActive: contentBorderRadiusActiveValue,
+    contentHasBorder: contentHasBorderValue,
+    contentMaxHeight: contentMaxHeightValue,
+    lightTitleColor: lightTitleColorValue,
+    lightTitleColorActive: lightTitleColorActiveValue,
+    lightTitleColorHover: lightTitleColorHoverValue,
+    lightTitleIconColor: lightTitleIconColorValue,
+    lightTitleIconColorActive: lightTitleIconColorActiveValue,
+    lightTitleIconColorHover: lightTitleIconColorHoverValue,
+    lightButtonBgColor: lightButtonBgColorValue,
+    lightButtonBgColorActive: lightButtonBgColorActiveValue,
+    lightButtonBgColorHover: lightButtonBgColorHoverValue,
+    lightContentColor: lightContentColorValue,
+    lightContentBgColor: lightContentBgColorValue,
+    lightContentBorderColor: lightContentBorderColorValue,
+    darkTitleColor: darkTitleColorValue,
+    darkTitleColorActive: darkTitleColorActiveValue,
+    darkTitleColorHover: darkTitleColorHoverValue,
+    darkTitleIconColor: darkTitleIconColorValue,
+    darkTitleIconColorActive: darkTitleIconColorActiveValue,
+    darkTitleIconColorHover: darkTitleIconColorHoverValue,
+    darkButtonBgColor: darkButtonBgColorValue,
+    darkButtonBgColorActive: darkButtonBgColorActiveValue,
+    darkButtonBgColorHover: darkButtonBgColorHoverValue,
+    darkContentColor: darkContentColorValue,
+    darkContentBgColor: darkContentBgColorValue,
+    darkContentBorderColor: darkContentBorderColorValue,
 	}
 })
 const componentDisabled = computed(() => {
@@ -434,7 +604,6 @@ const componentStyle = computed(() => {
 
 	return {
 		marginTop: '0',
-    textAlign: defaultValues.textAlign,
 	}
 })
 const textAlignStyle = computed(() => {
@@ -495,13 +664,65 @@ const ellipsisTextStyle = computed(() => {
   }
 })
 
+const titleColorStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkTitleColor : defaultValues.lightTitleColor
+})
+const titleColorActiveStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkTitleColorActive : defaultValues.lightTitleColorActive
+})
+const titleColorHoverStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkTitleColorHover : defaultValues.lightTitleColorHover
+})
+const titleIconColorStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkTitleIconColor : defaultValues.lightTitleIconColor
+})
+const titleIconColorActiveStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkTitleIconColorActive : defaultValues.lightTitleIconColorActive
+})
+const titleIconColorHoverStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkTitleIconColorHover : defaultValues.lightTitleIconColorHover
+})
+const buttonBgColorStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkButtonBgColor : defaultValues.lightButtonBgColor
+})
+const buttonBgColorActiveStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkButtonBgColorActive : defaultValues.lightButtonBgColorActive
+})
+const buttonBgColorHoverStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkButtonBgColorHover : defaultValues.lightButtonBgColorHover
+})
+const contentColorStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkContentColor : defaultValues.lightContentColor
+})
+const contentBgColorStyle = computed(() => {
+  const defaultValues = formatDefaultValues.value
+
+  return defaultValues.theme === 'dark' ? defaultValues.darkContentBgColor : defaultValues.lightContentBgColor
+})
+
 // handle tab index enter
 const handleTabIndex = (tabIndex, type = 'enter') => {
-  // check if disabled or has tab index enter is disabled
   if (blockClick.value || disabled.value || (type === 'enter' && !hasTabIndexEnter.value) || (type === 'space' && !hasTabIndexSpace.value)) return
-
-  // get first enabled tab index
-  console.log('tabIndex', tabIndex)
 
   clicked()
 }
@@ -516,8 +737,6 @@ const clicked = (event = null) => {
 
   changeActive(newValeu)
 
-  changeContentHeight(event)
-
   emit('clicked')
 }
 
@@ -530,57 +749,6 @@ const handleBlur = () => {
   // changeActive(false)
 
   emit('blurred')
-}
-// evento para capturar o texto selecionado (copiar ou cortar)
-const getSelectionFromTarget = (target) => {
-  // se o target não existe, retorna uma string vazia
-  if (!target) return ''
-
-  // se o target não tem valor, retorna uma string vazia
-  const hasValue = typeof target.value === 'string'
-
-  // se o target não tem seleção, retorna uma string vazia
-  const hasSelection = typeof target.selectionStart === 'number' && typeof target.selectionEnd === 'number'
-
-  // se o target não tem valor ou seleção, retorna uma string vazia
-  if (!hasValue || !hasSelection) return ''
-
-  // retorna o texto selecionado
-  return target.value.slice(target.selectionStart, target.selectionEnd)
-}
-// evento para montar o payload para o evento de copiar, colar ou cortar
-const mountCPCPayload = (event, type) => {
-  // se o evento não tem clipboard data, retorna uma string vazia
-  const clipboardText = event.clipboardData?.getData('text/plain')
-    || event.clipboardData?.getData('text')
-    || ''
-
-  // se o target não tem texto selecionado, retorna uma string vazia
-  const selectedText = getSelectionFromTarget(event.target)
-    || window.getSelection?.()?.toString?.()
-    || ''
-
-  // retorna o payload para o evento de copiar, colar ou cortar
-  return {
-    event,
-    type,
-    text: clipboardText || selectedText
-  }
-}
-// evento para capturar evento de copiar
-const handleCopy = (event) => {
-  const body = mountCPCPayload(event, 'copy')
-  emit('copied', body)
-}
-// evento para capturar evento de colar
-const handlePaste = (event) => {
-  const body = mountCPCPayload(event, 'paste')
-  emit('pasted', body)
-}
-// evento para capturar evento de cortar
-const handleCut = (event) => {
-  const body = mountCPCPayload(event, 'cut')
-  emit('cut', body)
 }
 
 // evento para verificar se deve emitir o evento outside-clicked (clicar fora do componente)
@@ -624,40 +792,12 @@ const handleResize = (event) => {
   })
 }
 
-// evento para capturar clique com botão direito dentro do componente
-const handleRightClick = (event) => {
-  // se o block right click está habilitado, não faz nada
-  if (blockRightClick.value) {
-    event.preventDefault()
-  }
-
-  emit('right-clicked', event)
-}
-
-// evento para capturar clique com botão direito fora do componente
-const handleOutsideRightClick = (event) => {
-  // se o clique é dentro do componente, não faz nada
-  if (wrapperRef.value?.contains(event.target)) return
-
-  // se não deve emitir o evento outside-right-clicked, não faz nada
-  if (!shouldEmitOutsideClick.value) return
-
-  // mudar o estado do componente para false
-  // changeActive(false)
-
-  // emitir o evento outside-right-clicked
-  emit('outside-right-clicked', event)
-
-  // resetar a flag para não emitir o evento outside-right-clicked novamente
-  shouldEmitOutsideClick.value = false
-}
 
 onMounted(() => {
   document.addEventListener('pointerdown', markOutsideIntent, true)
   document.addEventListener('mousedown', markOutsideIntent, true)
   document.addEventListener('touchstart', markOutsideIntent, true)
   document.addEventListener('click', handleClickOutside, false)
-  document.addEventListener('contextmenu', handleOutsideRightClick, false)
   window.addEventListener('resize', handleResize)
 })
 
@@ -666,17 +806,15 @@ onUnmounted(() => {
   document.removeEventListener('mousedown', markOutsideIntent, true)
   document.removeEventListener('touchstart', markOutsideIntent, true)
   document.removeEventListener('click', handleClickOutside, false)
-  document.removeEventListener('contextmenu', handleOutsideRightClick, false)
   window.removeEventListener('resize', handleResize)
 })
 
 /* New logic below */
 const contentRef = ref(null)
+const scrollClassStyle = computed(() => {
+  return isScrollClass.value ? scrollClass.value : ''
+})
 const displayContent = computed(() => {
-  const defaultValues = formatDefaultValues.value
-
-  if (defaultValues.componentType === 'animation') return {};
-
   return {
     display: isActive.value ? 'block' : 'none',
   };
@@ -767,24 +905,33 @@ const contentBorderRadiusActiveStyle = computed(() => {
 
 	return defaultValues.contentBorderRadiusActive
 })
+const contentHasBorderStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
 
-const changeContentHeight = async (event) => {
-  if (blockClick.value || disabled.value || !contentRef.value) return
+  const borderColor = defaultValues.theme === 'dark' ? defaultValues.darkContentBorderColor : defaultValues.lightContentBorderColor
 
+  const borderConfig = {
+    borderStyle: 'solid',
+    borderColor: borderColor,
+    borderLeftWidth: '1px',
+    borderRightWidth: '1px',
+    borderTopWidth: '0',
+    borderBottomWidth: '1px'
+  }
+
+	return isActive.value && defaultValues.contentHasBorder ? borderConfig : { border: 'none !important', borderWidth: '0 !important' }
+})
+const contentMaxHeightStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
-  event?.stopPropagation?.()
+  return `${defaultValues.contentMaxHeight}px`
+})
 
-  if (defaultValues.componentType === 'animation') {
-    if (isActive.value) {
-      await nextTick()
-      contentRef.value.style.maxHeight = `${contentRef.value.scrollHeight}px`
-      return
-    }
-
-    contentRef.value.style.maxHeight = '0px'
+watch(opened, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    changeActive(newVal)
   }
-}
+}, { immediate: true })
 </script>
 
 <style lang="scss" scoped>
@@ -826,8 +973,6 @@ const changeContentHeight = async (event) => {
 	box-sizing: border-box;
 	line-height: 1.42857143;
 
-  text-align: v-bind('textAlignStyle');
-
 	// user-select: none;
 
 	// touch-action: manipulation;
@@ -837,20 +982,16 @@ const changeContentHeight = async (event) => {
 
 	-webkit-text-decoration-line: none;
 	text-decoration-line: none;
-	white-space: nowrap;
 
   &.component--active {}
   
   // Component style start below:
   .component__button {
-    background-color: #f1f7ff;
-    color: #444;
     cursor: pointer;
     padding: v-bind('titlePaddingStyle');
     width: 100%;
     min-width: 0;
     border: none;
-    text-align: left;
     outline: none;
     border-radius: v-bind('titleBorderRadiusStyle');
 
@@ -885,6 +1026,7 @@ const changeContentHeight = async (event) => {
       font-family: v-bind('titleFontFamilyStyle');
       font-size: v-bind('titleFontSizeStyle');
       font-weight: v-bind('titleFontWeightStyle');
+      text-align: v-bind('textAlignStyle');
     }
 
     .component__button-trailing {
@@ -900,90 +1042,104 @@ const changeContentHeight = async (event) => {
       font-weight: v-bind('titleIconFontWeightStyle');
     }
 
-    &.component__button--active,
-    &:hover {
-      background-color: #dce9fb;
-    }
-
     &.component__button--active {
       border-radius: v-bind('titleBorderRadiusActiveStyle');
-
-      &~.component__content {
-        background-color: rgb(115, 115, 233);
-        border-style: solid;
-        border-color: #f1f1f1;
-        border-left-width: 1px;
-        border-right-width: 1px;
-        border-top-width: 0px;
-        border-bottom-width: 1px;
-        border-bottom-left-radius: 5px;
-        border-bottom-right-radius: 5px;
-      }
-    }
-
-    &.component__button--deactivate {
-      &~.component__content {
-        border: 0;
-      }
     }
   }
 
   .component__content {
     padding: v-bind('contentPaddingStyle');
-    overflow: hidden;
     display: none;
-    background-color: rgb(239, 13, 13);
     font-family: v-bind('contentFontFamilyStyle');
     font-size: v-bind('contentFontSizeStyle');
     font-weight: v-bind('contentFontWeightStyle');
     border-radius: v-bind('contentBorderRadiusActiveStyle');
-
-    &.component__content--animation {
-      display: block;
-      padding: 0;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.25s ease, opacity 0.2s ease;
-      will-change: max-height, opacity;
-
-      &.component__content--active {
-        padding: v-bind('contentPaddingStyle');
-        opacity: 1;
-      }
-    }
-    &.component__content--normal {
-      display: none;
-    }
+    max-height: v-bind('contentMaxHeightStyle');
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   // inicio propTheme
   &.component__theme--light {
-    &.component__input--background {}
+    .component__button {
+      background-color: v-bind('buttonBgColorStyle');
 
-    &.component__input--line {}
+      &.component__button--active {
+        background-color: v-bind('buttonBgColorActiveStyle');
 
-    &.component__input--border {}
+        .component__button-label {
+          color: v-bind('titleColorActiveStyle');
+        }
+        .component__button-trailing {
+          color: v-bind('titleIconColorActiveStyle');
+        }
+      }
+      
+      &:hover {
+        background-color: v-bind('buttonBgColorHoverStyle');
+
+        .component__button-label {
+          color: v-bind('titleColorHoverStyle');
+        }
+        .component__button-trailing {
+          color: v-bind('titleIconColorHoverStyle');
+        }
+      }
+
+      .component__button-label {
+        color: v-bind('titleColorStyle');
+      }
+      .component__button-trailing {
+        color: v-bind('titleIconColorStyle');
+      }
+    }
+
+    .component__content {
+      color: v-bind('contentColorStyle') !important;
+      background-color: v-bind('contentBgColorStyle');
+    }
   }
 
   &.component__theme--dark {
-    &.component__input--background {}
+    .component__button {
+      background-color: v-bind('buttonBgColorStyle');
 
-    &.component__input--line {}
+      &.component__button--active {
+        background-color: v-bind('buttonBgColorActiveStyle');
 
-    &.component__input--border {}
+        .component__button-label {
+          color: v-bind('titleColorActiveStyle');
+        }
+        .component__button-trailing {
+          color: v-bind('titleIconColorActiveStyle');
+        }
+      }
+      
+      &:hover {
+        background-color: v-bind('buttonBgColorHoverStyle');
+
+        .component__button-label {
+          color: v-bind('titleColorHoverStyle');
+        }
+        .component__button-trailing {
+          color: v-bind('titleIconColorHoverStyle');
+        }
+      }
+
+      .component__button-label {
+        color: v-bind('titleColorStyle');
+      }
+      .component__button-trailing {
+        color: v-bind('titleIconColorStyle');
+      }
+    }
+
+    .component__content {
+      color: v-bind('contentColorStyle') !important;
+      background-color: v-bind('contentBgColorStyle');
+    }
   }
   // fim propTheme
-
-  // inicio inputStyle
-  &.component__input--background {
-    // Mantém o comportamento padrão com background
-  }
-
-  &.component__input--line {}
-
-  &.component__input--border {}
-  // fim inputStyle
-
 }
 
 .component-disabled {

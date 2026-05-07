@@ -16,6 +16,7 @@
           <option value="stepperLine">stepperLine</option>
           <option value="segmentedButton">segmentedButton</option>
           <option value="collapse">collapse</option>
+          <option value="accordion">accordion</option>
         </select>
 
        <div v-if="btType === 'tabs'">
@@ -594,8 +595,9 @@
           theme="light"
           :has-tab-index-enter="hasTabIndexEnter"
           :disabled="collapseDisabled"
-          componentType="animation"
           :title="collapseTitle"
+          :is-scroll-class="true"
+          scrollClass="custom-scrollbar"
           @clicked="console.log('clicked')"
           @changed="console.log('changed')"
           @focused="console.log('focused')"
@@ -609,11 +611,11 @@
           @cut="console.log('cut', $event)"
         >
           <template #content>
-            <p>Lorem ipsum...</p>
+            <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat nisl vel consequat tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat nisl vel consequat tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat nisl vel consequat tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat nisl vel consequat tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat nisl vel consequat tincidunt. </p>
           </template>
         </NbCollapse>
         <NbCollapse
-          nb-id="collapse-1"
+          nb-id="collapse-2"
           display="b"
           theme="light"
           :has-tab-index-enter="hasTabIndexEnter"
@@ -633,11 +635,11 @@
           @cut="console.log('cut', $event)"
         >
           <template #content>
-            <p>Lorem ipsum...</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat nisl vel consequat tincidunt. </p>
           </template>
         </NbCollapse>
         <NbCollapse
-          nb-id="collapse-1"
+          nb-id="collapse-3"
           display="b"
           theme="light"
           :has-tab-index-enter="hasTabIndexEnter"
@@ -660,9 +662,144 @@
             <span>{{ isActive ? '=' : 'x' }}</span>
           </template>
           <template #content>
-            <p>Lorem ipsum...</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat nisl vel consequat tincidunt. </p>
           </template>
         </NbCollapse>
+
+        <br /><br />
+
+        <NbCollapse
+          nb-id="collapse-4"
+          display="b"
+          theme="light"
+          :has-tab-index-enter="hasTabIndexEnter"
+          :disabled="collapseDisabled"
+          :title="collapseTitle"
+          @clicked="console.log('clicked')"
+          @changed="console.log('changed')"
+          @focused="console.log('focused')"
+          @blurred="console.log('blurred')"
+          @outside-clicked="console.log('outside-clicked')"
+          @resized="console.log('resized', $event)"
+          @right-clicked="console.log('right-clicked')"
+          @outside-right-clicked="console.log('outside-right-clicked')"
+          @copied="console.log('copied', $event)"
+          @pasted="console.log('pasted', $event)"
+          @cut="console.log('cut', $event)"
+        >
+          <template #content>
+            <p>Light content...asdas</p>
+          </template>
+        </NbCollapse>
+        <NbCollapse
+          nb-id="collapse-5"
+          display="b"
+          theme="dark"
+          :has-tab-index-enter="hasTabIndexEnter"
+          :disabled="collapseDisabled"
+          :title="collapseTitle"
+          @clicked="console.log('clicked')"
+          @changed="console.log('changed')"
+          @focused="console.log('focused')"
+          @blurred="console.log('blurred')"
+          @outside-clicked="console.log('outside-clicked')"
+          @resized="console.log('resized', $event)"
+          @right-clicked="console.log('right-clicked')"
+          @outside-right-clicked="console.log('outside-right-clicked')"
+          @copied="console.log('copied', $event)"
+          @pasted="console.log('pasted', $event)"
+          @cut="console.log('cut', $event)"
+        >
+          <template #content>
+            <p>Dark content...</p>
+          </template>
+        </NbCollapse>
+      </div>
+    </div>
+
+    <div v-if="btType === 'accordion'" class="row" style="background-color: white; color: #000;">
+      <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
+        style="margin-top: 50px; margin-bottom: 50px; background-color: #fff; color: #000">
+        <h4 class="test-page__content-tile">NbAccordion</h4>
+
+        {{ accordionDisabled }} <input type="checkbox" v-model="accordionDisabled"> Disabled <br />
+
+        <br /><br />
+
+        <NbAccordion
+          nb-id="accordion-1"
+          display="b"
+          theme="light"
+          :has-tab-index-enter="hasTabIndexEnter"
+          :disabled="accordionDisabled"
+          :items="accordionItems"
+          :selecteds="accordionSelecteds"
+          :disableds="accordionDisableds"
+          @clicked="console.log('clicked')"
+          @changed="console.log('changed')"
+          @focused="console.log('focused')"
+          @blurred="console.log('blurred')"
+          @outside-clicked="console.log('outside-clicked')"
+          @resized="console.log('resized', $event)"
+          @right-clicked="console.log('right-clicked')"
+          @outside-right-clicked="console.log('outside-right-clicked')"
+          @copied="console.log('copied', $event)"
+          @pasted="console.log('pasted', $event)"
+          @cut="console.log('cut', $event)"
+        >
+          <template #content-0>
+            <p>Content 1</p>
+          </template>
+          <template #content-1>
+            <p>Content 2</p>
+          </template>
+          <template #content-2>
+            <p>Content 3</p>
+          </template>
+          <template #content-3>
+            <p>Content 4</p>
+          </template>
+          <template #content-4>
+            <p>Content 5</p>
+          </template>
+        </NbAccordion>
+        <NbAccordion
+          nb-id="accordion-2"
+          display="b"
+          theme="dark"
+          :has-tab-index-enter="hasTabIndexEnter"
+          :disabled="accordionDisabled"
+          :items="accordionItems"
+          :selecteds="accordionSelecteds"
+          :disableds="accordionDisableds"
+          @clicked="console.log('clicked')"
+          @changed="console.log('changed')"
+          @focused="console.log('focused')"
+          @blurred="console.log('blurred')"
+          @outside-clicked="console.log('outside-clicked')"
+          @resized="console.log('resized', $event)"
+          @right-clicked="console.log('right-clicked')"
+          @outside-right-clicked="console.log('outside-right-clicked')"
+          @copied="console.log('copied', $event)"
+          @pasted="console.log('pasted', $event)"
+          @cut="console.log('cut', $event)"
+        >
+          <template #content-0>
+            <p>Content 1</p>
+          </template>
+          <template #content-1>
+            <p>Content 2</p>
+          </template>
+          <template #content-2>
+            <p>Content 3</p>
+          </template>
+          <template #content-3>
+            <p>Content 4</p>
+          </template>
+          <template #content-4>
+            <p>Content 5</p>
+          </template>
+        </NbAccordion>
       </div>
     </div>
   </div>
@@ -676,8 +813,9 @@ const NbStepper = defineAsyncComponent(() => import('@components/NbStepper.vue')
 const NbStepperLine = defineAsyncComponent(() => import('@components/NbStepperLine.vue'))
 const NbSegmentedButton = defineAsyncComponent(() => import('@components/NbSegmentedButton.vue'))
 const NbCollapse = defineAsyncComponent(() => import('@components/NbCollapse.vue'))
+const NbAccordion = defineAsyncComponent(() => import('@components/NbAccordion.vue'))
 
-const btType = ref('collapse')
+const btType = ref('accordion')
 
 
 /* tests tab - model one*/
@@ -737,21 +875,20 @@ const handleSegmentedButtonClicked = (value) => {
 }
 
 /* tests collapse */
-const AccordionItems = ref([
+const collapseTitle = ref('Open Collapsible')
+const collapseSelected = ref(0)
+const collapseDisabled = ref(false)
+
+/* tests accordion */
+const accordionItems = ref([
   { key: 'features', label: 'Features' },
   { key: 'specs', label: 'Specs' },
   { key: 'dimensions', label: 'Dimensions' },
   { key: 'contact', label: 'Contact' },
 ])
-const collapseTitle = ref('Open Collapsible')
-const collapseSelected = ref(0)
-const collapseDisabled = ref(false)
-const collapseActives = ref([])
-const collapseDisableds = ref([])
-const handleCollapseClicked = (value) => {
-  console.log('handleCollapseClicked', value)
-  collapseSelected.value = value.index
-}
+const accordionDisabled = ref(false)
+const accordionSelecteds = ref([])
+const accordionDisableds = ref([])
 </script>
 
 <style lang="scss" scoped>
@@ -843,6 +980,27 @@ const handleCollapseClicked = (value) => {
     &.custom-scrollbar {
       &::-webkit-scrollbar {
         height: 5px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: tomato;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #640dfb;
+        border-radius: 4px;
+
+        &:hover {
+          background: #4d0bc0;
+        }
+      }
+    }
+  }
+
+:deep(.component__content) {
+    &.custom-scrollbar {
+      &::-webkit-scrollbar {
+        width: 5px;
       }
 
       &::-webkit-scrollbar-track {

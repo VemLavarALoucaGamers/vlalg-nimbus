@@ -3124,8 +3124,8 @@
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
     vue "^3.3.4"
 
-"@vlalg-nimbus/nb-navigation@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-navigation":
-  version "1.0.0"
+"@vlalg-nimbus/nb-navigation@^1.1.0", "@vlalg-nimbus/nb-navigation@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-navigation":
+  version "1.1.0"
   resolved "file:packages/vue-components/nb-navigation"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -10116,6 +10116,7 @@ negotiator@0.6.3:
     "@vlalg-nimbus/nb-images" "^2.0.3"
     "@vlalg-nimbus/nb-inputs" "^10.0.0"
     "@vlalg-nimbus/nb-loaders" "^1.0.3"
+    "@vlalg-nimbus/nb-navigation" "^1.0.0"
     "@vlalg-nimbus/nb-overlays" "^1.0.2"
     "@vlalg-nimbus/nb-pagination" "^1.0.0"
     "@vlalg-nimbus/nb-password" "^5.0.0"

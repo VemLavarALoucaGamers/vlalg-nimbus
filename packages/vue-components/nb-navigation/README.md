@@ -38,6 +38,8 @@ The components that are part of this lib are:
 - <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-stepper" target="_blank">nb-stepper</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-stepper-line" target="_blank">nb-stepper-line</a>
 - <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-segmented-button" target="_blank">nb-segmented-button</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-collapse" target="_blank">nb-collapse</a>
+- <a href="http://nimbus.tec.br/vue-components/nb-navigation/nb-accordion" target="_blank">nb-accordion</a>
 
 Click on each one above to find out how to use it, properties, events, etc.
 

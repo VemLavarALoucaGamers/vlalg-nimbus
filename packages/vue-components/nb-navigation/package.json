@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-navigation",
   "description": "Input components for Vuejs 3",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "main": "./dist/nb-navigation.umd.js",
   "module": "./dist/nb-navigation.js",
@@ -81,6 +81,8 @@
     "navigation footer",
     "navigation header",
     "navigation menu",
+    "accordion",
+    "collapse",
     "component",
     "vue components",
     "vuejs components",
