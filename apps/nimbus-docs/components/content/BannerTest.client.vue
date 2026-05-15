@@ -23,7 +23,7 @@ const props = defineProps({
   },
   text: {
     type: String,
-    default: 'New Version 3.2.8 Released!'
+    default: 'New Version 3.3.0 Released!'
   },
   emojiStart: {
     type: String,

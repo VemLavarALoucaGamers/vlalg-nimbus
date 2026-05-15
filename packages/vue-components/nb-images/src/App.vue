@@ -246,6 +246,8 @@
           <h5 style="margin-bottom: 15px;">9. Com Preview Modal (clique na imagem para abrir)</h5>
           <p style="margin-bottom: 10px; color: #999;">Clique na imagem para abrir o modal com controles de rotação e zoom</p>
           <div style="width: 100%; border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
+            disabled: <input type="checkbox" v-model="disabledImage"/>
+
             <NbImage
               nb-id="image-preview"
               :image="images[0]"
@@ -260,6 +262,7 @@
               controls-text-color-hover="#4CAF50"
               :controls-border-radius="8"
               :z-index="9999"
+              :disabled="disabledImage"
               @clicked="handleImageClick('preview')"
             />
           </div>
@@ -268,12 +271,15 @@
         <div style="margin-bottom: 40px;">
           <h5 style="margin-bottom: 15px;">10. Com lupa</h5>
           <div style="width: 100%; border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
+            disabled: <input type="checkbox" v-model="disabledImage"/>
+
             <NbImage
               nb-id="image-lupa"
               :image="images[0]"
               responsive-type="full"
               :hagnifier-glass="true"
               :has-preview="false"
+              :disabled="disabledImage"
               @clicked="handleImageClick('lupa')"
             />
           </div>
@@ -289,7 +295,7 @@ import { defineAsyncComponent, ref } from 'vue'
 const NbImageGallery = defineAsyncComponent(() => import('@components/NbImageGallery.vue'))
 const NbImage = defineAsyncComponent(() => import('@components/NbImage.vue'))
 
-const btType = ref('image-gallery')
+const btType = ref('image')
 const optionsLoaders = ref([
   'image-gallery',
   'image',
@@ -346,6 +352,8 @@ const images = ref([
     height: imgH.value
   },
 ])
+
+const disabledImage = ref(false)
 
 const handleImageClick = (type) => {
   console.log(`Image clicked - Type: ${type}`)

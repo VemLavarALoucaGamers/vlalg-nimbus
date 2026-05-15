@@ -52,9 +52,30 @@
           />
         </div>
 
+        <!-- Exemplo disabled -->
+        <div style="margin-bottom: 30px;">
+          <h4 style="margin-bottom: 10px;">4. Disabled (magnifier + preview)</h4>
+          <label style="display: block; margin-bottom: 12px;">
+            <input v-model="isDisabled" type="checkbox" />
+            Disabled
+          </label>
+          <NbImage
+            nb-id="image-test-disabled"
+            :image="image"
+            responsive-type="full"
+            max-width="500px"
+            :disabled="isDisabled"
+            :has-preview="true"
+            :hagnifier-glass="true"
+            :hagnifier-glass-zoom="3"
+            :hagnifier-glass-size="150"
+            @clicked="handleClick"
+          />
+        </div>
+
         <!-- Exemplo com diferentes tipos responsivos -->
         <div style="margin-bottom: 30px;">
-          <h4 style="margin-bottom: 15px;">4. Responsive types comparison</h4>
+          <h4 style="margin-bottom: 15px;">5. Responsive types comparison</h4>
           <p style="margin-bottom: 15px; color: #999; font-size: 14px;">
             All images are in 200px containers. See how each type behaves differently:
           </p>
@@ -122,6 +143,8 @@ const image = ref({
   width: 500,
   height: 500
 })
+
+const isDisabled = ref(false)
 
 const handleClick = () => {
   console.log('Image clicked!')

@@ -13,7 +13,7 @@
 			:style="[componentStyle]"
 		>
       <div
-        v-if="hagnifierGlass"
+        v-if="hagnifierGlass && !disabled"
         ref="magnifierGlassRef"
         :id="`${nbId}-magnifier-glass`"
         class="component__magnifier-glass"
@@ -35,14 +35,14 @@
         :integrity="integrity || undefined"
         :fetchpriority="fetchpriority"
         :style="imageStyle"
-        :class="['component__image', { 'component__image--show-preview': hasPreview, 'component__image--has-magnifier': hagnifierGlass }]"
+        :class="['component__image', { 'component__image--show-preview': hasPreview && !disabled, 'component__image--has-magnifier': hagnifierGlass && !disabled }]"
         @click="openModal($event)"
         @mouseenter="showMagnifier"
         @mouseleave="hideMagnifier"
       />
 		</div>
     <ImageModal
-      v-if="hasPreview"
+      v-if="hasPreview && !disabled"
       v-model="selectedImg"
       :images="imagesArray"
       :selected-index="0"
@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, toRefs, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { defineProps, ref, toRefs, computed, onUnmounted, nextTick, watch } from 'vue'
 import ImageModal from './ImageModal.vue'
 
 defineOptions({
@@ -81,21 +81,16 @@ defineOptions({
 
 const emit = defineEmits(['clicked'])
 
-onMounted(() => {
-  startMagnifier()
-})
+// Token para inicialização da lupa
+let magnifierInitToken = 0
 
 onUnmounted(() => {
-  // Remove o overflow do body
+  // Remover o overflow do body
   document.body.style.overflow = ''
-  
-  // Limpar event listeners da lupa
-  if (imageRef.value && hagnifierGlass.value) {
-    // Remove o event listener de mousemove
-    imageRef.value.removeEventListener("mousemove", moveMagnifier, { passive: true })
-    // Remove o event listener de touchmove
-    imageRef.value.removeEventListener("touchmove", moveMagnifier, { passive: true })
-  }
+  // Remover o overflow do documento
+  document.documentElement.style.overflow = ''
+  // Limpar a lupa
+  cleanupMagnifier()
 })
 
 const props = defineProps({
@@ -308,7 +303,14 @@ const props = defineProps({
     validator: value => {
       return typeof value === 'number' && value > 0
     }
-  }
+  },
+	disabled: {
+		type: Boolean,
+		default: false,
+		validator: value => {
+			return typeof value === 'boolean' && [true, false].includes(value)
+		}
+	}
 })
 
 const {
@@ -345,7 +347,8 @@ const {
   hagnifierGlassSize,
   hagnifierGlassBorderRadius,
   hagnifierGlassBorderColor,
-  hagnifierGlassBorderWidth
+  hagnifierGlassBorderWidth,
+  disabled
 } = toRefs(props)
 
 const selectedImg = ref(false) // imagem selecionada
@@ -421,6 +424,7 @@ const computedAriaAttrs = computed(() => {
 
   const attrs = {
     'aria-label': ariaLabel.value,
+    'aria-disabled': disabled.value,
     ...newAttrs
   }
   
@@ -511,6 +515,9 @@ const imageStyle = computed(() => {
 
 // Função para abrir o modal
 const openModal = (event) => {
+  // Se a imagem está desabilitada, retorna
+  if (disabled.value) return
+
   // Se o modal deve ser exibido e a imagem existe e a imagem tem uma URL, abre o modal
 	if (hasPreview.value && image.value && image.value.url) {
     // Atualiza o estado da imagem selecionada
@@ -521,80 +528,114 @@ const openModal = (event) => {
 }
 
 const closeModal = () => {
-  // Atualiza o estado da imagem selecionada
 	selectedImg.value = false
+}
+
+// Função para verificar se a lupa está desatualizada
+const isMagnifierInitStale = (token) => {
+  return (
+    token !== magnifierInitToken ||
+    disabled.value ||
+    !hagnifierGlass.value ||
+    !imageRef.value ||
+    !magnifierGlassRef.value
+  )
 }
 
 // Função para magnificar a imagem
 const magnify = () => {
-  // Obtém os valores padrão
-  const defaultValues = formatDefaultValues.value
+  // Se a imagem está desabilitada ou a lupa não está habilitada, retornar
+  if (disabled.value || !hagnifierGlass.value) return
 
-  // Se a imagem, a lupa ou a lupa não estiverem disponíveis, retorna
-  if (!imageRef.value || !magnifierGlassRef.value || !hagnifierGlass.value) {
-    return
+  // Se a imagem ou o elemento da lupa não existem, retornar
+  if (!imageRef.value || !magnifierGlassRef.value) return
+
+  // Obter o token
+  const token = magnifierInitToken
+
+  // Obter os valores padrão e o zoom da lupa
+  const defaultValues = formatDefaultValues.value
+  const zoom = defaultValues.hagnifierGlassZoom
+
+  // Função para inicializar a lupa
+  const initializeMagnifierGlass = () => {
+    // Se a lupa está desatualizada, retornar
+    if (isMagnifierInitStale(token)) return
+
+    // Imagem a ser magnificada
+    const imgToMagnify = imageRef.value
+    // Elemento da lupa
+    const magnifierGlass = magnifierGlassRef.value
+
+    // Se a imagem ou o elemento da lupa não existem, retornar
+    if (!imgToMagnify || !magnifierGlass) return
+
+    // Obter a largura e a altura da imagem
+    const imgWidth = imgToMagnify.offsetWidth || imgToMagnify.naturalWidth || imgToMagnify.width
+    const imgHeight = imgToMagnify.offsetHeight || imgToMagnify.naturalHeight || imgToMagnify.height
+
+    if (imgWidth === 0 || imgHeight === 0) {
+      // Aguardar 100ms e tentar inicializar a lupa novamente
+      setTimeout(initializeMagnifierGlass, 100)
+
+      // Retornar
+      return
+    }
+
+    // Definir a imagem da lupa
+    magnifierGlass.style.backgroundImage = "url('" + imgToMagnify.src + "')"
+    // Definir o repetição da imagem da lupa
+    magnifierGlass.style.backgroundRepeat = 'no-repeat'
+    // Definir o tamanho da imagem da lupa
+    magnifierGlass.style.backgroundSize = (imgWidth * zoom) + 'px ' + (imgHeight * zoom) + 'px'
+    // Definir a borda da imagem da lupa
+    magnifierBw.value = 3
+    // Definir a largura da imagem da lupa
+    magnifierW.value = magnifierGlass.offsetWidth / 2
+    // Definir a altura da imagem da lupa
+    magnifierH.value = magnifierGlass.offsetHeight / 2
+
+    // Se a largura ou a altura da imagem da lupa é 0, aguardar 100ms e tentar inicializar a lupa novamente
+    if (magnifierW.value === 0 || magnifierH.value === 0) {
+      // Aguardar 100ms e tentar inicializar a lupa novamente
+      setTimeout(initializeMagnifierGlass, 100)
+
+      // Retornar
+      return
+    }
+    
+    // Remover o event listener de mousemove
+    imgToMagnify.removeEventListener('mousemove', moveMagnifier, { passive: true })
+
+    // Remover o event listener de touchmove
+    imgToMagnify.removeEventListener('touchmove', moveMagnifier, { passive: true })
+
+    // Adicionar o event listener de mousemove para mover a lupa
+    imgToMagnify.addEventListener('mousemove', moveMagnifier, { passive: true })
+
+    // Adicionar o event listener de touchmove
+    imgToMagnify.addEventListener('touchmove', moveMagnifier, { passive: true })
   }
 
-  // Zoom da lupa
-  const zoom = defaultValues.hagnifierGlassZoom
   // Imagem a ser magnificada
   const imgToMagnify = imageRef.value
-  // Elemento da lupa
-  const magnifierGlass = magnifierGlassRef.value
-
-  // Aguardar a imagem carregar completamente antes de inicializar
-  const initializeMagnifierGlass = () => {
-    // Usar dimensões reais da imagem renderizada
-    const imgWidth = imgToMagnify.offsetWidth || imgToMagnify.naturalWidth || imgToMagnify.width // offsetWidth é a largura da imagem em pixels, naturalWidth é a largura da imagem em pixels, width é a largura da imagem em pixels
-    const imgHeight = imgToMagnify.offsetHeight || imgToMagnify.naturalHeight || imgToMagnify.height // offsetHeight é a altura da imagem em pixels, naturalHeight é a altura da imagem em pixels, height é a altura da imagem em pixels
-
-    // Verificar se a imagem tem dimensões válidas
-    if (imgWidth === 0 || imgHeight === 0) { // se a imagem não tem dimensões válidas, tentar novamente após um pequeno delay
-      // Tentar novamente após um pequeno delay se a imagem ainda não carregou
-      setTimeout(initializeMagnifierGlass, 100)
-      return
-    }
-
-    // Configurar a imagem da lupa
-    magnifierGlass.style.backgroundImage = "url('" + imgToMagnify.src + "')"; // src é a URL da imagem
-    magnifierGlass.style.backgroundRepeat = "no-repeat"; // backgroundRepeat é a repetição da imagem da lupa
-    magnifierGlass.style.backgroundSize = (imgWidth * zoom) + "px " + (imgHeight * zoom) + "px"; // backgroundSize é a largura e altura da imagem da lupa
-    magnifierBw.value = 3; // borda da imagem da lupa
-    magnifierW.value = magnifierGlass.offsetWidth / 2; // largura da imagem da lupa
-    magnifierH.value = magnifierGlass.offsetHeight / 2; // altura da imagem da lupa
-
-    // Verificar se a lupa tem dimensões válidas
-    if (magnifierW.value === 0 || magnifierH.value === 0) { // se a lupa não tem dimensões válidas, tentar novamente após um pequeno delay
-      // Tentar novamente após um pequeno delay se a lupa ainda não tem dimensões
-      setTimeout(initializeMagnifierGlass, 100)
-      return
-    }
-
-    // Remover listeners antigos antes de adicionar novos (evitar duplicatas)
-    imgToMagnify.removeEventListener("mousemove", moveMagnifier, { passive: true }) // remove o event listener de mousemove
-    imgToMagnify.removeEventListener("touchmove", moveMagnifier, { passive: true }) // remove o event listener de touchmove
-
-    // Executar a função quando o cursor do mouse passar sobre a imagem
-    imgToMagnify.addEventListener("mousemove", moveMagnifier, { passive: true }); // adiciona o event listener de mousemove
-
-    // Executar a função quando o cursor do touch passar sobre a imagem
-    imgToMagnify.addEventListener("touchmove", moveMagnifier, { passive: true }); // adiciona o event listener de touchmove
-  }
-
-  // Se a imagem já carregou, inicializar imediatamente
-  if (imgToMagnify.complete && imgToMagnify.naturalWidth > 0) { // se a imagem já carregou e a imagem tem uma largura válida, inicializar a lupa
+  if (imgToMagnify.complete && imgToMagnify.naturalWidth > 0) {
     // Inicializar a lupa
     initializeMagnifierGlass()
   } else {
-    // Caso contrário, aguardar o evento load
-    imgToMagnify.onload = initializeMagnifierGlass // onload é o evento de carregamento da imagem
-    // Fallback: se onload não disparar, tentar após um delay
-    setTimeout(initializeMagnifierGlass, 500) // tentar novamente após um pequeno delay se a imagem ainda não carregou
+    // Adicionar o event listener de onload para inicializar a lupa
+    imgToMagnify.onload = initializeMagnifierGlass
+
+    // Aguardar 500ms e tentar inicializar a lupa novamente
+    setTimeout(initializeMagnifierGlass, 500) // aguardar 500ms e tentar inicializar a lupa novamente
   }
 }
 
 // Função para mostrar a lupa
 const showMagnifier = () => {
+  // Se a imagem está desabilitada, retorna
+  if (disabled.value) return
+
   // Se a lupa está habilitada e o elemento da lupa existe, mostrar a lupa
   // Mostrar a lupa se a lupa está habilitada e o elemento da lupa existe
   if (hagnifierGlass.value && magnifierGlassRef.value) { // se a lupa está habilitada e o elemento da lupa existe
@@ -604,6 +645,9 @@ const showMagnifier = () => {
 
 // Função para ocultar a lupa
 const hideMagnifier = () => {
+  // Se a imagem está desabilitada, retorna
+  if (disabled.value) return
+
   // Se o elemento da lupa existe, ocultar a lupa
   if (magnifierGlassRef.value) {
     // Ocultar a lupa
@@ -613,6 +657,8 @@ const hideMagnifier = () => {
 
 // Função para mover a lupa
 const moveMagnifier = (e) => {
+  if (disabled.value) return
+
   // Obtém os valores padrão
   const defaultValues = formatDefaultValues.value
 
@@ -624,6 +670,7 @@ const moveMagnifier = (e) => {
 
   // Verificar se o evento veio da imagem desta instância
   const imgToMagnify = imageRef.value // imagem a ser magnificada
+
   // Se o evento não veio da imagem desta instância, retornar
   if (e.target !== imgToMagnify && !imgToMagnify.contains(e.target)) {
     return
@@ -708,51 +755,70 @@ const getCursorPos = (e) => {
   return { x: x, y: y }; // retornar a posição do cursor
 }
 
-// Função para iniciar a lupa
-const startMagnifier = async () => {
-  // Se a lupa está habilitada e a imagem e o elemento da lupa existem, iniciar a lupa
-  if (hagnifierGlass.value && imageRef.value && magnifierGlassRef.value) {
-    // Aguardar um tick para garantir que o DOM está pronto
-    await nextTick()
-    // Aguardar mais um tick para garantir que o DOM está pronto
-    await nextTick()
-    // Inicializar a lupa
-    magnify()
+// Função para limpar a lupa quando a imagem está desabilitada
+const cleanupMagnifier = () => {
+  // Incrementar o token
+  magnifierInitToken++
+
+  // Se a imagem existe, remover o event listener de mousemove e touchmove e onload
+  if (imageRef.value) {
+    // Remover o event listener de mousemove
+    imageRef.value.removeEventListener('mousemove', moveMagnifier, { passive: true })
+
+    // Remover o event listener de touchmove
+    imageRef.value.removeEventListener('touchmove', moveMagnifier, { passive: true })
+
+    // Limpar o event listener de onload
+    imageRef.value.onload = null
   }
+
+  // Se o elemento da lupa existe, ocultar a lupa, limpar a imagem da lupa e limpar a posição da imagem da lupa
+  if (magnifierGlassRef.value) {
+    magnifierGlassRef.value.style.display = 'none'
+    magnifierGlassRef.value.style.backgroundImage = ''
+    magnifierGlassRef.value.style.backgroundPosition = ''
+    magnifierGlassRef.value.style.backgroundSize = ''
+  }
+
+  // Limpar a largura, altura e borda da imagem da lupa
+  magnifierW.value = null // largura da imagem da lupa
+  magnifierH.value = null // altura da imagem da lupa
+  magnifierBw.value = null // borda da imagem da lupa
 }
 
-// Observa mudanças na lupa para iniciar a lupa
-watch(hagnifierGlass, async (newValue) => {
-  // Se a lupa está habilitada, iniciar a lupa
-  if (newValue) {
-    // Aguardar um tick para garantir que o DOM está pronto
-    // Aguardar um pouco para garantir que o elemento da lupa está no DOM
-    await nextTick()
-    // Aguardar mais um tick para garantir que o DOM está pronto
-    await nextTick()
-    // Inicializar a lupa
-    startMagnifier()
-  } else {
-    // Limpar event listeners quando desabilitar
-    if (imageRef.value) {
-      // Remover o event listener de mousemove
-      imageRef.value.removeEventListener("mousemove", moveMagnifier, { passive: true })
-      // Remover o event listener de touchmove
-      imageRef.value.removeEventListener("touchmove", moveMagnifier, { passive: true })
+// Função para sincronizar a lupa
+const syncMagnifier = async () => {
+  // Se a imagem está desabilitada ou a lupa não está habilitada, retornar
+  if (disabled.value || !hagnifierGlass.value) {
+    // Se a imagem está desabilitada, fechar o modal
+    if (disabled.value) {
+      selectedImg.value = false
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
 
-    // Se o elemento da lupa existe, ocultar a lupa
-    if (magnifierGlassRef.value) {
-      // Ocultar a lupa
-      magnifierGlassRef.value.style.display = "none"
-    }
+    // Limpar a lupa
+    cleanupMagnifier()
 
-    // Resetar valores da lupa
-    magnifierW.value = null // largura da imagem da lupa
-    magnifierH.value = null // altura da imagem da lupa
-    magnifierBw.value = null // borda da imagem da lupa
+    // Retornar
+    return
   }
-}, { immediate: true }) // iniciar a lupa imediatamente
+
+  // Aguardar 1 tick
+  await nextTick()
+
+  // Aguardar 1 tick
+  await nextTick()
+
+  // Se a imagem está desabilitada ou a lupa não está habilitada, retornar
+  if (disabled.value || !hagnifierGlass.value) return
+  if (!imageRef.value || !magnifierGlassRef.value) return
+
+  // Magnificar a imagem
+  magnify()
+}
+
+watch([disabled, hagnifierGlass], syncMagnifier, { immediate: true })
 </script>
 
 <style lang="scss" scoped>
