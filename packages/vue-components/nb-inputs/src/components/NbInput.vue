@@ -39,7 +39,7 @@
         </label>
       </div>
       <input
-        v-if="hasInputMask"
+        v-if="usesBuiltInMask"
         ref="inputRef"
         v-model="inputValue"
         v-mask="inputMaskForDirective"
@@ -62,6 +62,32 @@
         :max="supportsMinMaxStep ? max : undefined"
         :step="supportsMinMaxStep ? step : undefined"
         role="input"
+        :style="[borderRadiusStyle, inputIconStyle]"
+        @focus="isActive = true"
+        @blur="isActive = false"
+        @keydown.enter="!disabled && hasTabIndexEnter && enterConfirm()"
+        @paste="handlePaste"
+      />
+      <input
+        v-else-if="isExternalMaskInput"
+        ref="inputRef"
+        :id="computedInputName"
+        :name="computedInputName"
+        type="text"
+        class="component__input"
+        :class="[
+          uppercaseStyle,
+          hiddenDefaultEye,
+          activeStyle
+        ]"
+        :placeholder="computedPlaceholder"
+        :disabled="disabled || inputReadonly"
+        :required="required"
+        :readonly="inputReadonly"
+        :autocomplete="inputAutocomplete"
+        :tabindex="disabled || inputReadonly ? -1 : tabindex"
+        role="input"
+        inputmode="decimal"
         :style="[borderRadiusStyle, inputIconStyle]"
         @focus="isActive = true"
         @blur="isActive = false"
@@ -145,6 +171,7 @@ onMounted(() => {
   } else {
     inputValue.value = ''
   }
+  nextTick(() => emitMaskExternalReady())
 })
 onUnmounted(() => {
   startValue()
@@ -159,7 +186,8 @@ const emit = defineEmits([
   'clicked',
   'entered',
   'paste',
-  'mask-error'
+  'mask-error',
+  'mask-external-ready',
 ])
 
 const props = defineProps({
@@ -314,7 +342,8 @@ const props = defineProps({
   },
   /**
    * Máscara [`vue-the-mask`](https://www.npmjs.com/package/vue-the-mask) (mesma lib que `NbCreditCard` em `@vlalg-nimbus/nb-payments`).
-   * Só aplica com **`input-type="text"`**. Ex.: `'###.###.###-##'`, `'(##) ####-####'`. Array = máscaras dinâmicas por comprimento.
+   * Só aplica com **`input-type="text"`** e sem `input-mask-external`. Ex.: `'###.###.###-##'`, `'(##) ####-####'`.
+   * **Moeda (R$ 1.234,56):** arrays dinâmicos não se comportam bem (ex.: `100` vira `1,00`). Use `input-mask-external` + IMask, AutoNumeric, etc.
    */
   inputMask: {
     type: [String, Array],
@@ -344,6 +373,18 @@ const props = defineProps({
     type: Object,
     default: null,
     validator: value => value == null || (typeof value === 'object' && !Array.isArray(value)),
+  },
+  /**
+   * Não usa `vue-the-mask`. O input fica “cru” para você aplicar outra lib no elemento nativo.
+   * Ouça `@mask-external-ready` (`{ inputEl, registerSync, setMaskedValue }`).
+   * `setMaskedValue` — a lib chama após cada `accept` (mesmo texto que o IMask mostra no input, sem prefixo extra; só emite `@changed`, não sobrescreve o DOM).
+   * `registerSync` — só para `:input-text` vindo de fora (`mask.updateValue()`).
+   * `input-mask`, `input-mask-emit` e `mask-error` do pacote não se aplicam nesse modo.
+   */
+  inputMaskExternal: {
+    type: Boolean,
+    default: false,
+    validator: value => typeof value === 'boolean' && [true, false].includes(value),
   },
   hasTrim: {
     type: Boolean,
@@ -737,6 +778,7 @@ const {
 	inputMask,
   inputMaskEmit,
   inputMaskTokens,
+  inputMaskExternal,
   hasTrim,
 	inputUppercase,
   inputName,
@@ -815,6 +857,56 @@ const hasInputMask = computed(() => {
   return !(Array.isArray(m) && m.length === 0)
 })
 
+/** `vue-the-mask` ativo (não usar com `input-mask-external`). */
+const usesBuiltInMask = computed(
+  () => hasInputMask.value && !inputMaskExternal.value
+)
+
+/** Input texto sem `v-mask`; máscara fica a cargo do app (IMask, AutoNumeric…). */
+const isExternalMaskInput = computed(
+  () => inputMaskExternal.value && inputType.value === 'text'
+)
+
+/** Sincroniza `input-text` → lib externa via `registerSync` do `@mask-external-ready`. */
+const externalMaskSync = ref(null)
+
+/** Emite `mask-external-ready` (`{ inputEl, registerSync, setMaskedValue }`). */
+const emitMaskExternalReady = () => {
+  // Se não há máscara externa ou o input não está pronto, não emitir
+  if (!inputMaskExternal.value || !inputRef.value) return
+
+  // Emitir o evento `mask-external-ready` com os parâmetros necessários
+  emit('mask-external-ready', {
+    inputEl: inputRef.value,
+    registerSync: (fn) => {
+      externalMaskSync.value = typeof fn === 'function' ? fn : null
+    },
+    setMaskedValue: (masked) => {
+      const next = masked == null ? '' : String(masked)
+      if (inputValue.value !== next) {
+        inputValue.value = next
+      }
+    },
+  })
+}
+
+// Funções para focar e desfocar o input
+const focusInput = () => {
+  inputRef.value?.focus()
+}
+
+// Função para desfocar o input
+const blurInput = () => {
+  inputRef.value?.blur()
+}
+
+// Expor as funções para focar e desfocar o input
+defineExpose({
+  inputRef,
+  focusInput,
+  blurInput,
+})
+
 /** Padrão da máscara (string ou array); cópia segura se for array (vue-the-mask ordena in-place). */
 const inputMaskPattern = computed(() => {
   const m = inputMask.value
@@ -828,8 +920,12 @@ const maskTokensMerged = computed(() => ({
   ...(inputMaskTokens.value != null ? inputMaskTokens.value : {}),
 }))
 
+// Verifica se há tokens custom
 const hasCustomMaskTokens = computed(() => {
+  // Se não há tokens custom, retorna false
   const t = inputMaskTokens.value
+
+  // Se há tokens custom, retorna true
   return t != null && typeof t === 'object' && !Array.isArray(t) && Object.keys(t).length > 0
 })
 
@@ -838,11 +934,16 @@ const hasCustomMaskTokens = computed(() => {
  * como no componente `TheMask` do vue-the-mask.
  */
 const inputMaskForDirective = computed(() => {
+  // Se não há máscara, retorna a máscara original
   const pattern = inputMaskPattern.value
   if (pattern == null || pattern === '') return pattern
+
+  // Se há tokens custom, retorna a máscara e os tokens
   if (hasCustomMaskTokens.value) {
     return { mask: pattern, tokens: maskTokensMerged.value }
   }
+  
+  // Se não há tokens custom, retorna a máscara original
   return pattern
 })
 
@@ -1337,19 +1438,31 @@ const formatValueForEmit = (value) => {
       return isNaN(numValue) ? value : numValue
     }
   }
-  if (!hasInputMask.value || inputMaskEmit.value === 'masked') {
+
+  // Se há máscara externa ou não há máscara interna, retorna o valor original
+  if (inputMaskExternal.value || !hasInputMask.value || inputMaskEmit.value === 'masked') {
     return value
   }
+
+  // Se não há máscara interna, retorna o valor original
   const maskedStr = value == null ? '' : String(value)
+
+  // Se não há máscara, retorna o valor original
   const pattern = inputMaskPattern.value
   if (pattern == null || pattern === '') return value
+
+  // Se há máscara, retorna o valor mascarado
   const clean = masker(maskedStr, pattern, false, maskTokensMerged.value)
   if (inputMaskEmit.value === 'clean') {
     return clean
   }
+
+  // Se há máscara, retorna o valor mascarado e o valor limpo
   if (inputMaskEmit.value === 'both') {
     return { masked: maskedStr, clean }
   }
+
+  // Se não há máscara, retorna o valor original
   return value
 }
 
@@ -1379,7 +1492,10 @@ const handleLabelClick = (event) => {
 
 /** Emite `mask-error` se houver máscara, texto trimado não vazio e slots incompletos. */
 const emitMaskErrorIfIncomplete = (trigger) => {
-  // Se não houver máscara, não emitir
+  // Se há máscara externa, não emitir
+  if (inputMaskExternal.value) return false
+
+  // Se não há máscara interna, não emitir
   if (!hasInputMask.value) return false
 
   // Se o texto trimado estiver vazio, não emitir
@@ -1410,8 +1526,10 @@ const emitMaskErrorIfIncomplete = (trigger) => {
 const enterConfirm = () => {
   if (disabled.value || formatDefaultValues.value.inputReadonly || !hasTabIndexEnter.value) return
 
+  // Se há máscara externa, não emitir
   if (emitMaskErrorIfIncomplete('enter')) return
 
+  // Se não há máscara interna, emitir
   emit('entered', formatValueForEmit(inputValue.value))
 }
 
@@ -1432,15 +1550,34 @@ watch(inputType, value => {
   currentType.value = value
 }, { immediate: true })
 watch(inputText, value => {
+  // Se o valor for null, retorna vazio
+  const stringValue =
+    value == null
+      ? ''
+      : inputType.value === 'number' && typeof value === 'number'
+        ? String(value)
+        : String(value)
+
+  // Se o valor for igual ao valor atual, retorna
+  if (stringValue === inputValue.value) return
+
+  // Se há máscara externa, sincronizar o valor
+  if (inputMaskExternal.value && externalMaskSync.value) {
+    externalMaskSync.value(stringValue)
+    return
+  }
+
   if (value != null) {
+    // Se o valor for um número, converter para string
     if (inputType.value === 'number' && typeof value === 'number') {
-      if (value !== inputValue.value) inputValue.value = value
+      inputValue.value = value
     } else {
-      const stringValue = String(value)
-      if (stringValue !== inputValue.value) inputValue.value = stringValue
+      // Se não há máscara externa, sincronizar o valor
+      inputValue.value = stringValue
     }
   } else {
-    if (inputValue.value !== '') inputValue.value = ''
+    // Se o valor for null, retorna vazio
+    inputValue.value = ''
   }
 }, { immediate: true })
 watch(inputValue, value => {
@@ -1449,6 +1586,8 @@ watch(inputValue, value => {
   }
 
   emit('changed', formatValueForEmit(value))
+
+  // Se há máscara interna, emitir o evento mask-error se o texto trimado não for completo
   emitMaskErrorIfIncomplete('changed')
 })
 watch(isActive, value => {
@@ -1481,6 +1620,15 @@ watch(inputType, (newType) => {
     })
   }
 })
+
+// Se há máscara externa ou o input não está pronto, emitir o evento mask-external-ready
+watch(
+  [inputMaskExternal, inputRef],
+  () => nextTick(() => emitMaskExternalReady()),
+  { flush: 'post' }
+)
+
+
 </script>
 
 <style lang="scss" scoped>

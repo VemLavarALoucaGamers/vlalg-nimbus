@@ -273,13 +273,89 @@
           </template>
         </NbInput>
 
-        <h4 class="test-page__content-tile" style="color: #000;">NbInput — máscaras (vue-the-mask)</h4>
+        <h4 class="test-page__content-tile" style="color: #000;">NbInput — dois modos de máscara (exemplos reais)</h4>
         <p style="max-width: 52rem; margin: 0 0 1rem; line-height: 1.5; color: #1e293b">
-          Padrão com <code>#</code> (dígito) e strings no <code>input-mask</code>; moeda usa <strong>array</strong> de máscaras
-          para ir de <code>R$ 0,00</code> até valores grandes. Por padrão o <code>@changed</code> envia o texto mascarado;
-          use <code>input-mask-emit</code> para <code>clean</code> (só tokens) ou <code>both</code> (<code>&#123; masked, clean &#125;</code>).
-          Tokens custom do <code>vue-the-mask</code> via <code>input-mask-tokens</code> (merge com o padrão); ex.: inteiro com sinal opcional usando máscara <code>N###</code> e token <code>N</code>.
+          <strong>1. Generic</strong> — <code>input-mask</code> + <code>vue-the-mask</code> (CPF, telefone…).
+          <strong>2. External</strong> — <code>input-mask-external</code> + lib no app (aqui: <strong>IMask</strong> em
+          <code>src/demo/useDemoImaskCurrency.js</code>). Moeda: não use array <code>R$</code> no vue-the-mask.
         </p>
+
+        <div
+          style="
+            display: grid;
+            gap: 1.5rem;
+            max-width: 42rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+          "
+        >
+          <div>
+            <p style="margin: 0 0 0.5rem; font-weight: 600; color: #0f172a">1) Generic — CPF com vue-the-mask</p>
+            <NbInput
+              nb-id="demo-mask-generic-cpf"
+              display="b"
+              input-style="border"
+              input-name="demo-mask-generic-cpf"
+              input-mask="###.###.###-##"
+              input-mask-emit="both"
+              label="CPF"
+              :show-label="true"
+              input-placeholder="000.000.000-00"
+              @changed="onDemoGenericMaskChanged"
+              @mask-error="($e) => console.log('generic mask-error', $e)"
+            />
+            <pre
+              style="
+                margin: 0.5rem 0 0;
+                padding: 0.5rem 0.75rem;
+                background: #fff;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                font-size: 12px;
+                color: #000;
+                overflow: auto;
+              "
+            >@changed (both): {{ JSON.stringify(demoGenericMaskLast) }}</pre>
+          </div>
+
+          <div>
+            <p style="margin: 0 0 0.5rem; font-weight: 600; color: #0f172a">
+              2) External — moeda BR com IMask (só dígitos: <code>123490</code> → <code>1.234,90</code>;
+              ou <code>,</code> / <code>.</code> para centavos)
+            </p>
+            <NbInput
+              nb-id="demo-mask-external-imask"
+              display="b"
+              input-style="border"
+              input-name="demo-mask-external-imask"
+              input-mask-external
+              label="Valor (R$)"
+              :show-label="true"
+              input-placeholder="R$ 0,00"
+              @mask-external-ready="demoImaskCurrency.attach"
+              @changed="onDemoExternalMaskNbChanged"
+            />
+            <pre
+              style="
+                margin: 0.5rem 0 0;
+                padding: 0.5rem 0.75rem;
+                background: #fff;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                font-size: 12px;
+                color: #000;
+                overflow: auto;
+              "
+            >IMask masked: {{ demoImaskCurrency.maskedDisplay || '(vazio)' }}
+clean (API): {{ demoImaskCurrency.cleanValue || '(vazio)' }}
+NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
+          </div>
+        </div>
+
+        <h4 class="test-page__content-tile" style="color: #000; margin-top: 0.5rem">Outros exemplos (vue-the-mask)</h4>
         <div style="display: grid; gap: 1.25rem; max-width: 42rem">
           <p style="color: #000;">Valor do input: {{ refFakeChange }}</p>
           <NbInput
@@ -343,17 +419,6 @@
             :show-label="true"
             input-placeholder="(00) 00000-0000"
             @changed="($event) => console.log('mask fone', $event)"
-          />
-          <NbInput
-            nb-id="test-input-mask-real"
-            display="b"
-            input-style="border"
-            input-name="test-input-mask-real"
-            :input-mask="demoMaskMoedaReal"
-            label="Moeda (R$ 1,00 …)"
-            :show-label="true"
-            input-placeholder="R$ 0,00"
-            @changed="($event) => console.log('mask real', $event)"
           />
           <NbInput
             nb-id="test-input-mask-prefix-s"
@@ -3666,6 +3731,7 @@
 
 <script setup>
 import { defineAsyncComponent, ref, computed, onMounted, onUnmounted } from 'vue'
+import { useDemoImaskCurrency } from './demo/useDemoImaskCurrency.js'
 
 const NbInputTest = defineAsyncComponent(() => import('@components/NbInputTest.vue'))
 const NbInputRadio = defineAsyncComponent(() => import('@components/NbInputRadio.vue'))
@@ -3678,7 +3744,7 @@ const NbInputClean = defineAsyncComponent(() => import('@components/NbInputClean
 const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.vue'))
 const NbInputSearch = defineAsyncComponent(() => import('@components/NbInputSearch.vue'))
 
-const btType = ref('file')
+const btType = ref('input')
 
 /** vue-the-mask: padrão BR (milhar `.`, centavos `,`) com prefixo `R$ ` — vários tamanhos até bilhões. */
 const demoMaskMoedaReal = [
@@ -4201,6 +4267,27 @@ const changeFileInputRemove = (files) => {
 const removeFile = (index) => {
   console.log('remove file => ', index)
   fileInputRemoveAtIndexRef.value.removeAt(index)
+}
+
+
+/** Exemplo modo external: IMask só no demo (devDependency), não no pacote nb-inputs. */
+const demoImaskCurrency = useDemoImaskCurrency('br')
+const demoGenericMaskLast = ref({ masked: '', clean: '' })
+const demoExternalMaskNbChangedLast = ref('')
+
+const onDemoGenericMaskChanged = (v) => {
+  if (v && typeof v === 'object' && 'masked' in v && 'clean' in v) {
+    demoGenericMaskLast.value = {
+      masked: String(v.masked ?? ''),
+      clean: String(v.clean ?? ''),
+    }
+  } else {
+    demoGenericMaskLast.value = { masked: String(v ?? ''), clean: '' }
+  }
+}
+
+const onDemoExternalMaskNbChanged = (v) => {
+  demoExternalMaskNbChangedLast.value = v == null || v === '' ? '' : String(v)
 }
 </script>
 
