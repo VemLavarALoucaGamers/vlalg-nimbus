@@ -36,13 +36,13 @@
         <div
           ref="dropdownFieldSingleRef"
           class="component__dropdown-field"
-          :class="{ 'has-selection': currentOptionOnly !== null && currentOptionOnly !== emptyOptionValue }"
+          :class="{ 'has-selection': !isEmptySingleSelection(currentOptionOnly) }"
           :style="[borderRadiusStyle]"
           :tabindex="disabled ? -1 : tabIndex"
           @click="toggleDropdownSingle"
           @keydown="handleKeyDownSingle"
         >
-          <span v-if="!currentOptionOnly || currentOptionOnly === emptyOptionValue" class="component__dropdown-placeholder">
+          <span v-if="isEmptySingleSelection(currentOptionOnly)" class="component__dropdown-placeholder">
             {{ emptyOptionText }}
           </span>
           <span v-else class="component__dropdown-selected">
@@ -77,11 +77,11 @@
             class="component__option-item"
             :class="{ 
               'disabled': disabled,
-              'selected': !currentOptionOnly || currentOptionOnly === emptyOptionValue
+              'selected': isEmptySingleSelection(currentOptionOnly)
             }"
             :tabindex="disabled ? -1 : (focusedOptionIndexSingle === 0 ? 0 : -1)"
             role="option"
-            :aria-selected="!currentOptionOnly || currentOptionOnly === emptyOptionValue"
+            :aria-selected="isEmptySingleSelection(currentOptionOnly)"
             @click.prevent="!disabled && selectOptionSingle(emptyOptionValue)"
             @keydown.enter.prevent="!disabled && hasTabIndexEnter && selectOptionSingle(emptyOptionValue)"
             @keydown.space.prevent="!disabled && hasTabIndexSpace && selectOptionSingle(emptyOptionValue)"
@@ -930,6 +930,14 @@ const {
 const currentOptionOnly = ref(null)
 const currentOptionMultiple = ref([])
 const initialized = ref(false)
+
+/** `false`, `0` e `''` são valores válidos — não usar checagem truthy. */
+const isEmptySingleSelection = (value) => {
+	if (value === null || value === undefined) return true
+	const emptyVal = emptyOptionValue.value
+	if (emptyVal !== null && emptyVal !== undefined && value === emptyVal) return true
+	return false
+}
 const isDropdownOpen = ref(false)
 const isDropdownOpenSingle = ref(false)
 const wrapperRef = ref(null)
@@ -1218,7 +1226,7 @@ const isLabelActive = computed(() => {
 	}
 	
 	if (!multiple.value) {
-		return isActive.value || isDropdownOpenSingle.value || (currentOptionOnly.value !== null && currentOptionOnly.value !== emptyOptionValue.value)
+		return isActive.value || isDropdownOpenSingle.value || !isEmptySingleSelection(currentOptionOnly.value)
 	} else {
 		return isActive.value || isDropdownOpen.value || safeCurrentOptionMultiple.value.length > 0
 	}
@@ -1693,7 +1701,7 @@ const selectOptionSingle = (value) => {
 
 // Função para obter texto do item selecionado no single select
 const getSelectedTextSingle = () => {
-	if (!currentOptionOnly.value || currentOptionOnly.value === emptyOptionValue.value) {
+	if (isEmptySingleSelection(currentOptionOnly.value)) {
 		return emptyOptionText.value
 	}
 	const selectedOption = options.value.find(option => 
