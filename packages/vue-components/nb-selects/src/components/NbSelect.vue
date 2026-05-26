@@ -5,6 +5,8 @@
     :class="['nb-wrapper', componentDisabled]"
     :style="[wrapperStyle, selectWidthStyle]"
     :title="title"
+    :tabindex="disabled ? -1 : tabIndex"
+    @keydown="handleWrapperKeyDown"
     @focusin="handleFocusIn"
     @focusout="handleWrapperFocusOut"
     @mousedown.capture="onWrapperMouseDown"
@@ -38,7 +40,7 @@
           class="component__dropdown-field"
           :class="{ 'has-selection': !isEmptySingleSelection(currentOptionOnly) }"
           :style="[borderRadiusStyle]"
-          :tabindex="disabled ? -1 : tabIndex"
+          :tabindex="disabled ? -1 : (isDropdownOpenSingle ? tabIndex : -1)"
           @click="toggleDropdownSingle"
           @keydown="handleKeyDownSingle"
         >
@@ -67,7 +69,7 @@
               class="component__filter-input"
               :placeholder="filterPlaceholder"
               :disabled="disabled"
-              @keydown.stop
+              @keydown.stop="handleFilterKeyDown"
             />
           </div>
           <!-- Opção vazia (placeholder) - escondida quando o filtro está preenchido -->
@@ -79,7 +81,7 @@
               'disabled': disabled,
               'selected': isEmptySingleSelection(currentOptionOnly)
             }"
-            :tabindex="disabled ? -1 : (focusedOptionIndexSingle === 0 ? 0 : -1)"
+            :tabindex="disabled ? -1 : 0"
             role="option"
             :aria-selected="isEmptySingleSelection(currentOptionOnly)"
             @click.prevent="!disabled && selectOptionSingle(emptyOptionValue)"
@@ -117,7 +119,7 @@
                   'disabled': option.disabled || disabled,
                   'selected': currentOptionOnly === option[valueKey]
                 }"
-                :tabindex="(option.disabled || disabled) ? -1 : (focusedOptionIndexSingle === (showEmptyOptionInList ? flatIndex + 1 : flatIndex) ? 0 : -1)"
+                :tabindex="(option.disabled || disabled) ? -1 : 0"
                 role="option"
                 :aria-selected="currentOptionOnly === option[valueKey]"
                 @click.prevent="!option.disabled && !disabled && selectOptionSingle(option[valueKey])"
@@ -150,7 +152,7 @@
               'disabled': option.disabled || disabled,
               'selected': currentOptionOnly === option[valueKey]
             }"
-            :tabindex="(option.disabled || disabled) ? -1 : (focusedOptionIndexSingle === (showEmptyOptionInList ? optionIndex + 1 : optionIndex) ? 0 : -1)"
+            :tabindex="(option.disabled || disabled) ? -1 : 0"
             role="option"
             :aria-selected="currentOptionOnly === option[valueKey]"
             @click.prevent="!option.disabled && !disabled && selectOptionSingle(option[valueKey])"
@@ -189,7 +191,7 @@
           class="component__dropdown-field"
           :class="{ 'has-selection': safeCurrentOptionMultiple.length > 0 }"
           :style="[borderRadiusStyle]"
-          :tabindex="disabled ? -1 : tabIndex"
+          :tabindex="disabled ? -1 : (isDropdownOpen ? tabIndex : -1)"
           @click="toggleDropdown"
           @keydown="handleKeyDownMultiple"
         >
@@ -218,7 +220,7 @@
               class="component__filter-input"
               :placeholder="filterPlaceholder"
               :disabled="disabled"
-              @keydown.stop
+              @keydown.stop="handleFilterKeyDown"
             />
           </div>
           <!-- Opção vazia (limpar seleção) - escondida quando o filtro está preenchido -->
@@ -227,7 +229,7 @@
             data-option-index-multiple="0"
             class="component__checkbox-option"
             :class="{ 'disabled': disabled, 'selected': safeCurrentOptionMultiple.length === 0 }"
-            :tabindex="disabled ? -1 : (focusedOptionIndexMultiple === 0 ? 0 : -1)"
+            :tabindex="disabled ? -1 : 0"
             role="option"
             :aria-selected="safeCurrentOptionMultiple.length === 0"
             @click.prevent="!disabled && clearSelectionMultiple()"
@@ -264,7 +266,7 @@
                   'disabled': option.disabled || disabled,
                   'selected': safeCurrentOptionMultiple.includes(option[valueKey])
                 }"
-                :tabindex="(option.disabled || disabled) ? -1 : (focusedOptionIndexMultiple === (showEmptyOptionInList ? flatIndex + 1 : flatIndex) ? 0 : -1)"
+                :tabindex="(option.disabled || disabled) ? -1 : 0"
                 role="option"
                 :aria-selected="safeCurrentOptionMultiple.includes(option[valueKey])"
                 @click.prevent="!option.disabled && !disabled && toggleOption(option[valueKey])"
@@ -304,7 +306,7 @@
               'disabled': option.disabled || disabled,
               'selected': safeCurrentOptionMultiple.includes(option[valueKey])
             }"
-            :tabindex="(option.disabled || disabled) ? -1 : (focusedOptionIndexMultiple === (showEmptyOptionInList ? optionIndex + 1 : optionIndex) ? 0 : -1)"
+            :tabindex="(option.disabled || disabled) ? -1 : 0"
             role="option"
             :aria-selected="safeCurrentOptionMultiple.includes(option[valueKey])"
             @click.prevent="!option.disabled && !disabled && toggleOption(option[valueKey])"
@@ -1425,6 +1427,76 @@ const handleFocusIn = () => {
 	// Só mudar isActive se realmente mudou de false para true
 	if (!isActive.value) {
 		isActive.value = true
+	}
+}
+
+// Handler de teclado para o wrapper
+const handleWrapperKeyDown = (event) => {
+  // Se estiver desabilitado, não fazer nada
+	if (disabled.value) return
+
+	// Se a tecla pressionada for Escape, fechar o dropdown
+	if (event.key === 'Escape') {
+		// Se estiver no single select e o dropdown estiver aberto, fechar
+		if (!multiple.value && isDropdownOpenSingle.value) {
+			event.preventDefault() // Prevenir o comportamento padrão do navegador
+			closeDropdownSingle() // Fechar o dropdown
+		} else if (multiple.value && isDropdownOpen.value) {
+			event.preventDefault() // Prevenir o comportamento padrão do navegador
+			closeDropdownMultiple() // Fechar o dropdown
+		}
+
+    // Retornar para evitar que o navegador faça o comportamento padrão
+		return
+	}
+
+	// Enter/Space no wrapper (fechado) abre dropdown
+	if (event.target !== wrapperRef.value) return
+
+  // Se a tecla pressionada for Enter e o wrapper tiver tabindex, abrir o dropdown
+	if (event.key === 'Enter' && hasTabIndexEnter.value) {
+		event.preventDefault() // Prevenir o comportamento padrão do navegador
+
+    // Se estiver no single select e o dropdown estiver fechado, abrir
+		if (!multiple.value && !isDropdownOpenSingle.value) {
+			toggleDropdownSingle(event)
+		} else if (multiple.value && !isDropdownOpen.value) { // Se estiver no multiple select e o dropdown estiver fechado, abrir
+			toggleDropdown(event)
+		}
+
+    // Retornar para evitar que o navegador faça o comportamento padrão
+		return
+	}
+
+  // Se a tecla pressionada for Space e o wrapper tiver tabindex, abrir o dropdown
+	if (event.key === ' ' && hasTabIndexSpace.value) {
+		event.preventDefault() // Prevenir o comportamento padrão do navegador
+
+    // Se estiver no single select e o dropdown estiver fechado, abrir
+		if (!multiple.value && !isDropdownOpenSingle.value) {
+			toggleDropdownSingle(event)
+		} else if (multiple.value && !isDropdownOpen.value) { // Se estiver no multiple select e o dropdown estiver fechado, abrir
+			toggleDropdown(event)
+		}
+	}
+}
+
+// Handler de teclado para o input de filtro
+const handleFilterKeyDown = (event) => {
+	if (disabled.value) return // Se estiver desabilitado, não fazer nada
+
+	if (event.key === 'Escape') { // Se a tecla pressionada for Escape, fechar o dropdown
+		event.preventDefault() // Prevenir o comportamento padrão do navegador
+
+    // Se estiver no single select e o dropdown estiver aberto, fechar
+		if (!multiple.value && isDropdownOpenSingle.value) {
+			closeDropdownSingle()
+		} else if (multiple.value && isDropdownOpen.value) { // Se estiver no multiple select e o dropdown estiver aberto, fechar
+			closeDropdownMultiple()
+		}
+
+    // Retornar para evitar que o navegador faça o comportamento padrão
+		return
 	}
 }
 
