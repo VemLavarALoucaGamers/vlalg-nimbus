@@ -11,7 +11,10 @@
     <label
       v-if="showLabel"
       :for="computedInputName"
-      class="component__label"
+      :class="[
+        'component__label',
+        { 'component__label--disabled-empty': isDisabledEmptyLabel },
+      ]"
       :style="[styleLabel]"
     >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
     
@@ -53,11 +56,16 @@
         :id="computedInputName"
         :name="computedInputName"
         :placeholder="computedPlaceholder"
+        :disabled="disabled || inputReadonly"
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
         :required="required"
         :tabindex="disabled || inputReadonly ? -1 : tabIndex"
-        :class="['chips-input', activeTextStyleClass]"
+        :class="[
+          'chips-input',
+          activeTextStyleClass,
+          { 'chips-input--disabled-filled': isDisabledFilledInput },
+        ]"
         :style="[caretColorStyle, selectionStyle]"
         @keydown.enter="!disabled && hasTabIndexEnter && handleKeyDown($event)"
         @focus="handleFocus"
@@ -72,11 +80,16 @@
         :id="computedInputName"
         :name="computedInputName"
         :placeholder="computedPlaceholder"
+        :disabled="disabled || inputReadonly"
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
         :required="required"
         :tabindex="disabled || inputReadonly ? -1 : tabIndex"
-        :class="['chips-input', activeTextStyleClass]"
+        :class="[
+          'chips-input',
+          activeTextStyleClass,
+          { 'chips-input--disabled-filled': isDisabledFilledInput },
+        ]"
         :style="[caretColorStyle, selectionStyle]"
         @keydown.enter="!disabled && hasTabIndexEnter && handleKeyDown($event)"
         @focus="handleFocus"
@@ -851,10 +864,17 @@ const styleWidth = computed(() => {
 const computedInputName = computed(() => {
   return inputName.value ? inputName.value : `${nbId.value}-name-label`
 })
+const hasInputContent = computed(() => {
+  const value = chipInputValue.value
+  const hasChipInputText = value != null && String(value).trim().length > 0
+  return chipList.value.length > 0 || hasChipInputText
+})
 const isLabelActive = computed(() => {
   // Label está ativo se o input estiver focado OU se tiver chips OU se tiver conteúdo no input
-  return isActive.value || chipList.value.length > 0 || (chipInputValue.value && chipInputValue.value.trim().length > 0)
+  return isActive.value || hasInputContent.value
 })
+const isDisabledEmptyLabel = computed(() => disabled.value && !hasInputContent.value)
+const isDisabledFilledInput = computed(() => disabled.value && hasInputContent.value)
 const computedPlaceholder = computed(() => {
   // Se não houver label, sempre mostra o placeholder
   if (!showLabel.value) {
@@ -1151,6 +1171,10 @@ watch(chipInputValue, (newValue) => {
     z-index: 1;
     pointer-events: none;
 
+    &.component__label--disabled-empty {
+      opacity: 0.5;
+    }
+
     .component__label--required {
       color: red;
       display: contents;
@@ -1315,6 +1339,10 @@ watch(chipInputValue, (newValue) => {
   }
 
   .chips-input {
+    &.chips-input--disabled-filled {
+      opacity: 0.5;
+    }
+
     border: none;
     outline: none;
     flex: 1;

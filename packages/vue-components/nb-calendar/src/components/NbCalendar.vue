@@ -241,6 +241,42 @@
 import { ref, computed, watch, onBeforeMount, onMounted, onUnmounted, nextTick, toRefs } from 'vue'
 import { formatTimeValue, formatISOLocal as formatISOLocalUtil, formatISOString as formatISOStringUtil, isSameDay as isSameDayUtil, parseLocalDate as parseLocalDateUtil } from '../utils/dateUtils.js'
 
+/*
+    Constantes para a largura do calendário
+    Este constantes são usadas para definir a largura do calendário.
+    Ele é usado para definir a largura do calendário.
+*/
+const CALENDAR_MIN_WIDTH_DEFAULT = 200
+const CALENDAR_MAX_WIDTH_DEFAULT = 280
+
+/*
+    Função para normalizar a largura do calendário
+    Este função é usado para normalizar a largura do calendário.
+    Ele é usado para normalizar a largura do calendário.
+*/
+const normalizeWidthProp = (value, defaultValue) => {
+  // Se o valor não é um número ou é NaN ou é menor ou igual a 0, retornar o valor padrão
+	if (typeof value !== 'number' || Number.isNaN(value) || value <= 0) {
+		return defaultValue
+	}
+
+  // Retornar o valor normalizado
+	return value
+}
+
+/*
+    Função para resolver as larguras do calendário
+    Este função é usado para resolver as larguras do calendário.
+    Ele é usado para resolver as larguras do calendário.
+*/
+const resolveCalendarWidthBounds = (minRaw, maxRaw) => {
+	let min = normalizeWidthProp(minRaw, CALENDAR_MIN_WIDTH_DEFAULT)
+	let max = normalizeWidthProp(maxRaw, CALENDAR_MAX_WIDTH_DEFAULT)
+	if (min > max) min = max
+	if (max < min) max = min
+	return { min, max }
+}
+
 defineOptions({
     name: 'NbCalendar',
 	inheritAttrs: false
@@ -257,14 +293,6 @@ const props = defineProps({
 	nbId: {
 		type: String,
 		required: true
-	},
-	display: {
-		type: String,
-		default: 'b',
-		validator: (value = 'b') => {
-			const currentValue = value ? value.toLowerCase() : ''
-			return ['b', 'ib'].includes(currentValue)
-		}
 	},
   ariaLabel: {
     type: String,
@@ -318,11 +346,18 @@ const props = defineProps({
 			return typeof value === 'boolean' && [true, false].includes(value)
 		}
 	},
-	width: { // largura do calendário em pixels
+  minWidth: {
         type: Number,
-        default: 280,
+        default: CALENDAR_MIN_WIDTH_DEFAULT,
       validator: value => {
-        return typeof value === 'number' && value >= 280
+        return typeof value === 'number' && !Number.isNaN(value) && value > 0
+      }
+    },
+    maxWidth: {
+        type: Number,
+        default: CALENDAR_MAX_WIDTH_DEFAULT,
+      validator: value => {
+        return typeof value === 'number' && !Number.isNaN(value) && value > 0
       }
     },
     widthFull: { // se true, o calendário ocupará a largura total do container
@@ -724,7 +759,6 @@ const props = defineProps({
 })
 
 const {
-	display,
   ariaLabel,
   ariaAttrs,
   tabIndex,
@@ -774,7 +808,8 @@ const {
   clearButtonTitle,
   clearButtonSymbol,
   isoStringTimezoneFormat,
-  width,
+  minWidth,
+  maxWidth,
   widthFull,
   borderRadius,
   showClearButton,
@@ -782,14 +817,23 @@ const {
   clearButtonKeepCurrentMonth
 } = toRefs(props)
 
+/*
+    Computed para as larguras do calendário
+    Este computed é usado para definir as larguras do calendário.
+    Ele é usado para definir as larguras do calendário.
+*/
+const calendarWidthBounds = computed(() =>
+	resolveCalendarWidthBounds(minWidth.value, maxWidth.value)
+)
+
 const formatDefaultValues = computed(() => {
 	const disabledValue = disabled.value ? 'component-disabled' : ''
-	const displayValue = display.value !== 'b' ? 'inline-block' : 'block'
+	const displayValue = 'inline-block'
 	const fontValue = !fontFamily.value ? `'Lato', sans-serif` : fontFamily.value
 	const fontSizeValue = !fontSize.value ? '1.6em' : fontSize.value
 	const fontWeightValue = ((fontWeight.value !== 0 && !fontWeight.value) || fontWeight.value < 0) ? 400 : fontWeight.value
 	const themeValue = !theme.value ? 'light' : theme.value
-	const widthValue = !width.value || width.value < 280 ? 280 : width.value
+	const { min: minWidthValue, max: maxWidthValue } = calendarWidthBounds.value
 	const primaryColorValue = !primaryColor.value ? '#007bff' : primaryColor.value
 	const selectionColorValue = !selectionColor.value ? '#1976d2' : selectionColor.value
 	const eventColorValue = !eventColor.value ? '#4caf50' : eventColor.value
@@ -831,7 +875,8 @@ const formatDefaultValues = computed(() => {
 		fontSize: fontSizeValue,
 		fontWeight: fontWeightValue,
 		theme: themeValue,
-		width: widthValue,
+		minWidth: minWidthValue,
+		maxWidth: maxWidthValue,
 		primaryColor: primaryColorValue,
 		selectionColor: selectionColorValue,
 		eventColor: eventColorValue,
@@ -1225,24 +1270,38 @@ const componentDisabled = computed(() => {
 
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
+	const { min, max } = calendarWidthBounds.value
+
+	if (widthFull.value) {
+		return {
+			display: 'block',
+			width: '100%',
+			maxWidth: '100%',
+			minWidth: formatDimension(min)
+		}
+	}
+
 	return {
 		display: defaultValues.display,
-		width: widthFull.value ? '100%' : undefined,
-		maxWidth: widthFull.value ? '100%' : undefined,
-        minWidth: widthFull.value ? '280px' : undefined
+		width: '100%',
+		minWidth: formatDimension(min),
+		maxWidth: formatDimension(max)
 	}
 })
 
 const componentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
+	const { min, max } = calendarWidthBounds.value
+
 	return {
-    margin: 0,
-    padding: 0,
+		margin: 0,
+		padding: 0,
 		lineHeight: '1.42857143',
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight,
-		width: widthFull.value ? '100%' : 'fit-content',
-		maxWidth: widthFull.value ? '100%' : undefined
+		width: '100%',
+		minWidth: formatDimension(min),
+		maxWidth: widthFull.value ? '100%' : formatDimension(max)
 	}
 })
 
@@ -2026,24 +2085,21 @@ const getMonthAbbreviation = (monthName) => {
 */
 const formattedWidth = computed(() => {
     // Se o widthFull for true, retornar a largura 100%
+    const { min, max } = calendarWidthBounds.value
+
     if (widthFull.value) {
         // Retornar a largura 100%
         return {
             width: '100%',
-            maxWidth: '100%',
-            minWidth: '280px'
+            minWidth: formatDimension(min),
+            maxWidth: '100%'
         }
     }
 
-    // Obter a largura a ser usada
-    const widthToUse = formatDefaultValues.value.width
-
-    // Formatar a largura
-    const newWidth = formatDimension(widthToUse)
-
-    // Retornar a largura formatada
     return {
-        width: newWidth
+        width: '100%',
+        minWidth: formatDimension(min),
+        maxWidth: formatDimension(max)
     }
 })
 
@@ -3576,7 +3632,7 @@ const getEventsForDate = (date) => {
 */
 const formatDimension = (value) => {
     // Se o valor for null ou undefined, retornar valor padrão
-    if (value === null || value === undefined) return '280px'
+    if (value === null || value === undefined) return `${CALENDAR_MAX_WIDTH_DEFAULT}px`
     
     // Agora sempre recebe um número, então apenas adiciona 'px'
     return `${value}px`

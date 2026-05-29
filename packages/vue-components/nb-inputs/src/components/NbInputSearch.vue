@@ -25,7 +25,10 @@
       <label
         v-if="showLabel"
         :for="computedInputName"
-        class="component__label"
+        :class="[
+          'component__label',
+          { 'component__label--disabled-empty': isDisabledEmptyLabel },
+        ]"
         :style="[styleLabel]"
         @click="handleLabelClick"
       >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
@@ -39,7 +42,8 @@
         class="component__input"
         :class="[
           uppercaseStyle,
-          activeStyle
+          activeStyle,
+          { 'component__input--disabled-filled': isDisabledFilledInput },
         ]"
         :placeholder="computedPlaceholder"
         :disabled="disabled || inputReadonly"
@@ -1231,6 +1235,15 @@ const isLabelActive = computed(() => {
   const value = inputValue.value
   return isActive.value || (value != null && String(value).trim().length > 0)
 })
+
+const hasInputContent = computed(() => {
+  const value = inputValue.value
+  return value != null && String(value).trim().length > 0
+})
+
+const isDisabledEmptyLabel = computed(() => disabled.value && !hasInputContent.value)
+const isDisabledFilledInput = computed(() => disabled.value && hasInputContent.value)
+
 const inputPaddingStyle = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -2185,6 +2198,10 @@ onUnmounted(() => {
       z-index: 1;
       pointer-events: none;
 
+      &.component__label--disabled-empty {
+        opacity: 0.5;
+      }
+
       .component__label--required {
         color: red;
         display: contents;
@@ -2223,6 +2240,10 @@ onUnmounted(() => {
 
     // inicio INPUT
     .component__input {
+      &.component__input--disabled-filled {
+        opacity: 0.5;
+      }
+
       width: 100%;
       height: 100%;
       font-family: inherit;
@@ -2309,10 +2330,10 @@ onUnmounted(() => {
 
 	.component {
 		--disabled-button-color: v-bind('styleButtonColor');
-		--disabled-color: v-bind('styleTextColor');
-		background-color: var(--disabled-button-color) !important;
-		color: var(--disabled-color) !important;
-		border-radius: inherit;
+
+    .component__icon {
+      opacity: 0.5 !important;
+    }
 
     .component__input {
       &:focus,

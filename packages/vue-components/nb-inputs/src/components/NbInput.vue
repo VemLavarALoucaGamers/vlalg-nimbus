@@ -16,7 +16,10 @@
       <label
         v-if="showLabel"
         :for="computedInputName"
-        class="component__label"
+        :class="[
+          'component__label',
+          { 'component__label--disabled-empty': isDisabledEmptyLabel },
+        ]"
         :style="[styleLabel]"
         @click="handleLabelClick"
       >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
@@ -50,7 +53,8 @@
         :class="[
           uppercaseStyle,
           hiddenDefaultEye,
-          activeStyle
+          activeStyle,
+          { 'component__input--disabled-filled': isDisabledFilledInput },
         ]"
         :placeholder="computedPlaceholder"
         :disabled="disabled || inputReadonly"
@@ -78,7 +82,8 @@
         :class="[
           uppercaseStyle,
           hiddenDefaultEye,
-          activeStyle
+          activeStyle,
+          { 'component__input--disabled-filled': isDisabledFilledInput },
         ]"
         :placeholder="computedPlaceholder"
         :disabled="disabled || inputReadonly"
@@ -105,7 +110,8 @@
         :class="[
           uppercaseStyle,
           hiddenDefaultEye,
-          activeStyle
+          activeStyle,
+          { 'component__input--disabled-filled': isDisabledFilledInput },
         ]"
         :placeholder="computedPlaceholder"
         :disabled="disabled || inputReadonly"
@@ -1263,11 +1269,16 @@ const computedPlaceholder = computed(() => {
   // Se houver label, só mostra o placeholder quando o input estiver ativo
   return isActive.value ? inputPlaceholder.value : ''
 })
+const hasInputContent = computed(() => {
+  const value = inputValue.value
+  return value != null && String(value).trim().length > 0
+})
 const isLabelActive = computed(() => {
   // Label está ativo se o input estiver focado OU se tiver conteúdo
-  const value = inputValue.value
-  return isActive.value || (value != null && String(value).trim().length > 0)
+  return isActive.value || hasInputContent.value
 })
+const isDisabledEmptyLabel = computed(() => disabled.value && !hasInputContent.value)
+const isDisabledFilledInput = computed(() => disabled.value && hasInputContent.value)
 const hiddenDefaultEye = computed(() => {
   const defaultValues = formatDefaultValues.value
 
@@ -2155,6 +2166,10 @@ watch(
       z-index: 1;
       pointer-events: none;
 
+      &.component__label--disabled-empty {
+        opacity: 0.5;
+      }
+
       .component__label--required {
         color: red;
         display: contents;
@@ -2207,6 +2222,10 @@ watch(
 
     // inicio INPUT
     .component__input {
+      &.component__input--disabled-filled {
+        opacity: 0.5;
+      }
+
       width: 100%;
       height: 100%;
       font-family: inherit;
@@ -2320,13 +2339,9 @@ watch(
 	pointer-events: none;
 	user-select: none;
 
-	opacity: 0.8;
+	opacity: .8;
 
 	.component {
-		--disabled-button-color: v-bind('styleButtonColor');
-		--disabled-color: v-bind('styleTextColor');
-		background-color: var(--disabled-button-color) !important;
-		color: var(--disabled-color) !important;
 		border-radius: inherit;
 
     .component__eye {
@@ -2335,6 +2350,10 @@ watch(
       &:hover {
         cursor: not-allowed;
       }
+    }
+
+    .component__icon {
+      opacity: 0.5;
     }
 
     .component__input {

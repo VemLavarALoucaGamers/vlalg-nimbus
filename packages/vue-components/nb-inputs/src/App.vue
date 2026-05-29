@@ -22,6 +22,8 @@
           <option value="file">file</option>
           <option value="search">search</option>
         </select>
+
+        <input type="checkbox" v-model="disabled"> Disabled
       </div>
     </div>
 
@@ -80,6 +82,7 @@
           :current-option="currentRadioItem"
           :options="inputOptions"
           direction="right"
+          :disabled="disabled"
           @current-value="changeRadioItem($event)"
         />
 
@@ -96,6 +99,7 @@
             :current-option="currentRadioItem"
             :options="inputOptions"
             direction="right"
+            :disabled="disabled"
             @current-value="changeRadioItem($event)"
           />
         </p>
@@ -110,6 +114,7 @@
             :current-option="currentRadioItem"
             :options="inputOptions"
             direction="right"
+            :disabled="disabled"
             @current-value="changeRadioItem($event)"
           />
         </p>
@@ -126,7 +131,8 @@
             dark-color-hover="#7c3aed"
             :current-option="currentRadioItem"
             :options="inputOptions"
-            direction="right"
+            direction="right" 
+            :disabled="disabled"
             @current-value="changeRadioItem($event)"
           />
         </p>
@@ -147,6 +153,7 @@
           :options="inputOptions"
           type="circle"
           :background="false"
+          :disabled="disabled"
           @current-value="changeChackboxItem($event)"
         />
 
@@ -163,6 +170,7 @@
             :current-option="currentCheckboxItem"
             :options="inputOptions"
             :background="false"
+            :disabled="disabled"
             @current-value="changeChackboxItem($event)"
           />
         </p>
@@ -178,6 +186,7 @@
             :options="inputOptions"
             type="circle"
             :background="false"
+            :disabled="disabled"
             @current-value="changeChackboxItem($event)"
           />
         </p>
@@ -195,6 +204,7 @@
             :current-option="currentCheckboxItem"
             :options="inputOptions"
             :background="false"
+            :disabled="disabled"
             @current-value="changeChackboxItem($event)"
           />
         </p>
@@ -225,6 +235,7 @@
           :block-paste="true"
           show-label
           label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -257,6 +268,42 @@
           selection-text-color="yellow"
           :has-icon="true"
           :block-paste="false"
+          show-label
+          label="Test input"
+          :disabled="disabled"
+          @clicked="() => console.log('clicked')"
+          @current-value="($event) => console.log('current-value', $event)"
+          @changed="($event) => console.log('changed:',$event)"
+          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+          @changed-complete="($event) => console.log('changed-complete:', $event)"
+          @focused="() => console.log('focused')"
+          @blurred="() => console.log('blurred')"
+          @entered="($event) => console.log('entered', $event)"
+          @show-input-eye="($event) => console.log('show-input-eye', $event)"
+          @paste="($event) => console.log('paste', $event)"
+        >
+          <template #error>
+            <div>Erro teste</div>
+          </template>
+        </NbInput>
+        
+        <NbInput
+          nb-id="test1"
+          display="b"
+          input-name="test-input1"
+          input-type="text"
+          :show-msg="true"
+          :has-msg="true"
+          aria-label="Test input"
+          :aria-attrs="{ 'describedby': 'test-input-description' }"
+          caret-color="cyan"
+          selection-bg-color="magenta"
+          selection-text-color="yellow"
+          :has-icon="true"
+          :block-paste="false"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -301,8 +348,9 @@
               input-name="demo-mask-generic-cpf"
               input-mask="###.###.###-##"
               input-mask-emit="both"
-              label="CPF"
-              :show-label="true"
+              show-label
+              label="Test input"
+              :disabled="disabled"
               input-placeholder="000.000.000-00"
               @changed="onDemoGenericMaskChanged"
               @mask-error="($e) => console.log('generic mask-error', $e)"
@@ -332,8 +380,9 @@
               input-style="border"
               input-name="demo-mask-external-imask"
               input-mask-external
-              label="Valor (R$)"
-              :show-label="true"
+              show-label
+              label="Test input"
+              :disabled="disabled"
               input-placeholder="R$ 0,00"
               @mask-external-ready="demoImaskCurrency.attach"
               @changed="onDemoExternalMaskNbChanged"
@@ -365,8 +414,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             input-style="border"
             input-name="test-input-mask-cpf"
             input-mask="###"
-            label="CPF"
-            :show-label="true"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             input-placeholder="000.000.000-00"
             autocomplete="off"
             @changed="fakeChange"
@@ -379,8 +429,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             input-name="test-input-mask-signed-int"
             input-mask="N###"
             :input-mask-tokens="signedIntMaskTokens"
-            label="Inteiro (sinal opcional, N###)"
-            :show-label="true"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             input-placeholder="-123"
             autocomplete="off"
             @changed="($event) => console.log('signed int', $event)"
@@ -391,8 +442,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             input-style="border"
             input-name="test-input-mask-cpf"
             input-mask="###.###.###-##"
-            label="CPF"
-            :show-label="true"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             input-placeholder="000.000.000-00"
             @changed="($event) => console.log('mask cpf', $event)"
             @mask-error="($event) => console.log('mask-error', $event)"
@@ -403,8 +455,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             input-style="border"
             input-name="test-input-mask-cep"
             input-mask="#####-###"
-            label="CEP"
-            :show-label="true"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             input-placeholder="00000-000"
             @changed="($event) => console.log('mask cep', $event)"
             @mask-error="($event) => console.log('mask-error', $event)"
@@ -415,8 +468,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             input-style="border"
             input-name="test-input-mask-fone"
             :input-mask="demoMaskTelefoneBr"
-            label="Telefone (fixo / celular)"
-            :show-label="true"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             input-placeholder="(00) 00000-0000"
             @changed="($event) => console.log('mask fone', $event)"
           />
@@ -426,8 +480,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             input-style="border"
             input-name="test-input-mask-prefix-s"
             :input-mask="demoMaskMoedaPrefixoS"
-            label="Mesmo formato com prefixo S (ex.: S 1.000,00)"
-            :show-label="true"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             input-placeholder="S 0,00"
             @changed="($event) => console.log('mask prefix S', $event)"
           />
@@ -445,8 +500,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
                   input-name="test-input-mask-emit-clean"
                   input-mask="###.###.###-##"
                   input-mask-emit="clean"
-                  label="CPF → @changed só dígitos"
-                  :show-label="true"
+                  show-label
+                  label="Test input"
+                  :disabled="disabled"
                   input-placeholder="000.000.000-00"
                   @changed="onDemoMaskEmitCleanChanged"
                 />
@@ -460,8 +516,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
                   input-name="test-input-mask-emit-both"
                   input-mask="(##) #####-####"
                   input-mask-emit="both"
-                  label="Celular → @changed objeto"
-                  :show-label="true"
+                  show-label
+                  label="Test input"
+                  :disabled="disabled"
                   input-placeholder="(00) 00000-0000"
                   @changed="onDemoMaskEmitBothChanged"
                 />
@@ -484,6 +541,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           selection-bg-color="magenta"
           selection-text-color="yellow"
           :has-icon="true"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -512,6 +572,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           selection-bg-color="magenta"
           selection-text-color="yellow"
           :has-icon="true"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -536,8 +599,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           display="b"
           input-name="test-input-label"
           input-type="text"
-          :show-label="true"
-          label="Nome completo"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           :required="true"
           :show-msg="true"
           :has-msg="true"
@@ -559,8 +623,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           <NbInput
             nb-id="test4"
             display="ib"
-            :show-label="true"
-            label="Este é um label gigante para ver se sai para fora do componente"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             @current-value="($event) => console.log($event)"
           />
           text after
@@ -573,7 +638,8 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-name="test-input4"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
+          :disabled="disabled"
           input-style="background"
         />
         <NbInput
@@ -581,7 +647,8 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-name="test-input5"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
+          :disabled="disabled"
           input-style="border"
         />
         <NbInput
@@ -589,7 +656,8 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-name="test-input6"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
+          :disabled="disabled"
           input-style="line"
         />
 
@@ -600,7 +668,8 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-name="test-input7"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
+          :disabled="disabled"
           input-style="background"
           theme="dark"
         />
@@ -609,7 +678,8 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-name="test-input8"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
+          :disabled="disabled"
           input-style="border"
           theme="dark"
         />
@@ -618,14 +688,15 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-name="test-input9"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
+          :disabled="disabled"
           input-style="line"
           theme="dark"
         />
       </div>
     </div>
 
-    <div v-if="btType === 'inputChip'" class="row"  style="background-color: #d5d0fd;">
+    <div v-if="btType === 'inputChip'" class="row"  style="background-color: #ffffff;">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbInput</h4>
@@ -641,6 +712,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           selection-bg-color="magenta"
           selection-text-color="yellow"
           allow-duplicates
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
@@ -667,6 +741,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :current-list="[]"
           aria-label="Chips com máscara CPF"
           allow-duplicates
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @added="($event) => console.log('added', $event)"
         />
 
@@ -687,6 +764,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :current-list="[]"
           aria-label="Chips com máscara inteiro assinado"
           allow-duplicates
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @added="($event) => console.log('chip signed int added', $event)"
           @mask-error="($event) => console.log('chip signed int mask-error', $event)"
         />
@@ -701,6 +781,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :current-list="[]"
           aria-label="Chips com máscara inteiro assinado"
           allow-duplicates
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @added="($event) => console.log('chip signed int added', $event)"
           @mask-error="($event) => console.log('chip signed int mask-error', $event)"
         />
@@ -724,6 +807,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               :current-list="demoChipMaskEmitCleanList"
               aria-label="Chip máscara emit clean"
               allow-duplicates
+              show-label
+              label="Test input"
+              :disabled="disabled"
               @input-changed="onDemoChipMaskEmitCleanInput"
               @added="onDemoChipMaskEmitCleanAdded"
               @added-complete="onDemoChipMaskEmitCleanAddedComplete"
@@ -743,6 +829,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               :current-list="demoChipMaskEmitBothList"
               aria-label="Chip máscara emit both"
               allow-duplicates
+              show-label
+              label="Test input"
+              :disabled="disabled"
               @input-changed="onDemoChipMaskEmitBothInput"
               @added="onDemoChipMaskEmitBothAdded"
               @added-complete="onDemoChipMaskEmitBothAddedComplete"
@@ -765,6 +854,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
@@ -788,6 +880,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
@@ -802,6 +897,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           <NbInput
             nb-id="test2"
             display="ib"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             @current-value="($event) => console.log($event)"
           />
           text after
@@ -816,11 +914,12 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           theme="light"
           input-style="background"
           input-placeholder="Type and press Enter"
-          :show-label="true"
-          label="Label Light Theme"
+          show-label
+          label="Test input"
           :required="true"
           :current-list="currentChipList"
           aria-label="Test input chip light with label"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
@@ -839,10 +938,11 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           theme="dark"
           input-style="background"
           input-placeholder="Type and press Enter"
-          :show-label="true"
-          label="Label Dark Theme"
+          show-label
+          label="Test input"
           :current-list="currentChipList"
           aria-label="Test input chip dark with label"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
@@ -861,10 +961,11 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           theme="light"
           input-style="line"
           input-placeholder="Type and press Enter"
-          :show-label="true"
-          label="Label Line Style"
+          show-label
+          label="Test input"
           :current-list="currentChipList"
           aria-label="Test input chip light line with label"
+          :disabled="disabled"
           @changed="($event) => console.log('changed', $event)"
         />
 
@@ -877,10 +978,11 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           theme="dark"
           input-style="border"
           input-placeholder="Type and press Enter"
-          :show-label="true"
-          label="Label Border Style"
+          show-label
+          label="Test input"
           :current-list="currentChipList"
           aria-label="Test input chip dark border with label"
+          :disabled="disabled"
           @changed="($event) => console.log('changed', $event)"
         />
 
@@ -893,10 +995,11 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           theme="light"
           input-style="background"
           input-placeholder="Type and press Enter"
-          :show-label="true"
-          label="Label Empty"
+          show-label
+          label="Test input"
           :current-list="[]"
           aria-label="Test input chip empty with label"
+          :disabled="disabled"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
           @removed="($event) => console.log('removed', $event)"
@@ -912,10 +1015,11 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="background"
           input-position="top"
           input-placeholder="Type and press Enter"
-          :show-label="true"
-          label="Label Input Top"
+          show-label
+          label="Test input"
           :current-list="currentChipList"
           aria-label="Test input chip with input on top"
+          :disabled="disabled"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
           @removed="($event) => console.log('removed', $event)"
@@ -931,10 +1035,11 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="border"
           input-position="bottom"
           input-placeholder="Type and press Enter"
-          :show-label="true"
-          label="Label Input Top"
+          show-label
+          label="Test input"
           :current-list="currentChipList"
           aria-label="Test input chip with input on top"
+          :disabled="disabled"
           @changed="($event) => console.log('changed', $event)"
           @added="($event) => console.log('added', $event)"
           @removed="($event) => console.log('removed', $event)"
@@ -1144,6 +1249,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="2 * 1024 * 1024"
           :show-constraints-text="true"
           aria-label="File single background"
+          :disabled="disabled"
           @clicked="() => console.log('file-single-bg clicked')"
           @current-value="($event) => console.log('file-single-bg current-value', $event)"
           @changed="($event) => console.log('file-single-bg changed', $event)"
@@ -1162,6 +1268,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="1 * 1024 * 1024"
           :show-constraints-text="true"
           aria-label="File single border"
+          :disabled="disabled"
           @clicked="() => console.log('file-single-bg clicked')"
           @current-value="($event) => console.log('file-single-border current-value', $event)"
           @changed="($event) => console.log('file-single-border changed', $event)"
@@ -1181,6 +1288,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="10 * 1024 * 1024"
           :show-constraints-text="true"
           aria-label="File single line"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-single-line current-value', $event)"
           @changed="($event) => console.log('file-single-line changed', $event)"
         />
@@ -1197,6 +1305,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           input-placeholder="Single (no label) - background"
           aria-label="File single no label background"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-single-nolabel-bg current-value', $event)"
           @changed="($event) => console.log('file-single-nolabel-bg changed', $event)"
         />
@@ -1211,6 +1320,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           input-placeholder="Single (no label) - border"
           aria-label="File single no label border"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-single-nolabel-border current-value', $event)"
           @changed="($event) => console.log('file-single-nolabel-border changed', $event)"
         />
@@ -1225,6 +1335,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           input-placeholder="Single (no label) - line"
           aria-label="File single no label line"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-single-nolabel-line current-value', $event)"
           @changed="($event) => console.log('file-single-nolabel-line changed', $event)"
         />
@@ -1246,6 +1357,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           multiple-files-selected-text="arquivos selecionados"
           :show-constraints-text="true"
           aria-label="File multiple background"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-multi-bg current-value', $event)"
           @changed="changeFileInputRemove($event)"
         />
@@ -1270,6 +1382,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           multiple-files-selected-text="arquivos selecionados"
           :show-constraints-text="true"
           aria-label="File multiple border"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-multi-border current-value', $event)"
           @changed="($event) => console.log('file-multi-border changed', $event)"
         />
@@ -1288,6 +1401,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           multiple-files-selected-text="arquivos selecionados"
           :show-constraints-text="true"
           aria-label="File multiple line"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-multi-line current-value', $event)"
           @changed="($event) => console.log('file-multi-line changed', $event)"
         />
@@ -1307,6 +1421,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           input-placeholder="Multiple (no label) - background"
           aria-label="File multiple no label background"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-multi-nolabel-bg current-value', $event)"
           @changed="($event) => console.log('file-multi-nolabel-bg changed', $event)"
         />
@@ -1324,6 +1439,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           input-placeholder="Multiple (no label) - border"
           aria-label="File multiple no label border"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-multi-nolabel-border current-value', $event)"
           @changed="($event) => console.log('file-multi-nolabel-border changed', $event)"
         />
@@ -1341,6 +1457,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           input-placeholder="Multiple (no label) - line"
           aria-label="File multiple no label line"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-multi-nolabel-line current-value', $event)"
           @changed="($event) => console.log('file-multi-nolabel-line changed', $event)"
         />
@@ -1357,6 +1474,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="5 * 1024 * 1024"
           :show-label="true"
           label="Upload images"
+          :disabled="disabled"
           @changed="onFilesChanged"
         />
         <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
@@ -1386,6 +1504,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="4 * 1024 * 1024"
           :show-constraints-text="false"
           aria-label="File with icon left"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-icon-left', $event)"
           @changed="($event) => console.log('file-icon-left changed', $event)"
         >
@@ -1409,6 +1528,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="3 * 1024 * 1024"
           :show-constraints-text="false"
           aria-label="File with icon right"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-icon-right', $event)"
           @changed="($event) => console.log('file-icon-right changed', $event)"
         >
@@ -1431,6 +1551,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="1024 * 1024"
           :show-constraints-text="false"
           aria-label="File default icon slot"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-icon-default', $event)"
           @changed="($event) => console.log('file-icon-default changed', $event)"
         />
@@ -1452,6 +1573,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="20 * 1024 * 1024"
           :show-constraints-text="false"
           aria-label="File large icon"
+          :disabled="disabled"
           @current-value="($event) => console.log('file-icon-large', $event)"
           @changed="($event) => console.log('file-icon-large changed', $event)"
         >
@@ -1483,6 +1605,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           multiple-files-selected-text="files"
           aria-label="Allowed extensions demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-allowed-ext', $event)"
         />
 
@@ -1505,6 +1628,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           multiple-files-selected-text="files"
           aria-label="Allow duplicates demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-allow-dup', $event)"
         />
 
@@ -1527,6 +1651,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           multiple-files-selected-text="PDFs"
           aria-label="No file counter demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-no-counter', $event)"
         />
 
@@ -1547,6 +1672,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :multiple="false"
           :show-constraints-text="true"
           aria-label="GIF dimensions demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-gif-dims', $event)"
         />
 
@@ -1568,6 +1694,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :multiple="false"
           :show-constraints-text="true"
           aria-label="Video rules demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-video-rules', $event)"
         />
 
@@ -1589,6 +1716,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :show-constraints-text="true"
           multiple-files-selected-text="items"
           aria-label="Tiny multi file demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-tiny-multi', $event)"
         />
 
@@ -1610,6 +1738,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="10 * 1024 * 1024"
           :show-constraints-text="true"
           aria-label="Capture camera back demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-capture-camera-back', $event)"
         />
 
@@ -1626,6 +1755,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="40 * 1024 * 1024"
           :show-constraints-text="true"
           aria-label="Capture camera front demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-capture-camera-front', $event)"
         />
 
@@ -1642,6 +1772,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="8 * 1024 * 1024"
           :show-constraints-text="true"
           aria-label="Capture ignored for pdf demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-capture-pdf-ignored', $event)"
         />
 
@@ -1669,6 +1800,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           text-file-list-padding="6px"
           text-file-list-margin="4px 0"
           aria-label="Custom file-list slot demo"
+          :disabled="disabled"
           @changed="($event) => console.log('file-slot-list-custom', $event)"
         >
           <template #file-list="{ files, removeFile }">
@@ -1722,6 +1854,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             sizeExceeded: 'O arquivo {fileName} excede o tamanho máximo.',
           }"
           aria-label="Exemplo locale português"
+          :disabled="disabled"
           @changed="($event) => console.log('file-locale-ptbr', $event)"
           @validation-error="(p) => console.warn('file-locale-ptbr', p.msg, p.fileName, p.errorType)"
         />
@@ -1741,6 +1874,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :max-file-size-bytes="2 * 1024 * 1024"
           :show-constraints-text="true"
           aria-label="File multiple border"
+          :disabled="disabled"
           @validation-errors="onMultipleBorderValidationErrors"
           @validation-error="onMultipleBorderValidationItem"
         />
@@ -1777,6 +1911,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             :showFileList="false"
             :showConstraintsText="true"
             :extraContendAbsolute="true"
+            :disabled="disabled"
             @changed="($event) => console.log('file-capture-pdf-ignored', $event)"
           />
           <NbInput
@@ -1788,6 +1923,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             message="Erro teste"
             label="Este é um label gigante para ver se sai para fora do componente"
             :extraContendAbsolute="true"
+            :disabled="disabled"
             @current-value="($event) => console.log($event)"
           />
           text after
@@ -1817,6 +1953,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             max-width="400px"
             min-height="300px"
             max-height="700px"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             @clicked="() => console.log('clicked')"
             @current-value="($event) => console.log('current-value', $event)"
             @changed="($event) => console.log('changed:',$event)"
@@ -1843,6 +1982,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -1869,6 +2011,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -1895,6 +2040,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          show-label
+          label="Test input"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -1915,6 +2063,9 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             nb-id="textarea-4"
             display="ib"
             input-name="test-textarea4"
+            show-label
+            label="Test input"
+            :disabled="disabled"
             @current-value="($event) => console.log($event)"
           />
           text after
@@ -1928,28 +2079,31 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-name="test-textarea5"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
           input-style="background"
           :rows="4"
           :required="true"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-6"
           input-name="test-textarea6"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
           input-style="border"
           :rows="4"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-7"
           input-name="test-textarea7"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
           input-style="line"
           :rows="4"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -1960,30 +2114,33 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-name="test-textarea8"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
           input-style="background"
           theme="dark"
           :rows="4"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-9"
           input-name="test-textarea9"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
           input-style="border"
           theme="dark"
           :rows="4"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-10"
           input-name="test-textarea10"
           display="b"
           show-label
-          label="Test label"
+          label="Test input"
           input-style="line"
           theme="dark"
           :rows="4"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -1995,16 +2152,18 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           display="b"
           input-placeholder="Digite sua mensagem aqui..."
           :rows="5"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-12"
           input-name="test-textarea12"
           display="b"
           show-label
-          label="Mensagem"
+          label="Test input"
           input-placeholder="Digite sua mensagem aqui..."
           input-style="border"
           :rows="5"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -2026,6 +2185,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-text="Este textarea está somente leitura"
           input-style="border"
           :rows="3"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -2038,6 +2198,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :maxlength="100"
           input-placeholder="Máximo 100 caracteres"
           :rows="3"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-16"
@@ -2047,6 +2208,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-placeholder="Mínimo 10 caracteres"
           input-style="border"
           :rows="3"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -2059,6 +2221,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           resize="both"
           input-placeholder="Redimensionável em ambas direções"
           :rows="3"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-18"
@@ -2068,6 +2231,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-placeholder="Sem redimensionamento"
           input-style="border"
           :rows="3"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-19"
@@ -2076,6 +2240,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           resize="horizontal"
           input-placeholder="Redimensionável horizontalmente"
           :rows="3"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -2088,6 +2253,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           wrap="soft"
           input-placeholder="Wrap soft (padrão)"
           :rows="3"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-21"
@@ -2097,6 +2263,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-placeholder="Wrap hard"
           input-style="border"
           :rows="3"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-22"
@@ -2105,6 +2272,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           wrap="off"
           input-placeholder="Wrap off (sem quebra visual)"
           :rows="3"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -2117,6 +2285,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :rows="2"
           :cols="30"
           input-placeholder="2 linhas, 30 colunas"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-24"
@@ -2126,6 +2295,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :cols="50"
           input-placeholder="6 linhas, 50 colunas"
           input-style="border"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -2137,16 +2307,18 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           display="b"
           input-text="Este é um texto inicial pré-preenchido no textarea."
           :rows="4"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-26"
           input-name="test-textarea26"
           display="b"
           show-label
-          label="Comentário"
+          label="Test input"
           input-text="Este é um texto inicial com label."
           input-style="border"
           :rows="4"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -2159,6 +2331,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :input-uppercase="true"
           input-placeholder="Texto em maiúsculas"
           :rows="3"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-28"
@@ -2168,6 +2341,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-placeholder="Texto centralizado"
           input-style="border"
           :rows="3"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-29"
@@ -2176,6 +2350,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           text-align="right"
           input-placeholder="Texto alinhado à direita"
           :rows="3"
+          :disabled="disabled"
         />
 
         <br /><br />
@@ -2189,6 +2364,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :border-radius="1"
           input-placeholder="Com border radius"
           :rows="3"
+          :disabled="disabled"
         />
         <NbTextarea
           nb-id="textarea-31"
@@ -2199,6 +2375,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="border"
           input-placeholder="Border radius menor"
           :rows="3"
+          :disabled="disabled"
         />
       </div>
     </div>
@@ -2225,6 +2402,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             selection-bg-color="magenta"
             selection-text-color="yellow"
             calendar-z-index="2147483642"
+            :disabled="disabled"
             @clicked="() => console.log('clicked')"
             @current-value="($event) => console.log('current-value', $event)"
             @changed="($event) => console.log('changed:',$event)"
@@ -2260,8 +2438,11 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
-          :calendar-width="650"
+          :calendar-min-width="200"
+          :calendar-max-width="520"
+          :calendar-close-on-select="true"
           font-size="1.2em"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -2293,6 +2474,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -2324,6 +2506,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           caret-color="cyan"
           selection-bg-color="magenta"
           selection-text-color="yellow"
+          :disabled="disabled"
           @clicked="() => console.log('clicked')"
           @current-value="($event) => console.log('current-value', $event)"
           @changed="($event) => console.log('changed:',$event)"
@@ -2348,6 +2531,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
             display="ib"
             input-name="test-datepicker4"
             input-type="date"
+            :disabled="disabled"
             @current-value="($event) => console.log($event)"
             @current-value-complete="($event) => console.log('current-value-complete:', $event)"
             @changed-complete="($event) => console.log('changed-complete:', $event)"
@@ -2369,6 +2553,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           label="Data"
           input-type="date"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2385,6 +2570,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-type="datetime-local"
           input-style="border"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2400,6 +2586,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-type="time"
           input-style="line"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2414,6 +2601,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           label="Mês"
           input-type="month"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2429,6 +2617,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-type="week"
           input-style="border"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2447,6 +2636,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           label="Data"
           input-style="background"
           input-type="date"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2462,6 +2652,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="border"
           light-text-color="#ffffff"
           input-type="date"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2477,6 +2668,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="line"
           light-text-color="#ffffff"
           input-type="date"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2496,6 +2688,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="background"
           theme="dark"
           input-type="date"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2511,6 +2704,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="border"
           theme="dark"
           input-type="date"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2526,6 +2720,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="line"
           theme="dark"
           input-type="date"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2547,6 +2742,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           max="2024-12-31"
           input-style="border"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2565,6 +2761,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           min="2024-01-01T00:00"
           max="2024-12-31T23:59"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2584,6 +2781,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           min="2024-01-01T00:00"
           max="2024-12-31T23:59"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2617,6 +2815,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="border"
           light-text-color="#ffffff"
           input-type="date"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2636,6 +2835,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-type="date"
           :allow-range="true"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2652,6 +2852,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :allow-range="true"
           input-style="border"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2671,6 +2872,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-type="date"
           locale="pt-BR"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2687,6 +2889,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           locale="en-US"
           input-style="border"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2706,6 +2909,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-type="date"
           input-text="2024-06-15"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2722,6 +2926,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-text="2024-06-15T14:30"
           input-style="border"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2738,6 +2943,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-text="14:30"
           input-style="line"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2757,6 +2963,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-type="time"
           step="900"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2773,6 +2980,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           step="1800"
           input-style="border"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2791,6 +2999,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :border-radius="1"
           input-type="date"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2806,6 +3015,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-style="border"
           light-text-color="#ffffff"
           input-type="date"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2825,6 +3035,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           input-type="date"
           :use-custom-calendar="true"
           input-style="background"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2841,6 +3052,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           :use-custom-calendar="false"
           input-style="border"
           light-text-color="#ffffff"
+          :disabled="disabled"
           @current-value-complete="($event) => console.log('current-value-complete:', $event)"
           @changed-complete="($event) => console.log('changed-complete:', $event)"
           @date-selected="($event) => console.log('date-selected:', $event)"
@@ -2848,596 +3060,618 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
           @valid="($event) => console.log('valid:', $event)"
         />
 
-        <div style="margin: 438px 0;">
-        <span>23:24 - 23:59</span>
-        <NbDatePicker
-          nb-id="datepicker-time-inputtext-date"
-          input-name="test-datepicker-time-inputtext-date"
-          display="b"
-          show-label
-          label="Time InputText: Hora atual (Data do tipo Date object)"
-          input-type="time"
-          min="23:24"
-          max="23:59"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: Time com min e max, inputText dentro do range -->
-        <NbDatePicker
-          nb-id="datepicker-time-min-max-valid"
-          input-name="test-datepicker-time-min-max-valid"
-          display="b"
-          show-label
-          label="Time Min/Max: 23:24-23:59, InputText: 23:30 (dentro do range)"
-          input-type="time"
-          :min="'23:24'"
-          :max="'23:59'"
-          input-text="23:30"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: Time com min e max, inputText fora do range (deve não definir) -->
-        <NbDatePicker
-          nb-id="datepicker-time-min-max-invalid"
-          input-name="test-datepicker-time-min-max-invalid"
-          display="b"
-          show-label
-          label="Time Min/Max: 23:24-23:59, InputText: 01:01 (fora do range - não deve definir)"
-          input-type="time"
-          :min="'23:24'"
-          :max="'23:59'"
-          input-text="01:01"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: Time com min e max usando Date objects -->
-        <NbDatePicker
-          nb-id="datepicker-time-min-max-date"
-          input-name="test-datepicker-time-min-max-date"
-          display="b"
-          show-label
-          label="Time Min/Max: Date objects (14:00-18:00)"
-          input-type="time"
-          :min="new Date(2024, 0, 1, 14, 0, 0)"
-          :max="new Date(2024, 0, 1, 18, 0, 0)"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: Time apenas com min -->
-        <NbDatePicker
-          nb-id="datepicker-time-min-only"
-          input-name="test-datepicker-time-min-only"
-          display="b"
-          show-label
-          label="Time Min: 09:00 (sem max)"
-          input-type="time"
-          :min="'09:00'"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: Time apenas com max -->
-        <NbDatePicker
-          nb-id="datepicker-time-max-only"
-          input-name="test-datepicker-time-max-only"
-          display="b"
-          show-label
-          label="Time Max: 17:00 (sem min)"
-          input-type="time"
-          :max="'17:00'"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: Time com min e max, inputText no limite mínimo -->
-        <NbDatePicker
-          nb-id="datepicker-time-min-max-at-min"
-          input-name="test-datepicker-time-min-max-at-min"
-          display="b"
-          show-label
-          label="Time Min/Max: 10:00-15:00, InputText: 10:00 (no limite mínimo)"
-          input-type="time"
-          :min="'10:00'"
-          :max="'15:00'"
-          input-text="10:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: Time com min e max, inputText no limite máximo -->
-        <NbDatePicker
-          nb-id="datepicker-time-min-max-at-max"
-          input-name="test-datepicker-time-min-max-at-max"
-          display="b"
-          show-label
-          label="Time Min/Max: 10:00-15:00, InputText: 15:00 (no limite máximo)"
-          input-type="time"
-          :min="'10:00'"
-          :max="'15:00'"
-          input-text="15:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- ========== EXEMPLOS DATETIME-LOCAL ========== -->
-
-        <!-- Exemplo: DateTime-Local com min e max, inputText dentro do range -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-min-max-valid"
-          input-name="test-datepicker-datetime-min-max-valid"
-          display="b"
-          show-label
-          label="DateTime Min/Max: 14:00-18:00, InputText: 2024-01-15T15:30 (dentro do range)"
-          input-type="datetime-local"
-          :min="'14:00'"
-          :max="'18:00'"
-          input-text="2024-01-15T15:30"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local com min e max, inputText fora do range (deve não definir) -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-min-max-invalid"
-          input-name="test-datepicker-datetime-min-max-invalid"
-          display="b"
-          show-label
-          label="DateTime Min/Max: 14:00-18:00, InputText: 2024-01-15T10:00 (fora do range - não deve definir)"
-          input-type="datetime-local"
-          :min="'14:00'"
-          :max="'18:00'"
-          input-text="2024-01-15T10:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local com min e max usando Date objects -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-min-max-date"
-          input-name="test-datepicker-datetime-min-max-date"
-          display="b"
-          show-label
-          label="DateTime Min/Max: Date objects ( 01/01/2024 09:00-17:00)"
-          input-type="datetime-local"
-          :min="new Date(2024, 0, 1, 9, 0, 0)"
-          :max="new Date(2024, 0, 1, 17, 0, 0)"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local apenas com min -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-min-only"
-          input-name="test-datepicker-datetime-min-only"
-          display="b"
-          show-label
-          label="DateTime Min: 08:00 (sem max)"
-          input-type="datetime-local"
-          :min="'08:00'"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local apenas com max -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-max-only"
-          input-name="test-datepicker-datetime-max-only"
-          display="b"
-          show-label
-          label="DateTime Max: 20:00 (sem min)"
-          input-type="datetime-local"
-          :max="'20:00'"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local com min e max, inputText no limite mínimo -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-min-max-at-min"
-          input-name="test-datepicker-datetime-min-max-at-min"
-          display="b"
-          show-label
-          label="DateTime Min/Max: 12:00-16:00, InputText: 2024-01-15T12:00 (no limite mínimo)"
-          input-type="datetime-local"
-          :min="'12:00'"
-          :max="'16:00'"
-          input-text="2024-01-15T12:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-min-max-at-max"
-          input-name="test-datepicker-datetime-min-max-at-max"
-          display="b"
-          show-label
-          label="DateTime Min/Max: 12:00-16:00, InputText: 2024-01-15T16:00 (no limite máximo)"
-          input-type="datetime-local"
-          :min="'12:00'"
-          :max="'16:00'"
-          input-text="2024-01-15T11:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-null"
-          input-name="test-datepicker-datetime-null"
-          display="b"
-          show-label
-          label="valor null"
-          input-type="datetime-local"
-          :input-text="null"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-undefined"
-          input-name="test-datepicker-datetime-undefined"
-          display="b"
-          show-label
-          label="valor undefined"
-          input-type="datetime-local"
-          :input-text="undefined"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
-        <NbDatePicker
-          nb-id="datepicker-datetime-min-max-at-max"
-          input-name="test-datepicker-datetime-min-max-at-max"
-          display="b"
-          show-label
-          label="2026-01-09T21:07:50.624+00:00"
-          input-type="datetime-local"
-          input-text="2026-01-09T21:07:50.624+00:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
-        <NbDatePicker
-          nb-id="datepicker-date-simple"
-          input-name="test-datepicker-date-simple"
-          display="b"
-          show-label
-          label="2026-01-09"
-          input-type="date"
-          input-text="2026-01-09T21:07:50.624+00:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <NbDatePicker
-          nb-id="datepicker-date-simple-ptbr"
-          input-name="test-datepicker-date-simple-ptbr"
-          display="b"
-          show-label
-          label="2026-01-09 (pt-BR)"
-          input-type="date"
-          input-text="2026-01-09T21:07:50.624+00:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-
-        <NbDatePicker
-          nb-id="datepicker-date-simple-show-buttons"
-          input-name="test-datepicker-date-simple-show-button"
-          display="b"
-          show-label
-          label="2026-01-09 (show buttons)"
-          input-type="date"
-          input-text="2026-01-09T21:07:50.624+00:00"
-          input-style="border"
-          light-text-color="#ffffff"
-          locale="pt-BR"
-          :calendar-show-today-button="true"
-          :calendar-show-clear-button="true"
-          @changed="($event) => console.log('changed:', $event)"
-          @current-value-complete="($event) => console.log('current-value-complete:', $event)"
-          @changed-complete="($event) => console.log('changed-complete:', $event)"
-          @date-selected="($event) => console.log('date-selected:', $event)"
-          @month-changed="($event) => console.log('month-changed:', $event)"
-          @valid="($event) => console.log('valid:', $event)"
-        />
-        
-
-        <div style="color: black; margin-top: 60px;">
-          <p>Teste inputDate para DatePicker</p>
-          <p>inputNativeDate: {{ inputNativeDate }}</p>
-
-          <input type="date" v-model="inputNativeDate" />
-
+        <div style="margin-top: 438px 0;">
+          <span>23:24 - 23:59</span>
           <NbDatePicker
-            nb-id="datepicker-date-simple-native"
-            input-name="test-datepicker-date-simple-native"
-            display="ib"
+            nb-id="datepicker-time-inputtext-date"
+            input-name="test-datepicker-time-inputtext-date"
+            display="b"
             show-label
-            label="inputNativeDate"
-            input-type="date"
-            :input-text="inputNativeDate"
+            label="Time InputText: Hora atual (Data do tipo Date object)"
+            input-type="time"
+            min="23:24"
+            max="23:59"
             input-style="border"
             light-text-color="#ffffff"
-            @changed="($event) => inputNativeDate = $event"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
             @current-value-complete="($event) => console.log('current-value-complete:', $event)"
             @changed-complete="($event) => console.log('changed-complete:', $event)"
             @date-selected="($event) => console.log('date-selected:', $event)"
             @month-changed="($event) => console.log('month-changed:', $event)"
             @valid="($event) => console.log('valid:', $event)"
           />
-        </div>
 
-        <!-- Seção de Teste de Validação -->
-        <div style="color: black; margin-top: 60px; padding: 20px; background-color: #f5f5f5; border-radius: 8px;">
-          <h4 class="test-page__content-tile" style="margin-bottom: 20px;">🧪 Teste de Validação (@valid event)</h4>
-          
-          <div style="margin-bottom: 20px;">
-            <p><strong>Valor atual:</strong> {{ testValidationValue || '(vazio)' }}</p>
-            <p>
-              <strong>Status de validação:</strong> 
-              <span :style="{ color: testValidationIsValid ? '#4caf50' : '#f44336', fontWeight: 'bold' }">
-                {{ testValidationIsValid ? '✅ VÁLIDO' : '❌ INVÁLIDO' }}
-              </span>
-            </p>
-            <p><strong>Min:</strong> {{ testValidationMin || '(sem limite)' }}</p>
-            <p><strong>Max:</strong> {{ testValidationMax || '(sem limite)' }}</p>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px;">
-              <strong>Digite um valor para testar:</strong>
-            </label>
-            <input 
-              type="text" 
-              v-model="testValidationValue" 
-              :placeholder="testValidationInputType === 'date' ? 'YYYY-MM-DD' : testValidationInputType === 'time' ? 'HH:mm' : 'YYYY-MM-DDTHH:mm'"
-              style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;"
-            />
-            <button 
-              @click="testValidationValue = ''" 
-              style="margin-left: 10px; padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;"
-            >
-              Limpar
-            </button>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px;">
-              <strong>Tipo de input:</strong>
-            </label>
-            <select 
-              v-model="testValidationInputType" 
-              style="padding: 8px; width: 200px; border: 1px solid #ccc; border-radius: 4px;"
-            >
-              <option value="date">date</option>
-              <option value="time">time</option>
-              <option value="datetime-local">datetime-local</option>
-            </select>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px;">
-              <strong>Valores de teste rápido (VÁLIDOS):</strong>
-            </label>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-              <button 
-                v-for="(testVal, index) in getTestValues()" 
-                :key="index"
-                @click="testValidationValue = testVal" 
-                style="padding: 6px 12px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;"
-              >
-                {{ testVal }}
-              </button>
-            </div>
-            <label style="display: block; margin-bottom: 8px;">
-              <strong>Valores de teste rápido (INVÁLIDOS):</strong>
-            </label>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <button 
-                v-for="(testVal, index) in getInvalidTestValues()" 
-                :key="index"
-                @click="testValidationValue = testVal" 
-                style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;"
-              >
-                {{ testVal }}
-              </button>
-            </div>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px;">
-              <strong>Configurar Min/Max:</strong>
-            </label>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-              <div>
-                <label style="margin-right: 5px;">Min:</label>
-                <input 
-                  type="text" 
-                  v-model="testValidationMin" 
-                  :placeholder="testValidationInputType === 'date' ? 'YYYY-MM-DD' : testValidationInputType === 'time' ? 'HH:mm' : 'YYYY-MM-DDTHH:mm'"
-                  style="padding: 6px; width: 150px; border: 1px solid #ccc; border-radius: 4px;"
-                />
-              </div>
-              <div>
-                <label style="margin-right: 5px;">Max:</label>
-                <input 
-                  type="text" 
-                  v-model="testValidationMax" 
-                  :placeholder="testValidationInputType === 'date' ? 'YYYY-MM-DD' : testValidationInputType === 'time' ? 'HH:mm' : 'YYYY-MM-DDTHH:mm'"
-                  style="padding: 6px; width: 150px; border: 1px solid #ccc; border-radius: 4px;"
-                />
-              </div>
-              <button 
-                @click="testValidationMin = ''; testValidationMax = ''" 
-                style="padding: 6px 12px; background: #757575; color: white; border: none; border-radius: 4px; cursor: pointer;"
-              >
-                Remover limites
-              </button>
-            </div>
-          </div>
-
+          <!-- Exemplo: Time com min e max, inputText dentro do range -->
           <NbDatePicker
-            nb-id="datepicker-validation-test"
-            input-name="test-datepicker-validation-test"
+            nb-id="datepicker-time-min-max-valid"
+            input-name="test-datepicker-time-min-max-valid"
             display="b"
             show-label
-            label="DatePicker com Validação"
-            :input-type="testValidationInputType"
-            :input-text="testValidationValue"
-            :min="testValidationMin || undefined"
-            :max="testValidationMax || undefined"
+            label="Time Min/Max: 23:24-23:59, InputText: 23:30 (dentro do range)"
+            input-type="time"
+            :min="'23:24'"
+            :max="'23:59'"
+            input-text="23:30"
             input-style="border"
             light-text-color="#ffffff"
-            @changed="($event) => { testValidationValue = $event; console.log('changed:', $event) }"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
             @current-value-complete="($event) => console.log('current-value-complete:', $event)"
             @changed-complete="($event) => console.log('changed-complete:', $event)"
             @date-selected="($event) => console.log('date-selected:', $event)"
             @month-changed="($event) => console.log('month-changed:', $event)"
-            @valid="handleValidationTest"
+            @valid="($event) => console.log('valid:', $event)"
           />
 
-          <div style="margin-top: 20px; padding: 15px; background-color: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
-            <p style="margin: 0; font-size: 14px;">
-              <strong>💡 Como testar:</strong>
-            </p>
-            <ul style="margin: 10px 0 0 20px; font-size: 13px;">
-              <li>Digite um valor no input acima ou use os botões de teste rápido</li>
-              <li>Configure min/max para testar limites</li>
-              <li>O status de validação será atualizado automaticamente quando o valor mudar</li>
-              <li>O evento <code>@valid</code> é emitido quando: valor inicial é setado, valor muda, min/max mudam</li>
-              <li>Abra o console para ver os logs do evento <code>@valid</code></li>
-            </ul>
+          <!-- Exemplo: Time com min e max, inputText fora do range (deve não definir) -->
+          <NbDatePicker
+            nb-id="datepicker-time-min-max-invalid"
+            input-name="test-datepicker-time-min-max-invalid"
+            display="b"
+            show-label
+            label="Time Min/Max: 23:24-23:59, InputText: 01:01 (fora do range - não deve definir)"
+            input-type="time"
+            :min="'23:24'"
+            :max="'23:59'"
+            input-text="01:01"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: Time com min e max usando Date objects -->
+          <NbDatePicker
+            nb-id="datepicker-time-min-max-date"
+            input-name="test-datepicker-time-min-max-date"
+            display="b"
+            show-label
+            label="Time Min/Max: Date objects (14:00-18:00)"
+            input-type="time"
+            :min="new Date(2024, 0, 1, 14, 0, 0)"
+            :max="new Date(2024, 0, 1, 18, 0, 0)"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: Time apenas com min -->
+          <NbDatePicker
+            nb-id="datepicker-time-min-only"
+            input-name="test-datepicker-time-min-only"
+            display="b"
+            show-label
+            label="Time Min: 09:00 (sem max)"
+            input-type="time"
+            :min="'09:00'"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: Time apenas com max -->
+          <NbDatePicker
+            nb-id="datepicker-time-max-only"
+            input-name="test-datepicker-time-max-only"
+            display="b"
+            show-label
+            label="Time Max: 17:00 (sem min)"
+            input-type="time"
+            :max="'17:00'"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: Time com min e max, inputText no limite mínimo -->
+          <NbDatePicker
+            nb-id="datepicker-time-min-max-at-min"
+            input-name="test-datepicker-time-min-max-at-min"
+            display="b"
+            show-label
+            label="Time Min/Max: 10:00-15:00, InputText: 10:00 (no limite mínimo)"
+            input-type="time"
+            :min="'10:00'"
+            :max="'15:00'"
+            input-text="10:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: Time com min e max, inputText no limite máximo -->
+          <NbDatePicker
+            nb-id="datepicker-time-min-max-at-max"
+            input-name="test-datepicker-time-min-max-at-max"
+            display="b"
+            show-label
+            label="Time Min/Max: 10:00-15:00, InputText: 15:00 (no limite máximo)"
+            input-type="time"
+            :min="'10:00'"
+            :max="'15:00'"
+            input-text="15:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- ========== EXEMPLOS DATETIME-LOCAL ========== -->
+
+          <!-- Exemplo: DateTime-Local com min e max, inputText dentro do range -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-min-max-valid"
+            input-name="test-datepicker-datetime-min-max-valid"
+            display="b"
+            show-label
+            label="DateTime Min/Max: 14:00-18:00, InputText: 2024-01-15T15:30 (dentro do range)"
+            input-type="datetime-local"
+            :min="'14:00'"
+            :max="'18:00'"
+            input-text="2024-01-15T15:30"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local com min e max, inputText fora do range (deve não definir) -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-min-max-invalid"
+            input-name="test-datepicker-datetime-min-max-invalid"
+            display="b"
+            show-label
+            label="DateTime Min/Max: 14:00-18:00, InputText: 2024-01-15T10:00 (fora do range - não deve definir)"
+            input-type="datetime-local"
+            :min="'14:00'"
+            :max="'18:00'"
+            input-text="2024-01-15T10:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local com min e max usando Date objects -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-min-max-date"
+            input-name="test-datepicker-datetime-min-max-date"
+            display="b"
+            show-label
+            label="DateTime Min/Max: Date objects ( 01/01/2024 09:00-17:00)"
+            input-type="datetime-local"
+            :min="new Date(2024, 0, 1, 9, 0, 0)"
+            :max="new Date(2024, 0, 1, 17, 0, 0)"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local apenas com min -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-min-only"
+            input-name="test-datepicker-datetime-min-only"
+            display="b"
+            show-label
+            label="DateTime Min: 08:00 (sem max)"
+            input-type="datetime-local"
+            :min="'08:00'"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local apenas com max -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-max-only"
+            input-name="test-datepicker-datetime-max-only"
+            display="b"
+            show-label
+            label="DateTime Max: 20:00 (sem min)"
+            input-type="datetime-local"
+            :max="'20:00'"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local com min e max, inputText no limite mínimo -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-min-max-at-min"
+            input-name="test-datepicker-datetime-min-max-at-min"
+            display="b"
+            show-label
+            label="DateTime Min/Max: 12:00-16:00, InputText: 2024-01-15T12:00 (no limite mínimo)"
+            input-type="datetime-local"
+            :min="'12:00'"
+            :max="'16:00'"
+            input-text="2024-01-15T12:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-min-max-at-max"
+            input-name="test-datepicker-datetime-min-max-at-max"
+            display="b"
+            show-label
+            label="DateTime Min/Max: 12:00-16:00, InputText: 2024-01-15T16:00 (no limite máximo)"
+            input-type="datetime-local"
+            :min="'12:00'"
+            :max="'16:00'"
+            input-text="2024-01-15T11:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-null"
+            input-name="test-datepicker-datetime-null"
+            display="b"
+            show-label
+            label="valor null"
+            input-type="datetime-local"
+            :input-text="null"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-undefined"
+            input-name="test-datepicker-datetime-undefined"
+            display="b"
+            show-label
+            label="valor undefined"
+            input-type="datetime-local"
+            :input-text="undefined"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
+          <NbDatePicker
+            nb-id="datepicker-datetime-min-max-at-max"
+            input-name="test-datepicker-datetime-min-max-at-max"
+            display="b"
+            show-label
+            label="2026-01-09T21:07:50.624+00:00"
+            input-type="datetime-local"
+            input-text="2026-01-09T21:07:50.624+00:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Exemplo: DateTime-Local com min e max, inputText no limite máximo -->
+          <NbDatePicker
+            nb-id="datepicker-date-simple"
+            input-name="test-datepicker-date-simple"
+            display="b"
+            show-label
+            label="2026-01-09"
+            input-type="date"
+            input-text="2026-01-09T21:07:50.624+00:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <NbDatePicker
+            nb-id="datepicker-date-simple-ptbr"
+            input-name="test-datepicker-date-simple-ptbr"
+            display="b"
+            show-label
+            label="2026-01-09 (pt-BR)"
+            input-type="date"
+            input-text="2026-01-09T21:07:50.624+00:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <NbDatePicker
+            nb-id="datepicker-date-simple-show-buttons"
+            input-name="test-datepicker-date-simple-show-button"
+            display="b"
+            show-label
+            label="2026-01-09 (show buttons)"
+            input-type="date"
+            input-text="2026-01-09T21:07:50.624+00:00"
+            input-style="border"
+            light-text-color="#ffffff"
+            locale="pt-BR"
+            :calendar-show-today-button="true"
+            :calendar-show-clear-button="true"
+            :disabled="disabled"
+            @changed="($event) => console.log('changed:', $event)"
+            @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+            @changed-complete="($event) => console.log('changed-complete:', $event)"
+            @date-selected="($event) => console.log('date-selected:', $event)"
+            @month-changed="($event) => console.log('month-changed:', $event)"
+            @valid="($event) => console.log('valid:', $event)"
+          />
+
+          <!-- Seção de Teste de Validação -->
+          <div style="color: black; margin-top: 60px; padding: 20px; background-color: #f5f5f5; border-radius: 8px;">
+            <h4 class="test-page__content-tile" style="margin-bottom: 20px;">🧪 Teste de Validação (@valid event)</h4>
+            
+            <div style="margin-bottom: 20px;">
+              <p><strong>Valor atual:</strong> {{ testValidationValue || '(vazio)' }}</p>
+              <p>
+                <strong>Status de validação:</strong> 
+                <span :style="{ color: testValidationIsValid ? '#4caf50' : '#f44336', fontWeight: 'bold' }">
+                  {{ testValidationIsValid ? '✅ VÁLIDO' : '❌ INVÁLIDO' }}
+                </span>
+              </p>
+              <p><strong>Min:</strong> {{ testValidationMin || '(sem limite)' }}</p>
+              <p><strong>Max:</strong> {{ testValidationMax || '(sem limite)' }}</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px;">
+                <strong>Digite um valor para testar:</strong>
+              </label>
+              <input 
+                type="text"
+                v-model="testValidationValue" 
+                :placeholder="testValidationInputType === 'date' ? 'YYYY-MM-DD' : testValidationInputType === 'time' ? 'HH:mm' : 'YYYY-MM-DDTHH:mm'"
+                style="padding: 8px; width: 100%; border: 1px solid #ccc; border-radius: 4px;"
+              />
+              <button 
+                @click="testValidationValue = ''" 
+                style="margin-left: 10px; padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;"
+              >
+                Limpar
+              </button>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px;">
+                <strong>Tipo de input:</strong>
+              </label>
+              <select 
+                v-model="testValidationInputType" 
+                style="padding: 8px; width: 100%; border: 1px solid #ccc; border-radius: 4px;"
+              >
+                <option value="date">date</option>
+                <option value="time">time</option>
+                <option value="datetime-local">datetime-local</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px;">
+                <strong>Valores de teste rápido (VÁLIDOS):</strong>
+              </label>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                <button 
+                  v-for="(testVal, index) in getTestValues()" 
+                  :key="index"
+                  @click="testValidationValue = testVal" 
+                  style="padding: 6px 12px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;"
+                >
+                  {{ testVal }}
+                </button>
+              </div>
+              <label style="display: block; margin-bottom: 8px;">
+                <strong>Valores de teste rápido (INVÁLIDOS):</strong>
+              </label>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button 
+                  v-for="(testVal, index) in getInvalidTestValues()" 
+                  :key="index"
+                  @click="testValidationValue = testVal" 
+                  style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;"
+                >
+                  {{ testVal }}
+                </button>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px;">
+                <strong>Configurar Min/Max:</strong>
+              </label>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <div>
+                  <label style="margin-right: 5px;">Min:</label>
+                  <input 
+                    type="text" 
+                    v-model="testValidationMin" 
+                    :placeholder="testValidationInputType === 'date' ? 'YYYY-MM-DD' : testValidationInputType === 'time' ? 'HH:mm' : 'YYYY-MM-DDTHH:mm'"
+                    style="padding: 6px; width: 150px; border: 1px solid #ccc; border-radius: 4px;"
+                  />
+                </div>
+                <div>
+                  <label style="margin-right: 5px;">Max:</label>
+                  <input 
+                    type="text" 
+                    v-model="testValidationMax" 
+                    :placeholder="testValidationInputType === 'date' ? 'YYYY-MM-DD' : testValidationInputType === 'time' ? 'HH:mm' : 'YYYY-MM-DDTHH:mm'"
+                    style="padding: 6px; width: 150px; border: 1px solid #ccc; border-radius: 4px;"
+                  />
+                </div>
+                <button 
+                  @click="testValidationMin = ''; testValidationMax = ''" 
+                  style="padding: 6px 12px; background: #757575; color: white; border: none; border-radius: 4px; cursor: pointer;"
+                >
+                  Remover limites
+                </button>
+              </div>
+            </div>
+
+            <NbDatePicker
+              nb-id="datepicker-validation-test"
+              input-name="test-datepicker-validation-test"
+              display="b"
+              show-label
+              label="DatePicker com Validação"
+              :input-type="testValidationInputType"
+              :input-text="testValidationValue"
+              :min="testValidationMin || undefined"
+              :max="testValidationMax || undefined"
+              input-style="border"
+              light-text-color="#ffffff"
+              :disabled="disabled"
+              @changed="($event) => { testValidationValue = $event; console.log('changed:', $event) }"
+              @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+              @changed-complete="($event) => console.log('changed-complete:', $event)"
+              @date-selected="($event) => console.log('date-selected:', $event)"
+              @month-changed="($event) => console.log('month-changed:', $event)"
+              @valid="handleValidationTest"
+            />
+
+            <div style="margin-top: 20px; padding: 15px; background-color: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+              <p style="margin: 0; font-size: 14px;">
+                <strong>💡 Como testar:</strong>
+              </p>
+              <ul style="margin: 10px 0 0 20px; font-size: 13px;">
+                <li>Digite um valor no input acima ou use os botões de teste rápido</li>
+                <li>Configure min/max para testar limites</li>
+                <li>O status de validação será atualizado automaticamente quando o valor mudar</li>
+                <li>O evento <code>@valid</code> é emitido quando: valor inicial é setado, valor muda, min/max mudam</li>
+                <li>Abra o console para ver os logs do evento <code>@valid</code></li>
+              </ul>
+            </div>
           </div>
-        </div>
+
+          <div style="color: black; margin-top: 60px; margin-bottom: 600px;">
+            <p>Teste inputDate para DatePicker</p>
+            <p>inputNativeDate: {{ inputNativeDate }}</p>
+
+            <input type="date" v-model="inputNativeDate" :disabled="disabled" />
+
+            <NbDatePicker
+              nb-id="datepicker-date-simple-native"
+              input-name="test-datepicker-date-simple-native"
+              display="ib"
+              show-label
+              label="inputNativeDate"
+              input-type="date"
+              :input-text="inputNativeDate"
+              input-style="border"
+              light-text-color="#ffffff"
+              :disabled="disabled"
+              @changed="($event) => inputNativeDate = $event"
+              @current-value-complete="($event) => console.log('current-value-complete:', $event)"
+              @changed-complete="($event) => console.log('changed-complete:', $event)"
+              @date-selected="($event) => console.log('date-selected:', $event)"
+              @month-changed="($event) => console.log('month-changed:', $event)"
+              @valid="($event) => console.log('valid:', $event)"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -3475,6 +3709,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               interaction-trigger="debounce"
               :interaction-debounce-wait="500"
               :interaction-function="searchDemoInteractionDebounced"
+              :disabled="disabled"
               @entered="searchDemoOnEnteredDebounced"
               @changed="searchDemoLastChanged = $event"
               @interaction-start="searchDemoOnInteractionStart"
@@ -3514,6 +3749,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               interaction-trigger="submit"
               :interaction-debounce-wait="0"
               :interaction-function="searchDemoInteractionSubmitZero"
+              :disabled="disabled"
               @entered="searchDemoOnEnteredSubmitZero"
             />
             <div style="margin-top: 1rem" />
@@ -3536,6 +3772,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               interaction-trigger="submit"
               :interaction-debounce-wait="0"
               :interaction-function="searchDemoInteractionSubmitZero"
+              :disabled="disabled"
               @entered="searchDemoOnEnteredSubmitZero"
             />
           </div>
@@ -3559,6 +3796,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               :icon-padding-input="35"
               input-padding="10px 35px 10px 15px"
               :interaction-function="searchDemoInteractionSubmitZero"
+              :disabled="disabled"
               @entered="searchDemoOnEnteredSubmitZero"
             >
               <template #icon>
@@ -3582,6 +3820,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               icon-direction="right"
               :icon-padding-input="35"
               :interaction-function="searchDemoInteractionSubmitZero"
+              :disabled="disabled"
               @entered="searchDemoOnEnteredSubmitZero"
             >
               <template #icon>
@@ -3604,6 +3843,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               interaction-trigger="submit"
               :interaction-debounce-wait="500"
               :interaction-function="searchDemoInteractionSubmitWait500"
+              :disabled="disabled"
               @entered="searchDemoOnEnteredSubmitWait500"
             />
           </div>
@@ -3675,6 +3915,7 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               :interaction-debounce-enforce-min-length="false"
               :interaction-debounce-min-length="3"
               :interaction-function="searchFakeCatalogInteraction"
+              :disabled="disabled"
               @changed="searchFakeCatalogOnChanged"
               @cleared="searchFakeCatalogOnCleared"
               @interaction-start="searchFakeCatalogOnInteractionStart"
@@ -3744,7 +3985,8 @@ const NbInputClean = defineAsyncComponent(() => import('@components/NbInputClean
 const NbInputFile = defineAsyncComponent(() => import('@components/NbInputFile.vue'))
 const NbInputSearch = defineAsyncComponent(() => import('@components/NbInputSearch.vue'))
 
-const btType = ref('input')
+const btType = ref('datePicker')
+const disabled = ref(false)
 
 /** vue-the-mask: padrão BR (milhar `.`, centavos `,`) com prefixo `R$ ` — vários tamanhos até bilhões. */
 const demoMaskMoedaReal = [

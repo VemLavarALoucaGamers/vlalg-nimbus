@@ -3080,8 +3080,8 @@
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
     vue "^3.3.4"
 
-"@vlalg-nimbus/nb-calendar@^2.1.1", "@vlalg-nimbus/nb-calendar@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-calendar":
-  version "2.1.1"
+"@vlalg-nimbus/nb-calendar@^3.0.1", "@vlalg-nimbus/nb-calendar@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-calendar":
+  version "3.0.1"
   resolved "file:packages/vue-components/nb-calendar"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
@@ -3113,13 +3113,12 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-inputs@^10.0.0", "@vlalg-nimbus/nb-inputs@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-inputs":
-  version "10.1.0"
+  version "11.0.0"
   resolved "file:packages/vue-components/nb-inputs"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"
     "@vlalg-nimbus/chameleon-grid-layout" "^1.0.2"
     "@vlalg-nimbus/magic-debounce" "^3.0.2"
-    "@vlalg-nimbus/nb-calendar" "^2.1.1"
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-loaders@^1.0.3":
@@ -3199,7 +3198,7 @@
     vue "^3.3.4"
 
 "@vlalg-nimbus/nb-selects@file:G:\\projetos\\vlalg-nimbus\\packages\\vue-components\\nb-selects":
-  version "2.3.0"
+  version "2.3.2"
   resolved "file:packages/vue-components/nb-selects"
   dependencies:
     "@vlalg-nimbus/bee-css-reset" "^2.0.2"

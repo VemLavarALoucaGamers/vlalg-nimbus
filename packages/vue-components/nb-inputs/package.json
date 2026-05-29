@@ -1,7 +1,7 @@
 {
   "name": "@vlalg-nimbus/nb-inputs",
   "description": "Input components for Vuejs 3",
-  "version": "11.0.0",
+  "version": "12.0.0",
   "type": "module",
   "main": "./dist/nb-inputs.umd.js",
   "module": "./dist/nb-inputs.js",
@@ -35,7 +35,7 @@
     "@vlalg-nimbus/bee-css-reset": "^2.0.2",
     "@vlalg-nimbus/chameleon-grid-layout": "^1.0.2",
     "@vlalg-nimbus/magic-debounce": "^3.0.2",
-    "@vlalg-nimbus/nb-calendar": "^2.1.1",
+    "@vlalg-nimbus/nb-calendar": "^3.0.1",
     "vue": "^3.3.4"
   },
   "peerDependencies": {

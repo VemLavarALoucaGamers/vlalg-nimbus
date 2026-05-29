@@ -16,7 +16,10 @@
       <label
         v-if="showLabel"
         :for="computedInputName"
-        class="component__label"
+        :class="[
+          'component__label',
+          { 'component__label--disabled-empty': isDisabledEmptyLabel },
+        ]"
         :style="[styleLabel]"
         @click="handleLabelClick"
       >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
@@ -50,7 +53,8 @@
         class="component__input component__input--file-display"
         :class="[
           uppercaseStyle,
-          activeStyle
+          activeStyle,
+          { 'component__input--disabled-filled': isDisabledFilledInput },
         ]"
         role="button"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
@@ -1606,10 +1610,13 @@ const computedPlaceholder = computed(() => {
   // Se houver label, só mostra o placeholder quando o input estiver ativo
   return isActive.value ? inputPlaceholder.value : ''
 })
+const hasInputContent = computed(() => files.value.length > 0)
 const isLabelActive = computed(() => {
   // Label ativo quando há foco/interação ou quando já existe arquivo selecionado
-  return isActive.value || files.value.length > 0
+  return isActive.value || hasInputContent.value
 })
+const isDisabledEmptyLabel = computed(() => disabled.value && !hasInputContent.value)
+const isDisabledFilledInput = computed(() => disabled.value && hasInputContent.value)
 
 /* Input padding */
 const inputPadding = computed(() => {
@@ -2698,6 +2705,10 @@ watch(isActive, value => {
       z-index: 1;
       pointer-events: none;
 
+      &.component__label--disabled-empty {
+        opacity: 0.5;
+      }
+
       .component__label--required {
         color: red;
         display: contents;
@@ -2736,6 +2747,10 @@ watch(isActive, value => {
 
     // inicio INPUT
     .component__input {
+      &.component__input--disabled-filled {
+        opacity: 0.5;
+      }
+
       width: 100%;
       height: 100%;
       font-family: inherit;
@@ -2927,11 +2942,11 @@ watch(isActive, value => {
 	opacity: 0.8;
 
 	.component {
-		--disabled-button-color: v-bind('styleButtonColor');
-		--disabled-color: v-bind('styleTextColor');
-		background-color: var(--disabled-button-color) !important;
-		color: var(--disabled-color) !important;
 		border-radius: inherit;
+
+    .component__icon {
+      opacity: 0.5;
+    }
 
     .component__input {
       &:focus,

@@ -16,7 +16,10 @@
         <label
           v-if="showLabel"
           :for="computedInputName"
-          class="component__label"
+          :class="[
+            'component__label',
+            { 'component__label--disabled-empty': isDisabledEmptyLabel },
+          ]"
           :style="[styleLabel]"
           @click="handleLabelClick"
         >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
@@ -33,7 +36,8 @@
           :class="[
             uppercaseStyle,
             activeStyle,
-            isEmptyClass
+            isEmptyClass,
+            { 'component__input--disabled-filled': isDisabledFilledInput },
           ]"
           :placeholder="computedPlaceholder"
           :disabled="disabled || inputReadonly"
@@ -84,7 +88,8 @@
             :max="max"
             :step="step"
             :disabled="disabled"
-            :width="formatCalendarWidth"
+            :min-width="calendarMinWidth"
+            :max-width="calendarMaxWidth"
             :locale="locale"
             :theme="theme"
             :allow-range="allowRange"
@@ -376,6 +381,13 @@ const Calendar = defineAsyncComponent(() =>
         return typeof value === 'boolean' && [true, false].includes(value)
       }
     },
+    calendarCloseOnSelect: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
     calendarZIndex: {
       type: Number,
       default: 10000,
@@ -383,11 +395,18 @@ const Calendar = defineAsyncComponent(() =>
         return typeof value === 'number' && value >= 0
       }
     },
-    calendarWidth: {
+    calendarMinWidth: {
       type: Number,
-      default: 350,
+      default: 200,
       validator: value => {
-        return typeof value === 'number' && value >= 280
+        return typeof value === 'number' && !Number.isNaN(value) && value > 0
+      }
+    },
+    calendarMaxWidth: {
+      type: Number,
+      default: 280,
+      validator: value => {
+        return typeof value === 'number' && !Number.isNaN(value) && value > 0
       }
     },
     blockClicksWithoutEvents: {
@@ -1041,8 +1060,10 @@ const Calendar = defineAsyncComponent(() =>
     locale,
     theme,
     allowRange,
+    calendarCloseOnSelect,
     calendarZIndex,
-    calendarWidth,
+    calendarMinWidth,
+    calendarMaxWidth,
     blockClicksWithoutEvents,
     tabindex,
       lightBgColor,
@@ -1088,10 +1109,6 @@ const Calendar = defineAsyncComponent(() =>
   const isActive = ref(false) // Flag para indicar se o input está ativo (focado)
   const isCalendarInteraction = ref(false) // Flag para indicar interação com calendário
 
-  const formatCalendarWidth = computed(() => {
-    return !calendarWidth.value || calendarWidth.value < 280 ? 280 : parseInt(calendarWidth.value, 10)
-  })
-  
   /*
     Computed para decidir se o calendário deve exibir segundos
     Regras:
@@ -1108,21 +1125,32 @@ const Calendar = defineAsyncComponent(() =>
   
     // Detectar automaticamente apenas para time e datetime-local
     if (inputType.value === 'time' || inputType.value === 'datetime-local') {
+      // Função para verificar se o valor tem segundos
       const hasSecondsIn = (val) => {
+        // Verificar se o valor é null ou undefined ou não é uma string
         if (!val || typeof val !== 'string') return false
+
+        // Verificar se o valor é datetime-local
         // Remover timezone, se houver (ex: 2026-01-09T21:07:50.624+00:00)
         let timePart = val
         if (inputType.value === 'datetime-local') {
+          // Remover timezone, se houver (ex: 2026-01-09T21:07:50.624+00:00)
           timePart = val.split('T')[1] || ''
+
+          // Remover timezone, se houver (ex: 2026-01-09T21:07:50.624+00:00)
           timePart = timePart.split(/[Z+-]/)[0] || ''
         }
+
         // Para time, já é só HH:mm[:ss]
         const parts = timePart.split(':')
+
+        // Verificar se o valor tem segundos
         return parts.length >= 3
       }
   
       // Priorizar inputValue (valor interno normalizado)
       if (hasSecondsIn(inputValue.value)) return true
+
       // Fallback para inputText original
       if (hasSecondsIn(inputText.value)) return true
     }
@@ -1136,6 +1164,7 @@ const Calendar = defineAsyncComponent(() =>
     Ele converte strings ISO para Date objects e objetos JSON de range para objetos com Date objects.
   */
   const calendarValue = computed(() => {
+    // Verificar se o inputValue é null ou undefined
     if (!inputValue.value) return null
     
     // Se for range, converter JSON string para objeto
@@ -1163,6 +1192,8 @@ const Calendar = defineAsyncComponent(() =>
             // Converter a data para um Date object
             return new Date(dateStr)
           }
+
+          // Retornar o startDate e endDate
           return {
             startDate: rangeValue.startDate ? parseLocalDate(rangeValue.startDate) : null,
             endDate: rangeValue.endDate ? parseLocalDate(rangeValue.endDate) : null
@@ -1241,6 +1272,7 @@ const Calendar = defineAsyncComponent(() =>
             
             // Se ambas as datas existem, retornar formato de range
             if (start && end) {
+              // Se ambas as datas existem, retornar formato de range
               return `${start} - ${end}`
             } else if (start) {
               // Se só tem data inicial, retornar apenas ela
@@ -1450,6 +1482,7 @@ const Calendar = defineAsyncComponent(() =>
               
               // Adicionar zero à esquerda se necessário para dia
               const dayPadded = day.padStart(2, '0')
+
               // Adicionar zero à esquerda se necessário para mês
               const monthPadded = month.padStart(2, '0')
               
@@ -1461,6 +1494,7 @@ const Calendar = defineAsyncComponent(() =>
               
               // Adicionar zero à esquerda se necessário para dia
               const dayPadded = day.padStart(2, '0')
+
               // Adicionar zero à esquerda se necessário para mês
               const monthPadded = month.padStart(2, '0')
               
@@ -1476,6 +1510,7 @@ const Calendar = defineAsyncComponent(() =>
             
             // Adicionar zero à esquerda se necessário para dia
             const dayPadded = day.padStart(2, '0')
+
             // Adicionar zero à esquerda se necessário para mês
             const monthPadded = month.padStart(2, '0')
             
@@ -1497,6 +1532,7 @@ const Calendar = defineAsyncComponent(() =>
         if (startDate && endDate) {
           // Converter para Date objects para comparar
           const startDateObj = new Date(startDate)
+
           // Converter para Date objects para comparar para data final
           const endDateObj = new Date(endDate)
           
@@ -1504,8 +1540,10 @@ const Calendar = defineAsyncComponent(() =>
           if (endDateObj < startDateObj) {
             // Trocar data inicial e data final
             const temp = startDate
+
             // Trocar data inicial para data final
             startDate = endDate
+
             // Trocar data final para data inicial
             endDate = temp
           }
@@ -1534,6 +1572,7 @@ const Calendar = defineAsyncComponent(() =>
           
           // Adicionar zero à esquerda se necessário para dia
           const dayPadded = day.padStart(2, '0')
+
           // Adicionar zero à esquerda se necessário para mês
           const monthPadded = month.padStart(2, '0')
           
@@ -1545,6 +1584,7 @@ const Calendar = defineAsyncComponent(() =>
           
           // Adicionar zero à esquerda se necessário para dia
           const dayPadded = day.padStart(2, '0')
+
           // Adicionar zero à esquerda se necessário para mês
           const monthPadded = month.padStart(2, '0')
           
@@ -1559,6 +1599,7 @@ const Calendar = defineAsyncComponent(() =>
         
         // Adicionar zero à esquerda se necessário para dia
         const dayPadded = day.padStart(2, '0')
+
         // Adicionar zero à esquerda se necessário para mês
         const monthPadded = month.padStart(2, '0')
         
@@ -1585,6 +1626,7 @@ const Calendar = defineAsyncComponent(() =>
           
           // Adicionar zero à esquerda se necessário para dia
           const dayPadded = day.padStart(2, '0')
+
           // Adicionar zero à esquerda se necessário para mês
           const monthPadded = month.padStart(2, '0')
           
@@ -1602,6 +1644,7 @@ const Calendar = defineAsyncComponent(() =>
           
           // Adicionar zero à esquerda se necessário para dia
           const dayPadded = day.padStart(2, '0')
+
           // Adicionar zero à esquerda se necessário para mês
           const monthPadded = month.padStart(2, '0')
           
@@ -1621,11 +1664,13 @@ const Calendar = defineAsyncComponent(() =>
         
         // Separar ano, mês e dia da parte da data
         const dateParts = datePart.split('-')
+
         // Separar ano, mês e dia da parte da data
         const [year, month, day] = dateParts
         
         // Adicionar zero à esquerda se necessário para dia
         const dayPadded = day.padStart(2, '0')
+
         // Adicionar zero à esquerda se necessário para mês
         const monthPadded = month.padStart(2, '0')
         
@@ -1696,7 +1741,7 @@ const Calendar = defineAsyncComponent(() =>
   }
   // Refs para controle do calendário customizado
   const showCustomCalendar = ref(false) // Flag para mostrar/ocultar calendário
-  const calendarPosition = ref({ top: 0, left: 0 }) // Posição do calendário na tela
+  const calendarPosition = ref({ top: 0, left: 0, width: null }) // Posição e largura do popup na tela
   const inputRef = ref(null) // Referência ao elemento input
   const calendarRef = ref(null) // Referência ao elemento do calendário
   const useCustomCalendar = ref(true) // Flag para usar calendário customizado
@@ -2126,6 +2171,14 @@ const Calendar = defineAsyncComponent(() =>
     return !displayValue.value || displayValue.value.trim().length === 0 ? 'component__input--empty' : ''
   })
 
+  const hasInputContent = computed(() => {
+    const value = inputValue.value
+    return value != null && String(value).trim().length > 0
+  })
+
+  const isDisabledEmptyLabel = computed(() => disabled.value && !hasInputContent.value)
+  const isDisabledFilledInput = computed(() => disabled.value && hasInputContent.value)
+
   /*
     Computed para classe de input ativo
     Este computed é usado para retornar a classe CSS quando o input está ativo.
@@ -2323,28 +2376,107 @@ const Calendar = defineAsyncComponent(() =>
   }
   
   /*
-    Função para calcular posição do calendário customizado
-    Esta função é usada para calcular a posição do calendário customizado em relação ao input.
-    Ela posiciona o calendário abaixo do input com um espaçamento de 4px.
-    Como o calendário é renderizado via Teleport no body, sempre usa position: fixed.
+    Constantes para o calendário
+    Este constantes são usadas para definir as constantes do calendário.
+    Ele é usado para definir as constantes do calendário.
+  */
+  const CALENDAR_GAP = 4
+  const CALENDAR_HEIGHT_ESTIMATE = 360
+  const CALENDAR_MIN_WIDTH_DEFAULT = 200
+  const CALENDAR_MAX_WIDTH_DEFAULT = 280
+
+  /*
+    Função para normalizar a largura do calendário
+    Este função é usado para normalizar a largura do calendário.
+    Ele é usado para normalizar a largura do calendário.
+  */
+  const normalizeCalendarWidthProp = (value, defaultValue) => {
+    if (typeof value !== 'number' || Number.isNaN(value) || value <= 0) {
+      return defaultValue
+    }
+    return value
+  }
+
+  /*
+    Computed para as larguras do calendário
+    Este computed é usado para definir as larguras do calendário.
+    Ele é usado para definir as larguras do calendário.
+  */
+  const calendarWidthBounds = computed(() => {
+    let min = normalizeCalendarWidthProp(calendarMinWidth.value, CALENDAR_MIN_WIDTH_DEFAULT)
+    let max = normalizeCalendarWidthProp(calendarMaxWidth.value, CALENDAR_MAX_WIDTH_DEFAULT)
+    if (min > max) min = max
+    if (max < min) max = min
+    return { min, max }
+  })
+
+  /*
+    Função para resolver a largura do calendário
+    Este função é usado para resolver a largura do calendário.
+    Ele é usado para resolver a largura do calendário.
+  */
+  const resolveCalendarPopupWidthPx = (inputWidthPx) => {
+    const { min, max } = calendarWidthBounds.value
+    const reference = inputWidthPx > 0 ? inputWidthPx : max
+    return Math.min(max, Math.max(min, reference))
+  }
+
+  /*
+    Posição do calendário (Teleport + fixed): abaixo por padrão; abre acima só se
+    não couber embaixo e houver mais espaço acima. Largura acompanha o input (min/max).
+  */
+  const resolveCalendarPosition = () => {
+    // Verificar se o inputRef existe
+    if (!inputRef.value) return null
+
+    // Obter o retângulo do input
+    const inputRect = inputRef.value.getBoundingClientRect()
+    // Obter a altura do calendário
+    const calendarH = calendarRef.value?.offsetHeight || CALENDAR_HEIGHT_ESTIMATE
+    // Obter a altura da viewport
+    const vh = window.innerHeight
+
+    // Obter o espaço abaixo do input
+    const spaceBelow = vh - inputRect.bottom - CALENDAR_GAP
+
+    // Obter o espaço acima do input
+    const spaceAbove = inputRect.top - CALENDAR_GAP
+
+    // Calcular a posição top do calendário
+    let top = inputRect.bottom + CALENDAR_GAP
+
+    // Verificar se o calendário cabe abaixo do input e acima do input
+    if (calendarH > spaceBelow && spaceAbove > spaceBelow) {
+      top = inputRect.top - CALENDAR_GAP - calendarH
+    }
+
+    // Calcular a largura do calendário
+    const widthPx = resolveCalendarPopupWidthPx(inputRect.width)
+
+    // Retornar a posição e largura do calendário
+    return {
+      top: `${top}px`,
+      left: `${inputRect.left}px`,
+      width: `${widthPx}px`
+    }
+  }
+
+  /*
+    Função para calcular a posição do calendário
+    Esta função é usada para calcular a posição do calendário.
+    Ela calcula a posição do calendário usando a função resolveCalendarPosition.
   */
   const calculateCalendarPosition = () => {
     // Verificar se o inputRef existe
     if (!inputRef.value) return
-    
-    // Usar nextTick para garantir que o DOM atualizou
+
+    // Usar nextTick para garantir que o DOM foi atualizado
     nextTick(() => {
-      // Obter o rect do input em relação à viewport
-      const inputRect = inputRef.value.getBoundingClientRect()
-      
-      const spacing = 4 // Espaçamento entre input e calendário
-      
-      // Como o calendário é renderizado no body via Teleport, sempre usar coordenadas da viewport
-      // Sempre posicionar abaixo do input usando position: fixed
-      calendarPosition.value = {
-        top: `${inputRect.bottom + spacing}px`,
-        left: `${inputRect.left}px`
-      }
+      // Calcular a posição do calendário
+      const pos = resolveCalendarPosition()
+
+      // Verificar se a posição existe
+      if (pos) calendarPosition.value = pos
     })
   }
   
@@ -2355,14 +2487,26 @@ const Calendar = defineAsyncComponent(() =>
     Ele retorna um objeto com position fixed, top, left e zIndex.
   */
   const calendarPositionStyle = computed(() => {
-    // Retornar objeto com position fixed, top, left e zIndex
-    // z-index configurável via prop calendarZIndex (padrão: 10000)
-    return {
+    // Obter as larguras do calendário
+    const { min, max } = calendarWidthBounds.value
+
+    // Gerar o estilo CSS do calendário
+    const style = {
       position: 'fixed',
       top: calendarPosition.value.top,
       left: calendarPosition.value.left,
-      zIndex: calendarZIndex.value
+      zIndex: calendarZIndex.value,
+      boxSizing: 'border-box',
+      minWidth: `${min}px`,
+      maxWidth: `${max}px`
     }
+
+    // Verificar se a largura do calendário existe
+    if (calendarPosition.value.width) {
+      style.width = calendarPosition.value.width
+    }
+
+    return style
   })
   
   /*
@@ -2600,27 +2744,49 @@ const Calendar = defineAsyncComponent(() =>
     Esta função é usada para parsear uma data mínima ou máxima a partir de diferentes formatos.
   */
   const parseMinMaxDate = (value) => {
+    // Verificar se o valor é null ou undefined
     if (!value) return null
+
+    // Verificar se o valor é uma instância de Date
     if (value instanceof Date) {
+      // Criar nova data com o valor
       const date = new Date(value.getTime())
+
+      // Definir as horas, minutos, segundos e milissegundos para 0
       date.setHours(0, 0, 0, 0)
       return date
     }
+
+    // Verificar se o valor é uma string
     if (typeof value === 'string') {
       // Para strings no formato YYYY-MM-DD, criar data local (não UTC)
       if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        // Encontrar o ano, mês e dia
         const [year, month, day] = value.split('-').map(Number)
+
+        // Criar nova data com o ano, mês e dia
         const date = new Date(year, month - 1, day)
+
+        // Definir as horas, minutos, segundos e milissegundos para 0
         date.setHours(0, 0, 0, 0)
+
         return date
       }
+
       // Para outros formatos, tentar parse normal
       const date = new Date(value)
+
+      // Verificar se a data é válida
       if (!isNaN(date.getTime())) {
+        // Definir as horas, minutos, segundos e milissegundos para 0
         date.setHours(0, 0, 0, 0)
+
+        // Retornar a data
         return date
       }
     }
+
+    // Retornar null
     return null
   }
   
@@ -2661,9 +2827,15 @@ const Calendar = defineAsyncComponent(() =>
       const timeRegex = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/
       const match = timePart.match(timeRegex)
       
+      // Verificar se o match existe
       if (match) {
+        // Obter a hora
         const hour = parseInt(match[1], 10)
+
+        // Obter o minuto
         const minute = parseInt(match[2], 10)
+
+        // Obter o segundo
         const second = match[3] ? parseInt(match[3], 10) : 0
         
         // Validar valores
@@ -2686,18 +2858,29 @@ const Calendar = defineAsyncComponent(() =>
     // Converter para Date se for string
     let date = null
     if (dateValue instanceof Date) {
+      // Criar nova data com o valor
       date = new Date(dateValue.getTime())
+
+      // Definir as horas, minutos, segundos e milissegundos para 0
       date.setHours(0, 0, 0, 0)
     } else if (typeof dateValue === 'string') {
       // Formato YYYY-MM-DD
       if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+        // Encontrar o ano, mês e dia
         const [year, month, day] = dateValue.split('-').map(Number)
+
+        // Criar nova data com o ano, mês e dia
         date = new Date(year, month - 1, day)
+
+        // Definir as horas, minutos, segundos e milissegundos para 0
         date.setHours(0, 0, 0, 0)
       } else {
         // Tentar parse normal
         date = new Date(dateValue)
+
+        // Verificar se a data é válida
         if (!isNaN(date.getTime())) {
+          // Definir as horas, minutos, segundos e milissegundos para 0
           date.setHours(0, 0, 0, 0)
         } else {
           return true // Data inválida
@@ -2710,8 +2893,13 @@ const Calendar = defineAsyncComponent(() =>
     // Verificar min (datas antes do min são desabilitadas)
     const minDate = parseMinMaxDate(min.value)
     if (minDate) {
+      // Criar nova data com o valor
       const normalizedMin = new Date(minDate.getTime())
+
+      // Definir as horas, minutos, segundos e milissegundos para 0
       normalizedMin.setHours(0, 0, 0, 0)
+
+      // Verificar se a data é menor que a data mínima
       if (date < normalizedMin) {
         return true
       }
@@ -2720,13 +2908,19 @@ const Calendar = defineAsyncComponent(() =>
     // Verificar max (datas depois do max são desabilitadas)
     const maxDate = parseMinMaxDate(max.value)
     if (maxDate) {
+      // Criar nova data com o valor
       const normalizedMax = new Date(maxDate.getTime())
+
+      // Definir as horas, minutos, segundos e milissegundos para 0
       normalizedMax.setHours(0, 0, 0, 0)
+
+      // Verificar se a data é maior que a data máxima
       if (date > normalizedMax) {
         return true
       }
     }
     
+    // Retornar false
     return false
   }
   
@@ -2741,7 +2935,10 @@ const Calendar = defineAsyncComponent(() =>
     // Verificar min (tempos antes do min são desabilitados)
     const timeMin = parseTimeMinMax(min.value)
     if (timeMin) {
+      // Criar nova data com o valor
       const minTime = timeMin.hour * 3600 + timeMin.minute * 60 + (timeMin.second || 0)
+      
+      // Verificar se o tempo é menor que o tempo mínimo
       if (timeInSeconds < minTime) {
         return true
       }
@@ -2750,12 +2947,16 @@ const Calendar = defineAsyncComponent(() =>
     // Verificar max (tempos depois do max são desabilitados)
     const timeMax = parseTimeMinMax(max.value)
     if (timeMax) {
+      // Criar nova data com o valor
       const maxTime = timeMax.hour * 3600 + timeMax.minute * 60 + (timeMax.second || 0)
+
+      // Verificar se o tempo é maior que o tempo máximo
       if (timeInSeconds > maxTime) {
         return true
       }
     }
     
+    // Retornar false
     return false
   }
   
@@ -3007,6 +3208,45 @@ const Calendar = defineAsyncComponent(() =>
     return true
   })
   
+  const shouldCloseCalendarAfterSelection = (value) => {
+    if (!calendarCloseOnSelect.value || allowRange.value) {
+      return false
+    }
+
+    if (value == null || value === '') {
+      return false
+    }
+
+    if (typeof value === 'object' && !(value instanceof Date)) {
+      return false
+    }
+
+    switch (inputType.value) {
+      case 'date':
+        return value instanceof Date || (typeof value === 'string' && value.length > 0)
+      case 'month':
+        return typeof value === 'string' && /^\d{4}-\d{2}$/.test(value)
+      case 'time':
+        return typeof value === 'string' && value.length > 0
+      case 'datetime-local':
+        return typeof value === 'string' && value.includes('T')
+      case 'week':
+        return typeof value === 'string' && /^\d{4}-W\d{2}$/i.test(value)
+      default:
+        return true
+    }
+  }
+
+  const closeCustomCalendarAfterSelection = () => {
+    if (!shouldUseCustomCalendar.value) {
+      return
+    }
+
+    showCustomCalendar.value = false
+    isCalendarInteraction.value = false
+    isActive.value = false
+  }
+
   /*
     Handler para quando o calendário emite evento changed
     Esta função é usada para processar mudanças no calendário e atualizar o inputValue e displayValue.
@@ -3076,8 +3316,9 @@ const Calendar = defineAsyncComponent(() =>
     // Salvar como último valor válido
     lastValidDisplayValue.value = formatted
     
-    // NÃO atualizar isActive aqui - o calendário ainda está aberto
-    // O isActive só será atualizado quando o calendário fechar (via handleInputBlur ou handleClickOutside)
+    if (shouldCloseCalendarAfterSelection(value)) {
+      nextTick(closeCustomCalendarAfterSelection)
+    }
   }
   
   /*
@@ -3523,7 +3764,7 @@ const Calendar = defineAsyncComponent(() =>
   let resizeObserver = null // Observer para mudanças de tamanho do input
   let positionObserver = null // Observer para mudanças de posição do input
   let animationFrameId = null // ID do frame de animação para tracking contínuo
-  let lastPosition = { top: 0, left: 0 } // Última posição conhecida do calendário
+  let lastPosition = { top: 0, left: 0, width: 0 } // Última posição/largura conhecidas do calendário
   
   /*
     Função para atualizar posição do calendário continuamente
@@ -3531,34 +3772,22 @@ const Calendar = defineAsyncComponent(() =>
     Ela só atualiza se a posição mudou, evitando re-renderizações desnecessárias.
   */
   const updatePositionContinuously = () => {
-    // Verificar se o calendário estiver aberto e se o calendário customizado estiver ativo e se o inputRef existe
     if (!showCustomCalendar.value || !shouldUseCustomCalendar.value || !inputRef.value) {
       return
     }
-    
-    // Obter o espaçamento entre o input e o calendário
-    const spacing = 4
-    
-    // Como o calendário é renderizado no body via Teleport, sempre usar coordenadas da viewport
-    const inputRect = inputRef.value.getBoundingClientRect()
-    
-    const newTop = `${inputRect.bottom + spacing}px`
-    const newLeft = `${inputRect.left}px`
-    
-    // Só atualizar se a posição mudou
-    if (lastPosition.top !== newTop || lastPosition.left !== newLeft) {
-      // Atualizar a última posição top
-      lastPosition.top = newTop
-      // Atualizar a última posição left
-      lastPosition.left = newLeft
-      // Atualizar a posição do calendário
-      calendarPosition.value = {
-        top: newTop,
-        left: newLeft
-      }
+
+    const pos = resolveCalendarPosition()
+    const posWidth = pos?.width ? parseFloat(pos.width) : 0
+    if (
+      pos
+      && (lastPosition.top !== pos.top || lastPosition.left !== pos.left || lastPosition.width !== posWidth)
+    ) {
+      lastPosition.top = pos.top
+      lastPosition.left = pos.left
+      lastPosition.width = posWidth
+      calendarPosition.value = pos
     }
-    
-    // Continuar o loop enquanto o calendário estiver aberto
+
     animationFrameId = requestAnimationFrame(updatePositionContinuously)
   }
   
@@ -3572,7 +3801,7 @@ const Calendar = defineAsyncComponent(() =>
     if (!inputRef.value || !shouldUseCustomCalendar.value) return
     
     // Iniciar loop de animação para acompanhar posição continuamente
-    lastPosition = { top: 0, left: 0 }
+    lastPosition = { top: 0, left: 0, width: 0 }
 
     // Atualizar a posição continuamente
     updatePositionContinuously()
@@ -3634,9 +3863,8 @@ const Calendar = defineAsyncComponent(() =>
   watch(showCustomCalendar, (isOpen) => {
     // Verificar se o calendário estiver aberto e se o calendário customizado estiver ativo
     if (isOpen && shouldUseCustomCalendar.value) {
-      // Atualizar o DOM
       nextTick(() => {
-        // Iniciar o tracking da posição
+        calculateCalendarPosition()
         startPositionTracking()
       })
     } else {
@@ -4348,6 +4576,10 @@ const Calendar = defineAsyncComponent(() =>
         z-index: 1;
         pointer-events: none;
 
+        &.component__label--disabled-empty {
+          opacity: 0.5;
+        }
+
         .component__label--required {
           color: red;
           display: contents;
@@ -4357,6 +4589,10 @@ const Calendar = defineAsyncComponent(() =>
   
       // inicio INPUT
       .component__input {
+        &.component__input--disabled-filled {
+          opacity: 0.5;
+        }
+
         width: 100%;
         height: 100%;
         font-family: inherit;
@@ -4503,10 +4739,6 @@ const Calendar = defineAsyncComponent(() =>
       opacity: 0.8;
   
       .component {
-          --disabled-button-color: v-bind('styleButtonColor');
-          --disabled-color: v-bind('styleThemeTextColor');
-          background-color: var(--disabled-button-color) !important;
-          border-radius: inherit;
   
       .component__input {
         &:focus,
@@ -4518,11 +4750,16 @@ const Calendar = defineAsyncComponent(() =>
   }
   
   .datepicker__custom-calendar-wrapper {
-    /* position e z-index são definidos dinamicamente via :style="calendarPositionStyle" */
+    /* position, width, min/max e z-index via :style="calendarPositionStyle"
     /* Como é renderizado via Teleport no body, sempre usa position: fixed */
+    box-sizing: border-box;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     margin-top: 4px;
+
+    :deep(.nb-wrapper) {
+      width: 100%;
+    }
   }
   </style>
   

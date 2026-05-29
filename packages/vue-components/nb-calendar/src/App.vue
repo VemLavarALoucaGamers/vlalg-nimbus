@@ -24,7 +24,7 @@
     <div v-if="calendarType === 'date'" class="row">
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px; overflow: hidden;">
-        <h4 class="test-page__content-tile">NbCalendar - Date (Width Fulle)</h4>
+        <h4 class="test-page__content-tile">NbCalendar - Date (Width Full)</h4>
         
         <NbCalendar
           nb-id="calendar-date-width-full-1"
@@ -139,15 +139,18 @@
           :value="new Date()"
           />
 
-        <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Largura Customizada)</h4>
-        <NbCalendar
-          nb-id="calendar-date-width-1"
-          input-type="date"
-          theme="light"
-          :width="450"
-          :value="selectedDate8"
-          @changed="($event) => { selectedDate8 = $event; console.log('changed:', $event) }"
+        <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Min/Max Width)</h4>
+        <div style="width: 320px;">
+          <NbCalendar
+            nb-id="calendar-date-width-1"
+            input-type="date"
+            theme="light"
+            :min-width="200"
+            :max-width="320"
+            :value="selectedDate8"
+            @changed="($event) => { selectedDate8 = $event; console.log('changed:', $event) }"
           />
+        </div>
 
         <h4 class="test-page__content-tile" style="margin-top: 40px;">NbCalendar - Date (Com Border Radius)</h4>
         <NbCalendar

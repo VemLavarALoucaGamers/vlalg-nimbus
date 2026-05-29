@@ -16,7 +16,10 @@
       <label
         v-if="showLabel"
         :for="computedInputName"
-        class="component__label"
+        :class="[
+          'component__label',
+          { 'component__label--disabled-empty': isDisabledEmptyLabel },
+        ]"
         :style="[styleLabel]"
       >{{ label }}<span v-if="required" class="component__label--required">*</span></label>
 
@@ -28,7 +31,8 @@
         class="component__input"
         :class="[
           uppercaseStyle,
-          activeStyle
+          activeStyle,
+          { 'component__input--disabled-filled': isDisabledFilledInput },
         ]"
         :placeholder="computedPlaceholder"
         :disabled="disabled || inputReadonly"
@@ -902,10 +906,16 @@ const computedPlaceholder = computed(() => {
   // Se houver label, só mostra o placeholder quando o input estiver ativo
   return isActive.value ? inputPlaceholder.value : ''
 })
+const hasInputContent = computed(() => {
+  const value = inputValue.value
+  return value != null && String(value).trim().length > 0
+})
 const isLabelActive = computed(() => {
   // Label está ativo se o input estiver focado OU se tiver conteúdo
-  return isActive.value || (inputValue.value && inputValue.value.trim().length > 0)
+  return isActive.value || hasInputContent.value
 })
+const isDisabledEmptyLabel = computed(() => disabled.value && !hasInputContent.value)
+const isDisabledFilledInput = computed(() => disabled.value && hasInputContent.value)
 const activeInput = computed(() => {
   return isActive.value ? 'component__input--active' : 'component__input--no-active'
 })
@@ -1433,6 +1443,10 @@ watch(inputValue, () => {
       pointer-events: none;
       line-height: 1.42857143;
 
+      &.component__label--disabled-empty {
+        opacity: 0.5;
+      }
+
       .component__label--required {
         color: red;
         display: contents;
@@ -1441,6 +1455,10 @@ watch(inputValue, () => {
 
     // inicio TEXTAREA
     .component__input {
+      &.component__input--disabled-filled {
+        opacity: 0.5;
+      }
+
       width: 100%;
       min-height: 100%;
       height: auto;
@@ -1532,7 +1550,6 @@ watch(inputValue, () => {
 	.component {
 		--disabled-button-color: v-bind('styleButtonColor');
 		--disabled-color: v-bind('styleTextColor');
-		// background-color: var(--disabled-button-color) !important;
 		color: var(--disabled-color) !important;
 		border-radius: inherit;
 
