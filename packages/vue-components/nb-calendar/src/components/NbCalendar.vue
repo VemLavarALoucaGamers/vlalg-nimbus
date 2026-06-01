@@ -1282,7 +1282,7 @@ const wrapperStyle = computed(() => {
 	}
 
 	return {
-		display: defaultValues.display,
+		display: 'block',
 		width: '100%',
 		minWidth: formatDimension(min),
 		maxWidth: formatDimension(max)
@@ -5172,9 +5172,15 @@ onUnmounted(() => {
    -webkit-box-sizing: border-box;
    -moz-box-sizing: border-box;
    box-sizing: border-box;
-   display: inline-block;
- 	vertical-align: bottom;
+   display: block;
+   max-width: 100%;
  }
+
+.nb-reset.component {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
 
 .nb-reset {
 	font-family: 'Lato', sans-serif;
@@ -5446,8 +5452,13 @@ onUnmounted(() => {
 .calendar-wrapper {
     font-family: v-bind('font') !important;
     box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
     
     .calendar {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         background: #fff;
         border-radius: v-bind('styleBorderRadius');
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

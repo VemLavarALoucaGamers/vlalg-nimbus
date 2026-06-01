@@ -2387,12 +2387,12 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
 
         <h5 class="test-page__content-tile" style="margin-top: 24px">Largura do popup (calendar min/max)</h5>
         <p style="margin: 0 0 16px; max-width: 52rem; font-size: 0.95em; opacity: 0.9">
-          Input estreito (~220px). O popup usa <code>calendarMaxWidth</code> (520px), não a largura do input.
-          Com <code>calendar-width-full</code>, o popup acompanha o input.
+          O popup usa <code>calendarMinWidth</code> e <code>calendarMaxWidth</code> (não a largura do input).
+          Em telas estreitas, encolhe até o mínimo e respeita a viewport.
         </p>
         <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; margin-bottom: 32px">
           <div style="width: 220px">
-            <p style="margin: 0 0 8px; font-size: 0.85em; font-weight: 600">Padrão — popup 520px</p>
+            <p style="margin: 0 0 8px; font-size: 0.85em; font-weight: 600">min 200 / max 420</p>
             <NbDatePicker
               nb-id="datepicker-width-config"
               display="b"
@@ -2407,19 +2407,18 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
               :disabled="disabled"
             />
           </div>
-          <div style="width: 320px">
-            <p style="margin: 0 0 8px; font-size: 0.85em; font-weight: 600">calendar-width-full — popup = input</p>
+          <div style="width: 220px">
+            <p style="margin: 0 0 8px; font-size: 0.85em; font-weight: 600">min 240 / max 320</p>
             <NbDatePicker
-              nb-id="datepicker-width-full"
+              nb-id="datepicker-width-narrow"
               display="b"
-              input-name="test-datepicker-width-full"
+              input-name="test-datepicker-width-narrow"
               input-type="date"
               show-label
               label="Data"
               input-style="border"
-              :calendar-min-width="200"
-              :calendar-max-width="520"
-              :calendar-width-full="true"
+              :calendar-min-width="240"
+              :calendar-max-width="320"
               :calendar-close-on-select="true"
               :disabled="disabled"
             />

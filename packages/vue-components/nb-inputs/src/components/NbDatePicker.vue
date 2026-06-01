@@ -141,7 +141,7 @@
             :max-year="calendarMaxYear"
             :go-to-date="calendarGoToDate"
             :is-required="calendarIsRequired"
-            :width-full="calendarWidthFull"
+            :width-full="true"
             :border-radius="calendarBorderRadius"
             :scroll-class="calendarScrollClass"
             :events="calendarEvents"
@@ -743,13 +743,6 @@ const Calendar = defineAsyncComponent(() =>
         return typeof value === 'boolean' && [true, false].includes(value)
       }
     },
-    calendarWidthFull: {
-      type: Boolean,
-      default: false,
-      validator: value => {
-        return typeof value === 'boolean' && [true, false].includes(value)
-      }
-    },
     calendarBorderRadius: {
       type: Number,
       default: 0
@@ -1080,7 +1073,6 @@ const Calendar = defineAsyncComponent(() =>
     calendarZIndex,
     calendarMinWidth,
     calendarMaxWidth,
-    calendarWidthFull,
     blockClicksWithoutEvents,
     tabindex,
     lightBgColor,
@@ -2435,18 +2427,35 @@ const Calendar = defineAsyncComponent(() =>
   })
 
   /*
-    Largura do popup: por padrão usa calendarMaxWidth (config do calendário).
-    Com calendarWidthFull, acompanha a largura do input (limitada por min/max).
+    Largura máxima que cabe na viewport a partir do left do popup (evita overflow horizontal).
   */
-  const resolveCalendarPopupWidthPx = (inputWidthPx) => {
+  const getCalendarPopupMaxAvailableWidth = (anchorLeftPx) => {
+    const edge = CALENDAR_GAP
+    const fromAnchor = window.innerWidth - anchorLeftPx - edge
+    const fromViewport = window.innerWidth - edge * 2
+    return Math.max(0, Math.min(fromAnchor, fromViewport))
+  }
+
+  /*
+    Largura do popup entre calendarMinWidth e calendarMaxWidth, limitada pela viewport.
+  */
+  const resolveCalendarPopupWidthPx = (anchorLeftPx = 0) => {
+    // Obter as larguras do calendário
     const { min, max } = calendarWidthBounds.value
 
-    if (calendarWidthFull.value) {
-      const reference = inputWidthPx > 0 ? inputWidthPx : max
-      return Math.min(max, Math.max(min, reference))
-    }
+    // Obter a largura máxima que cabe na viewport a partir do left do popup
+    const available = getCalendarPopupMaxAvailableWidth(anchorLeftPx)
 
-    return max
+    // Definir a largura do calendário como a largura máxima que cabe na viewport
+    let target = max
+
+    // Se a largura máxima que cabe na viewport for maior que 0, definir a largura do calendário como a largura máxima que cabe na viewport
+    if (available > 0) {
+      target = Math.min(target, available)
+    } 
+
+    // Retornar a largura do calendário
+    return Math.min(max, Math.max(min, target))
   }
 
   /*
@@ -2478,13 +2487,21 @@ const Calendar = defineAsyncComponent(() =>
       top = inputRect.top - CALENDAR_GAP - calendarH
     }
 
-    // Calcular a largura do calendário
-    const widthPx = resolveCalendarPopupWidthPx(inputRect.width)
+    // Calcular a largura do calendário (responsiva entre min/max e viewport)
+    const widthPx = resolveCalendarPopupWidthPx(inputRect.left)
+
+    // Calcular a posição esquerda do calendário (evita overflow horizontal)
+    let leftPx = inputRect.left
+
+    // Verificar se o calendário cabe na viewport a partir do left do popup
+    if (leftPx + widthPx > window.innerWidth - CALENDAR_GAP) {
+      leftPx = Math.max(CALENDAR_GAP, window.innerWidth - CALENDAR_GAP - widthPx)
+    }
 
     // Retornar a posição e largura do calendário
     return {
       top: `${top}px`,
-      left: `${inputRect.left}px`,
+      left: `${leftPx}px`,
       width: `${widthPx}px`
     }
   }
@@ -2543,6 +2560,8 @@ const Calendar = defineAsyncComponent(() =>
     // Verificar se a largura do calendário é válida
     if (calendarPosition.value.width) {
       style.width = calendarPosition.value.width
+    } else {
+      style.width = '100%'
     }
 
     // Retornar o estilo CSS do calendário
