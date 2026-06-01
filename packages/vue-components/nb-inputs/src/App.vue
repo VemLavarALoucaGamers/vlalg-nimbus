@@ -2384,8 +2384,48 @@ NbInput @changed: {{ demoExternalMaskNbChangedLast || '(vazio)' }}</pre>
       <div class="col-xs-12 col-md-10 col-md-offset-1 test-page__content"
         style="margin-top: 50px; margin-bottom: 50px;">
         <h4 class="test-page__content-tile">NbDatePicker</h4>
-        
-        
+
+        <h5 class="test-page__content-tile" style="margin-top: 24px">Largura do popup (calendar min/max)</h5>
+        <p style="margin: 0 0 16px; max-width: 52rem; font-size: 0.95em; opacity: 0.9">
+          Input estreito (~220px). O popup usa <code>calendarMaxWidth</code> (520px), não a largura do input.
+          Com <code>calendar-width-full</code>, o popup acompanha o input.
+        </p>
+        <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; margin-bottom: 32px">
+          <div style="width: 220px">
+            <p style="margin: 0 0 8px; font-size: 0.85em; font-weight: 600">Padrão — popup 520px</p>
+            <NbDatePicker
+              nb-id="datepicker-width-config"
+              display="b"
+              input-name="test-datepicker-width-config"
+              input-type="date"
+              show-label
+              label="Data"
+              input-style="border"
+              :calendar-min-width="200"
+              :calendar-max-width="420"
+              :calendar-close-on-select="true"
+              :disabled="disabled"
+            />
+          </div>
+          <div style="width: 320px">
+            <p style="margin: 0 0 8px; font-size: 0.85em; font-weight: 600">calendar-width-full — popup = input</p>
+            <NbDatePicker
+              nb-id="datepicker-width-full"
+              display="b"
+              input-name="test-datepicker-width-full"
+              input-type="date"
+              show-label
+              label="Data"
+              input-style="border"
+              :calendar-min-width="200"
+              :calendar-max-width="520"
+              :calendar-width-full="true"
+              :calendar-close-on-select="true"
+              :disabled="disabled"
+            />
+          </div>
+        </div>
+
         <div v-if="showModal" class="fakemodal">
           <p>Simulação de modal</p>
           <br />

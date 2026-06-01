@@ -214,19 +214,19 @@ const Calendar = defineAsyncComponent(() =>
   ])
   
   const props = defineProps({
-      nbId: {
-          type: String,
-          required: true
-      },
-      display: {
-          type: String,
-          default: 'b',
-          validator: (value = 'b') => {
-              const currentValue = value.toLowerCase()
-              return ['b', 'ib'].includes(currentValue)
-          }
-      },
-      tabIndex: {
+    nbId: {
+      type: String,
+      required: true
+    },
+    display: {
+      type: String,
+      default: 'b',
+      validator: (value = 'b') => {
+          const currentValue = value.toLowerCase()
+          return ['b', 'ib'].includes(currentValue)
+      }
+    },
+    tabIndex: {
       type: Number,
       default: 0
     },
@@ -246,89 +246,89 @@ const Calendar = defineAsyncComponent(() =>
       type: String,
       default: ''
     },
-      caretColor: {
-          type: String,
-          default: '',
-          validator: value => {
-              return !value || typeof value === 'string'
-          }
-      },
-      selectionBgColor: {
-          type: String,
-          default: '',
-          validator: value => {
-              return !value || typeof value === 'string'
-          }
-      },
-      selectionTextColor: {
-          type: String,
-          default: '',
-          validator: value => {
-              return !value || typeof value === 'string'
-          }
-      },
-      theme: {
-          type: String,
-          default: 'light',
-          validator: value => {
-              return ['dark', 'light'].indexOf(value) !== -1
-          }
-      },
+    caretColor: {
+      type: String,
+      default: '',
+      validator: value => {
+          return !value || typeof value === 'string'
+      }
+    },
+    selectionBgColor: {
+      type: String,
+      default: '',
+      validator: value => {
+          return !value || typeof value === 'string'
+      }
+    },
+    selectionTextColor: {
+      type: String,
+      default: '',
+      validator: value => {
+          return !value || typeof value === 'string'
+      }
+    },
+    theme: {
+      type: String,
+      default: 'light',
+      validator: value => {
+          return ['dark', 'light'].indexOf(value) !== -1
+      }
+    },
     hasBorderRadius: {
       type: Boolean,
       default: false,
           validator: value => {
         return typeof value === 'boolean' && [true, false].includes(value)
       },
-      },
-      borderRadius: {
-          type: Number,
-          default: .5 // 0.375
-      },
-      disabled: {
-          type: Boolean,
-          default: false,
-          validator: value => {
-              return typeof value === 'boolean' && [true, false].includes(value)
-          }
-      },
-      fontFamily: {
-          type: String,
-          default: `'Lato', sans-serif`
-      },
-      fontSize: {
-        type: String,
-        default: null
-      },
-      fontWeight: {
-          type: Number,
-          default: 400,
-          validator: value => {
-              return !value ? 700 : value
-          }
-      },
-      fontFamilyMsg: {
-          type: String,
-          default: `'Lato', sans-serif`
-      },
-      fontSizeMsg: {
-          type: String,
-          default: '1em',
-          validator: value => {
-              return !value ? '1em' : value
-          }
-      },
-      fontWeightMsg: {
-          type: Number,
-          default: 400,
-          validator: value => {
-              return !value ? 700 : value
-          }
-      },
-      textMessageColor: {
-          type: String,
-          default: '#f15574'
-      },
+    },
+    borderRadius: {
+      type: Number,
+      default: .5 // 0.375
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    fontFamily: {
+      type: String,
+      default: `'Lato', sans-serif`
+    },
+    fontSize: {
+      type: String,
+      default: null
+    },
+    fontWeight: {
+      type: Number,
+      default: 400,
+      validator: value => {
+        return !value ? 700 : value
+      }
+    },
+    fontFamilyMsg: {
+      type: String,
+      default: `'Lato', sans-serif`
+    },
+    fontSizeMsg: {
+      type: String,
+      default: '1em',
+      validator: value => {
+          return !value ? '1em' : value
+      }
+    },
+    fontWeightMsg: {
+      type: Number,
+      default: 400,
+      validator: value => {
+        return !value ? 700 : value
+      }
+    },
+    textMessageColor: {
+      type: String,
+      default: '#f15574'
+    },
     textAlign: {
       type: String,
       default: 'left',
@@ -384,6 +384,20 @@ const Calendar = defineAsyncComponent(() =>
     calendarCloseOnSelect: {
       type: Boolean,
       default: false,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarCloseOnScroll: {
+      type: Boolean,
+      default: true,
+      validator: value => {
+        return typeof value === 'boolean' && [true, false].includes(value)
+      }
+    },
+    calendarCloseOnResize: {
+      type: Boolean,
+      default: true,
       validator: value => {
         return typeof value === 'boolean' && [true, false].includes(value)
       }
@@ -846,54 +860,54 @@ const Calendar = defineAsyncComponent(() =>
       },
     },
     inputWidth: {
-          type: Number,
-          default: 200
-      },
-      inputStyle: {
-          type: String,
-          default: 'background',
-          validator: value => {
-              return ['background', 'line', 'border'].indexOf(value) !== -1
-          }
-      },
-      // Cores do tema light
-      lightBgColor: {
-          type: String,
-          default: '#f8f8f2'
-      },
-      lightBgColorFocus: {
-          type: String,
-          default: '#eaeaea'
-      },
-      lightDisabledBgColor: {
-          type: String,
-          default: '#dfdfd9'
-      },
-      lightTextColor: {
-          type: String,
-          default: '#000000'
-      },
-      // Cores do tema dark
-      darkBgColor: {
-          type: String,
-          default: '#353734'
-      },
-      darkBgColorFocus: {
-          type: String,
-          default: '#272936'
-      },
-      darkDisabledBgColor: {
-          type: String,
-          default: 'rgba(40, 42, 54, 1)'
-      },
-      darkTextColor: {
-          type: String,
-          default: '#ffffff'
-      },
-      tabindex: {
-          type: [String, Number],
-          default: 0
-      },
+      type: Number,
+      default: 200
+    },
+    inputStyle: {
+      type: String,
+      default: 'background',
+      validator: value => {
+        return ['background', 'line', 'border'].indexOf(value) !== -1
+      }
+    },
+    // Cores do tema light
+    lightBgColor: {
+      type: String,
+      default: '#f8f8f2'
+    },
+    lightBgColorFocus: {
+      type: String,
+      default: '#eaeaea'
+    },
+    lightDisabledBgColor: {
+      type: String,
+      default: '#dfdfd9'
+    },
+    lightTextColor: {
+      type: String,
+      default: '#000000'
+    },
+    // Cores do tema dark
+    darkBgColor: {
+      type: String,
+      default: '#353734'
+    },
+    darkBgColorFocus: {
+      type: String,
+      default: '#272936'
+    },
+    darkDisabledBgColor: {
+      type: String,
+      default: 'rgba(40, 42, 54, 1)'
+    },
+    darkTextColor: {
+      type: String,
+      default: '#ffffff'
+    },
+    tabindex: {
+      type: [String, Number],
+      default: 0
+    },
     showMsg: { // Se mostrado o erro
       type: Boolean,
       default: false,
@@ -981,76 +995,76 @@ const Calendar = defineAsyncComponent(() =>
       default: 0,
     },
     fontFamilyLabel: {
-          type: String,
-          default: `'Lato', sans-serif`
-      },
-      fontSizeLabel: {
-          type: String,
-          default: '1em',
-          validator: value => {
-              return !value ? '1em' : value
-          }
-      },
-      fontSizeLabelActive: {
-          type: String,
-          default: '0.8em',
-          validator: value => {
-              return !value ? '0.8em' : value
-          }
-      },
-      fontWeightLabel: {
-          type: Number,
-          default: 400,
-          validator: value => {
-              return !value ? 700 : value
-          }
-      },
-      lightTextColorLabel: {
-          type: String,
-          default: '#333333'
-      },
-      lightTextColorLabelActive: {
-          type: String,
-          default: '#333333'
-      },
-      darkTextColorLabel: {
-          type: String,
-          default: '#ffffff'
-      },
-      darkTextColorLabelActive: {
-          type: String,
-          default: '#ffffff'
+      type: String,
+      default: `'Lato', sans-serif`
+    },
+    fontSizeLabel: {
+      type: String,
+      default: '1em',
+      validator: value => {
+          return !value ? '1em' : value
       }
+    },
+    fontSizeLabelActive: {
+      type: String,
+      default: '0.8em',
+      validator: value => {
+          return !value ? '0.8em' : value
+      }
+    },
+    fontWeightLabel: {
+      type: Number,
+      default: 400,
+      validator: value => {
+          return !value ? 700 : value
+      }
+    },
+    lightTextColorLabel: {
+      type: String,
+      default: '#333333'
+    },
+    lightTextColorLabelActive: {
+      type: String,
+      default: '#333333'
+    },
+    darkTextColorLabel: {
+      type: String,
+      default: '#ffffff'
+    },
+    darkTextColorLabelActive: {
+      type: String,
+      default: '#ffffff'
+    }
   })
   
   const {
     nbId,
-      display,
+    display,
     hasTabIndexEnter,
     ariaLabel,
     ariaAttrs,
-      caretColor,
-      selectionBgColor,
-      selectionTextColor,
+    caretColor,
+    selectionBgColor,
+    selectionTextColor,
     hasBorderRadius,
-      borderRadius,
-      disabled,
-      fontFamily,
-      fontSize,
-      fontWeight,
-      fontFamilyMsg,
-      fontSizeMsg,
-      fontWeightMsg,
-      textMessageColor,
-      inputWidth,
-      inputStyle,
-      activeTextStyle,
-      sizeMediaQuery,
-      inputReadonly,
-      blockPaste,
-      inputType,
+    borderRadius,
+    disabled,
+    fontFamily,
+    fontSize,
+    fontWeight,
+    fontFamilyMsg,
+    fontSizeMsg,
+    fontWeightMsg,
+    textMessageColor,
+    inputWidth,
+    inputStyle,
+    activeTextStyle,
+    sizeMediaQuery,
+    inputReadonly,
+    blockPaste,
+    inputType,
     hasTrim,
-      inputUppercase,
+    inputUppercase,
     inputName,
     inputText,
     min,
@@ -1061,19 +1075,22 @@ const Calendar = defineAsyncComponent(() =>
     theme,
     allowRange,
     calendarCloseOnSelect,
+    calendarCloseOnScroll,
+    calendarCloseOnResize,
     calendarZIndex,
     calendarMinWidth,
     calendarMaxWidth,
+    calendarWidthFull,
     blockClicksWithoutEvents,
     tabindex,
-      lightBgColor,
-      lightBgColorFocus,
-      lightDisabledBgColor,
-      lightTextColor,
-      darkBgColor,
-      darkBgColorFocus,
-      darkDisabledBgColor,
-      darkTextColor,
+    lightBgColor,
+    lightBgColorFocus,
+    lightDisabledBgColor,
+    lightTextColor,
+    darkBgColor,
+    darkBgColorFocus,
+    darkDisabledBgColor,
+    darkTextColor,
     textAlign,
     showMsg,
     hasMsg,
@@ -1741,7 +1758,7 @@ const Calendar = defineAsyncComponent(() =>
   }
   // Refs para controle do calendário customizado
   const showCustomCalendar = ref(false) // Flag para mostrar/ocultar calendário
-  const calendarPosition = ref({ top: 0, left: 0, width: null }) // Posição e largura do popup na tela
+  const calendarPosition = ref({ top: null, left: null, width: null }) // Posição e largura do popup na tela
   const inputRef = ref(null) // Referência ao elemento input
   const calendarRef = ref(null) // Referência ao elemento do calendário
   const useCustomCalendar = ref(true) // Flag para usar calendário customizado
@@ -2171,12 +2188,19 @@ const Calendar = defineAsyncComponent(() =>
     return !displayValue.value || displayValue.value.trim().length === 0 ? 'component__input--empty' : ''
   })
 
+  /*
+    Computed para verificar se o input tem conteúdo
+    Este computed é usado para verificar se o input tem conteúdo baseado nas props.
+  */
   const hasInputContent = computed(() => {
     const value = inputValue.value
     return value != null && String(value).trim().length > 0
   })
 
+  // Computed para classe de input desabilitado vazio
   const isDisabledEmptyLabel = computed(() => disabled.value && !hasInputContent.value)
+
+  // Computed para classe de input desabilitado preenchido
   const isDisabledFilledInput = computed(() => disabled.value && hasInputContent.value)
 
   /*
@@ -2411,19 +2435,23 @@ const Calendar = defineAsyncComponent(() =>
   })
 
   /*
-    Função para resolver a largura do calendário
-    Este função é usado para resolver a largura do calendário.
-    Ele é usado para resolver a largura do calendário.
+    Largura do popup: por padrão usa calendarMaxWidth (config do calendário).
+    Com calendarWidthFull, acompanha a largura do input (limitada por min/max).
   */
   const resolveCalendarPopupWidthPx = (inputWidthPx) => {
     const { min, max } = calendarWidthBounds.value
-    const reference = inputWidthPx > 0 ? inputWidthPx : max
-    return Math.min(max, Math.max(min, reference))
+
+    if (calendarWidthFull.value) {
+      const reference = inputWidthPx > 0 ? inputWidthPx : max
+      return Math.min(max, Math.max(min, reference))
+    }
+
+    return max
   }
 
   /*
     Posição do calendário (Teleport + fixed): abaixo por padrão; abre acima só se
-    não couber embaixo e houver mais espaço acima. Largura acompanha o input (min/max).
+    não couber embaixo e houver mais espaço acima.
   */
   const resolveCalendarPosition = () => {
     // Verificar se o inputRef existe
@@ -2461,22 +2489,25 @@ const Calendar = defineAsyncComponent(() =>
     }
   }
 
+  const applyCalendarPosition = () => {
+    if (!inputRef.value) return
+
+    const pos = resolveCalendarPosition()
+    if (pos) calendarPosition.value = pos
+  }
+
   /*
     Função para calcular a posição do calendário
     Esta função é usada para calcular a posição do calendário.
     Ela calcula a posição do calendário usando a função resolveCalendarPosition.
   */
   const calculateCalendarPosition = () => {
-    // Verificar se o inputRef existe
     if (!inputRef.value) return
 
-    // Usar nextTick para garantir que o DOM foi atualizado
+    applyCalendarPosition()
     nextTick(() => {
-      // Calcular a posição do calendário
-      const pos = resolveCalendarPosition()
-
-      // Verificar se a posição existe
-      if (pos) calendarPosition.value = pos
+      applyCalendarPosition()
+      requestAnimationFrame(applyCalendarPosition)
     })
   }
   
@@ -2493,19 +2524,28 @@ const Calendar = defineAsyncComponent(() =>
     // Gerar o estilo CSS do calendário
     const style = {
       position: 'fixed',
-      top: calendarPosition.value.top,
-      left: calendarPosition.value.left,
       zIndex: calendarZIndex.value,
       boxSizing: 'border-box',
       minWidth: `${min}px`,
       maxWidth: `${max}px`
     }
 
-    // Verificar se a largura do calendário existe
+    // Verificar se a posição do calendário é válida
+    if (calendarPosition.value.top != null && calendarPosition.value.left != null) {
+      style.top = calendarPosition.value.top
+      style.left = calendarPosition.value.left
+    } else {
+      style.visibility = 'hidden'
+      style.top = '0'
+      style.left = '0'
+    }
+
+    // Verificar se a largura do calendário é válida
     if (calendarPosition.value.width) {
       style.width = calendarPosition.value.width
     }
 
+    // Retornar o estilo CSS do calendário
     return style
   })
   
@@ -3165,86 +3205,132 @@ const Calendar = defineAsyncComponent(() =>
     if (!date || !(date instanceof Date)) return date || ''
     
     if (type === 'date') {
+      // Converter a data para string no formato YYYY-MM-DD
       return dateToISOString(date)
     } else if (type === 'time') {
+      // Converter a data para string no formato HH:mm:ss
       const hours = String(date.getHours()).padStart(2, '0')
       const minutes = String(date.getMinutes()).padStart(2, '0')
       const seconds = String(date.getSeconds()).padStart(2, '0')
       return `${hours}:${minutes}:${seconds}`
     } else if (type === 'datetime-local') {
+      // Converter a data para string no formato YYYY-MM-DDTHH:mm:ss
       const datePart = dateToISOString(date)
       const hours = String(date.getHours()).padStart(2, '0')
       const minutes = String(date.getMinutes()).padStart(2, '0')
       const seconds = String(date.getSeconds()).padStart(2, '0')
       return `${datePart}T${hours}:${minutes}:${seconds}`
     } else if (type === 'month') {
+      // Converter a data para string no formato YYYY-MM
       const year = date.getFullYear()
       const month = String(date.getMonth() + 1).padStart(2, '0')
       return `${year}-${month}`
     } else if (type === 'week') {
-      // Para week, precisamos calcular a semana ISO
+      // Converter a data para string no formato YYYY-Www
       // Por enquanto, retornar apenas a data
       return dateToISOString(date)
     }
     
-    // Se não for nenhum tipo conhecido, retornar string vazia
+    // Se não for nenhum tipo conhecido, retornar string vazia como padrão
     return ''
   }
   
   // Computed properties para converter min/max para string quando necessário (input nativo)
   const nativeMin = computed(() => {
+    // Se está usando calendário customizado, retornar undefined
     if (shouldUseCustomCalendar.value) return undefined
+
+    // Converter o valor min para string no formato esperado pelo input
     return dateToInputString(min.value, inputType.value)
   })
   
   const nativeMax = computed(() => {
+    // Se está usando calendário customizado, retornar undefined
     if (shouldUseCustomCalendar.value) return undefined
+
+    // Converter o valor max para string no formato esperado pelo input
     return dateToInputString(max.value, inputType.value)
   })
   
   // Computed para tornar o input readonly quando está usando calendário customizado
   // Isso força o usuário a usar o calendário para selecionar valores, garantindo validação correta
   const shouldBlockInputEdit = computed(() => {
+    // Forçar o input a ser readonly quando está usando calendário customizado
     return true
   })
   
   const shouldCloseCalendarAfterSelection = (value) => {
+    // Se não está configurado para fechar o calendário após seleção ou está usando range, não fechar
     if (!calendarCloseOnSelect.value || allowRange.value) {
       return false
     }
 
+    // Se o valor é null ou undefined ou string vazia, não fechar
     if (value == null || value === '') {
       return false
     }
 
+    // Se o valor é um objeto e não é uma instância de Date, não fechar
     if (typeof value === 'object' && !(value instanceof Date)) {
       return false
     }
 
+    // Verificar o tipo de input (date, month, time, datetime-local, week)
     switch (inputType.value) {
+      // Se o tipo é date, retornar true se o valor é uma instância de Date ou uma string com mais de 0 caracteres
       case 'date':
         return value instanceof Date || (typeof value === 'string' && value.length > 0)
+      // Se o tipo é month, retornar true se o valor é uma string e corresponde ao formato YYYY-MM
       case 'month':
         return typeof value === 'string' && /^\d{4}-\d{2}$/.test(value)
+      // Se o tipo é time, retornar true se o valor é uma string com mais de 0 caracteres
       case 'time':
         return typeof value === 'string' && value.length > 0
+      // Se o tipo é datetime-local, retornar true se o valor é uma string e contém 'T'
       case 'datetime-local':
         return typeof value === 'string' && value.includes('T')
+      // Se o tipo é week, retornar true se o valor é uma string e corresponde ao formato YYYY-Www
       case 'week':
         return typeof value === 'string' && /^\d{4}-W\d{2}$/i.test(value)
+      // Se o tipo é desconhecido, retornar true
       default:
+        // Se o tipo é desconhecido, retornar true
         return true
     }
   }
 
+  /*
+    Função para fechar o calendário customizado após seleção
+    Esta função é usada para fechar o calendário customizado após seleção de um valor.
+    Ela verifica se deve usar calendário customizado e fecha o calendário se necessário.
+  */
   const closeCustomCalendarAfterSelection = () => {
+    // Se não está usando calendário customizado, não fechar
     if (!shouldUseCustomCalendar.value) {
+      return
+    }
+
+    // Fechar o calendário customizado
+    showCustomCalendar.value = false
+
+    // Desativar interação com o calendário
+    isCalendarInteraction.value = false
+    
+    // Desativar o calendário
+    isActive.value = false
+  }
+
+  const closeCustomCalendarPopup = () => {
+    if (!showCustomCalendar.value || !shouldUseCustomCalendar.value) {
       return
     }
 
     showCustomCalendar.value = false
     isCalendarInteraction.value = false
-    isActive.value = false
+
+    if (!displayValue.value || !String(displayValue.value).trim()) {
+      isActive.value = false
+    }
   }
 
   /*
@@ -3735,36 +3821,48 @@ const Calendar = defineAsyncComponent(() =>
   }
   
   /*
-    Handler para recalcular posição do calendário ao fazer scroll
-    Esta função é usada para recalcular a posição do calendário quando a página é rolada.
-    Ela só recalcula se o calendário estiver aberto e se o calendário customizado estiver ativo.
+    Handler de scroll: fecha o popup (padrão) ou só recalcula a posição (calendarCloseOnScroll false).
   */
   const handleScroll = () => {
-    // Verificar se o calendário estiver aberto e se o calendário customizado estiver ativo
-    if (showCustomCalendar.value && shouldUseCustomCalendar.value) {
-      // Recalcular posição do calendário
-      calculateCalendarPosition()
+    // Verificar se o calendário estiver aberto e se está usando calendário customizado
+    if (!showCustomCalendar.value || !shouldUseCustomCalendar.value) {
+      return
     }
+
+    // Verificar se deve fechar o calendário customizado
+    if (calendarCloseOnScroll.value) {
+      closeCustomCalendarPopup()
+      return
+    }
+
+    // Recalcular a posição do calendário
+    calculateCalendarPosition()
   }
   
   /*
-    Handler para recalcular posição ao redimensionar a janela
-    Esta função é usada para fechar o calendário quando a janela é redimensionada.
-    Isso evita problemas de posicionamento e melhora a experiência do usuário.
+    Handler de resize da janela: fecha o popup (padrão) ou só recalcula a posição (calendarCloseOnResize false).
   */
   const handleResize = () => {
-    // Verificar se o calendário estiver aberto e se o calendário customizado estiver ativo
-    if (showCustomCalendar.value && shouldUseCustomCalendar.value) {
-      // Fechar calendário ao redimensionar para evitar problemas de posicionamento
-      showCustomCalendar.value = false
+    // Verificar se o calendário estiver aberto e se está usando calendário customizado
+    if (!showCustomCalendar.value || !shouldUseCustomCalendar.value) {
+      return
     }
+
+    // Verificar se deve fechar o calendário customizado
+    if (calendarCloseOnResize.value) {
+      closeCustomCalendarPopup()
+      return
+    }
+
+    // Recalcular a posição do calendário
+    calculateCalendarPosition()
   }
   
   // Variáveis para controle de observadores e animação
   let resizeObserver = null // Observer para mudanças de tamanho do input
   let positionObserver = null // Observer para mudanças de posição do input
   let animationFrameId = null // ID do frame de animação para tracking contínuo
-  let lastPosition = { top: 0, left: 0, width: 0 } // Última posição/largura conhecidas do calendário
+  let lastPosition = { top: '', left: '', width: 0 } // Última posição/largura conhecidas do calendário
   
   /*
     Função para atualizar posição do calendário continuamente
@@ -3772,22 +3870,37 @@ const Calendar = defineAsyncComponent(() =>
     Ela só atualiza se a posição mudou, evitando re-renderizações desnecessárias.
   */
   const updatePositionContinuously = () => {
+    // Verificar se o calendário estiver aberto, se está usando calendário customizado e se o inputRef existe
     if (!showCustomCalendar.value || !shouldUseCustomCalendar.value || !inputRef.value) {
       return
     }
 
-    const pos = resolveCalendarPosition()
+    // Aplicar a posição do calendário
+    applyCalendarPosition()
+
+    // Obter a posição do calendário
+    const pos = calendarPosition.value
+
+    // Obter a largura da posição do calendário
     const posWidth = pos?.width ? parseFloat(pos.width) : 0
+
+    // Obter a posição superior da posição do calendário
+    const posTop = pos?.top ?? ''
+
+    // Obter a posição esquerda da posição do calendário
+    const posLeft = pos?.left ?? ''
+
+    // Verificar se a posição superior, esquerda e largura mudaram
     if (
-      pos
-      && (lastPosition.top !== pos.top || lastPosition.left !== pos.left || lastPosition.width !== posWidth)
+      posTop
+      && (lastPosition.top !== posTop || lastPosition.left !== posLeft || lastPosition.width !== posWidth)
     ) {
-      lastPosition.top = pos.top
-      lastPosition.left = pos.left
+      lastPosition.top = posTop
+      lastPosition.left = posLeft
       lastPosition.width = posWidth
-      calendarPosition.value = pos
     }
 
+    // Atualizar a posição do calendário continuamente usando requestAnimationFrame
     animationFrameId = requestAnimationFrame(updatePositionContinuously)
   }
   
@@ -3797,11 +3910,11 @@ const Calendar = defineAsyncComponent(() =>
     Ela inicializa o loop de animação usando requestAnimationFrame.
   */
   const startPositionTracking = () => {
-    // Verificar se o inputRef existe e se o calendário customizado estiver ativo
+    // Verificar se o inputRef existe e se está usando calendário customizado
     if (!inputRef.value || !shouldUseCustomCalendar.value) return
     
     // Iniciar loop de animação para acompanhar posição continuamente
-    lastPosition = { top: 0, left: 0, width: 0 }
+    lastPosition = { top: '', left: '', width: 0 }
 
     // Atualizar a posição continuamente
     updatePositionContinuously()
@@ -3886,14 +3999,21 @@ const Calendar = defineAsyncComponent(() =>
       if (inputText.value === null || inputText.value === undefined || inputText.value === '') {
         initialValue = ''
       } else if (typeof inputText.value === 'string') {
+        // Verificar se o valor é uma string e corresponde ao formato YYYY-MM-DDTHH:mm ou YYYY-MM-DDTHH:mm:ss
         const plainRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/
+
+        // Verificar se o valor é uma string e corresponde ao formato YYYY-MM-DDTHH:mm:ss.SSSZ ou YYYY-MM-DDTHH:mm:ssZ ou YYYY-MM-DDTHH:mmZ
         const isoRegex = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?)(?:Z|[+-]\d{2}:\d{2})?$/
 
+        // Verificar se o valor é uma string e corresponde ao formato YYYY-MM-DDTHH:mm ou YYYY-MM-DDTHH:mm:ss
         if (plainRegex.test(inputText.value)) {
           // Já está no formato esperado pelo input
           initialValue = inputText.value
         } else if (isoRegex.test(inputText.value)) {
+          // Converter o valor para Date
           const date = new Date(inputText.value)
+
+          // Verificar se a data é válida
           if (!isNaN(date.getTime())) {
             const year = date.getFullYear()
             const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -3902,8 +4022,13 @@ const Calendar = defineAsyncComponent(() =>
             const minutes = String(date.getMinutes()).padStart(2, '0')
             const seconds = String(date.getSeconds()).padStart(2, '0')
 
+            // Obter a parte do tempo
             const timePart = inputText.value.split('T')[1]?.split(/[Z+-]/)[0] || ''
+
+            // Verificar se o tempo tem segundos
             const hasSeconds = timePart.includes(':') && timePart.split(':').length >= 3
+
+            // Atualizar o valor inicial
             initialValue = hasSeconds
               ? `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
               : `${year}-${month}-${day}T${hours}:${minutes}`
