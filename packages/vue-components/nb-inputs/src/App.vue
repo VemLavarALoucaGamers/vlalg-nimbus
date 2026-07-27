@@ -222,6 +222,9 @@
           display="b"
           input-name="test-input1"
           input-type="number"
+          min="0"
+          max="10"
+          step="1"
           :input-text="inputNumberValue"
           :show-msg="true"
           :has-msg="true"
@@ -253,6 +256,23 @@
         </NbInput>
 
         <h4 class="test-page__content-tile">NbInput</h4>
+
+        <h5 class="test-page__content-tile">Limite de caracteres (text / email / password)</h5>
+        <NbInput
+          nb-id="test-maxlength"
+          display="b"
+          input-name="test-input-maxlength"
+          input-type="text"
+          :maxlength="10"
+          :minlength="3"
+          input-placeholder="3 a 10 caracteres"
+          show-label
+          label="maxlength / minlength"
+          input-style="border"
+          :disabled="disabled"
+        />
+
+        <br /><br />
         
         <NbInput
           nb-id="test1"

@@ -62,9 +62,11 @@
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
-        :min="supportsMinMaxStep ? min : undefined"
-        :max="supportsMinMaxStep ? max : undefined"
-        :step="supportsMinMaxStep ? step : undefined"
+        :min="nativeMin"
+        :max="nativeMax"
+        :step="nativeStep"
+        :maxlength="nativeMaxlength"
+        :minlength="nativeMinlength"
         role="input"
         :style="[borderRadiusStyle, inputIconStyle]"
         @focus="isActive = true"
@@ -91,6 +93,8 @@
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
+        :maxlength="nativeMaxlength"
+        :minlength="nativeMinlength"
         role="input"
         inputmode="decimal"
         :style="[borderRadiusStyle, inputIconStyle]"
@@ -119,9 +123,11 @@
         :readonly="inputReadonly"
         :autocomplete="inputAutocomplete"
         :tabindex="disabled || inputReadonly ? -1 : tabindex"
-        :min="supportsMinMaxStep ? min : undefined"
-        :max="supportsMinMaxStep ? max : undefined"
-        :step="supportsMinMaxStep ? step : undefined"
+        :min="nativeMin"
+        :max="nativeMax"
+        :step="nativeStep"
+        :maxlength="nativeMaxlength"
+        :minlength="nativeMinlength"
         role="input"
         :style="[borderRadiusStyle, inputIconStyle]"
         @focus="isActive = true"
@@ -334,17 +340,54 @@ const props = defineProps({
       return ['text', 'number', 'email', 'password'].indexOf(value) !== -1
     },
   },
+  /**
+   * Valor numérico mínimo (atributo HTML `min`).
+   * Só aplica com **`input-type="number"`**. String vazia = não aplica o atributo.
+   */
   min: {
     type: String,
     default: '',
   },
+  /**
+   * Valor numérico máximo (atributo HTML `max`).
+   * Só aplica com **`input-type="number"`**. String vazia = não aplica o atributo.
+   */
   max: {
     type: String,
     default: '',
   },
+  /**
+   * Incremento entre valores válidos (atributo HTML `step`).
+   * Só aplica com **`input-type="number"`**. Aceita número ou `"any"`.
+   * String/valor vazio = não aplica o atributo (browser usa o padrão, geralmente `1`).
+   */
   step: {
     type: [String, Number],
     default: '',
+  },
+  /**
+   * Máximo de caracteres (atributo HTML `maxlength`).
+   * Só aplica com **`input-type`** `text`, `email` ou `password`. `null` = sem limite.
+   * Não aplica em `number` (o browser ignora `maxlength` nesse tipo).
+   */
+  maxlength: {
+    type: Number,
+    default: null,
+    validator: value => {
+      return value === null || (typeof value === 'number' && value >= 0)
+    },
+  },
+  /**
+   * Mínimo de caracteres (atributo HTML `minlength`).
+   * Só aplica com **`input-type`** `text`, `email` ou `password`. `null` = sem mínimo.
+   * Não aplica em `number`.
+   */
+  minlength: {
+    type: Number,
+    default: null,
+    validator: value => {
+      return value === null || (typeof value === 'number' && value >= 0)
+    },
   },
   /**
    * Máscara [`vue-the-mask`](https://www.npmjs.com/package/vue-the-mask) (mesma lib que `NbCreditCard` em `@vlalg-nimbus/nb-payments`).
@@ -1433,10 +1476,48 @@ const changeShowValue = () => {
   showValue.value = newShow
 }
 
-const supportsMinMaxStep = computed(() => {
-  // Apenas 'number' suporta min, max e step no validator atual
-  // Se no futuro adicionar date, datetime-local, etc., adicionar aqui
-  return currentType.value === 'number'
+/*
+  min / max / step: atributos HTML de valor numérico.
+  Nos inputTypes atuais do NbInput, só `number` os utiliza.
+*/
+const supportsMinMaxStep = computed(() => inputType.value === 'number')
+
+/*
+  maxlength / minlength: atributos HTML de quantidade de caracteres.
+  Funcionam em text, email e password (não em number).
+*/
+const supportsMinMaxLength = computed(() =>
+  ['text', 'email', 'password'].includes(inputType.value)
+)
+
+const nativeMin = computed(() => {
+  if (!supportsMinMaxStep.value) return undefined
+  const value = props.min
+  return value !== '' && value != null ? value : undefined
+})
+
+const nativeMax = computed(() => {
+  if (!supportsMinMaxStep.value) return undefined
+  const value = props.max
+  return value !== '' && value != null ? value : undefined
+})
+
+const nativeStep = computed(() => {
+  if (!supportsMinMaxStep.value) return undefined
+  const value = props.step
+  return value !== '' && value != null ? value : undefined
+})
+
+const nativeMaxlength = computed(() => {
+  if (!supportsMinMaxLength.value) return undefined
+  const value = props.maxlength
+  return value !== null && value >= 0 ? value : undefined
+})
+
+const nativeMinlength = computed(() => {
+  if (!supportsMinMaxLength.value) return undefined
+  const value = props.minlength
+  return value !== null && value >= 0 ? value : undefined
 })
 
 const formatValueForEmit = (value) => {
