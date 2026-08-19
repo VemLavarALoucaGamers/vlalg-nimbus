@@ -57,4 +57,15 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-11-19',
+
+  // StackBlitz WebContainers no iframe exigem isolamento no documento pai.
+  // https://github.com/stackblitz/webcontainer-core/issues/2100
+  routeRules: {
+    '/**': {
+      headers: {
+        'Cross-Origin-Embedder-Policy': 'credentialless',
+        'Cross-Origin-Opener-Policy': 'same-origin'
+      }
+    }
+  }
 })

@@ -15,7 +15,7 @@
       :id="nbId"
       :ref="nbId"
       :class="['nb-reset', 'component', themeStyle, inputStyleClass]"
-      :style="[selectWidthStyle, borderRadiusStyle]"
+      :style="[rootComponentStyle, selectWidthStyle, borderRadiusStyle]"
       v-bind="computedAriaAttrs"
     >
       <label
@@ -32,7 +32,7 @@
         v-if="!multiple"
         class="component__dropdown"
         :class="{ 'open': isDropdownOpenSingle, 'disabled': disabled }"
-        :style="[componentStyle]"
+        :style="[dropdownStyle]"
       >
         <!-- Campo que simula um select -->
         <div
@@ -45,7 +45,7 @@
           @keydown="handleKeyDownSingle"
         >
           <span v-if="isEmptySingleSelection(currentOptionOnly)" class="component__dropdown-placeholder">
-            {{ emptyOptionText }}
+            {{ computedFieldPlaceholderText }}
           </span>
           <span v-else class="component__dropdown-selected">
             {{ getSelectedTextSingle() }}
@@ -183,7 +183,7 @@
         v-else
         class="component__dropdown"
         :class="{ 'open': isDropdownOpen, 'disabled': disabled }"
-        :style="[componentStyle]"
+        :style="[dropdownStyle]"
       >
         <!-- Campo que simula um select -->
         <div
@@ -196,7 +196,7 @@
           @keydown="handleKeyDownMultiple"
         >
           <span v-if="safeCurrentOptionMultiple.length === 0" class="component__dropdown-placeholder">
-            {{ emptyOptionText }}
+            {{ computedFieldPlaceholderText }}
           </span>
           <span v-else class="component__dropdown-selected">
             {{ getSelectedText() }}
@@ -1116,28 +1116,33 @@ const componentDisabled = computed(() => {
 
 const wrapperStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
-	const isActive = isLabelActive.value
 
 	return {
 		display: defaultValues.display,
-		// Adiciona padding-top quando o label está ativo para evitar que seja cortado
-    // paddingTop: isActive && showLabel.value ? `${Math.abs(defaultValues.labelActiveTop)}px` : '0',
-    paddingTop: '0px',
-		// Esconde o label quando não está ativo usando overflow hidden
-		// Se não tem label ou está ativo, permite overflow visible para não cortar conteúdo
-		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden'
+		paddingTop: '0px',
+		// overflow do label fica no .component (rootComponentStyle): se hidden for aqui, corta
+		// mensagens externas (NSelect fake-msg) ficam fora deste wrapper
+		overflow: 'visible',
 	}
 })
 
-const componentStyle = computed(() => {
+const rootComponentStyle = computed(() => {
 	const defaultValues = formatDefaultValues.value
 	const isActive = isLabelActive.value
+
+	return {
+		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
+		overflow: (!showLabel.value || isActive) ? 'visible' : 'hidden',
+	}
+})
+
+const dropdownStyle = computed(() => {
+	const defaultValues = formatDefaultValues.value
 
 	return {
 		fontSize: defaultValues.fontSize,
 		fontWeight: defaultValues.fontWeight,
 		textAlign: defaultValues.textAlign,
-		marginTop: isActive && showLabel.value ? `${defaultValues.inputLabelMarginActive}px` : '0',
 	}
 })
 
@@ -1220,18 +1225,26 @@ const styleGroupPadding = computed(() => {
 	return defaultValues.groupPadding
 })
 
-// Computed para verificar se o label está ativo (select aberto ou tem valor selecionado)
-const isLabelActive = computed(() => {
-	// Se showLabel é true, o label está sempre ativo
-	if (showLabel.value) {
-		return true
-	}
-	
+const hasSelectionContent = computed(() => {
 	if (!multiple.value) {
-		return isActive.value || isDropdownOpenSingle.value || !isEmptySingleSelection(currentOptionOnly.value)
-	} else {
-		return isActive.value || isDropdownOpen.value || safeCurrentOptionMultiple.value.length > 0
+		return !isEmptySingleSelection(currentOptionOnly.value)
 	}
+
+	return safeCurrentOptionMultiple.value.length > 0
+})
+
+/** Igual ao NbInput: com label visível, só mostra placeholder no campo quando focado/aberto. */
+const computedFieldPlaceholderText = computed(() => {
+	if (!showLabel.value) {
+		return emptyOptionText.value
+	}
+
+	return isActive.value ? emptyOptionText.value : ''
+})
+
+// Label ativo quando focado/aberto OU quando já tem valor selecionado (mesma regra do NbInput)
+const isLabelActive = computed(() => {
+	return isActive.value || hasSelectionContent.value
 })
 
 // Computed para estilo do label (similar ao NbInput)
@@ -2075,6 +2088,11 @@ watch(isActive, (value, oldValue) => {
 	line-height: 1.42857143;
 	font-family: v-bind('font');
 	position: relative;
+	height: 32.39px;
+	max-height: 32.39px;
+	display: inline-block;
+	width: 100%;
+	text-align: left;
 
 	user-select: none;
 	touch-action: manipulation;
@@ -2809,6 +2827,7 @@ watch(isActive, (value, oldValue) => {
 	.component__dropdown {
 		position: relative;
 		width: 100%;
+		height: 100%;
 		box-sizing: border-box;
 		
 		&.disabled {
